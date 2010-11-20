@@ -1,0 +1,14 @@
+Setups a shell environment depending on your path
+
+
+Inspirations
+------------
+
+Homebrew, RVM
+
+
+FAQ
+---
+
+Q: Why lua ?
+A: Easily embeddable, no dependencies, more manageable than Ruby or Bash
