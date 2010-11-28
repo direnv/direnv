@@ -1,0 +1,50 @@
+#!/bin/bash
+
+rc_path=`pwd`
+# FIXME: $SHELL_ENV is empty. WTF?
+SHELL_ENV=$SHELL_ENV
+
+set -e
+set -u
+
+# TODO: avoid all the spawn/exec
+find_rc() {
+  if [ -f "$rc_path/.envrc" ]; then
+    return 0
+  elif [ "$rc_path" = "/" ]; then
+    return 1
+  else
+    rc_path=`dirname $rc_path`
+    find_rc
+    return $?
+  fi
+}
+
+# NOTE: $PPID is bash-only
+# FIXME: $SHELL_ENV is empty
+load_rc() {
+  if [ "$SHELL_ENV" = "$rc_path" ]; then
+    exit
+  fi
+  if [ -z "$SHELL_ENV" ]; then
+    # backup current ENV
+    # FIXME: collect old envs in some way
+    env | sort > $HOME/.shell_env.$PPID
+  else
+    # restore old ENV
+    # TODO: unset unused variables
+    . $HOME/.shell_env.$PPID
+  fi
+  export SHELL_ENV=$rc_path
+  unset rc_path
+  echo "* Loading rc at $SHELL_ENV"
+  . $SHELL_ENV/.envrc
+}
+
+if find_rc; then
+  # NOTE: echo in load_rc will go to stderr, because not evaled
+  load_rc >&2
+  # NOTE: eval doesn't like X=Y space Z, so we quote it
+  # FIXME: quoting quoted stings will break
+  env | sort | sed -e "s/\([^=]\)=\(.*\)/\1=\"\2\"/g"
+fi
