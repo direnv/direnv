@@ -3,114 +3,204 @@ require 'shellwords'
 require 'base64'
 require 'zlib'
 
-def debug(msg)
-  $stderr.puts "DBG: #{msg}"
-end
-
-def fail(reason)
-  $stderr.puts "FAIL: #{reason}"
-  exit 1
-end
-
-def find_rc(path)
-  rc_path = path
-  loop do
-    if File.exists? File.join(path, '.envrc')
-      return path
-    elsif path == '/'
-      return nil
+module ShellEnv
+  IGNORE_KEYS = %w{_ OLDPWD SHLVL}
+  
+  # Returns the difference of two env hashes. Suppressions are represented as
+  # nil values.
+  def diff_env(env1, env2, &each_pair)
+    new_env = (env1.keys | env2.keys).inject({}) do |diff, k|
+      if env2[k] != env1[k] && !IGNORE_KEYS.include?(k)
+        diff[k] = env2[k] 
+      end
+      diff
     end
-    old_path = path
-    path = File.dirname(path)
-    if path == old_path
-      fail "BUG in find_rc. #{path} == #{old_path}"
-      exit 1
+    if block_given?
+      new_env.each_pair(&each_pair)
     end
-  end
-end
-
-def env_diff(env1, env2)
-  (env1.keys | env2.keys).inject({}) do |diff, k|
-    if env2[k] != env1[k]
-      diff[k] = env2[k] 
-    end
-    diff
-  end
-end
-
-def dump_env(env)
-  str = Base64.encode64(Zlib::Deflate.deflate(Marshal.dump(env), Zlib::BEST_COMPRESSION)).gsub("\n",'')
-  debug "dump size: #{str.size}"
-  str
-end
-
-def load_env(str)
-  Marshal.load(Zlib::Inflate.inflate(Base64.decode64(str)))
-end
-
-def load_rc(path)
-  # No need to re-load env if path is the same
-  if ENV['SHELLENV'] == path
-    debug "nothing to do for #{path}"
-    exit
+    new_env
   end
   
-  old_env = ENV.to_hash
+  # Returns an encoded string of a env hash. See #load_env
+  def marshal_env(env)
+    Base64.encode64(
+      Zlib::Deflate.deflate(
+        Marshal.dump(env), Zlib::BEST_COMPRESSION
+      )
+    ).gsub("\n",'')
+  end
   
-  # FIXME: some environment variables may have been introduced by other means
-  # they should be ignored
+  # Returns a env hash from an encoded string. See #marshal_env
+  def load_env(str)
+    Marshal.load(
+      Zlib::Inflate.inflate(
+        Base64.decode64(str)))
+  end
   
-  # Restore old env
-  if ENV['SHELLENV_BACKUP']
-    debug "Restoring env"
+  def has_backup?(env)
+    !!env['SHELLENV_BACKUP']
+  end
     
-    begin
-      bak_env = load_env(ENV['SHELLENV_BACKUP'])
-    rescue
-      fail "BUG: Corrupt SHELLENV_BACKUP detected"
-      exit 1
-    end
-    
-    env_diff(ENV.to_hash, bak_env).each_pair do |k,v|
-      ENV[k] = v
-    end
-  end
-  
-  # Load rc if any
-  if path
-    unless ENV['SHELLENV_BACKUP']
-      # backup current ENV
-      ENV['SHELLENV_BACKUP'] = dump_env(ENV.to_hash)
-    end
-    
-    ENV['SHELLENV'] = path
-  
-    $stderr.puts "* Loading rc at #{path}"
-  
-    new_env = `sh -c ". #{path}/.envrc >/dev/null; env"`
-    new_env = new_env.split("\n").inject({}) do |env, line|
+  # Parses the output of `env`
+  # @param str String
+  # @returns Hash
+  def parse_env(str)
+    str.split("\n").inject({}) do |env, line|
       md = /^([^=]+)=(.+)$/.match(line)
       unless md
-        fail "BUG: Unknown line #{line} from rc"
-        exit 1
+        abort "BUG: Unknown line #{line} from rc"
       end
       env[md[1]] = md[2]
       env
     end
-    
-    env_diff(ENV.to_hash, new_env).each_pair do |k,v|
-      ENV[k] = v
-    end
   end
   
-  env_diff(old_env, ENV.to_hash).each_pair do |k,v|
-    if v
-      puts "#{k}=#{v.shellescape}; export #{k};"
-    else
-      puts "unset #{k};"
+  # Looks the path up to / for the first .envrc file. Returns the path where
+  # the file lies.
+  def find_rc(path)
+    deep = 0
+    while deep < 255 do
+      deep += 1
+      if File.exists? File.join(path, '.envrc')
+        return path
+      elsif path == '/'
+        return nil
+      end
+      old_path = path
+      path = File.dirname(path)
+      if path == old_path
+        abort "BUG in find_rc. #{path} == #{old_path}"
+      end
+    end
+    abort "More that 255 directories searched. WTF ?. Current: #{path}"
+  end
+  
+  # Restore old env
+  # FIXME: some environment variables may have been introduced by the user
+  # they should be ignored
+  def unload!(env)
+    abort "No backup found" unless env['SHELLENV_BACKUP']
+    
+    begin
+      bak_env = load_env(env['SHELLENV_BACKUP'])
+    rescue
+      abort "BUG: Corrupt SHELLENV_BACKUP detected"
+    end
+    
+    diff_env(env, bak_env) do |k,v|
+      env[k] = v
+    end
+    env
+  end
+
+  # No need to re-load env if path is the same
+  def already_loaded?(env, rc_dir)
+    env['SHELLENV'] == rc_dir
+  end
+
+  def load!(env, rc_dir)
+    new_env = env.dup
+    unless new_env['SHELLENV_BACKUP']
+      # backup current ENV
+      new_env['SHELLENV_BACKUP'] = marshal_env(env)
+    end
+    
+    new_env['SHELLENV'] = rc_dir
+  
+    $stderr.puts "* Loading rc at #{rc_dir}"
+      
+    env_str = with_env(new_env) do
+      `sh -c \". '#{rc_dir}/.envrc' >&2; env\"`
+    end
+    
+    if $?.exitstatus > 0
+      abort "#{rc_dir}/.envrc error with exit status #{$?.exitstatus}. #{env_str}"
+    end
+    
+    new_env = parse_env(env_str)
+    diff_env(env, new_env)
+  end
+  
+  def to_shell(env_diff)
+    str = ""
+    env_diff.each_pair do |k,v|
+      if v
+        str += "#{k}=#{v.shellescape}; export #{k};"
+      else
+        if k == "PS1"
+          # unsetting PS1 doesn't restore the default in OSX's bash
+        else
+          str += "unset #{k};"
+        end
+      end
+    end
+    str
+  end
+  
+  def with_env(env, &block)
+    env_bak = ::ENV.to_hash
+    diff_env(env, env_bak) do |k,v|
+      ::ENV[k] = v
+    end
+    return yield
+  ensure
+    diff_env(env_bak, env) do |k, v|
+      ::ENV[k] = v
     end
   end
+
+  extend self
+
+private
+
+  def debug(msg); $stderr.puts "DBG: #{msg}" end
+  #def debug(msg); nil end
+
 end
 
-rc_path = find_rc(Dir.pwd)
-load_rc rc_path
+if __FILE__ == $0 && ARGV[0] == "test"
+  require "test/unit"
+
+  class TestMe < Test::Unit::TestCase
+    include ShellEnv
+    
+    def test_diff_env
+      assert_equal({'one'=>nil}, diff_env({'one'=>'x'}, {}))
+      assert_equal({'two'=>'2'}, diff_env({}, {'two'=>'2'}))
+    end
+    
+    def test_marshal
+      env = {'one'=>'1', 'two'=>'2'}
+      assert_equal(env, load_env(marshal_env(env)))
+    end
+    
+    def test_parse_env
+      assert_equal({'FOO'=>'bar'}, parse_env("FOO=bar\n"))
+      assert_equal({'FOO'=>'bar','BAR'=>'baz'}, parse_env("FOO=bar\nBAR=baz\n"))
+      assert_equal({'FOO'=>'with space','BAR'=>'baz'}, parse_env("FOO=with space\nBAR=baz\n"))
+    end
+  end
+
+elsif __FILE__ == $0
+  
+  env = ENV.to_hash
+  rc_dir = ShellEnv.find_rc(Dir.pwd)
+  
+  if ShellEnv.already_loaded?(env, rc_dir)
+    exit
+  elsif rc_dir
+    if ShellEnv.has_backup?(env)
+      $stderr.puts "Switching env from xxx to yyy"
+      ShellEnv.unload!(env)
+    else
+      $stderr.puts "Loading env at yyy"
+    end
+    diff_env = ShellEnv.load!(env, rc_dir)
+    puts ShellEnv.to_shell(diff_env)
+  elsif ShellEnv.has_backup?(env)
+    $stderr.puts "Unloading old env: ..."
+    ShellEnv.unload!(env)
+  else
+    # No env, no rc. Nothing to do
+  end
+end
