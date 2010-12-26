@@ -1,50 +1,116 @@
-#!/bin/bash
+#!/usr/bin/env ruby
+require 'shellwords'
+require 'base64'
+require 'zlib'
 
-rc_path=`pwd`
-# FIXME: $SHELL_ENV is empty. WTF?
-SHELL_ENV=$SHELL_ENV
+def debug(msg)
+  $stderr.puts "DBG: #{msg}"
+end
 
-set -e
-set -u
+def fail(reason)
+  $stderr.puts "FAIL: #{reason}"
+  exit 1
+end
 
-# TODO: avoid all the spawn/exec
-find_rc() {
-  if [ -f "$rc_path/.envrc" ]; then
-    return 0
-  elif [ "$rc_path" = "/" ]; then
-    return 1
-  else
-    rc_path=`dirname $rc_path`
-    find_rc
-    return $?
-  fi
-}
+def find_rc(path)
+  rc_path = path
+  loop do
+    if File.exists? File.join(path, '.envrc')
+      return path
+    elsif path == '/'
+      return nil
+    end
+    old_path = path
+    path = File.dirname(path)
+    if path == old_path
+      fail "BUG in find_rc. #{path} == #{old_path}"
+      exit 1
+    end
+  end
+end
 
-# NOTE: $PPID is bash-only
-# FIXME: $SHELL_ENV is empty
-load_rc() {
-  if [ "$SHELL_ENV" = "$rc_path" ]; then
+def env_diff(env1, env2)
+  (env1.keys | env2.keys).inject({}) do |diff, k|
+    if env2[k] != env1[k]
+      diff[k] = env2[k] 
+    end
+    diff
+  end
+end
+
+def dump_env(env)
+  str = Base64.encode64(Zlib::Deflate.deflate(Marshal.dump(env), Zlib::BEST_COMPRESSION)).gsub("\n",'')
+  debug "dump size: #{str.size}"
+  str
+end
+
+def load_env(str)
+  Marshal.load(Zlib::Inflate.inflate(Base64.decode64(str)))
+end
+
+def load_rc(path)
+  # No need to re-load env if path is the same
+  if ENV['SHELLENV'] == path
+    debug "nothing to do for #{path}"
     exit
-  fi
-  if [ -z "$SHELL_ENV" ]; then
-    # backup current ENV
-    # FIXME: collect old envs in some way
-    env | sort > $HOME/.shell_env.$PPID
-  else
-    # restore old ENV
-    # TODO: unset unused variables
-    . $HOME/.shell_env.$PPID
-  fi
-  export SHELL_ENV=$rc_path
-  unset rc_path
-  echo "* Loading rc at $SHELL_ENV"
-  . $SHELL_ENV/.envrc
-}
+  end
+  
+  old_env = ENV.to_hash
+  
+  # FIXME: some environment variables may have been introduced by other means
+  # they should be ignored
+  
+  # Restore old env
+  if ENV['SHELLENV_BACKUP']
+    debug "Restoring env"
+    
+    begin
+      bak_env = load_env(ENV['SHELLENV_BACKUP'])
+    rescue
+      fail "BUG: Corrupt SHELLENV_BACKUP detected"
+      exit 1
+    end
+    
+    env_diff(ENV.to_hash, bak_env).each_pair do |k,v|
+      ENV[k] = v
+    end
+  end
+  
+  # Load rc if any
+  if path
+    unless ENV['SHELLENV_BACKUP']
+      # backup current ENV
+      ENV['SHELLENV_BACKUP'] = dump_env(ENV.to_hash)
+    end
+    
+    ENV['SHELLENV'] = path
+  
+    $stderr.puts "* Loading rc at #{path}"
+  
+    new_env = `sh -c ". #{path}/.envrc >/dev/null; env"`
+    new_env = new_env.split("\n").inject({}) do |env, line|
+      md = /^([^=]+)=(.+)$/.match(line)
+      unless md
+        fail "BUG: Unknown line #{line} from rc"
+        exit 1
+      end
+      env[md[1]] = md[2]
+      env
+    end
+    
+    env_diff(ENV.to_hash, new_env).each_pair do |k,v|
+      ENV[k] = v
+    end
+  end
+  
+  env_diff(old_env, ENV.to_hash).each_pair do |k,v|
+    if v
+      puts "#{k}=#{v.shellescape}; export #{k};"
+    else
+      puts "unset #{k};"
+    end
+  end
+end
 
-if find_rc; then
-  # NOTE: echo in load_rc will go to stderr, because not evaled
-  load_rc >&2
-  # NOTE: eval doesn't like X=Y space Z, so we quote it
-  # FIXME: quoting quoted stings will break
-  env | sort | sed -e "s/\([^=]\)=\(.*\)/\1=\"\2\"/g"
-fi
+rc_path = find_rc(Dir.pwd)
+load_rc rc_path
