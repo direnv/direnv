@@ -6,9 +6,9 @@ shell-env is a really small tool that opens lots of new possibilities.
 Usage
 -----
 
-Once the shell-env is installed, the script will loop for an .envrc
-in the current and upper path. If one is found, it will source it
-and set the changed environment variables to the current command-line.
+Once the shell-env is installed, the script will look for .envrc
+in the current and upper directories. If one is found, it will export
+the variables to the current shell.
 
 It is also usable by scripts by invoking shell-env.
 

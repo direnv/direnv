@@ -4,7 +4,7 @@ require 'base64'
 require 'zlib'
 
 module ShellEnv
-  IGNORE_KEYS = %w{_ OLDPWD SHLVL}
+  IGNORE_KEYS = %w{_ PWD OLDPWD SHLVL SHELL}
   
   # Returns the difference of two env hashes. Suppressions are represented as
   # nil values.
@@ -21,7 +21,7 @@ module ShellEnv
     new_env
   end
   
-  # Returns an encoded string of a env hash. See #load_env
+  # Returns an encoded string of a env hash. See #unmarshal_env
   def marshal_env(env)
     Base64.encode64(
       Zlib::Deflate.deflate(
@@ -31,7 +31,7 @@ module ShellEnv
   end
   
   # Returns a env hash from an encoded string. See #marshal_env
-  def load_env(str)
+  def unmarshal_env(str)
     Marshal.load(
       Zlib::Inflate.inflate(
         Base64.decode64(str)))
@@ -40,13 +40,17 @@ module ShellEnv
   def has_backup?(env)
     !!env['SHELLENV_BACKUP']
   end
+
+  def env_path(env)
+    env['SHELLENV']
+  end
     
   # Parses the output of `env`
   # @param str String
   # @returns Hash
   def parse_env(str)
     str.split("\n").inject({}) do |env, line|
-      md = /^([^=]+)=(.+)$/.match(line)
+      md = /^([^=]+)=(.*)$/.match(line)
       unless md
         abort "BUG: Unknown line #{line} from rc"
       end
@@ -56,7 +60,7 @@ module ShellEnv
   end
   
   # Looks the path up to / for the first .envrc file. Returns the path where
-  # the file lies.
+  # the file lies or nil if not found.
   def find_rc(path)
     deep = 0
     while deep < 255 do
@@ -76,21 +80,12 @@ module ShellEnv
   end
   
   # Restore old env
-  # FIXME: some environment variables may have been introduced by the user
-  # they should be ignored
-  def unload!(env)
+  def restore_env(env)
     abort "No backup found" unless env['SHELLENV_BACKUP']
     
-    begin
-      bak_env = load_env(env['SHELLENV_BACKUP'])
-    rescue
-      abort "BUG: Corrupt SHELLENV_BACKUP detected"
-    end
-    
-    diff_env(env, bak_env) do |k,v|
-      env[k] = v
-    end
-    env
+    return unmarshal_env(env['SHELLENV_BACKUP'])
+  rescue
+    abort "BUG: Corrupt SHELLENV_BACKUP detected"
   end
 
   # No need to re-load env if path is the same
@@ -98,27 +93,25 @@ module ShellEnv
     env['SHELLENV'] == rc_dir
   end
 
-  def load!(env, rc_dir)
+  def load_env(env, rc_dir)
     new_env = env.dup
-    unless new_env['SHELLENV_BACKUP']
-      # backup current ENV
-      new_env['SHELLENV_BACKUP'] = marshal_env(env)
+    if new_env['SHELLENV_BACKUP']
+      abort "BUG: env already loaded"
     end
     
+    # backup current ENV
+    new_env['SHELLENV_BACKUP'] = marshal_env(env)
     new_env['SHELLENV'] = rc_dir
   
-    $stderr.puts "* Loading rc at #{rc_dir}"
-      
     env_str = with_env(new_env) do
-      `sh -c \". '#{rc_dir}/.envrc' >&2; env\"`
+      `/bin/sh -c \"set -e; . '#{rc_dir}/.envrc' >&2; env\"`
     end
     
     if $?.exitstatus > 0
       abort "#{rc_dir}/.envrc error with exit status #{$?.exitstatus}. #{env_str}"
     end
-    
-    new_env = parse_env(env_str)
-    diff_env(env, new_env)
+
+    parse_env(env_str)
   end
   
   def to_shell(env_diff)
@@ -137,19 +130,18 @@ module ShellEnv
     str
   end
   
+  #
   def with_env(env, &block)
     env_bak = ::ENV.to_hash
-    diff_env(env, env_bak) do |k,v|
+    diff_env(env_bak, env) do |k,v|
       ::ENV[k] = v
     end
     return yield
   ensure
-    diff_env(env_bak, env) do |k, v|
+    diff_env(env, env_bak) do |k, v|
       ::ENV[k] = v
     end
   end
-
-  extend self
 
 private
 
@@ -158,48 +150,28 @@ private
 
 end
 
-if __FILE__ == $0 && ARGV[0] == "test"
-  require "test/unit"
-
-  class TestMe < Test::Unit::TestCase
-    include ShellEnv
-    
-    def test_diff_env
-      assert_equal({'one'=>nil}, diff_env({'one'=>'x'}, {}))
-      assert_equal({'two'=>'2'}, diff_env({}, {'two'=>'2'}))
-    end
-    
-    def test_marshal
-      env = {'one'=>'1', 'two'=>'2'}
-      assert_equal(env, load_env(marshal_env(env)))
-    end
-    
-    def test_parse_env
-      assert_equal({'FOO'=>'bar'}, parse_env("FOO=bar\n"))
-      assert_equal({'FOO'=>'bar','BAR'=>'baz'}, parse_env("FOO=bar\nBAR=baz\n"))
-      assert_equal({'FOO'=>'with space','BAR'=>'baz'}, parse_env("FOO=with space\nBAR=baz\n"))
-    end
-  end
-
-elsif __FILE__ == $0
+if __FILE__ == $0
+  include ShellEnv
   
-  env = ENV.to_hash
-  rc_dir = ShellEnv.find_rc(Dir.pwd)
+  cur_env = ENV.to_hash
+  rc_dir = find_rc(Dir.pwd)
   
-  if ShellEnv.already_loaded?(env, rc_dir)
+  if already_loaded?(cur_env, rc_dir)
     exit
   elsif rc_dir
-    if ShellEnv.has_backup?(env)
-      $stderr.puts "Switching env from xxx to yyy"
-      ShellEnv.unload!(env)
+    if has_backup?(cur_env)
+      $stderr.puts "Switching env from #{env_path(cur_env)} to #{rc_dir}"
+      new_env = restore_env(cur_env)
     else
-      $stderr.puts "Loading env at yyy"
+      $stderr.puts "Loading env at #{rc_dir}"
+      new_env = cur_env
     end
-    diff_env = ShellEnv.load!(env, rc_dir)
-    puts ShellEnv.to_shell(diff_env)
-  elsif ShellEnv.has_backup?(env)
-    $stderr.puts "Unloading old env: ..."
-    ShellEnv.unload!(env)
+    new_env = load_env(new_env, rc_dir)
+    puts to_shell(diff_env(cur_env, new_env))
+  elsif has_backup?(cur_env)
+    $stderr.puts "Restoring old env after #{env_path(cur_env)}"
+    old_env = restore_env(cur_env)
+    puts to_shell(diff_env(cur_env, old_env))
   else
     # No env, no rc. Nothing to do
   end
