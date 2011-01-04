@@ -13,7 +13,7 @@ the variables to the current shell.
 It is also usable by scripts by invoking shell-env.
 
 .envrc is .rvmrc compatible:
-rvm --create use ruby-1.9.2@yourproject
+eval `rvm --create env ruby-1.9.2@yourproject`
 
 Features
 --------
