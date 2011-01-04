@@ -11,9 +11,12 @@ Once the shell-env is installed, the script will look for .envrc
 in the current and upper directories. If one is found, it will export
 the variables to the current shell.
 
-It is also usable by scripts by invoking shell-env.
+Example:
 
-.envrc is .rvmrc compatible:
+    export PATH="$SHELLENV/bin:$PATH"
+    export RUBYOPT="-I$SHELLENV/lib"
+
+.envrc is also compatible with rvm:
 
     eval `rvm --create env ruby-1.9.2@yourproject`
 
