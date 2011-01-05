@@ -104,7 +104,7 @@ module ShellEnv
     new_env['SHELLENV'] = rc_dir
   
     env_str = with_env(new_env) do
-      `/bin/sh -c \"set -e; . '#{rc_dir}/.envrc' >&2; env\"`
+      `/bin/sh -c \"set -e; . '#{rc_dir}/.envrc' >&2; /usr/bin/env\"`
     end
     
     if $?.exitstatus > 0
