@@ -154,7 +154,12 @@ if __FILE__ == $0
   include ShellEnv
   
   cur_env = ENV.to_hash
-  rc_dir = find_rc(Dir.pwd)
+  begin
+    rc_dir = find_rc(Dir.pwd)
+  rescue Errno::ENOENT # Current directory does not exist
+    $stderr.puts "Current directory does not exist"
+    rc_dir = nil
+  end
   
   if already_loaded?(cur_env, rc_dir)
     exit
