@@ -1,8 +1,27 @@
-SHELL-ENV: Power-up your shell (mushroom edition)
+SHELL-ENV: Power-up your shell
 ==============================
 
-shell-env is a really small that dynamically adapts your shell depending on
-the path you are in.
+shell-env let's you have path-specific environment variables in your
+shell.
+
+If you are like me and checkout tons of projects, you don't want to
+clutter your .profile or .bashrc. By adding an .envrc to the projects,
+you can override some variables while being in that or sub directories.
+Keep your .bashrc clean !
+
+Install
+-------
+
+Put the shell-env script in your path and add the following lines to
+your bashrc:
+
+    precmd() {
+      eval `shell-env`
+    }
+    PROMPT_COMMAND=precmd
+
+It should also work for zsh users but I didn't test it. For you, the
+last line is not necessarz.
 
 Usage
 -----
@@ -11,7 +30,7 @@ Once the shell-env is installed, the script will look for .envrc
 in the current and upper directories. If one is found, it will export
 the variables to the current shell.
 
-Example:
+.envrc sample:
 
     export PATH="$SHELLENV/bin:$PATH"
     export RUBYOPT="-I$SHELLENV/lib"
@@ -25,21 +44,6 @@ Features
 
 * Adapts with the current path
 * Able to revert previous changes
-
-Install
--------
-
-put shell-env in your path, and put the following lines in your .bashrc:
-
-    precmd() {
-      eval `shell-env`
-    }
-    PROMPT_COMMAND=precmd
-
-for zsh, you should normally just need to set the `precmd` function, but
-I didn't test it. Please report if it works ! 
-(ref: http://www.zsh.org/mla/users/1997/msg00267.html)
-
 
 TODO
 ----
