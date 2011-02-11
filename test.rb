@@ -14,10 +14,4 @@ class TestMe < Test::Unit::TestCase
     env = {'one'=>'1', 'two'=>'2'}
     assert_equal(env, unmarshal_env(marshal_env(env)))
   end
-    
-  def test_parse_env
-    assert_equal({'FOO'=>'bar'}, parse_env("FOO=bar\n"))
-    assert_equal({'FOO'=>'bar','BAR'=>'baz'}, parse_env("FOO=bar\nBAR=baz\n"))
-    assert_equal({'FOO'=>'with space','BAR'=>'baz'}, parse_env("FOO=with space\nBAR=baz\n"))
-  end
 end
