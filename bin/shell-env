@@ -44,20 +44,6 @@ module ShellEnv
   def env_path(env)
     env['SHELLENV']
   end
-    
-  # Parses the output of `env`
-  # @param str String
-  # @returns Hash
-  def parse_env(str)
-    str.split("\n").inject({}) do |env, line|
-      md = /^([^=]+)=(.*)$/.match(line)
-      unless md
-        abort "BUG: Unknown line #{line} from rc"
-      end
-      env[md[1]] = md[2]
-      env
-    end
-  end
   
   # Looks the path up to / for the first .envrc file. Returns the path where
   # the file lies or nil if not found.
@@ -104,14 +90,14 @@ module ShellEnv
     new_env['SHELLENV'] = rc_dir
   
     env_str = with_env(new_env) do
-      `/bin/sh -c \"set -e; . '#{rc_dir}/.envrc' >&2; /usr/bin/env\"`
+      `/bin/sh -c \"set -e; . '#{rc_dir}/.envrc' >&2; ruby -e 'puts Marshal.dump(ENV.to_hash)'\"`
     end
     
     if $?.exitstatus > 0
       abort "#{rc_dir}/.envrc error with exit status #{$?.exitstatus}. #{env_str}"
     end
 
-    parse_env(env_str)
+    Marshal.load(env_str)
   end
   
   def to_shell(env_diff)
