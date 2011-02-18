@@ -1,3 +1,9 @@
+#!/bin/sh
+if ! [ -z "$RUBYOPT" ]; then
+  export SHELLENV_RUBYOPT="$RUBYOPT"
+  unset RUBYOPT
+fi
+exec ruby $0 $@
 #!/usr/bin/env ruby
 require 'shellwords'
 require 'base64'
@@ -90,7 +96,7 @@ module ShellEnv
     new_env['SHELLENV'] = rc_dir
   
     env_str = with_env(new_env) do
-      `/bin/sh -c \"set -e; . '#{rc_dir}/.envrc' >&2; ruby -e 'puts Marshal.dump(ENV.to_hash)'\"`
+      `/bin/sh -c \"set -e; . '#{rc_dir}/.envrc' >&2 && #{__FILE__.shellescape} marshall\"`
     end
     
     if $?.exitstatus > 0
@@ -138,7 +144,17 @@ end
 
 if __FILE__ == $0
   include ShellEnv
-  
+
+  # Restore RUBYOPT
+  if ENV['SHELLENV_RUBYOPT']
+    ENV['RUBYOPT'] = ENV.delete('SHELLENV_RUBYOPT')
+  end
+
+  if ARGV[0] == "marshall"
+    puts Marshal.dump(ENV.to_hash)
+    exit
+  end
+
   cur_env = ENV.to_hash
   begin
     rc_dir = find_rc(Dir.pwd)
