@@ -45,6 +45,11 @@ Features
 * Adapts with the current path
 * Able to revert previous changes
 
+Contribute
+----------
+
+Patches are welcome. We can also discuss new features at shellenv@librelist.com.
+
 TODO
 ----
 
