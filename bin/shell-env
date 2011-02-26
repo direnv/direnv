@@ -4,7 +4,7 @@ if ! [ -z "$RUBYOPT" ]; then
   export SHELLENV_RUBYOPT="$RUBYOPT"
   unset RUBYOPT
 fi
-exec ruby -e"\$0='$0'; load '$0'" -- $@
+exec ${SHELLENV_RUBY:-ruby} -e"\$0='$0'; load '$0'" -- $@
 =end
 
 require 'shellwords'
