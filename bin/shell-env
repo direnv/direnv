@@ -1,10 +1,12 @@
 #!/bin/sh
+=begin 2>/dev/null
 if ! [ -z "$RUBYOPT" ]; then
   export SHELLENV_RUBYOPT="$RUBYOPT"
   unset RUBYOPT
 fi
-exec ruby $0 $@
-#!/usr/bin/env ruby
+exec ruby -e"load '$0'" -- $@
+=end
+
 require 'shellwords'
 require 'base64'
 require 'zlib'
