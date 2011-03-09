@@ -3,10 +3,10 @@
 # Works a bit like /usr/bin/env 
 
 if [ -z "$1" ]; then
-  echo "direnv-exec program_to_run" >&2
+  echo "direnv exec program_to_run" >&2
   exit 1
 fi
 
-eval `direnv-export`
+eval `direnv export`
 
 exec $@

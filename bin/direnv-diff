@@ -41,7 +41,7 @@ end
 
 reverse = false
 opts = OptionParser.new do |opts|
-  opts.banner = "direnv-diff [options] OLD_ENV"
+  opts.banner = "direnv diff [options] OLD_ENV"
   opts.on("-r", "--reverse", "Uses the OLD_ENV as the source") do reverse = true end
 
   opts.on("-h", "--help", "Shows this help") do
