@@ -4,7 +4,7 @@
 
 set -e
 
-find_rc() {
+direnv_find_rc() {
   while true; do
     if [ -f ".envrc" ]; then
       return 0
@@ -34,8 +34,8 @@ layout() {
 
 #### end stdlib #############
 
-if find_rc; then
-  unset find_rc
+if direnv_find_rc; then
+  unset direnv_find_rc
   if [ -n "$DIRENV_BACKUP" ]; then
     if [ "$DIRENV_DIR" = `pwd` ]; then
       # env already loaded
