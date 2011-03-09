@@ -45,7 +45,7 @@ if direnv_find_rc; then
   fi
   DIRENV_BACKUP=`direnv dump`
   DIRENV_DIR=$PWD
-  echo "Switching env to $PWD" >&2
+  echo "direnv: loading $PWD" >&2
   export DIRENV_BACKUP DIRENV_DIR
   if [ -n "$DIRENV_CONTEXT" ]; then
     . .env.$DIRENV_CONTEXT >&2
@@ -55,7 +55,7 @@ if direnv_find_rc; then
   direnv diff -r "$DIRENV_BACKUP"
 else
   if [ -n "$DIRENV_BACKUP" ]; then
-    echo "Unloading env from $DIRENV_DIR" >&2
+    echo "direnv: unloading $DIRENV_DIR" >&2
     direnv diff "$DIRENV_BACKUP"
   fi
 fi
