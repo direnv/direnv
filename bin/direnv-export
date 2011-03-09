@@ -19,7 +19,7 @@ direnv_find_rc() {
 #### stdlib ##################
 
 PATH_add() {
-  export PATH="$PWD/$1:$PATH"
+  export PATH="`readlink -f "$1"`:$PATH"
 }
 
 layout_ruby() {
@@ -37,7 +37,7 @@ layout() {
 if direnv_find_rc; then
   unset direnv_find_rc
   if [ -n "$DIRENV_BACKUP" ]; then
-    if [ "$DIRENV_DIR" = `pwd` ]; then
+    if [ "$DIRENV_DIR" = "`pwd`" ]; then
       # env already loaded
       exit 0
     fi
@@ -50,7 +50,7 @@ if direnv_find_rc; then
   if [ -n "$DIRENV_CONTEXT" ]; then
     . .env.$DIRENV_CONTEXT >&2
   else
-    . $PWD/.envrc >&2
+    . "$PWD/.envrc" >&2
   fi
   direnv diff -r "$DIRENV_BACKUP"
 else
