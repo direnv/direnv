@@ -1,93 +1,48 @@
-SHELL-ENV: Power-up your shell
-==============================
+direnv - Unclutter your .profile
+================================
 
-shell-env let's you have path-specific environment variables in your
-shell.
-
-If you are like me and checkout tons of projects, you don't want to
-clutter your .profile or .bashrc. By adding an .envrc to the projects,
-you can override some variables while being in that or sub directories.
-Keep your .bashrc clean !
-
-Install
--------
-
-Put the shell-env script in your path and add the following lines to
-your bashrc:
-
-    precmd() {
-      eval `shell-env`
-    }
-    PROMPT_COMMAND=precmd
-
-It should also work for zsh users but I didn't test it. For you, the
-last line is not necessarz.
+direnv is a small POSIX utility that works in combination with your shell (bash or zsh).
+It allows you to have path-dependent environment variables, to load and unload them
+when navigating trough your filesystem.
 
 Usage
 -----
 
-Once the shell-env is installed, the script will look for .envrc
-in the current and upper directories. If one is found, it will export
-the variables to the current shell.
+Usually, I set an .envrc file in projects that have a bin/ or lib/ directory.
 
-.envrc sample:
+When navigating in the project's root direcory or it's children, direnv will
+add the bin/ directory to my path and the lib/ directory to the target-language's libpath.
+That way they are handily available, no need to set something by hand.
 
-    export PATH="$SHELLENV/bin:$PATH"
-    export RUBYOPT="-I$SHELLENV/lib"
+I also use direnv to set the GEM_HOME environment variable to make project-dependent gemsets.
+The gemset moves with the project unlike in rvm. Feature request: the cache directory could
+be set to $HOME/.gem/cache, it would really help.
 
-.envrc is also compatible with rvm:
+Install
+-------
 
-    eval `rvm --create env ruby-1.9.2@yourproject`
+1) Get the code
 
-Features
---------
+  git clone http://github.com/zimbatm/shell-env
 
-* Adapts with the current path
-* Able to revert previous changes
+2) Put `direnv` in your PATH
 
-Contribute
-----------
+For example by symlinking it in your ~/bin or /usr/local/bin directory
 
-Patches are welcome. We can also discuss new features at shellenv@librelist.com.
+3) Add those lines to your .bashrc:
 
-TODO
-----
-
-* It would make sense to port shell-env to BASH or C. There was an initial BASH
-version, but I got confused with escaping and ENV diffs.
-
-* shell-env [bash,zsh,ruby,...] for language-specific exports
-
-FAQ
----
-
-Q
-: How does RVM update the ENV when changing path?
-A
-: It overrides cd with :
-
-    cd() {
-      builtin cd "$@"
-      local result=$?
-      __rvm_project_rvmrc
-      rvm_hook="after_cd" ; source "$rvm_path/scripts/hook"
-      return $result
+    precmd() {
+      eval `direnv export`
     }
+    PROMPT_COMMAND=precmd
 
-It does not work in any cases because cd is not the only command to change
-directory. (see: pushd for example)
-
-Q
-: How does the magic work ?
-A
-: We set the PROMPT_COMMAND to a function name
-  On each prompt display, bash calls the function, adapting the environment
-  depending on the path.
+zsh users can use the same code and forget the last line, precmd is a magic function. (TO BE TESTED, please report)
 
 Contributors (and thanks)
 -------------------------
 
-* Joshua Peek
+* Joshua Peek (aka. josh) for his patch
+* Magnus Holm (aka. judofyr) for his patches and ideas
 
 LICENCE
 -------
@@ -111,3 +66,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+

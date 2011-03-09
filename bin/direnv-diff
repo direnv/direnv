@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+#
+# Porcelaine tool
+require 'base64'
+require 'zlib'
+require 'optparse'
+require 'shellwords'
+
+IGNORE_KEYS = %w{_ PWD OLDPWD SHLVL SHELL}
+
+# Returns the difference of two env hashes. Suppressions are represented as
+# nil values.
+def diff_env(env1, env2, &each_pair)
+  new_env = (env1.keys | env2.keys).inject({}) do |diff, k|
+    if env2[k] != env1[k] && !IGNORE_KEYS.include?(k)
+      diff[k] = env2[k] 
+    end
+    diff
+  end
+  if block_given?
+    new_env.each_pair(&each_pair)
+  end
+  new_env
+end
+
+def to_shell(env_diff)
+  str = ""
+  env_diff.each_pair do |k,v|
+    if v
+      str += "#{k}=#{v.shellescape}; export #{k};"
+    else
+      if k == "PS1"
+        # unsetting PS1 doesn't restore the default in OSX's bash
+      else
+        str += "unset #{k};"
+      end
+    end
+  end
+  str
+end
+
+reverse = false
+opts = OptionParser.new do |opts|
+  opts.banner = "direnv-diff [options] OLD_ENV"
+  opts.on("-r", "--reverse", "Uses the OLD_ENV as the source") do reverse = true end
+
+  opts.on("-h", "--help", "Shows this help") do
+    puts opts
+    exit
+  end
+end
+
+begin
+  opts.parse!
+rescue OptionParser::ParseError => ex
+  $stderr.puts ex
+  exit 1
+end
+
+unless ARGV[0]
+  $stderr.puts "Missing OLD_ENV argument"
+  exit 1
+end
+
+old_env = Marshal.load(
+  Zlib::Inflate.inflate(
+    Base64.decode64(ARGV[0])))
+
+if reverse
+  diff = diff_env(old_env, ENV.to_hash)
+else
+  diff = diff_env(ENV.to_hash, old_env)
+end
+puts to_shell(diff)

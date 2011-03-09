@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require 'zlib'
+require 'base64'
+
+puts Base64.encode64(
+  Zlib::Deflate.deflate(
+    Marshal.dump(ENV.to_hash), Zlib::BEST_COMPRESSION
+  )
+).gsub("\n",'')

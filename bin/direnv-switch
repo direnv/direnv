@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# switch environments in the same directory
+
+echo "TODOOOOOOOO !!!"
+exit 1
