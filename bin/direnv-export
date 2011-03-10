@@ -23,6 +23,7 @@ PATH_add() {
 }
 
 layout_ruby() {
+  PATH_add 'vendor/gems/bin'
   PATH_add 'bin'
   export RUBYLIB=$PWD/lib
   export GEM_HOME=$PWD/vendor/gems
