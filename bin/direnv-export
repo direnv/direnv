@@ -41,6 +41,10 @@ layout() {
 if has rvm; then
   # source rvm on first call, haha :)
   rvm() {
+    if [ -z "$rvm_scripts_path" ]; then
+      echo "rvm: \$rvm_scripts_path not found"
+      exit 1
+    fi
     unset rvm
     . "$rvm_scripts_path/rvm"
     rvm $@
