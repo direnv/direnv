@@ -16,42 +16,6 @@ direnv_find_rc() {
   done
 }
 
-#### stdlib ##################
-
-has() {
-  type "$1" >/dev/null 2>&1
-  return $?
-}
-
-PATH_add() {
-  export PATH="`readlink -f "$1"`:$PATH"
-}
-
-layout_ruby() {
-  PATH_add 'vendor/gems/bin'
-  PATH_add 'bin'
-  export RUBYLIB=$PWD/lib
-  export GEM_HOME=$PWD/vendor/gems
-}
-
-layout() {
-  eval "layout_$1"
-}
-
-if has rvm; then
-  # source rvm on first call, haha :)
-  rvm() {
-    if [ -z "$rvm_scripts_path" ]; then
-      echo "rvm: \$rvm_scripts_path not found"
-      exit 1
-    fi
-    unset rvm
-    . "$rvm_scripts_path/rvm"
-    rvm $@
-  }
-fi
-
-#### end stdlib #############
 
 if direnv_find_rc; then
   unset direnv_find_rc
@@ -62,6 +26,8 @@ if direnv_find_rc; then
     fi
     eval `direnv diff "$DIRENV_BACKUP"`
   fi
+  # load the stdlib
+  . `direnv stdlib`
   DIRENV_BACKUP=`direnv dump`
   DIRENV_DIR=$PWD
   echo "direnv: loading $PWD" >&2

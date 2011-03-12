@@ -1,0 +1,30 @@
+#!/bin/echo
+
+has() {
+  which "$1" >/dev/null 2>&1
+  return $?
+}
+
+PATH_add() {
+  export PATH="`readlink -f "$1"`:$PATH"
+}
+
+layout_ruby() {
+  PATH_add 'vendor/gems/bin'
+  PATH_add 'bin'
+  export RUBYLIB=$PWD/lib
+  export GEM_HOME=$PWD/vendor/gems
+}
+
+layout() {
+  eval "layout_$1"
+}
+
+if has rvm; then
+  # source rvm on first call, haha :)
+  rvm() {
+    unset rvm
+    . "$rvm_scripts_path/rvm"
+    rvm $@
+  }
+fi
