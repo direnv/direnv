@@ -34,7 +34,6 @@ abs_dirname() {
 }
 
 bindir=`abs_dirname $0`
-echo $bindir >&2
 
 if [ -z "$1" ]; then
   usage
