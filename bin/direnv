@@ -8,8 +8,33 @@ usage() {
   echo "direnv export|exec|switch [options]" >&2
 }
 
-binpath=`readlink -f $0`
-bindir=`dirname "$binpath"`
+# usage: abs_dirname $filename
+# finds the original $filename path and prints it's absolute folder path
+abs_dirname() {
+  prev_path="$1"
+  # Resolve the symlink(s) recursively
+  while true; do
+    abs_path=`readlink "$prev_path"`
+    if [ -z "$abs_path" ]; then
+      abs_path="$prev_path"
+      break
+    else
+      prev_path="$abs_path"
+    fi
+  done
+  unset prev_path
+
+  # Get the absolute directory of the final $abs_path
+  orig_dir=`pwd`
+  cd `dirname "$abs_path"`
+  # prints an absolute path here
+  pwd
+  cd "$orig_dir"
+  unset abs_path orig_dir
+}
+
+bindir=`abs_dirname $0`
+echo $bindir >&2
 
 if [ -z "$1" ]; then
   usage
