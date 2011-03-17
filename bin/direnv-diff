@@ -1,6 +1,16 @@
-#!/usr/bin/env ruby
+#!/bin/sh
 #
 # Porcelaine tool
+#
+=begin 2>/dev/null
+if ! [ -z "$RUBYOPT" ]; then
+  export DIRENV_RUBYOPT="$RUBYOPT"
+  unset RUBYOPT
+fi
+exec ${DIRENV_RUBY:-ruby} -e"\$0='$0'; load '$0'" -- $@
+=end
+ENV['RUBYOPT'] = ENV.delete 'DIRENV_RUBYOPT'
+
 require 'base64'
 require 'zlib'
 require 'optparse'
