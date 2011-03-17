@@ -14,7 +14,7 @@ abs_dirname() {
   prev_path="$1"
   # Resolve the symlink(s) recursively
   while true; do
-    abs_path=`readlink "$prev_path"`
+    abs_path=`readlink "$prev_path" || true`
     if [ -z "$abs_path" ]; then
       abs_path="$prev_path"
       break
