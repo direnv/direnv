@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# Prints the target-shell hooks so that you don't have to update them
+# if they change over time.
+#
+
+set -e
+
+target=$1
+
+if [ -z "$target" ] && [ -n "$PPID" ]; then
+  target=`cat /proc/$PPID/cmdline`
+  target=`basename "$target"`
+fi
+
+if [ -z "$target" ]; then
+  echo "Unable to determine the target shell" >&2
+  echo "usage: direnv hook shell-name" >&2
+  exit 1
+fi
+
+# More of them here: http://www.linux.org/docs/ldp/howto/Xterm-Title-4.html
+if [ "$target" = "bash" ]; then
+  cat <<HOOK
+export PROMPT_COMMAND='eval \`direnv export\`'
+HOOK
+elif [ "$target" = "zsh" ]; then
+  cat <<HOOK
+precmd() {
+  eval \`direnv export\`
+}
+HOOK
+else
+    echo "Unknown target shell '$target'" >&2
+    exit 1
+fi
