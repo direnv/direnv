@@ -38,9 +38,11 @@ if direnv_find_rc; then
     . "$PWD/.envrc" >&2
   fi
   direnv diff -r "$DIRENV_BACKUP"
+  echo "alias direnv-reload='unset DIRENV_DIR'"
 else
   if [ -n "$DIRENV_BACKUP" ]; then
     echo "direnv: unloading $DIRENV_DIR" >&2
     direnv diff "$DIRENV_BACKUP"
+    echo "unalias direnv-reload"
   fi
 fi
