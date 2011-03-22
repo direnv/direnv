@@ -8,13 +8,14 @@ set -e
 
 target=$1
 
-if [ -z "$target" ] && [ -n "$PPID" ]; then
+# Linux shell auto-detection
+if [ -z "$target" ] && [ -n "$PPID" ] && [ -f "/proc/$PPID/cmdline" ]; then
   target=`cat /proc/$PPID/cmdline`
   target=`basename "$target"`
 fi
 
 if [ -z "$target" ]; then
-  echo "Unable to determine the target shell" >&2
+  echo "Please specify the target shell" >&2
   echo "usage: direnv hook shell-name" >&2
   exit 1
 fi
