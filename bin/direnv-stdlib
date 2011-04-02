@@ -6,12 +6,12 @@ has() {
 }
 
 PATH_add() {
-  export PATH="`readlink -f "$1"`:$PATH"
+  export PATH="$1:$PATH"
 }
 
 layout_ruby() {
-  PATH_add 'vendor/gems/bin'
-  PATH_add 'bin'
+  PATH_add "$PWD/vendor/gems/bin"
+  PATH_add "$PWD/bin"
   export RUBYLIB=$PWD/lib
   export GEM_HOME=$PWD/vendor/gems
 }

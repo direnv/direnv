@@ -9,7 +9,7 @@ direnv_find_rc() {
     if [ -f ".envrc" ]; then
       return 0
     fi
-    if [ `pwd` = '/' ]; then
+    if [ "`pwd`" = '/' ]; then
       return 1
     fi
     cd ..
