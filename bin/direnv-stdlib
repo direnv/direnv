@@ -5,13 +5,18 @@ has() {
   return $?
 }
 
+# TODO: replace .. in paths
+abspath() {
+  echo $PWD/$1
+}
+
 PATH_add() {
-  export PATH="$1:$PATH"
+  export PATH="`abspath "$1"`:$PATH"
 }
 
 layout_ruby() {
-  PATH_add "$PWD/vendor/gems/bin"
-  PATH_add "$PWD/bin"
+  PATH_add "vendor/gems/bin"
+  PATH_add "bin"
   export RUBYLIB=$PWD/lib
   export GEM_HOME=$PWD/vendor/gems
 }
