@@ -29,7 +29,7 @@ if has rvm; then
   # source rvm on first call, haha :)
   rvm() {
     unset rvm
-    . "$rvm_scripts_path/rvm"
+    . "$rvm_path/scripts/rvm"
     rvm $@
   }
 fi
