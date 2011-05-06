@@ -29,12 +29,9 @@ Install
 
 For example by symlinking it in your ~/bin or /usr/local/bin directory
 
-3) Add those lines to your .bashrc:
+3) Add this line to your .bashrc:
 
-    precmd() {
-      eval `direnv export`
-    }
-    PROMPT_COMMAND=precmd
+    eval `direnv hook bash`
 
 zsh users can use the same code and forget the last line, precmd is a magic function. (TO BE TESTED, please report)
 
