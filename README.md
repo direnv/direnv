@@ -2,7 +2,7 @@ direnv - Unclutter your .profile
 ================================
 
 direnv is a small POSIX utility that works in combination with your shell (bash or zsh).
-It allows you to have path-dependent environment variables, to load and unload them
+It allows you to have path-dependent environment variables, and load/unload them
 when navigating through your filesystem.
 
 Usage
@@ -10,7 +10,7 @@ Usage
 
 Usually, I set an .envrc file in projects that have a bin/ or lib/ directory.
 
-When navigating a project's root directory (or subdirectories), direnv will
+When navigating a project's root directory (or sub-directories), direnv will
 add the bin/ directory to my path and the lib/ directory to the target-language's libpath.
 That way they are handily available, no need to set something by hand.
 
