@@ -33,7 +33,8 @@ For example by symlinking it in your ~/bin or /usr/local/bin directory
 
     eval `direnv hook bash`
 
-zsh users can use the same code and forget the last line, precmd is a magic function. (TO BE TESTED, please report)
+zsh users can use the same code and forget the last line, precmd is a magic function.
+Note that on my install zsh's %c in PROMPT would replace the current directory with DIRENV_DIR for some reason. Replace with %C.
 
 Contributors (and thanks)
 -------------------------
