@@ -11,26 +11,22 @@ usage() {
 # usage: abs_dirname $filename
 # finds the original $filename path and prints it's absolute folder path
 abs_dirname() {
-  prev_path="$1"
+  orig_dir=`pwd`
+  path="$1"
   # Resolve the symlink(s) recursively
   while true; do
-    abs_path=`readlink "$prev_path" || true`
-    if [ -z "$abs_path" ]; then
-      abs_path="$prev_path"
+    cd `dirname "$path"`
+    path=`readlink "$path" || true`
+    if [ -z "$path" ]; then
       break
-    else
-      prev_path="$abs_path"
     fi
   done
-  unset prev_path
+  unset path
 
-  # Get the absolute directory of the final $abs_path
-  orig_dir=`pwd`
-  cd `dirname "$abs_path"`
   # prints an absolute path here
   pwd
   cd "$orig_dir"
-  unset abs_path orig_dir
+  unset orig_dir
 }
 
 bindir=`abs_dirname $0`
