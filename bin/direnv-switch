@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # switch environments in the same directory
 

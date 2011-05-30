@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Prints the target-shell hooks so that you don't have to update them
 # if they change over time.

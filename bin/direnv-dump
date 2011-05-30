@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 =begin 2>/dev/null
 if ! [ -z "$RUBYOPT" ]; then
   export DIRENV_RUBYOPT="$RUBYOPT"

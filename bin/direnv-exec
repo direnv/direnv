@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Works a bit like /usr/bin/env 
 

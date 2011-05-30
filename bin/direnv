@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # git-like libexec switcher
 
