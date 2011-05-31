@@ -27,7 +27,7 @@ layout() {
   eval "layout_$1"
 }
 
-if has rvm; then
+if [ -n "$rvm_path" ]; then
   # source rvm on first call, haha :)
   rvm() {
     unset rvm
