@@ -15,10 +15,11 @@ PATH_add() {
 }
 
 layout_ruby() {
-  PATH_add ".direnv/gems/bin"
+  ruby_version=`ruby -e"puts RUBY_VERSION"`
+  PATH_add ".direnv/gems-${ruby_version}/bin"
   PATH_add "bin"
   export RUBYLIB=$PWD/lib
-  export GEM_HOME=$PWD/.direnv/gems-`ruby -e"puts RUBY_VERSION"`
+  export GEM_HOME=$PWD/.direnv/gems-${ruby_version}
   export RBXOPT=-Xrbc.db=$PWD/.direnv/rbx-cache
 }
 
