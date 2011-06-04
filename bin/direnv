@@ -14,14 +14,12 @@ abs_dirname() {
   orig_dir=`pwd`
   path="$1"
   # Resolve the symlink(s) recursively
-  while true; do
+  while [ -n "$path" ]; do
     cd `dirname "$path"`
-    path=`readlink "$path" || true`
-    if [ -z "$path" ]; then
-      break
-    fi
+    name=`basename "$path"`
+    path=`readlink "$name" || true`
   done
-  unset path
+  unset name path
 
   # prints an absolute path here
   pwd
