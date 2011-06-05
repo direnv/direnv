@@ -31,7 +31,9 @@ if [ -n "$rvm_path" ]; then
   # source rvm on first call, haha :)
   rvm() {
     unset rvm
+    set +e
     . "$rvm_path/scripts/rvm"
     rvm $@
+    set -e
   }
 fi
