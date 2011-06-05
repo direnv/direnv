@@ -1,45 +1,50 @@
 direnv - Unclutter your .profile
 ================================
 
-direnv is a small POSIX utility that works in combination with your shell (bash or zsh).
-It allows you to have path-dependent environment variables, and load/unload them
-when navigating through your filesystem.
+direnv allows you to have path-dependent environment variables. It works in combination with your shell (bash or zsh) to make the magic work.
 
-Usage
------
+Example
+-------
 
-Usually, I set an .envrc file in projects that have a bin/ or lib/ directory.
+    $ cd ~/code/my_project
+    $ ls
+    bin/ lib/ Rakefile README.md
+    $ echo $PATH
+    /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+    $ echo PATH_add bin > .envrc
+    direnv: loading /Users/zimbatm/code/my_project
+    $ echo $PATH
+    /Users/zimbatm/code/my_project/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+    $ cd ..
+    direnv: unloading /Users/zimbatm/code/my_project
+    $ echo $PATH
+    /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
 
-When navigating a project's root directory (or sub-directories), direnv will
-add the bin/ directory to my path and the lib/ directory to the target-language's libpath.
-That way they are handily available, no need to set something by hand.
-
-I also use direnv to set the GEM_HOME environment variable to make project-dependent gemsets.
-The gemset moves with the project unlike in rvm. Feature request: the cache directory could
-be set to $HOME/.gem/cache, it would really help.
+For more examples, check out the wiki pages: https://github.com/zimbatm/direnv/wiki
 
 Install
 -------
 
-1) Get the code
+1a) Get the code and put direnv in your path
 
-  git clone http://github.com/zimbatm/shell-env
+    git clone http://github.com/zimbatm/shell-env
+    ln -s `pwd`/direnv/bin /usr/local/bin/direnv
 
-2) Put `direnv` in your PATH
+1b) Use homebrew (for OSX users)
 
-For example by symlinking it in your ~/bin or /usr/local/bin directory
+    brew install direnv
 
-3) Add this line to your .bashrc:
+2) Add this line at the end of your .bashrc (after rvm, git-prompt, ...):
 
     eval `direnv hook bash`
 
-zsh users can use the same code and forget the last line, precmd is a magic function.
-Note that on my install zsh's %c in PROMPT would replace the current directory with DIRENV_DIR for some reason. Replace with %C.
+
+Note that zsh's "named directory" feature will replace %c in your PROMPT with "~DIRENV_DIR". Until I find a solution, use %C instead if it annoys you.
 
 Contributors (and thanks)
 -------------------------
 
-* Joshua Peek (aka. josh) for his patch
+* Joshua Peek (aka. josh) for his patch and support
 * Magnus Holm (aka. judofyr) for his patches and ideas
 
 LICENCE
