@@ -10,6 +10,7 @@ abspath() {
   echo $PWD/$1
 }
 
+# Safer PATH handling
 PATH_add() {
   export PATH="`abspath "$1"`:$PATH"
 }
@@ -26,6 +27,14 @@ layout_ruby() {
 
 layout() {
   eval "layout_$1"
+}
+
+# Inherit another file.
+# Did you know you could override that function ? wicked
+source() {
+  pushd `dirname "$1"`
+  . `basename "$1"`
+  popd
 }
 
 if [ -n "$rvm_path" ]; then
