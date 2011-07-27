@@ -23,7 +23,7 @@ fi
 # More of them here: http://www.linux.org/docs/ldp/howto/Xterm-Title-4.html
 if [ "$target" = "bash" ]; then
   cat <<HOOK
-export PROMPT_COMMAND="eval \\\`direnv export\\\`;\$PROMPT_COMMAND"
+PROMPT_COMMAND="eval \\\`direnv export\\\`;\$PROMPT_COMMAND"
 HOOK
 elif [ "$target" = "zsh" ]; then
   cat <<HOOK
