@@ -22,8 +22,9 @@ direnv_find_rc() {
 
 if direnv_find_rc; then
   unset direnv_find_rc
+  eval `stat -s $PWD/.envrc`
   if [ -n "$DIRENV_BACKUP" ]; then
-    if [ "$DIRENV_DIR" = "`pwd`" ]; then
+    if [ "$DIRENV_DIR" = "`pwd`" ] && [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
       # env already loaded
       exit 0
     fi
@@ -33,8 +34,9 @@ if direnv_find_rc; then
   . `direnv stdlib`
   DIRENV_BACKUP=`direnv dump`
   DIRENV_DIR=$PWD
+  DIRENV_MTIME=$st_mtime
   echo "direnv: loading $PWD" >&2
-  export DIRENV_BACKUP DIRENV_DIR
+  export DIRENV_BACKUP DIRENV_DIR DIRENV_MTIME
   if [ -n "$DIRENV_CONTEXT" ]; then
     . .env.$DIRENV_CONTEXT >&2
   else
