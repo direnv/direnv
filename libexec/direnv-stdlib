@@ -32,9 +32,9 @@ layout() {
 # Inherit another file.
 # Did you know you could override that function ? wicked
 source() {
-  pushd `dirname "$1"`
-  . `basename "$1"`
-  popd
+  pushd `dirname "$1"` > /dev/null
+  . ./`basename "$1"`
+  popd > /dev/null
 }
 
 if [ -n "$rvm_path" ]; then
