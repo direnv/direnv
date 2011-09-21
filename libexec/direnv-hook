@@ -16,9 +16,13 @@ fi
 
 if [ -z "$target" ]; then
   echo "Please specify the target shell" >&2
-  echo "usage: direnv hook shell-name" >&2
+  echo "usage: direnv hook \$0" >&2
   exit 1
 fi
+
+target=${target#-}
+target=${target#/bin/}
+target=${target#/usr/bin/}
 
 # More of them here: http://www.linux.org/docs/ldp/howto/Xterm-Title-4.html
 if [ "$target" = "bash" ]; then

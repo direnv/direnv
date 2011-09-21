@@ -36,7 +36,7 @@ Install
 
 2) Add this line at the end of your .bashrc (after rvm, git-prompt, ...):
 
-    eval `direnv hook bash`
+    eval `direnv hook $0`
 
 
 Note that zsh's "named directory" feature will replace %c in your PROMPT with "~DIRENV_DIR". Until I find a solution, use %C instead if it annoys you.
