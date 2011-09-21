@@ -29,9 +29,8 @@ layout() {
   eval "layout_$1"
 }
 
-# Inherit another file.
-# Did you know you could override that function ? wicked
-source() {
+# Inherit another .envrc
+source_env() {
   pushd `dirname "$1"` > /dev/null
   . ./`basename "$1"`
   popd > /dev/null
