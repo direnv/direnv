@@ -22,7 +22,11 @@ direnv_find_rc() {
 
 if direnv_find_rc; then
   unset direnv_find_rc
-  eval `stat -s $PWD/.envrc`
+  if [ $(uname) = Linux ]; then
+    st_mtime=`stat -c '%Y' "$PWD/.envrc"`
+  else
+    eval `stat -s $PWD/.envrc`
+  fi
   if [ -n "$DIRENV_BACKUP" ]; then
     if [ "$DIRENV_DIR" = "`pwd`" ] && [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
       # env already loaded
