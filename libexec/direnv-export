@@ -31,6 +31,9 @@ if direnv_find_rc; then
     if [ "$DIRENV_DIR" = "`pwd`" ] && [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
       # env already loaded
       exit 0
+    else
+      echo "direnv: unloading $DIRENV_DIR" >&2
+      direnv diff "$DIRENV_BACKUP"
     fi
     eval `direnv diff "$DIRENV_BACKUP"`
   fi
