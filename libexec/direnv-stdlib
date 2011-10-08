@@ -1,4 +1,5 @@
 #!/bin/echo
+# vim: ft=sh
 
 has() {
   which "$1" >/dev/null 2>&1
@@ -7,7 +8,11 @@ has() {
 
 # TODO: replace .. in paths
 abspath() {
-  echo $PWD/$1
+  if [ "${1#/}" = "$1" ]; then
+    echo $PWD/$1
+  else
+    echo $1
+  fi
 }
 
 # Safer PATH handling
@@ -17,16 +22,29 @@ PATH_add() {
 
 layout_ruby() {
   # TODO: ruby_version should be the ABI version
-  ruby_version=`ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION"`
-  PATH_add ".direnv/${ruby_version}/bin"
+  _ruby_version=`ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION"`
+  PATH_add ".direnv/${_ruby_version}/bin"
   PATH_add "bin"
   export RUBYLIB=$PWD/lib
-  export GEM_HOME=$PWD/.direnv/${ruby_version}
+  export GEM_HOME=$PWD/.direnv/${_ruby_version}
   export RBXOPT=-Xrbc.db=$PWD/.direnv/rbx-cache
 }
 
 layout() {
   eval "layout_$1"
+}
+
+program_prefix=$HOME/.rbenv/versions
+set_program_prefix() {
+  program_prefix=$1
+}
+
+# $!: wanted version
+add_program() {
+  path="$program_prefix/$1*/bin"
+  pushd $path >/dev/null
+  PATH_add $PWD
+  popd > /dev/null
 }
 
 # Inherit another .envrc
