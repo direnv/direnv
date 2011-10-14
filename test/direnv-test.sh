@@ -10,13 +10,16 @@ eval `direnv export`
 test_start() {
   pushd "scenarios/$1" > /dev/null
   echo "## Testing $1 ##"
-  time direnv export > /dev/null
-  eval `direnv export`
+  time direnv dump > /dev/null
+  foo=`direnv dump`
+  time direnv diff "$foo"
+  time direnv export > /dev/null 2>&1
+  eval `direnv export` 2>/dev/null
 }
 
 test_stop() {
   popd > /dev/null
-  eval `direnv export`
+  eval `direnv export` 2>/dev/null
 }
 
 test_start base
