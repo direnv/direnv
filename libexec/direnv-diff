@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: ft=ruby
 #
 # Porcelaine tool
 #
@@ -16,7 +17,7 @@ require 'zlib'
 require 'optparse'
 require 'shellwords'
 
-IGNORE_KEYS = %w{_ PWD OLDPWD SHLVL SHELL}
+IGNORE_KEYS = %w{_ PWD OLDPWD SHLVL SHELL DIRENV_BACKUP}
 
 # Returns the difference of two env hashes. Suppressions are represented as
 # nil values.

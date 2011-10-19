@@ -30,26 +30,33 @@ if direnv_find_rc; then
       # env already loaded
       exit 0
     fi
+    # restore the old environment
     eval `direnv diff "$DIRENV_BACKUP"`
+  else
+    # save the original environment
+    export DIRENV_BACKUP=`direnv dump`
+    echo "export DIRENV_BACKUP=\"${DIRENV_BACKUP}\";"
   fi
+
+  # DIRENV variables
+  export DIRENV_DIR=$PWD
+  export DIRENV_MTIME=$st_mtime
+
   # load the stdlib
   . `direnv stdlib`
-  DIRENV_BACKUP=`direnv dump`
-  DIRENV_DIR=$PWD
-  DIRENV_MTIME=$st_mtime
+
   echo "direnv: loading $PWD" >&2
-  export DIRENV_BACKUP DIRENV_DIR DIRENV_MTIME
-  if [ -n "$DIRENV_CONTEXT" ]; then
-    . .env.$DIRENV_CONTEXT >&2
-  else
-    . "$PWD/.envrc" >&2
-  fi
+  . "$PWD/.envrc" >&2
+
+  # export the diff
   direnv diff -r "$DIRENV_BACKUP"
   echo "alias direnv-reload='unset DIRENV_DIR'"
 else
   if [ -n "$DIRENV_BACKUP" ]; then
     echo "direnv: unloading $DIRENV_DIR" >&2
     direnv diff "$DIRENV_BACKUP"
+    # Also remove the backup
+    echo "unset DIRENV_BACKUP"
     echo "unalias direnv-reload"
   fi
 fi
