@@ -57,6 +57,6 @@ else
     direnv diff "$DIRENV_BACKUP"
     # Also remove the backup
     echo "unset DIRENV_BACKUP"
-    echo "unalias direnv-reload"
+    echo "if type direnv-reload >/dev/null; then unalias direnv-reload; fi"
   fi
 fi
