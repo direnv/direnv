@@ -56,7 +56,7 @@ else
     echo "direnv: unloading $DIRENV_DIR" >&2
     direnv diff "$DIRENV_BACKUP"
     # Also remove the backup
-    echo "unset DIRENV_BACKUP"
-    echo "if type direnv-reload >/dev/null; then unalias direnv-reload; fi"
+    echo "unset DIRENV_BACKUP;"
+    echo "if type direnv-reload >/dev/null ; then unalias direnv-reload; fi"
   fi
 fi
