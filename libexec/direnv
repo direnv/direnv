@@ -26,14 +26,16 @@ abs_dirname() {
   cd "$orig_dir"
 }
 
-bindir=`abs_dirname $0`
+if [ -z "$DIRENV_LIBEXEC_DIR" ]; then
+  export DIRENV_LIBEXEC_DIR=`abs_dirname $0`
+fi
 
 if [ -z "$1" ]; then
   usage
   exit 1
 fi
 
-prefix="$bindir/direnv-"
+prefix="$DIRENV_LIBEXEC_DIR/direnv-"
 
 if ! [ -x "$prefix$1" ]; then
   prefix="direnv-"

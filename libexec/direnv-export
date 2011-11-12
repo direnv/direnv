@@ -17,7 +17,6 @@ direnv_find_rc() {
   done
 }
 
-
 if direnv_find_rc; then
   unset direnv_find_rc
   if [ $(uname) = Linux ]; then
@@ -50,7 +49,8 @@ if direnv_find_rc; then
 
   # export the diff
   direnv diff -r "$DIRENV_BACKUP"
-  echo "alias direnv-reload='unset DIRENV_DIR'"
+  echo "export DIRENV_LIBEXEC_DIR='$DIRENV_LIBEXEC_DIR';"
+  echo "alias direnv-reload='unset DIRENV_DIR';"
 else
   if [ -n "$DIRENV_BACKUP" ]; then
     echo "direnv: unloading $DIRENV_DIR" >&2
