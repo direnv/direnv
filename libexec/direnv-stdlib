@@ -34,17 +34,31 @@ layout() {
   eval "layout_$1"
 }
 
-program_prefix=$HOME/.rbenv/versions
-set_program_prefix() {
-  program_prefix=$1
+# This folder contains a <program-name>/<version> structure
+cellar_path=/usr/local/Cellar
+set_cellar_path() {
+  cellar_path=$1
 }
 
-# $!: wanted version
+# $1: program name
+# $2: wanted version
+use() {
+  path="$cellar_path/$1/$2/bin"
+  if [ -d "$path" ]; then
+    echo "Using $1 v$2"
+    PATH_add "$path"
+  else
+    echo "* Unable to load $path"
+  fi
+  unset path
+}
+
+set_program_prefix() {
+  echo '`set_program_prefix` was renamed to `set_cellar_path`'
+}
+
 add_program() {
-  path="$program_prefix/$1*/bin"
-  pushd $path >/dev/null
-  PATH_add $PWD
-  popd > /dev/null
+  echo '`add_program` does not exist anymore and was replaced by `use`'
 }
 
 # Inherit another .envrc
