@@ -63,9 +63,15 @@ add_program() {
 
 # Inherit another .envrc
 source_env() {
-  pushd `dirname "$1"` > /dev/null
-  . ./`basename "$1"`
+  rcfile=$1
+  if [ -d "$1" ]; then
+    rcfile=$1/.envrc
+  fi
+  echo "direnv: loading $rcfile"
+  pushd `dirname "$rcfile"` > /dev/null
+  . ./`basename "$rcfile"`
   popd > /dev/null
+  unset rcfile
 }
 
 if [ -n "$rvm_path" ]; then
