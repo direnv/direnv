@@ -68,14 +68,16 @@ rescue OptionParser::ParseError => ex
   exit 1
 end
 
-unless ARGV[0]
+old_env = ARGV[0] || ENV['DIRENV_BACKUP']
+
+unless old_env
   $stderr.puts "Missing OLD_ENV argument"
   exit 1
 end
 
 old_env = Marshal.load(
   Zlib::Inflate.inflate(
-    Base64.decode64(ARGV[0])))
+    Base64.decode64(old_env)))
 
 if reverse
   diff = diff_env(old_env, ENV.to_hash)
