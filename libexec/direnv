@@ -26,8 +26,8 @@ abs_dirname() {
   cd "$orig_dir"
 }
 
-if [ -z "$DIRENV_LIBEXEC_DIR" ]; then
-  export DIRENV_LIBEXEC_DIR=`abs_dirname $0`
+if [ -z "$DIRENV_LIBEXEC" ]; then
+  export DIRENV_LIBEXEC=`abs_dirname $0`
 fi
 
 if [ -z "$1" ]; then
@@ -35,7 +35,7 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-prefix="$DIRENV_LIBEXEC_DIR/direnv-"
+prefix="$DIRENV_LIBEXEC/direnv-"
 
 if ! [ -x "$prefix$1" ]; then
   prefix="direnv-"
