@@ -1,0 +1,18 @@
+direnv-diff(1) -- Diff of ENVs
+==============================
+
+## SYNOPSIS
+
+`direnv diff [options] <OLD_ENV>`
+
+## DESCRIPTION
+
+This command is part of the porcelain, you usually don't use it direclty.
+
+Echoes the difference between your ENV and the given compressed OLD_ENV. See direnv-dump(1) on how to produce a ENV dump.
+
+ * -r outputs the reverse diff
+
+## SEE ALSO
+
+direnv(1), direnv-dump(1)

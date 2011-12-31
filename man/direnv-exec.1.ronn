@@ -1,0 +1,14 @@
+direnv-exec(1) -- Replaces /usr/bin/env
+=======================================
+
+## SYNOPSIS
+
+`direnv exec` command ...
+
+## DESCRIPTION
+
+Runs your program after loading the .envrc. The idea is to use direnv in your production systems but I never got around to really use that so beware :)
+
+## SEE ALSO
+
+direnv(1)

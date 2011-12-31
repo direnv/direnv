@@ -1,0 +1,77 @@
+direnv(1) -- Unclutter your .profile
+===========================================
+
+## SYNOPSIS
+
+`direnv` [options] <command> [...]
+
+## DESCRIPTION
+
+The `direnv` project aims to allow path-dependent environment variables in your shell. It has many uses but mine it to have project-specific settings so as to not clutter my `~/.profile`. I'm using it to specify ruby version, set AWS or SSH keys, ...
+
+The `direnv` command-line is a proxy to the sub-commands and it work like the git(1) wrapper. You don't usually use that anyways. Once the shell extension is loaded, most of the interaction is done in your `.envrc` files.
+
+## EXAMPLE
+
+    $ cd ~/code/my_project
+    $ ls
+    bin/ lib/ Rakefile README.md
+    $ echo $PATH
+    /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+    $ echo PATH_add bin > .envrc
+    direnv: loading /Users/zimbatm/code/my_project
+    $ echo $PATH
+    /Users/zimbatm/code/my_project/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+    $ cd ..
+    direnv: unloading /Users/zimbatm/code/my_project
+    $ echo $PATH
+    /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+
+For common usage examples, check out the wiki pages: https://github.com/zimbatm/direnv/wiki
+
+## USAGE
+
+Place a `.envrc` file in the folder you want and add some export(1) in it. If you cd(1) in that directory or child, the exported variables are available. If you cd(1) out of it, they are unloaded.
+
+A range of utility functions are available in the `.envrc` context and are documented in the direnv-stdlib(1) page.
+
+If the `.envrc` file is added/changed/removed or you are no longer in the path, the environment is reloaded.
+
+## INSTALL
+
+ * 1a) Get the code and put direnv in your path
+
+    git clone http://github.com/zimbatm/shell-env
+    ln -s `pwd`/direnv/bin /usr/local/bin/direnv
+
+ * 1b) Use homebrew (for OSX users)
+
+    brew install direnv
+
+ * 2) Add this line at the end of your .bashrc (after rvm, git-prompt, ...):
+
+    eval `direnv hook $0`
+
+Note that zsh's "named directory" feature will replace %c in your PROMPT with "~DIRENV_DIR".
+
+## HOW IT WORKS
+
+bash and zsh has a mechanism to execute code before each prompt is displayed. direnv uses that to `eval` a diff of your environment, adding or removing environment variables based on your $PATH and whenever or not an .envrc has been found. When a new .envrc is found, the old ENV is backed-up in DIRENV_BACKUP and used later for the restore. Then the direnv-stdlib + .envrc are evaled in a bash process and the diff is fed to the eval. Some ruby is used for the backup and the diff because it's hard to do it in bash. Ideally we wouldn't depend on ruby because it's not available everywhere.
+
+## BUGS
+
+Bug reports and contributions are welcome. Just hop to http://github.com/zimbatm/direnv/issues or drop me an email.
+
+## COPYRIGHT
+
+Thank you for making direnv better
+
+* Joshua Peek (aka. josh) for his patch and support
+* Magnus Holm (aka. judofyr) for his patches and ideas
+* Sam Stephenson (aka. sstephenson) for his expand_path code that I stole from https://github.com/sstephenson/bats
+
+Copyright (C) 2011 Jonas Pfenniger <jonas@pfenniger.name> and contributors under the MIT licence.
+
+## SEE ALSO
+
+direnv-diff(1), direnv-dump(1), direnv-exec(1), direnv-export(1), direnv-hook(1), direnv-stdlib(1)

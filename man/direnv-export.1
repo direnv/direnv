@@ -1,0 +1,22 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "DIRENV\-EXPORT" "1" "December 2011" "0x2a" "direnv"
+.
+.SH "NAME"
+\fBdirenv\-export\fR \- Main direnv engine
+.
+.SH "SYNOPSIS"
+\fBdirenv export\fR
+.
+.SH "DESCRIPTION"
+This command is part of the porcelain, you usually don\'t use it direclty\.
+.
+.P
+Scans for an \.envrc in your current and up directories and prints the result so it can be evaled by \fBeval\fR
+.
+.P
+The mtime of the \.envrc is stored so it can be reloaded if it\'s changed\.
+.
+.SH "SEE ALSO"
+direnv(1)

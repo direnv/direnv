@@ -1,0 +1,22 @@
+direnv-hook(1) -- shell hook installation utility
+=================================================
+
+## SYNOPSIS
+
+`direnv hook $0`
+
+## DESCRIPTION
+
+Small utility function to install the shell hook in your .bashrc or .zshrc
+
+## USAGE
+
+in ~/.bashrc or ~/.zshrc :
+
+    eval `direnv hook $0`
+
+put it at the end to make sure it doesn't interfere with the rest.
+
+## SEE ALSO
+
+direnv(1)

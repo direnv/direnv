@@ -1,0 +1,18 @@
+direnv-dump(1) -- ENV backup tool
+=================================
+
+## SYNOPSIS
+
+`direnv dump`
+
+## DESCRIPTION
+
+This command is part of the porcelain, you usually don't use it direclty.
+
+Echoes your environment variables in a compressed string.
+
+The result is produced with ruby marshal | gzip | base64
+
+## SEE ALSO
+
+direnv(1), direnv-diff(1), direnv-export(1)

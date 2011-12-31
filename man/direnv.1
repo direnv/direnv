@@ -1,0 +1,99 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "DIRENV" "1" "December 2011" "0x2a" "direnv"
+.
+.SH "NAME"
+\fBdirenv\fR \- Unclutter your \.profile
+.
+.SH "SYNOPSIS"
+\fBdirenv\fR [options] \fIcommand\fR [\.\.\.]
+.
+.SH "DESCRIPTION"
+The \fBdirenv\fR project aims to allow path\-dependent environment variables in your shell\. It has many uses but mine it to have project\-specific settings so as to not clutter my \fB~/\.profile\fR\. I\'m using it to specify ruby version, set AWS or SSH keys, \.\.\.
+.
+.P
+The \fBdirenv\fR command\-line is a proxy to the sub\-commands and it work like the git(1) wrapper\. You don\'t usually use that anyways\. Once the shell extension is loaded, most of the interaction is done in your \fB\.envrc\fR files\.
+.
+.SH "EXAMPLE"
+.
+.nf
+
+$ cd ~/code/my_project
+$ ls
+bin/ lib/ Rakefile README\.md
+$ echo $PATH
+/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+$ echo PATH_add bin > \.envrc
+direnv: loading /Users/zimbatm/code/my_project
+$ echo $PATH
+/Users/zimbatm/code/my_project/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+$ cd \.\.
+direnv: unloading /Users/zimbatm/code/my_project
+$ echo $PATH
+/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+.
+.fi
+.
+.P
+For common usage examples, check out the wiki pages: https://github\.com/zimbatm/direnv/wiki
+.
+.SH "USAGE"
+Place a \fB\.envrc\fR file in the folder you want and add some export(1) in it\. If you cd(1) in that directory or child, the exported variables are available\. If you cd(1) out of it, they are unloaded\.
+.
+.P
+A range of utility functions are available in the \fB\.envrc\fR context and are documented in the direnv\-stdlib(1) page\.
+.
+.P
+If the \fB\.envrc\fR file is added/changed/removed or you are no longer in the path, the environment is reloaded\.
+.
+.SH "INSTALL"
+.
+.IP "\(bu" 4
+1a) Get the code and put direnv in your path
+.
+.IP
+git clone http://github\.com/zimbatm/shell\-env ln \-s \fBpwd\fR/direnv/bin /usr/local/bin/direnv
+.
+.IP "\(bu" 4
+1b) Use homebrew (for OSX users)
+.
+.IP
+brew install direnv
+.
+.IP "\(bu" 4
+2) Add this line at the end of your \.bashrc (after rvm, git\-prompt, \.\.\.):
+.
+.IP
+eval \fBdirenv hook $0\fR
+.
+.IP "" 0
+.
+.P
+Note that zsh\'s "named directory" feature will replace %c in your PROMPT with "~DIRENV_DIR"\.
+.
+.SH "HOW IT WORKS"
+bash and zsh has a mechanism to execute code before each prompt is displayed\. direnv uses that to \fBeval\fR a diff of your environment, adding or removing environment variables based on your $PATH and whenever or not an \.envrc has been found\. When a new \.envrc is found, the old ENV is backed\-up in DIRENV_BACKUP and used later for the restore\. Then the direnv\-stdlib + \.envrc are evaled in a bash process and the diff is fed to the eval\. Some ruby is used for the backup and the diff because it\'s hard to do it in bash\. Ideally we wouldn\'t depend on ruby because it\'s not available everywhere\.
+.
+.SH "BUGS"
+Bug reports and contributions are welcome\. Just hop to http://github\.com/zimbatm/direnv/issues or drop me an email\.
+.
+.SH "COPYRIGHT"
+Thank you for making direnv better
+.
+.IP "\(bu" 4
+Joshua Peek (aka\. josh) for his patch and support
+.
+.IP "\(bu" 4
+Magnus Holm (aka\. judofyr) for his patches and ideas
+.
+.IP "\(bu" 4
+Sam Stephenson (aka\. sstephenson) for his expand_path code that I stole from https://github\.com/sstephenson/bats
+.
+.IP "" 0
+.
+.P
+Copyright (C) 2011 Jonas Pfenniger \fIjonas@pfenniger\.name\fR and contributors under the MIT licence\.
+.
+.SH "SEE ALSO"
+direnv\-diff(1), direnv\-dump(1), direnv\-exec(1), direnv\-export(1), direnv\-hook(1), direnv\-stdlib(1)
