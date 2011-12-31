@@ -10,16 +10,12 @@ eval `direnv export`
 test_start() {
   pushd "scenarios/$1" > /dev/null
   echo "## Testing $1 ##"
-  time direnv dump > /dev/null
-  foo=`direnv dump`
-  time direnv diff "$foo"
-  time direnv export > /dev/null 2>&1
-  eval `direnv export` 2>/dev/null
+  time eval `direnv export`
 }
 
 test_stop() {
   popd > /dev/null
-  eval `direnv export` 2>/dev/null
+  eval `direnv export` >/dev/null 2>&1
 }
 
 test_start base
@@ -36,4 +32,5 @@ test_stop
 
 # Make sure directories with spaces are fine
 test_start "space dir"
+test "$SPACE_DIR" = "true"
 test_stop
