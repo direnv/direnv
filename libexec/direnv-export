@@ -42,7 +42,7 @@ if direnv_find_rc; then
   export DIRENV_MTIME=$st_mtime
 
   # load the stdlib
-  . `direnv stdlib`
+  . "$DIRENV_LIBEXEC/direnv-stdlib"
 
   echo "direnv: loading $PWD" >&2
   . "$PWD/.envrc" >&2
