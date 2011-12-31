@@ -41,7 +41,10 @@ if direnv_find_rc; then
     fi
 
     # restore the old environment
-    eval `$DIRENV_LIBEXEC/direnv-diff "$DIRENV_BACKUP"`
+    diff=`$DIRENV_LIBEXEC/direnv-diff "$DIRENV_BACKUP"`
+    echo $diff
+    eval "$diff"
+    unset diff
   else
     # save the original environment
     export DIRENV_BACKUP=`$DIRENV_LIBEXEC/direnv-dump`
