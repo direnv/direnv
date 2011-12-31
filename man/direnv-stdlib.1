@@ -10,25 +10,127 @@
 Library of functions that are available in the \.envrc files
 .
 .SH "USAGE"
-return 0 if $1 is in the $PATH \fBhas $program_name\fR
+.
+.SS "has"
+return 0 if $1 is in the $PATH
 .
 .P
-Transforms a relative path to absolute path \fBexpand_path $some_path\fR
+Example:
+.
+.IP "" 4
+.
+.nf
+
+$ if has ruby; then echo "Yes you have" end
+Yes you have
+.
+.fi
+.
+.IP "" 0
+.
+.SS "expand_path $path"
+Transforms a relative path to absolute path
 .
 .P
-Utility function to prefix $PATH with $some_path\. \fBPATH_add $some_path\fR
+Example:
+.
+.IP "" 4
+.
+.nf
+
+$ pwd
+/path/to/project
+$ expand_path \'\./bin\'
+/path/to/project/bin
+.
+.fi
+.
+.IP "" 0
+.
+.SS "PATH_add $some_path"
+Utility function to prefix $PATH with $some_path\.
 .
 .P
-Sets your $GEM_HOME to \./\.direnv/$ruby_version and adds the bin dir to your $PATH Adds \./bin to your $PATH Adds \./lib to your $RUBYLIB \fBlayout ruby\fR
+Example:
+.
+.IP "" 4
+.
+.nf
+
+$ PATH_add bin
+$ echo $PATH
+/path/to/project/bin:/usr/local/bin:/usr/bin
+.
+.fi
+.
+.IP "" 0
+.
+.SS "layout ruby"
+Sets your $GEM_HOME to \./\.direnv/$ruby_version and adds the bin dir to your $PATH Adds \./bin to your $PATH Adds \./lib to your $RUBYLIB
 .
 .P
-Adds the $cellar_path/$program/$version/bin to you $PATH \fBuse $program $version\fR
+Example:
+.
+.IP "" 4
+.
+.nf
+
+$ layout ruby
+.
+.fi
+.
+.IP "" 0
+.
+.SS "use $program $version"
+Adds the $cellar_path/$program/$version/bin to you $PATH
 .
 .P
-Loads another \.envrc into your environment\. The \.envrc is loaded with the $PWD set to it\'s folder\. This allows you to inherit environments\. \fBsource_env $other_dir_or_envrc\fR
+Example:
+.
+.IP "" 4
+.
+.nf
+
+$ use ruby 1\.9\.3
+Using ruby v1\.9\.3
+.
+.fi
+.
+.IP "" 0
+.
+.SS "source_env"
+Loads another \.envrc into your environment\. The \.envrc is loaded with the $PWD set to it\'s folder\. This allows you to inherit environments\.
 .
 .P
-Wrapper to use rvm, like \fBrvm use 1\.8\.7\fR\. Do that before \fBlayout ruby\fR if you want to use both\. \fBrvm \.\.\.\fR
+Example:
+.
+.IP "" 4
+.
+.nf
+
+$ source_env \.\.
+direnv: loading /path/to/parent
+.
+.fi
+.
+.IP "" 0
+.
+.SS "rvm"
+Wrapper to use rvm, like \fBrvm use 1\.8\.7\fR\. Do that before \fBlayout ruby\fR if you want to use both\.
+.
+.P
+Example:
+.
+.IP "" 4
+.
+.nf
+
+$ rvm use 1\.8\.7
+using ruby 1\.8\.7
+.
+.fi
+.
+.IP "" 0
 .
 .SH "SEE ALSO"
 direnv(1)
