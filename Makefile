@@ -5,7 +5,7 @@ DESTDIR := /usr/local
 RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv --organization=0x2a" || echo "@echo 'Could not generate manpage because ronn is missing. gem install ronn' || ")
 MAN_PAGES := $(shell ls libexec | sed -e "s/\(.*\)/man\/\1.1/g")
 
-.PHONY: all man test release install
+.PHONY: all man test release install gh-pages
 all: man test
 
 %.1: %.1.ronn
@@ -18,6 +18,18 @@ test:
 
 release:
 	git tag v$(VERSION)
+
+gh-pages:
+	git stash
+	$(RONN) -h man/*.ronn
+	git checkout gh-pages
+	cp man/*.html .
+	rm -rf man
+	git add .
+	git commit -m "$(VERSION)"
+	git push
+	git checkout master
+	git stash pop
 
 install:
 	install -d bin $(DESTDIR)/bin
