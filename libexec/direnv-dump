@@ -14,8 +14,14 @@ ENV['RUBYOPT'] = ENV.delete 'DIRENV_RUBYOPT'
 require 'zlib'
 require 'base64'
 
+# Don't backup unused variables
+env = ENV.to_hash
+%w{_ PWD OLDPWD SHLVL SHELL DIRENV_BACKUP DIRENV_LIBEXEC}.each do |var|
+  env.delete(var)
+end
+
 puts Base64.encode64(
   Zlib::Deflate.deflate(
-    Marshal.dump(ENV.to_hash), Zlib::BEST_COMPRESSION
+    Marshal.dump(env), Zlib::BEST_COMPRESSION
   )
 ).gsub("\n",'')
