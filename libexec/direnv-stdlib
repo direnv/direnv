@@ -26,8 +26,8 @@ PATH_add() {
 
 layout_ruby() {
   # TODO: ruby_version should be the ABI version
-  _ruby_version=`ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION"`
-  PATH_add ".direnv/${_ruby_version}/bin"
+  local ruby_version=`ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION"`
+  PATH_add ".direnv/${ruby_version}/bin"
   PATH_add "bin"
   export RUBYLIB=$PWD/lib
   export GEM_HOME=$PWD/.direnv/${_ruby_version}
