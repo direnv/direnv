@@ -34,7 +34,7 @@ gh-pages:
 install:
 	install -d bin $(DESTDIR)/bin
 	install -d libexec $(DESTDIR)/libexec
-	install -d man $(DESTDIR)/man/man1
+	install -d man $(DESTDIR)/share/man/man1
 	cp -R bin/* $(DESTDIR)/bin
 	cp -R libexec/* $(DESTDIR)/libexec
-	cp -R man/*.1 $(DESTDIR)/man/man1
+	cp -R man/*.1 $(DESTDIR)/share/man/man1
