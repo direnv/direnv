@@ -4,6 +4,10 @@
 
 set -e
 
+if [ -z "${DIRENV_LIBEXEC}" ]; then
+  export DIRENV_LIBEXEC=$(dirname $0)
+fi
+
 direnv_find_rc() {
   while true; do
     local cur_path=`pwd 2>/dev/null`
@@ -19,22 +23,32 @@ direnv_find_rc() {
 
 if direnv_find_rc; then
   unset direnv_find_rc
+
   if [ $(uname) = Linux ]; then
     st_mtime=`stat -c '%Y' "$PWD/.envrc"`
   else
     eval `stat -s "$PWD/.envrc"`
   fi
+
   if [ -n "$DIRENV_BACKUP" ]; then
-    if [ "$DIRENV_DIR" = "`pwd`" ] && [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
+    if [ "$DIRENV_DIR" = "$PWD" ] && [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
       # env already loaded
       exit 0
+    elif [ "$st_mtime" -gt "${DIRENV_MTIME:-0}" ]; then
+      echo "direnv: reloading $PWD" >&2
+    else
+      echo "direnv: switching from $DIRENV_DIR to $PWD" >&2
     fi
+
     # restore the old environment
-    eval `direnv diff "$DIRENV_BACKUP"`
+    eval `$DIRENV_LIBEXEC/direnv-diff "$DIRENV_BACKUP"`
   else
     # save the original environment
-    export DIRENV_BACKUP=`direnv dump`
+    export DIRENV_BACKUP=`$DIRENV_LIBEXEC/direnv-dump`
     echo "export DIRENV_BACKUP=\"${DIRENV_BACKUP}\";"
+    echo "export DIRENV_LIBEXEC=\"${DIRENV_LIBEXEC}\";"
+
+    echo "direnv: loading $PWD" >&2
   fi
 
   # DIRENV variables
@@ -42,19 +56,14 @@ if direnv_find_rc; then
   export DIRENV_MTIME=$st_mtime
 
   # load the stdlib
-  . "$DIRENV_LIBEXEC/direnv-stdlib"
-
-  echo "direnv: loading $PWD" >&2
+  . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
   . "$PWD/.envrc" >&2
 
   # export the diff
-  direnv diff -r "$DIRENV_BACKUP"
-  echo "export DIRENV_LIBEXEC='$DIRENV_LIBEXEC';"
-else
-  if [ -n "$DIRENV_BACKUP" ]; then
-    echo "direnv: unloading $DIRENV_DIR" >&2
-    direnv diff "$DIRENV_BACKUP"
-    # Also remove the backup
-    echo "unset DIRENV_BACKUP;"
-  fi
+  $DIRENV_LIBEXEC/direnv-diff -r "$DIRENV_BACKUP"
+elif [ -n "$DIRENV_BACKUP" ]; then
+  echo "direnv: unloading $DIRENV_DIR" >&2
+
+  $DIRENV_LIBEXEC/direnv-diff "$DIRENV_BACKUP"
+  echo "unset DIRENV_BACKUP"
 fi
