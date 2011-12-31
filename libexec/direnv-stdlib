@@ -6,18 +6,22 @@ has() {
   return $?
 }
 
-# TODO: replace .. in paths
 abspath() {
-  if [ "${1#/}" = "$1" ]; then
-    echo $PWD/$1
-  else
-    echo $1
-  fi
+  echo "abspath() renamed to expand_path()"
+  expand_path "$1"
+}
+
+expand_path() {
+  { cd "$(dirname "$1")" 2>/dev/null
+    local dirname="$PWD"
+    cd "$OLDPWD"
+    echo "$dirname/$(basename "$1")"
+  } || echo "$1"
 }
 
 # Safer PATH handling
 PATH_add() {
-  export PATH="`abspath "$1"`:$PATH"
+  export PATH="`expand_path "$1"`:$PATH"
 }
 
 layout_ruby() {
@@ -43,14 +47,13 @@ set_cellar_path() {
 # $1: program name
 # $2: wanted version
 use() {
-  path="$cellar_path/$1/$2/bin"
+  local path="$cellar_path/$1/$2/bin"
   if [ -d "$path" ]; then
     echo "Using $1 v$2"
     PATH_add "$path"
   else
     echo "* Unable to load $path"
   fi
-  unset path
 }
 
 set_program_prefix() {
@@ -63,7 +66,7 @@ add_program() {
 
 # Inherit another .envrc
 source_env() {
-  rcfile=$1
+  local rcfile=$1
   if [ -d "$1" ]; then
     rcfile=$1/.envrc
   fi
@@ -71,7 +74,6 @@ source_env() {
   pushd `dirname "$rcfile"` > /dev/null
   . ./`basename "$rcfile"`
   popd > /dev/null
-  unset rcfile
 }
 
 if [ -n "$rvm_path" ]; then

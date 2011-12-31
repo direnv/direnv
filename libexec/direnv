@@ -8,26 +8,28 @@ usage() {
   echo "direnv export|exec|switch [options]" >&2
 }
 
+readlink=$(type -p greadlink readlink | head -1)
+
 # usage: abs_dirname $filename
 # finds the original $filename path and prints it's absolute folder path
 abs_dirname() {
-  local orig_dir=`pwd`
+  local cwd="$(pwd)"
   local path="$1"
-  local name=
+
   # Resolve the symlink(s) recursively
   while [ -n "$path" ]; do
-    cd `dirname "$path"`
-    name=`basename "$path"`
-    path=`readlink "$name" || true`
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$($readlink "$name" || true)"
   done
 
   # prints an absolute path here
   pwd
-  cd "$orig_dir"
+  cd "$cwd"
 }
 
 if [ -z "$DIRENV_LIBEXEC" ]; then
-  export DIRENV_LIBEXEC=`abs_dirname $0`
+  export DIRENV_LIBEXEC=$(abs_dirname "$0")
 fi
 
 if [ -z "$1" ]; then
