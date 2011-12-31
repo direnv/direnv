@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-#
-# switch environments in the same directory
-
-echo "TODOOOOOOOO !!!"
-exit 1
