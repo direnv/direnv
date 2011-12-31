@@ -52,8 +52,24 @@ If the \fB\.envrc\fR file is added/changed/removed or you are no longer in the p
 .IP "\(bu" 4
 1a) Get the code and put direnv in your path
 .
-.IP
-git clone http://github\.com/zimbatm/shell\-env ln \-s \fBpwd\fR/direnv/bin /usr/local/bin/direnv
+.IP "" 0
+.
+.P
+```
+.
+.IP "" 4
+.
+.nf
+
+git clone http://github\.com/zimbatm/shell\-env
+ln \-s `pwd`/direnv/bin /usr/local/bin/direnv
+.
+.fi
+.
+.IP "" 0
+.
+.P
+```
 .
 .IP "\(bu" 4
 1b) Use homebrew (for OSX users)
@@ -64,10 +80,23 @@ brew install direnv
 .IP "\(bu" 4
 2) Add this line at the end of your \.bashrc (after rvm, git\-prompt, \.\.\.):
 .
-.IP
-eval \fBdirenv hook $0\fR
+.IP "" 0
+.
+.P
+```
+.
+.IP "" 4
+.
+.nf
+
+eval `direnv hook $0`
+.
+.fi
 .
 .IP "" 0
+.
+.P
+```
 .
 .P
 Note that zsh\'s "named directory" feature will replace %c in your PROMPT with "~DIRENV_DIR"\.
@@ -75,8 +104,8 @@ Note that zsh\'s "named directory" feature will replace %c in your PROMPT with "
 .SH "HOW IT WORKS"
 bash and zsh has a mechanism to execute code before each prompt is displayed\. direnv uses that to \fBeval\fR a diff of your environment, adding or removing environment variables based on your $PATH and whenever or not an \.envrc has been found\. When a new \.envrc is found, the old ENV is backed\-up in DIRENV_BACKUP and used later for the restore\. Then the direnv\-stdlib + \.envrc are evaled in a bash process and the diff is fed to the eval\. Some ruby is used for the backup and the diff because it\'s hard to do it in bash\. Ideally we wouldn\'t depend on ruby because it\'s not available everywhere\.
 .
-.SH "BUGS"
-Bug reports and contributions are welcome\. Just hop to http://github\.com/zimbatm/direnv/issues or drop me an email\.
+.SH "CONTRIBUTE"
+Bug reports, contributions and forks are welcome\. Just hop to \fIhttp://github\.com/zimbatm/direnv\fR or drop me an email\.
 .
 .SH "COPYRIGHT"
 Thank you for making direnv better

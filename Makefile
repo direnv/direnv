@@ -2,27 +2,23 @@ VERSION := 0.1.$(shell git log --oneline | wc -l | sed -e "s/ //g")
 
 DESTDIR := /usr/local
 
-RONN := ronn -w --manual=direnv --organization=0x2a
+RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv --organization=0x2a" || echo "@echo 'Could not generate manpage because ronn is missing. gem install ronn' || ")
 MAN_PAGES := $(shell ls libexec | sed -e "s/\(.*\)/man\/\1.1/g")
 
-.PHONY: all
+.PHONY: all man test release install
 all: man test
 
 %.1: %.1.ronn
-	$(RONN) -r $@.ronn
+	$(RONN) -r $<
 
-.PHONY: man
 man: $(MAN_PAGES)
 
-.PHONY: test
 test:
 	./test/direnv-test.sh
 
-.PHONY: release
 release:
 	git tag v$(VERSION)
 
-.PHONY: install
 install:
 	install -d bin $(DESTDIR)/bin
 	install -d libexec $(DESTDIR)/libexec
