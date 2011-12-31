@@ -46,6 +46,7 @@ Contributors (and thanks)
 
 * Joshua Peek (aka. josh) for his patch and support
 * Magnus Holm (aka. judofyr) for his patches and ideas
+* Laurie Young (aka. wildfalcon) for fixing my engrish
 * Martin Aumüller (aka. aumuell) for his patches and awesomeness
 * Sam Stephenson (aka. sstephenson) for his expand_path code that I stole from https://github.com/sstephenson/bats
 
