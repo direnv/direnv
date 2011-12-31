@@ -50,13 +50,11 @@ if direnv_find_rc; then
   # export the diff
   direnv diff -r "$DIRENV_BACKUP"
   echo "export DIRENV_LIBEXEC='$DIRENV_LIBEXEC';"
-  echo "alias direnv-reload='unset DIRENV_DIR';"
 else
   if [ -n "$DIRENV_BACKUP" ]; then
     echo "direnv: unloading $DIRENV_DIR" >&2
     direnv diff "$DIRENV_BACKUP"
     # Also remove the backup
     echo "unset DIRENV_BACKUP;"
-    echo "if type direnv-reload >/dev/null ; then unalias direnv-reload; fi"
   fi
 fi
