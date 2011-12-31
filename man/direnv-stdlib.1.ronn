@@ -7,28 +7,72 @@ Library of functions that are available in the .envrc files
 
 ## USAGE
 
+### has
+
 return 0 if $1 is in the $PATH
-`has $program_name`
+
+Example:
+
+    $ if has ruby; then echo "Yes you have" end
+    Yes you have
+
+### expand_path $path
 
 Transforms a relative path to absolute path
-`expand_path $some_path`
+
+Example:
+
+    $ pwd
+    /path/to/project
+    $ expand_path './bin'
+    /path/to/project/bin
+
+### PATH_add $some_path
 
 Utility function to prefix $PATH with $some_path.
-`PATH_add $some_path`
+
+Example:
+
+    $ PATH_add bin
+    $ echo $PATH
+    /path/to/project/bin:/usr/local/bin:/usr/bin
+
+### layout ruby
 
 Sets your $GEM_HOME to ./.direnv/$ruby_version and adds the bin dir to your $PATH
 Adds ./bin to your $PATH
 Adds ./lib to your $RUBYLIB
-`layout ruby`
+
+Example:
+
+    $ layout ruby
+
+### use $program $version
 
 Adds the $cellar_path/$program/$version/bin to you $PATH
-`use $program $version`
+
+Example:
+
+    $ use ruby 1.9.3
+    Using ruby v1.9.3
+
+### source_env
 
 Loads another .envrc into your environment. The .envrc is loaded with the $PWD set to it's folder. This allows you to inherit environments.
-`source_env $other_dir_or_envrc`
+
+Example:
+
+    $ source_env ..
+    direnv: loading /path/to/parent
+
+### rvm
 
 Wrapper to use rvm, like `rvm use 1.8.7`. Do that before `layout ruby` if you want to use both.
-`rvm ...`
+
+Example:
+
+    $ rvm use 1.8.7
+    using ruby 1.8.7
 
 ## SEE ALSO
 
