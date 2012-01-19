@@ -1,0 +1,3 @@
+---
+language: ruby
+script: "make test"
