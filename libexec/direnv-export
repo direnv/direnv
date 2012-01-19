@@ -9,7 +9,7 @@ if [ -z "${DIRENV_LIBEXEC}" ]; then
 fi
 
 direnv_find_rc() {
-  cd `pwd -P 2>/dev/null`
+  cd "`pwd -P 2>/dev/null`"
   while true; do
     if [ -f ".envrc" ]; then
       return 0
