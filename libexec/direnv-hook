@@ -33,10 +33,10 @@ HOOK
   ;;
 zsh)
   cat <<HOOK
-direnv_hook() {
+function direnv_hook {
   eval \`direnv export\`
-}
-[[ -z \$precmd_functions ]] && precmd_functions=()
+};
+[[ -z \$precmd_functions ]] && precmd_functions=();
 precmd_functions=(\$precmd_functions direnv_hook)
 HOOK
   ;;
