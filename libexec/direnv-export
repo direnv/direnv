@@ -11,11 +11,10 @@ fi
 direnv_find_rc() {
   cd `pwd -P 2>/dev/null`
   while true; do
-    local cur_path=`pwd 2>/dev/null`
     if [ -f ".envrc" ]; then
       return 0
     fi
-    if [ "$cur_path" = "/" ] || [ "$cur_path" = "//" ]; then
+    if [ "$PWD" = "/" ] || [ "$PWD" = "//" ]; then
       return 1
     fi
     cd ..
