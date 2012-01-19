@@ -1,4 +1,5 @@
-direnv - Unclutter your .profile
+direnv - Unclutter your .profile [![Build
+Status](https://secure.travis-ci.org/zimbatm/direnv.png)](http://travis-ci.org/zimbatm/direnv)
 ================================
 
 direnv allows you to have path-dependent environment variables. It works in combination with your shell (bash or zsh) to make the magic work.
