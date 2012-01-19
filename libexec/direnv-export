@@ -31,13 +31,13 @@ if direnv_find_rc; then
   fi
 
   if [ -n "$DIRENV_BACKUP" ]; then
-    if [ "$DIRENV_DIR" = "$PWD" ] && [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
+    if [ "${DIRENV_DIR#-}" = "$PWD" ] && [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
       # env already loaded
       exit 0
     elif [ "$st_mtime" -gt "${DIRENV_MTIME:-0}" ]; then
       echo "direnv: reloading $PWD" >&2
     else
-      echo "direnv: switching from $DIRENV_DIR to $PWD" >&2
+      echo "direnv: switching from ${DIRENV_DIR#-} to $PWD" >&2
     fi
 
     # restore the old environment
@@ -55,7 +55,7 @@ if direnv_find_rc; then
   fi
 
   # DIRENV variables
-  export DIRENV_DIR=$PWD
+  export DIRENV_DIR=-$PWD
   export DIRENV_MTIME=$st_mtime
 
   # load the stdlib
