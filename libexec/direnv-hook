@@ -25,17 +25,22 @@ target=${target#/bin/}
 target=${target#/usr/bin/}
 
 # More of them here: http://www.linux.org/docs/ldp/howto/Xterm-Title-4.html
-if [ "$target" = "bash" ]; then
+case "$target" in
+bash)
   cat <<HOOK
 PROMPT_COMMAND="eval \\\`direnv export\\\`;\$PROMPT_COMMAND"
 HOOK
-elif [ "$target" = "zsh" ]; then
+  ;;
+zsh)
   cat <<HOOK
-precmd() {
+direnv_hook() {
   eval \`direnv export\`
 }
+[[ -z \$precmd_functions ]] && precmd_functions=()
+precmd_functions=(\$precmd_functions direnv_hook)
 HOOK
-else
+  ;;
+*)
     echo "Unknown target shell '$target'" >&2
     exit 1
-fi
+esac

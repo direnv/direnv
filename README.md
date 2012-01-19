@@ -50,6 +50,7 @@ Contributors (and thanks)
 * Martin Aumüller (aka. aumuell) for his patches and awesomeness
 * Sam Stephenson (aka. sstephenson) for his expand_path code that I stole from https://github.com/sstephenson/bats
 * Alexander Kobel for his patches
+* Brian M. Clapper (aka. bmc) for his patch
 
 LICENCE
 -------
