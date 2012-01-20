@@ -22,16 +22,14 @@ release:
 	git tag v$(VERSION)
 
 gh-pages:
-	git stash
 	$(RONN) -W5 -s toc man/*.ronn
+	git stash
 	git checkout gh-pages
-	cp man/*.html .
-	rm -rf man
-	git add .
+	mv man/*.html .
+	git add *.html
 	git commit -m "$(VERSION)"
-	git push
 	git checkout master
-	git stash pop
+	git stash pop || true
 
 install:
 	install -d bin $(DESTDIR)/bin
