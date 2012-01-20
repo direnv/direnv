@@ -42,7 +42,7 @@ If the `.envrc` file is added/changed/removed or you are no longer in the path, 
  * 1a) Get the code and put direnv in your path
 
 ```
-    git clone http://github.com/zimbatm/shell-env
+    git clone http://github.com/zimbatm/direnv
     ln -s `pwd`/direnv/bin /usr/local/bin/direnv
 ```
 

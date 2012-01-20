@@ -27,7 +27,7 @@ Install
 
 1a) Get the code and put direnv in your path
 
-    git clone http://github.com/zimbatm/shell-env
+    git clone http://github.com/zimbatm/direnv
     ln -s `pwd`/direnv/bin /usr/local/bin/direnv
 
 1b) Use homebrew (for OSX users)
