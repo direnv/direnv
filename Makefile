@@ -6,13 +6,16 @@ RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv --or
 RONNS = $(wildcard man/*.ronn)
 ROFFS = $(RONNS:.ronn=)
 
-.PHONY: all man test release install gh-pages
+.PHONY: all man html test release install gh-pages
 all: man test
 
 %.1: %.1.ronn
 	$(RONN) -r $<
 
 man: $(ROFFS)
+
+html:
+	$(RONN) -W5 -s toc man/*.ronn
 
 # Maybe use https://github.com/bmizerany/roundup
 test:
@@ -21,8 +24,7 @@ test:
 release:
 	git tag v$(VERSION)
 
-gh-pages:
-	$(RONN) -W5 -s toc man/*.ronn
+gh-pages: html
 	git stash
 	git checkout gh-pages
 	mv man/*.html .
