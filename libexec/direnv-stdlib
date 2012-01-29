@@ -11,6 +11,7 @@ abspath() {
   expand_path "$1"
 }
 
+# Usage: expand_path ./rel/path
 expand_path() {
   { cd "$(dirname "$1")" 2>/dev/null
     local dirname="$PWD"
@@ -20,10 +21,31 @@ expand_path() {
 }
 
 # Safer PATH handling
+#
+# Usage: PATH_add PATH
+# Example: PATH_add bin
 PATH_add() {
   export PATH="`expand_path "$1"`:$PATH"
 }
 
+# Safer path handling
+#
+# Usage: path_add VARNAME PATH
+# Example: path_add LD_LIBRARY_PATH ./lib
+path_add() {
+  local old_paths=${!1}
+  local path=`expand_path "$2"`
+
+  if [ -z "$old_paths" ]; then
+    old_paths="$path"
+  else
+    old_paths="$path:$old_paths"
+  fi
+
+  export $1="$old_paths"
+}
+
+# Usage: layout ruby
 layout_ruby() {
   # TODO: ruby_version should be the ABI version
   local ruby_version=`ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION"`
@@ -44,8 +66,8 @@ set_cellar_path() {
   cellar_path=$1
 }
 
-# $1: program name
-# $2: wanted version
+# Usage: use PROGRAM_NAME VERSION
+# Example: use ruby 1.9.3
 use() {
   local path="$cellar_path/$1/$2/bin"
   if [ -d "$path" ]; then
