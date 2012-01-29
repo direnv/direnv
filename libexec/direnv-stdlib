@@ -108,3 +108,8 @@ if [ -n "$rvm_path" ]; then
     set -e
   }
 fi
+
+# Load a maser envrc if it exists
+if [ -f "$HOME/.direnvrc" ]; then
+  source_env $HOME/.direnvrc
+fi
