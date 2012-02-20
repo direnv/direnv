@@ -8,6 +8,21 @@ if [ -z "${DIRENV_LIBEXEC}" ]; then
   export DIRENV_LIBEXEC=$(dirname $0)
 fi
 
+user_rel_path() {
+  local path=${1#-}
+
+  if [ -z "$path" ]; then return; fi
+
+  if [ -n "$HOME" ]; then
+    local rel_path="${path#$HOME}"
+    if [ "$rel_path" != "$path" ]; then
+      path="~${rel_path}"
+    fi
+  fi
+
+  echo $path
+}
+
 direnv_find_rc() {
   cd "`pwd -P 2>/dev/null`"
   while true; do
@@ -35,9 +50,9 @@ if direnv_find_rc; then
       # env already loaded
       exit 0
     elif [ "$st_mtime" -gt "${DIRENV_MTIME:-0}" ]; then
-      echo "direnv: reloading $PWD" >&2
+      echo "direnv: reloading `user_rel_path $PWD`" >&2
     else
-      echo "direnv: switching from ${DIRENV_DIR#-} to $PWD" >&2
+      echo "direnv: switching from `user_rel_path $DIRENV_DIR` to `user_rel_path $PWD`" >&2
     fi
 
     # restore the old environment
@@ -51,7 +66,7 @@ if direnv_find_rc; then
     echo "export DIRENV_BACKUP=\"${DIRENV_BACKUP}\";"
     echo "export DIRENV_LIBEXEC=\"${DIRENV_LIBEXEC}\";"
 
-    echo "direnv: loading $PWD" >&2
+    echo "direnv: loading `user_rel_path $PWD`" >&2
   fi
 
   # DIRENV variables
@@ -65,7 +80,7 @@ if direnv_find_rc; then
   # export the diff
   $DIRENV_LIBEXEC/direnv-diff -r "$DIRENV_BACKUP"
 elif [ -n "$DIRENV_BACKUP" ]; then
-  echo "direnv: unloading $DIRENV_DIR" >&2
+  echo "direnv: unloading `user_rel_path $DIRENV_DIR`" >&2
 
   $DIRENV_LIBEXEC/direnv-diff "$DIRENV_BACKUP"
   echo "unset DIRENV_BACKUP"
