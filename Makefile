@@ -1,6 +1,6 @@
 VERSION := 0.1.$(shell git log --oneline | wc -l | sed -e "s/ //g")
 
-DESTDIR := /usr/local
+DESTDIR ?= /usr/local
 
 RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv --organization=0x2a" || echo "@echo 'Could not generate manpage because ronn is missing. gem install ronn' || ")
 RONNS = $(wildcard man/*.ronn)
