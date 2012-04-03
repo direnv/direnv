@@ -20,6 +20,22 @@ expand_path() {
   } || echo "$1"
 }
 
+# Usage: user_rel_path /Users/you/some_path => ~/some_path
+user_rel_path() {
+  local path=${1#-}
+
+  if [ -z "$path" ]; then return; fi
+
+  if [ -n "$HOME" ]; then
+    local rel_path="${path#$HOME}"
+    if [ "$rel_path" != "$path" ]; then
+      path="~${rel_path}"
+    fi
+  fi
+
+  echo $path
+}
+
 # Safer PATH handling
 #
 # Usage: PATH_add PATH
@@ -92,7 +108,7 @@ source_env() {
   if [ -d "$1" ]; then
     rcfile=$1/.envrc
   fi
-  echo "direnv: loading $rcfile"
+  echo "direnv: loading $(user_rel_path "$rcfile")"
   pushd `dirname "$rcfile"` > /dev/null
   . ./`basename "$rcfile"`
   popd > /dev/null
