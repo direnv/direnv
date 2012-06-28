@@ -6,6 +6,15 @@ cd `dirname $0`
 TEST_DIR=$PWD
 export PATH=$PWD/../bin:$PATH
 
+# Remove things we could have in our env
+unset GOPATH
+unset GEM_HOME
+
+# And reset the direnv loading if any
+unset DIRENV_LIBEXEC
+unset DIRENV_BACKUP
+unset DIRENV_MTIME
+
 direnv_eval() {
   eval `direnv export`
 }
