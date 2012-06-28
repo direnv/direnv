@@ -21,15 +21,12 @@ IGNORE_KEYS = %w{_ PWD OLDPWD SHLVL SHELL DIRENV_BACKUP DIRENV_LIBEXEC}
 
 # Returns the difference of two env hashes. Suppressions are represented as
 # nil values.
-def diff_env(env1, env2, &each_pair)
+def diff_env(env1, env2)
   new_env = (env1.keys | env2.keys).inject({}) do |diff, k|
     if env2[k] != env1[k] && !IGNORE_KEYS.include?(k)
       diff[k] = env2[k] 
     end
     diff
-  end
-  if block_given?
-    new_env.each_pair(&each_pair)
   end
   new_env
 end
@@ -38,7 +35,7 @@ def to_shell(env_diff)
   str = ""
   env_diff.each_pair do |k,v|
     if v
-      str += "#{k}=#{v.shellescape}; export #{k};"
+      str += "export #{k}=#{v.shellescape};"
     else
       if k == "PS1"
         # unsetting PS1 doesn't restore the default in OSX's bash
@@ -53,7 +50,7 @@ end
 reverse = false
 opts = OptionParser.new do |opts|
   opts.banner = "direnv diff [options] OLD_ENV"
-  opts.on("-r", "--reverse", "Uses the OLD_ENV as the source") do reverse = true end
+  opts.on("--reverse", "Uses the OLD_ENV as the source") do reverse = true end
 
   opts.on("-h", "--help", "Shows this help") do
     puts opts

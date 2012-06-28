@@ -40,3 +40,10 @@ install:
 	cp -R bin/* $(DESTDIR)/bin
 	cp -R libexec/* $(DESTDIR)/libexec
 	cp -R man/*.1 $(DESTDIR)/share/man/man1
+
+export GOPATH=$(PWD)
+go:
+	cd src/direnv-dump && go build
+	mv src/direnv-dump/direnv-dump libexec/direnv-dump-`uname`-`uname -m`
+	cd src/direnv-diff && go build
+	mv src/direnv-diff/direnv-diff libexec/direnv-diff-`uname`-`uname -m`
