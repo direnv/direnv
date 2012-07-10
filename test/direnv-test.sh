@@ -32,6 +32,8 @@ test_start base
   direnv_eval
   test "$MTIME" = "$DIRENV_MTIME"
 
+  sleep 1
+
   touch .envrc
   direnv_eval
   test "$MTIME" != "$DIRENV_MTIME"
