@@ -13,11 +13,17 @@ abspath() {
 
 # Usage: expand_path ./rel/path
 expand_path() {
-  { cd "$(dirname "$1")" 2>/dev/null
-    local dirname="$PWD"
-    cd "$OLDPWD"
-    echo "$dirname/$(basename "$1")"
-  } || echo "$1"
+  if [ -d "$1" ]; then
+    cd "$1"
+    echo $PWD
+    return
+  fi
+
+  if [ "${parent:0:1}" = "/" ]; then
+    echo $1
+  else
+    echo $PWD/$1
+  fi
 }
 
 # Usage: user_rel_path /Users/you/some_path => ~/some_path
