@@ -12,9 +12,9 @@ fi
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
 direnv_find_rc() {
-  local dir=`find_up .envrc`
-  if [ -n "$dir" ]; then
-    cd $dir
+  local path=`find_up .envrc`
+  if [ -n "$path" ]; then
+    cd `dirname $path`
     return 0
   else
     return 1
