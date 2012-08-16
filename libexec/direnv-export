@@ -14,7 +14,7 @@ fi
 direnv_find_rc() {
   local path=`find_up .envrc`
   if [ -n "$path" ]; then
-    cd `dirname $path`
+    cd "$(dirname "$path")"
     return 0
   else
     return 1
