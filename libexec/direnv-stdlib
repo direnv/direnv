@@ -137,6 +137,14 @@ source_env() {
   popd > /dev/null
 }
 
+# Inherits the first .envrc it finds in the path
+source_up() {
+  local dir=`cd .. && find_up '.envrc'`
+  if [ -n "$dir" ]; then
+    source_env "$dir"
+  fi
+}
+
 if [ -n "$rvm_path" ]; then
   # source rvm on first call, haha :)
   rvm() {
