@@ -27,7 +27,7 @@ if direnv_find_rc; then
   if [ $(uname) = Linux ]; then
     st_mtime=`stat --dereference -c '%Y' "$PWD/.envrc"`
   else
-    eval `stat -s "$PWD/.envrc"`
+    eval `stat -L -s "$PWD/.envrc"`
   fi
 
   if [ -n "$DIRENV_BACKUP" ]; then
