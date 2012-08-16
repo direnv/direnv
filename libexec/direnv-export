@@ -8,32 +8,17 @@ if [ -z "${DIRENV_LIBEXEC}" ]; then
   export DIRENV_LIBEXEC=$(dirname $0)
 fi
 
-user_rel_path() {
-  local path=${1#-}
-
-  if [ -z "$path" ]; then return; fi
-
-  if [ -n "$HOME" ]; then
-    local rel_path="${path#$HOME}"
-    if [ "$rel_path" != "$path" ]; then
-      path="~${rel_path}"
-    fi
-  fi
-
-  echo $path
-}
+# load the stdlib
+. "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
 direnv_find_rc() {
-  cd "`pwd -P 2>/dev/null`"
-  while true; do
-    if [ -f ".envrc" ]; then
-      return 0
-    fi
-    if [ "$PWD" = "/" ] || [ "$PWD" = "//" ]; then
-      return 1
-    fi
-    cd ..
-  done
+  local dir=`find_up .envrc`
+  if [ -n "$dir" ]; then
+    cd $dir
+    return 0
+  else
+    return 1
+  fi
 }
 
 if direnv_find_rc; then
@@ -73,8 +58,12 @@ if direnv_find_rc; then
   export DIRENV_DIR=-$PWD
   export DIRENV_MTIME=$st_mtime
 
-  # load the stdlib
-  . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
+  # Load a maser envrc if it exists
+  if [ -f "$HOME/.direnvrc" ]; then
+    source_env $HOME/.direnvrc 1>&2
+  fi
+
+  # Get the source
   . "$PWD/.envrc" >&2
 
   # export the diff

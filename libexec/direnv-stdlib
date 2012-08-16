@@ -42,6 +42,23 @@ user_rel_path() {
   echo $path
 }
 
+# Usage: find_up some_file
+find_up() {
+  (
+    cd "`pwd -P 2>/dev/null`"
+    while true; do
+      if [ -f "$1" ]; then
+        echo $PWD
+        return 0
+      fi
+      if [ "$PWD" = "/" ] || [ "$PWD" = "//" ]; then
+        return 1
+      fi
+      cd ..
+    done
+  )
+}
+
 # Safer PATH handling
 #
 # Usage: PATH_add PATH
@@ -129,9 +146,4 @@ if [ -n "$rvm_path" ]; then
     rvm $@
     set -e
   }
-fi
-
-# Load a maser envrc if it exists
-if [ -f "$HOME/.direnvrc" ]; then
-  source_env $HOME/.direnvrc
 fi
