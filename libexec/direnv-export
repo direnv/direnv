@@ -42,8 +42,6 @@ if direnv_find_rc; then
     export DIRENV_BACKUP=`$DIRENV_LIBEXEC/direnv-dump`
     echo "export DIRENV_BACKUP=\"${DIRENV_BACKUP}\";"
     echo "export DIRENV_LIBEXEC=\"${DIRENV_LIBEXEC}\";"
-
-    echo "direnv: loading `user_rel_path $PWD`" >&2
   fi
 
   # DIRENV variables
@@ -56,7 +54,7 @@ if direnv_find_rc; then
   fi
 
   # Get the source
-  . "$PWD/.envrc" >&2
+  source_env "$PWD/.envrc" >&2
 
   # export the diff
   $DIRENV_LIBEXEC/direnv-diff -r "$DIRENV_BACKUP"
