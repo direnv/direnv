@@ -2,9 +2,9 @@
 #
 #
 
-set -e
+set -e -u
 
-if [ -z "${DIRENV_LIBEXEC}" ]; then
+if [ -z "${DIRENV_LIBEXEC-}" ]; then
   export DIRENV_LIBEXEC=$(dirname $0)
 fi
 
@@ -20,8 +20,10 @@ if direnv_find_rc; then
     eval `stat -L -s "$PWD/.envrc"`
   fi
 
-  if [ -n "$DIRENV_BACKUP" ]; then
-    if [ "${DIRENV_DIR#-}" = "$PWD" ] && [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
+  if [ -n "${DIRENV_BACKUP-}" ]; then
+    if [ -n "${DIRENV_DIR-}" ] &&
+       [ "${DIRENV_DIR#-}" = "$PWD" ] &&
+       [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
       # env already loaded
       exit 0
     elif [ "$st_mtime" -gt "${DIRENV_MTIME:-0}" ]; then
@@ -58,7 +60,7 @@ if direnv_find_rc; then
 
   # export the diff
   $DIRENV_LIBEXEC/direnv-diff -r "$DIRENV_BACKUP"
-elif [ -n "$DIRENV_BACKUP" ]; then
+elif [ -n "${DIRENV_BACKUP-}" ]; then
   echo "direnv: unloading `user_rel_path $DIRENV_DIR`" >&2
 
   $DIRENV_LIBEXEC/direnv-diff "$DIRENV_BACKUP"

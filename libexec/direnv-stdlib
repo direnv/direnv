@@ -19,7 +19,7 @@ expand_path() {
     return
   fi
 
-  if [ "${parent:0:1}" = "/" ]; then
+  if [ -n "${parent-}" ] && [ "${parent:0:1}" = "/" ]; then
     echo $1
   else
     echo $PWD/$1
@@ -161,7 +161,7 @@ source_up() {
   fi
 }
 
-if [ -n "$rvm_path" ]; then
+if [ -n "${rvm_path-}" ]; then
   # source rvm on first call, haha :)
   rvm() {
     unset rvm
