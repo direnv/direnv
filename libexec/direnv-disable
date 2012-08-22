@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Catch bugs
+set -e -u
+
+# load the stdlib
+if [ -z "${DIRENV_LIBEXEC}" ]; then export DIRENV_LIBEXEC=$(dirname $0); fi
+. "$DIRENV_LIBEXEC/direnv-stdlib" >&2
+
+if direnv_find_rc; then
+  unset direnv_find_rc
+  rcfile="$PWD/.envrc"
+  compute_sum SUM "$rcfile"
+  SUMFILE="${DIRENV_CONFIG_DIR}/sums/${SUM}"
+  if [ -e "$SUMFILE" ]; then
+    echo -n "direnv-disable: disabling: "
+    cat $SUMFILE
+    rm -v $SUMFILE
+    # TODO(pwaller): Automatically pick up changes to ${DCD}/sums/
+    echo "direnv-disable: done. Remember to exit and re-enter this directory."
+  else
+    echo "direnv-disable: couldn't find sumfile for $rcfile"
+  fi
+else
+  echo "direnv-disable: didn't find a .envrc"
+fi
+

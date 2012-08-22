@@ -5,7 +5,7 @@
 set -e
 
 usage() {
-  echo "direnv export|exec|switch [options]" >&2
+  echo "direnv enable|list-enabled|disable|export|exec|switch [options]" >&2
 }
 
 readlink=$(type -p greadlink readlink | head -1)

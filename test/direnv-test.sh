@@ -13,6 +13,7 @@ direnv_eval() {
 test_start() {
   cd "$TEST_DIR/scenarios/$1"
   echo "## Testing $1 ##"
+  direnv enable
 }
 
 test_stop() {

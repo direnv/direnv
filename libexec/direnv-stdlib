@@ -152,6 +152,25 @@ direnv_init() {
   return 0
 }
 
+# Returns the sum of "$2$(cat $2)" in the variable $1
+compute_sum() {
+  local  __resultvar=$1
+  local filename="$2"
+  local SUMCMD="shasum"
+  local result=`echo "$filename" | cat - "$filename" | $SUMCMD - | cut -d' ' -f1`
+  eval $__resultvar="'$result'"
+}
+
+validity_check() {
+  local rcfile="$1"
+  compute_sum SUM "$rcfile"
+  if [ ! -f ${DIRENV_CONFIG_DIR}/sums/${SUM} ]; then
+    return 1 # The file doesn't exist, so it should be ignored
+  else
+    return 0
+  fi
+}
+
 # Inherit another .envrc
 # Usage: source_env <FILE_OR_DIR_PATH>
 source_env() {
@@ -159,6 +178,13 @@ source_env() {
   if ! [ -f "$1" ]; then
     rcfile="$rcfile/.envrc"
   fi
+  
+  if ! validity_check "$rcfile"; then
+    echo "direnv: need to run 'direnv enable' if you want to automatically source" >&2
+    echo "        $rcfile" >&2
+    return 0
+  fi
+  
   echo "direnv: loading $(user_rel_path "$rcfile")"
   pushd "`dirname "$rcfile"`" > /dev/null
   . "./`basename "$rcfile"`"
