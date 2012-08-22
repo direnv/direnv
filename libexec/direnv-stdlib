@@ -1,6 +1,10 @@
 #!/bin/echo
 # vim: ft=sh
 
+if [ -z "${DIRENV_CONFIG_DIR-}" ]; then
+  export DIRENV_CONFIG_DIR="${XDG_CONFIG_HOME-${HOME}/.config}/direnv"
+fi
+
 has() {
   which "$1" >/dev/null 2>&1
   return $?
@@ -133,6 +137,19 @@ set_program_prefix() {
 
 add_program() {
   echo '`add_program` does not exist anymore and was replaced by `use`'
+}
+
+direnv_init() {
+  if [[ -e $DIRENV_CONFIG_DIR && ! -d $DIRENV_CONFIG_DIR ]]; then
+    echo "direnv: Failed to init direnv because $DIRENV_CONFIG_DIR" 1>&2
+    echo "  exists and is not a directory" 1>&2
+    return 1
+  fi
+  if ! mkdir -p $DIRENV_CONFIG_DIR/sums; then
+    echo "direnv: failed to make $DIRENV_CONFIG_DIR" 1>&2
+  fi
+  #echo "Made $DIRENV_CONFIG_DIR." 1>&2
+  return 0
 }
 
 # Inherit another .envrc

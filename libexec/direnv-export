@@ -7,6 +7,11 @@ set -e -u
 if [ -z "${DIRENV_LIBEXEC-}" ]; then
   export DIRENV_LIBEXEC=$(dirname $0)
 fi
+if [ -z "${DIRENV_CONFIG_DIR-}" ]; then
+  # Needs to come before stdlib
+  export DIRENV_CONFIG_DIR="${XDG_CONFIG_HOME-${HOME}/.config}/direnv"
+  echo 'export DIRENV_CONFIG_DIR="'${DIRENV_CONFIG_DIR}'"'
+fi
 
 # load the stdlib
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2

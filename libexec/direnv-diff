@@ -17,7 +17,7 @@ require 'zlib'
 require 'optparse'
 require 'shellwords'
 
-IGNORE_KEYS = %w{_ PWD OLDPWD SHLVL SHELL DIRENV_BACKUP DIRENV_LIBEXEC}
+IGNORE_KEYS = %w{_ PWD OLDPWD SHLVL SHELL DIRENV_BACKUP DIRENV_LIBEXEC DIRENV_CONFIG_DIR}
 
 # Returns the difference of two env hashes. Suppressions are represented as
 # nil values.
