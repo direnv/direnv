@@ -11,16 +11,6 @@ fi
 # load the stdlib
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
-direnv_find_rc() {
-  local path=`find_up .envrc`
-  if [ -n "$path" ]; then
-    cd "$(dirname "$path")"
-    return 0
-  else
-    return 1
-  fi
-}
-
 if direnv_find_rc; then
   unset direnv_find_rc
 

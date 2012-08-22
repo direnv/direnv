@@ -59,6 +59,16 @@ find_up() {
   )
 }
 
+direnv_find_rc() {
+  local path=`find_up .envrc`
+  if [ -n "$path" ]; then
+    cd "$(dirname "$path")"
+    return 0
+  else
+    return 1
+  fi
+}
+
 # Safer PATH handling
 #
 # Usage: PATH_add PATH
