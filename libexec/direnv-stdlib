@@ -143,8 +143,8 @@ source_env() {
     rcfile="$rcfile/.envrc"
   fi
   echo "direnv: loading $(user_rel_path "$rcfile")"
-  pushd `dirname "$rcfile"` > /dev/null
-  . ./`basename "$rcfile"`
+  pushd "`dirname "$rcfile"`" > /dev/null
+  . "./`basename "$rcfile"`"
   popd > /dev/null
 }
 
