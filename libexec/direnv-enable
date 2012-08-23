@@ -14,7 +14,7 @@ if direnv_find_rc; then
   unset direnv_find_rc
   rcfile="$PWD/.envrc"
   compute_sum SUM "$rcfile"
-  CMD="echo '$rcfile' >> ${DIRENV_CONFIG_DIR}/sums/${SUM}"
+  CMD="echo '$rcfile' > ${DIRENV_CONFIG_DIR}/sums/${SUM}"
   echo $CMD
   eval $CMD
   # TODO(pwaller): Automatically pick up changes to ${DCD}/sums/
