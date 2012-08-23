@@ -7,7 +7,8 @@ set -e -u
 if [ -z "${DIRENV_LIBEXEC}" ]; then export DIRENV_LIBEXEC=$(dirname $0); fi
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
-echo "I am here" >&2
+# Initialize direnv
+direnv_init
 
 if direnv_find_rc; then
   unset direnv_find_rc
