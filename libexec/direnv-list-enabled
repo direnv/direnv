@@ -7,4 +7,4 @@ set -e -u
 if [ -z "${DIRENV_LIBEXEC}" ]; then export DIRENV_LIBEXEC=$(dirname $0); fi
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
-cat ${DIRENV_CONFIG_DIR}/sums/* | sort
+cat ${DIRENV_CONFIG_DIR}/sums/* | sort -u
