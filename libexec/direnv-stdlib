@@ -180,7 +180,7 @@ source_env() {
   fi
   
   if ! validity_check "$rcfile"; then
-    echo "direnv: need to run 'direnv enable' if you want to automatically source" >&2
+    echo "direnv: not loaded: run 'direnv enable' if you want to automatically source" >&2
     echo "        $rcfile" >&2
     return 0
   fi

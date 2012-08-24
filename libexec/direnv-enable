@@ -17,8 +17,7 @@ if direnv_find_rc; then
   CMD="echo '$rcfile' > ${DIRENV_CONFIG_DIR}/sums/${SUM}"
   echo $CMD
   eval $CMD
-  # TODO(pwaller): Automatically pick up changes to ${DCD}/sums/
-  echo "direnv-enable: done. Remember to exit and re-enter this directory."
+  #echo "direnv-enable: done."
 else
   echo "direnv-enable: didn't find a .envrc"
 fi

@@ -39,9 +39,13 @@ if direnv_find_rc; then
       # env already loaded
       exit 0
     elif [ "$st_mtime" -gt "${DIRENV_MTIME:-0}" ]; then
-      echo "direnv: reloading `user_rel_path $PWD`" >&2
+      # Need to reload
+      #echo "direnv: reloading `user_rel_path $PWD`" >&2
+      true
     else
-      echo "direnv: switching from `user_rel_path $DIRENV_DIR` to `user_rel_path $PWD`" >&2
+      # Directory has changed
+      #echo "direnv: switching from `user_rel_path $DIRENV_DIR` to `user_rel_path $PWD`" >&2
+      true
     fi
 
     # restore the old environment

@@ -13,11 +13,10 @@ if direnv_find_rc; then
   compute_sum SUM "$rcfile"
   SUMFILE="${DIRENV_CONFIG_DIR}/sums/${SUM}"
   if [ -e "$SUMFILE" ]; then
-    echo -n "direnv-disable: disabling: "
+    echo -n "direnv-disable: disabled: "
     cat $SUMFILE
-    rm -v $SUMFILE
+    rm -fv $SUMFILE
     # TODO(pwaller): Automatically pick up changes to ${DCD}/sums/
-    echo "direnv-disable: done. Remember to exit and re-enter this directory."
   else
     echo "direnv-disable: couldn't find sumfile for $rcfile"
   fi
