@@ -81,10 +81,19 @@ if direnv_find_rc; then
     source_env $HOME/.direnvrc 1>&2
   fi
 
-  # Get the source
-  source_env "$PWD/.envrc" >&2
-
-  # export the diff
+  # attempt to source the environment
+  if source_env "$PWD/.envrc"; then
+    # sourcing succeded.
+    debug "env sourced"
+    unset DIRENV_REJECTED
+  else
+    # environment not modified (because e.g, direnv-enable not yet called)
+    # don't save information about old environemnt
+    debug "env not modified"
+    export DIRENV_REJECTED=1
+  fi
+  # export what changed by printing it as a command which will be eval'd
+  # by the $PROMPT_COMMAND
   $DIRENV_LIBEXEC/direnv-diff -r "$DIRENV_BACKUP"
 elif [ -n "${DIRENV_BACKUP-}" ]; then
 

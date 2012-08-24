@@ -185,13 +185,14 @@ source_env() {
   if ! validity_check "$rcfile"; then
     echo "direnv: not loaded: run 'direnv enable' if you want to automatically source" >&2
     echo "        $rcfile" >&2
-    return 0
+    return 1
   fi
   
-  echo "direnv: loading $(user_rel_path "$rcfile")"
+  echo "direnv: loading $(user_rel_path "$rcfile")" >&2
   pushd "`dirname "$rcfile"`" > /dev/null
-  . "./`basename "$rcfile"`"
+  . "./`basename "$rcfile"`" >&2
   popd > /dev/null
+  return 0
 }
 
 # Inherits the first .envrc (or given FILE_NAME) it finds in the path
