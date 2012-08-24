@@ -5,6 +5,12 @@ if [ -z "${DIRENV_CONFIG_DIR-}" ]; then
   export DIRENV_CONFIG_DIR="${XDG_CONFIG_HOME-${HOME}/.config}/direnv"
 fi
 
+debug() {
+  if [ -n "${DIRENV_DEBUG-}" ]; then
+    echo "$(basename "$0"): (debug) ""$@" >&2
+  fi
+}
+
 has() {
   which "$1" >/dev/null 2>&1
   return $?
@@ -164,11 +170,8 @@ compute_sum() {
 validity_check() {
   local rcfile="$1"
   compute_sum SUM "$rcfile"
-  if [ ! -f ${DIRENV_CONFIG_DIR}/sums/${SUM} ]; then
-    return 1 # The file doesn't exist, so it should be ignored
-  else
-    return 0
-  fi
+  if [ -f ${DIRENV_CONFIG_DIR}/sums/${SUM} ]; then return 0; fi
+  return 1 # The file doesn't exist, so it should be ignored
 }
 
 # Inherit another .envrc

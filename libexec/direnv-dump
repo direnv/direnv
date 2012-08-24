@@ -16,7 +16,7 @@ require 'base64'
 
 # Don't backup unused variables
 env = ENV.to_hash
-%w{_ PWD OLDPWD SHLVL SHELL DIRENV_BACKUP DIRENV_LIBEXEC DIRENV_CONFIG_DIR}.each do |var|
+%w{_ PWD OLDPWD SHLVL SHELL DIRENV_BACKUP DIRENV_LIBEXEC DIRENV_CONFIG_DIR DIRENV_DEBUG}.each do |var|
   env.delete(var)
 end
 

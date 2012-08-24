@@ -17,6 +17,7 @@ test_start() {
 }
 
 test_stop() {
+  direnv disable
   cd $TEST_DIR
   direnv_eval
 }

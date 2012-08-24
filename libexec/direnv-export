@@ -16,9 +16,14 @@ fi
 # load the stdlib
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
-if direnv_find_rc; then
-  unset direnv_find_rc
+debug "entry"
 
+# Look for .envrc in a directory in $PWD or above
+if direnv_find_rc; then
+  # Inside a directory under the influence of a .envrc
+  # $PWD from here on is the directory containing the .envrc
+
+  # Check the modification time, maybe it has changed and needs to cause a reload
   if [ $(uname) = Linux ]; then
     st_mtime_sums=`stat --dereference -c '%Y' "$DIRENV_CONFIG_DIR/sums" 2> /dev/null || echo 0`
     st_mtime=`stat --dereference -c '%Y' "$PWD/.envrc"`
@@ -29,22 +34,27 @@ if direnv_find_rc; then
   fi
   
   if [ "$st_mtime_sums" -gt "$st_mtime" ]; then
+    # Take latest modification time of the .envrc or $DIRENV_CONFIG_DIR/sums/
     st_mtime=$st_mtime_sums
   fi
-
+  
   if [ -n "${DIRENV_BACKUP-}" ]; then
+    # The shell already contains an environment caused by an .envrc
+  
     if [ -n "${DIRENV_DIR-}" ] &&
        [ "${DIRENV_DIR#-}" = "$PWD" ] &&
        [ "$st_mtime" -le "${DIRENV_MTIME:-0}" ]; then
-      # env already loaded
+      # The existing env corresponds to the current directory, do nothing
+      debug "do nothing: environment not modified. a:${DIRENV_MTIME:-0} b:${st_mtime}"
       exit 0
     elif [ "$st_mtime" -gt "${DIRENV_MTIME:-0}" ]; then
-      # Need to reload
-      #echo "direnv: reloading `user_rel_path $PWD`" >&2
+      # The configuration on disk has been modified, therefore reload it
+      # TODO: won't this also match in case we change directory
+      echo "direnv: reloading `user_rel_path $PWD`" >&2
       true
     else
       # Directory has changed
-      #echo "direnv: switching from `user_rel_path $DIRENV_DIR` to `user_rel_path $PWD`" >&2
+      echo "direnv: switching from `user_rel_path $DIRENV_DIR` to `user_rel_path $PWD`" >&2
       true
     fi
 
@@ -57,14 +67,16 @@ if direnv_find_rc; then
     # save the original environment
     export DIRENV_BACKUP=`$DIRENV_LIBEXEC/direnv-dump`
     echo "export DIRENV_BACKUP=\"${DIRENV_BACKUP}\";"
+    # TODO(pwaller): Why is this here?
     echo "export DIRENV_LIBEXEC=\"${DIRENV_LIBEXEC}\";"
+    debug "no previous environment"
   fi
 
-  # DIRENV variables
+  # DIRENV variables, will be exported by direnv-diff
   export DIRENV_DIR=-$PWD
   export DIRENV_MTIME=$st_mtime
 
-  # Load a maser envrc if it exists
+  # Load a master envrc if it exists
   if [ -f "$HOME/.direnvrc" ]; then
     source_env $HOME/.direnvrc 1>&2
   fi
@@ -75,7 +87,13 @@ if direnv_find_rc; then
   # export the diff
   $DIRENV_LIBEXEC/direnv-diff -r "$DIRENV_BACKUP"
 elif [ -n "${DIRENV_BACKUP-}" ]; then
-  echo "direnv: unloading `user_rel_path $DIRENV_DIR`" >&2
+
+  if ! [ -n "${DIRENV_REJECTED-}" ]; then
+    # only print "unloading" if the environment was modified
+    echo "direnv: unloading `user_rel_path $DIRENV_DIR`" >&2
+  else
+    debug "left environment which had disabled .envrc"
+  fi
 
   $DIRENV_LIBEXEC/direnv-diff "$DIRENV_BACKUP"
   echo "unset DIRENV_BACKUP"
