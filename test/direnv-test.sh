@@ -2,6 +2,8 @@
 
 set -e
 
+export DIRENV_DEBUG=1
+
 cd `dirname $0`
 TEST_DIR=$PWD
 export PATH=$PWD/../bin:$PATH
@@ -13,9 +15,14 @@ direnv_eval() {
 test_start() {
   cd "$TEST_DIR/scenarios/$1"
   echo "## Testing $1 ##"
+  if test "${2-noparam}" == "noparam"; then
+    # no second argument, auto-enable environment
+    direnv enable
+  fi
 }
 
 test_stop() {
+  direnv disable
   cd $TEST_DIR
   direnv_eval
 }
@@ -58,4 +65,13 @@ test_stop
 test_start "space dir"
   direnv_eval
   test "$SPACE_DIR" = "true"
+test_stop
+
+test_start "evil" --no-auto-enable
+  # Environment is disabled
+  test -z "${DIRENV_HAVE_EVIL-}"
+  
+  sleep 1; direnv enable; direnv_eval
+  
+  test -n "${DIRENV_HAVE_EVIL}"
 test_stop

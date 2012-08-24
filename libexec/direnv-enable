@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Catch bugs
+set -e -u
+
+# load the stdlib
+if [ -z "${DIRENV_LIBEXEC}" ]; then export DIRENV_LIBEXEC=$(dirname $0); fi
+. "$DIRENV_LIBEXEC/direnv-stdlib" >&2
+
+# Initialize direnv
+direnv_init
+
+if direnv_find_rc; then
+  rcfile="$PWD/.envrc"
+  compute_sum SUM "$rcfile"
+  CMD="echo '$rcfile' > ${DIRENV_CONFIG_DIR}/sums/${SUM}"
+  echo $CMD
+  eval $CMD
+else
+  echo "direnv-enable: didn't find a .envrc"
+fi
+
+

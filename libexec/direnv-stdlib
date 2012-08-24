@@ -1,6 +1,16 @@
 #!/bin/echo
 # vim: ft=sh
 
+if [ -z "${DIRENV_CONFIG_DIR-}" ]; then
+  export DIRENV_CONFIG_DIR="${XDG_CONFIG_HOME-${HOME}/.config}/direnv"
+fi
+
+debug() {
+  if [ -n "${DIRENV_DEBUG-}" ]; then
+    echo "$(basename "$0"): (debug) ""$@" >&2
+  fi
+}
+
 has() {
   which "$1" >/dev/null 2>&1
   return $?
@@ -82,7 +92,7 @@ PATH_add() {
 # Usage: path_add VARNAME PATH
 # Example: path_add LD_LIBRARY_PATH ./lib
 path_add() {
-  local old_paths=${!1}
+  local old_paths=${!1-}
   local path=`expand_path "$2"`
 
   if [ -z "$old_paths" ]; then
@@ -135,6 +145,43 @@ add_program() {
   echo '`add_program` does not exist anymore and was replaced by `use`'
 }
 
+direnv_init() {
+  if [[ -e $DIRENV_CONFIG_DIR && ! -d $DIRENV_CONFIG_DIR ]]; then
+    echo "direnv: Failed to init direnv because $DIRENV_CONFIG_DIR" 1>&2
+    echo "  exists and is not a directory" 1>&2
+    return 1
+  fi
+  if ! mkdir -p $DIRENV_CONFIG_DIR/sums; then
+    echo "direnv: failed to make $DIRENV_CONFIG_DIR" 1>&2
+  fi
+  #echo "Made $DIRENV_CONFIG_DIR." 1>&2
+  return 0
+}
+
+# Returns a hash of the filename $2 in the variable named by $1
+# If $3 is specified, file content is included with filename in the hashed string
+compute_sum() {
+  local  __resultvar=$1
+  local filename="$2"
+  local SUMCMD="shasum"
+  if [ -z "${3-}" ]; then
+    local result=`echo "$filename" | cat - "$filename" | $SUMCMD - | cut -d' ' -f1`
+  else
+    local result=`echo "$filename" | $SUMCMD - | cut -d' ' -f1`
+  fi
+  eval $__resultvar="'$result'"
+}
+
+# Checks if either the filename + its content or just the filename exists in the sums directory
+validity_check() {
+  local rcfile="$1"
+  compute_sum SUM "$rcfile" --content
+  if [ -f ${DIRENV_CONFIG_DIR}/sums/${SUM} ]; then return 0; fi
+  compute_sum SUM "$rcfile"
+  if [ -f ${DIRENV_CONFIG_DIR}/sums/${SUM} ]; then return 0; fi
+  return 1 # The file doesn't exist, so it should be ignored
+}
+
 # Inherit another .envrc
 # Usage: source_env <FILE_OR_DIR_PATH>
 source_env() {
@@ -142,16 +189,24 @@ source_env() {
   if ! [ -f "$1" ]; then
     rcfile="$rcfile/.envrc"
   fi
-  echo "direnv: loading $(user_rel_path "$rcfile")"
+  
+  if ! validity_check "$rcfile"; then
+    echo "direnv: not loaded: run 'direnv enable' if you want to automatically source" >&2
+    echo "        $rcfile" >&2
+    return 1
+  fi
+  
+  echo "direnv: loading $(user_rel_path "$rcfile")" >&2
   pushd "`dirname "$rcfile"`" > /dev/null
-  . "./`basename "$rcfile"`"
+  . "./`basename "$rcfile"`" >&2
   popd > /dev/null
+  return 0
 }
 
 # Inherits the first .envrc (or given FILE_NAME) it finds in the path
 # Usage: source_up [FILE_NAME]
 source_up() {
-  local file="$1"
+  local file="${1-}"
   if [ -z "$file" ]; then
     file=".envrc"
   fi
