@@ -8,7 +8,6 @@ if [ -z "${DIRENV_LIBEXEC}" ]; then export DIRENV_LIBEXEC=$(dirname $0); fi
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
 if direnv_find_rc; then
-  unset direnv_find_rc
   rcfile="$PWD/.envrc"
   compute_sum SUM "$rcfile"
   SUMFILE="${DIRENV_CONFIG_DIR}/sums/${SUM}"
@@ -16,7 +15,6 @@ if direnv_find_rc; then
     echo -n "direnv-disable: disabled: "
     cat $SUMFILE
     rm -fv $SUMFILE
-    # TODO(pwaller): Automatically pick up changes to ${DCD}/sums/
   else
     echo "direnv-disable: couldn't find sumfile for $rcfile"
   fi

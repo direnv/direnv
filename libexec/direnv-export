@@ -49,13 +49,10 @@ if direnv_find_rc; then
       exit 0
     elif [ "$st_mtime" -gt "${DIRENV_MTIME:-0}" ]; then
       # The configuration on disk has been modified, therefore reload it
-      # TODO: won't this also match in case we change directory
       echo "direnv: reloading `user_rel_path $PWD`" >&2
-      true
     else
       # Directory has changed
       echo "direnv: switching from `user_rel_path $DIRENV_DIR` to `user_rel_path $PWD`" >&2
-      true
     fi
 
     # restore the old environment
