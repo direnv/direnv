@@ -92,7 +92,7 @@ PATH_add() {
 # Usage: path_add VARNAME PATH
 # Example: path_add LD_LIBRARY_PATH ./lib
 path_add() {
-  local old_paths=${!1}
+  local old_paths=${!1-}
   local path=`expand_path "$2"`
 
   if [ -z "$old_paths" ]; then
@@ -198,7 +198,7 @@ source_env() {
 # Inherits the first .envrc (or given FILE_NAME) it finds in the path
 # Usage: source_up [FILE_NAME]
 source_up() {
-  local file="$1"
+  local file="${1-}"
   if [ -z "$file" ]; then
     file=".envrc"
   fi
