@@ -20,9 +20,16 @@ if direnv_find_rc; then
   unset direnv_find_rc
 
   if [ $(uname) = Linux ]; then
+    st_mtime_sums=`stat --dereference -c '%Y' "$DIRENV_CONFIG_DIR/sums" 2> /dev/null || echo 0`
     st_mtime=`stat --dereference -c '%Y' "$PWD/.envrc"`
   else
+    eval `stat -L -s "$DIRENV_CONFIG_DIR/sums" 2> /dev/null || echo 0`
+    st_mtime_sums=$st_mtime
     eval `stat -L -s "$PWD/.envrc"`
+  fi
+  
+  if [ "$st_mtime_sums" -gt "$st_mtime" ]; then
+    st_mtime=$st_mtime_sums
   fi
 
   if [ -n "${DIRENV_BACKUP-}" ]; then
