@@ -158,17 +158,25 @@ direnv_init() {
   return 0
 }
 
-# Returns the sum of "$2$(cat $2)" in the variable $1
+# Returns a hash of the filename $2 in the variable named by $1
+# If $3 is specified, file content is included with filename in the hashed string
 compute_sum() {
   local  __resultvar=$1
   local filename="$2"
   local SUMCMD="shasum"
-  local result=`echo "$filename" | cat - "$filename" | $SUMCMD - | cut -d' ' -f1`
+  if [ -z "${3-}" ]; then
+    local result=`echo "$filename" | cat - "$filename" | $SUMCMD - | cut -d' ' -f1`
+  else
+    local result=`echo "$filename" | $SUMCMD - | cut -d' ' -f1`
+  fi
   eval $__resultvar="'$result'"
 }
 
+# Checks if either the filename + its content or just the filename exists in the sums directory
 validity_check() {
   local rcfile="$1"
+  compute_sum SUM "$rcfile" --content
+  if [ -f ${DIRENV_CONFIG_DIR}/sums/${SUM} ]; then return 0; fi
   compute_sum SUM "$rcfile"
   if [ -f ${DIRENV_CONFIG_DIR}/sums/${SUM} ]; then return 0; fi
   return 1 # The file doesn't exist, so it should be ignored
