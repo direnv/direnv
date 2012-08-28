@@ -144,6 +144,7 @@ source_env() {
   fi
   echo "direnv: loading $(user_rel_path "$rcfile")"
   pushd "`dirname "$rcfile"`" > /dev/null
+  set +u
   . "./`basename "$rcfile"`"
   popd > /dev/null
 }
