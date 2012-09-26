@@ -21,8 +21,7 @@ if [ -z "$target" ]; then
 fi
 
 target=${target#-}
-target=${target#/bin/}
-target=${target#/usr/bin/}
+target=`basename "$target"`
 
 # More of them here: http://www.linux.org/docs/ldp/howto/Xterm-Title-4.html
 case "$target" in
