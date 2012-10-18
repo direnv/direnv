@@ -46,8 +46,8 @@ if direnv_find_rc; then
   fi
 
   # DIRENV variables
-  export DIRENV_DIR=-$PWD
-  export DIRENV_MTIME=$st_mtime
+  echo export DIRENV_DIR=-$PWD
+  echo export DIRENV_MTIME=$st_mtime
 
   # Load a maser envrc if it exists
   if [ -f "$HOME/.direnvrc" ]; then
