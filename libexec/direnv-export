@@ -14,7 +14,8 @@ fi
 if direnv_find_rc; then
   unset direnv_find_rc
 
-  if [ $(uname) = Linux ]; then
+  u=$(uname)
+  if [[ $u == Linux || $u == CYGWIN* ]]; then
     st_mtime=`stat --dereference -c '%Y' "$PWD/.envrc"`
   else
     eval `stat -L -s "$PWD/.envrc"`
