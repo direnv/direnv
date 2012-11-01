@@ -7,7 +7,11 @@ RONNS = $(wildcard man/*.ronn)
 ROFFS = $(RONNS:.ronn=)
 
 .PHONY: all man html test release install gh-pages
-all: man test
+all: build man test
+
+build: libexec/direnv
+	cd src/direnv && go build || (cd ../../libexec && ln -s direnv.sh direnv)
+	cp src/direnv/direnv libexec/direnv
 
 %.1: %.1.ronn
 	$(RONN) -r $<

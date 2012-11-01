@@ -4,24 +4,10 @@
 
 set -e -u
 
-if [ -z "${DIRENV_LIBEXEC-}" ]; then
-  export DIRENV_LIBEXEC=$(dirname $0)
-fi
-
 # load the stdlib
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
-arch=`uname`-`uname -m`
-
-direnv_dump="$DIRENV_LIBEXEC/direnv-dump-$arch"
-if ! [ -x "$direnv_dump" ]; then
-  direnv_dump="$DIRENV_LIBEXEC/direnv-dump"
-fi
-
-direnv_diff="$DIRENV_LIBEXEC/direnv-diff-$arch"
-if ! [ -x "$direnv_diff" ]; then
-  direnv_diff="$DIRENV_LIBEXEC/direnv-diff"
-fi
+direnv="$DIRENV_LIBEXEC/direnv"
 
 if direnv_find_rc; then
   unset direnv_find_rc
@@ -45,13 +31,13 @@ if direnv_find_rc; then
     fi
 
     # restore the old environment
-    diff=`$direnv_diff "$DIRENV_BACKUP"`
+    diff=`$direnv diff "$DIRENV_BACKUP"`
     echo $diff
     eval "$diff"
     unset diff
   else
     # save the original environment
-    export DIRENV_BACKUP=`$direnv_dump`
+    export DIRENV_BACKUP=`$direnv dump`
     echo "export DIRENV_BACKUP=\"${DIRENV_BACKUP}\";"
     echo "export DIRENV_LIBEXEC=\"${DIRENV_LIBEXEC}\";"
   fi
@@ -69,10 +55,10 @@ if direnv_find_rc; then
   source_env "$PWD/.envrc" >&2
 
   # export the diff
-  $direnv_diff --reverse "$DIRENV_BACKUP"
+  $direnv diff -r "$DIRENV_BACKUP"
 elif [ -n "${DIRENV_BACKUP-}" ]; then
   echo "direnv: unloading `user_rel_path $DIRENV_DIR`" >&2
 
-  $direnv_diff "$DIRENV_BACKUP"
+  $direnv diff "$DIRENV_BACKUP"
   echo "unset DIRENV_BACKUP"
 fi
