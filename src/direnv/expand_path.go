@@ -4,7 +4,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 )
+
+// Makes a path absolute, relative to another "wd" path
+func expandPath(path string, wd string) string {
+	if filepath.IsAbs(path) {
+		return filepath.Clean(path)
+	}
+	return filepath.Join(wd, path)
+}
 
 func ExpandPath(args []string) (err error) {
 	var path, wd string

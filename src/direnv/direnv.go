@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -99,12 +99,19 @@ func init() {
 	libexecDir = os.Getenv("DIRENV_LIBEXEC")
 	if libexecDir == "" {
 		exePath, err := exec.LookPath(os.Args[0])
-		if err == nil {
-			libexecDir = path.Dir(resolvePath(exePath))
-			// fmt.Fprintf(os.Stderr, "DIRENV_LIBEXEC=%s\n", libexecDir)
-			os.Setenv("DIRENV_LIBEXEC", libexecDir)
+		if err != nil {
+			exePath = os.Args[0]
 		}
 
+		libexecDir, err = filepath.EvalSymlinks(exePath)
+		if err != nil {
+			libexecDir = exePath
+		}
+
+		libexecDir = filepath.Dir(libexecDir)
+
+		// fmt.Fprintf(os.Stderr, "DIRENV_LIBEXEC=%s\n", libexecDir)
+		os.Setenv("DIRENV_LIBEXEC", libexecDir)
 	}
 }
 
