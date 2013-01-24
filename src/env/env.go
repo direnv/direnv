@@ -13,11 +13,7 @@ import (
 )
 
 // A list of keys we don't want to deal with
-var IGNORED_KEYS []string
-
-func init() {
-	IGNORED_KEYS = []string{"_", "PWD", "OLDPWD", "SHLVL", "SHELL"}
-}
+var IGNORED_KEYS = []string{"_", "PWD", "OLDPWD", "SHLVL", "SHELL"}
 
 func IgnoredKey(key string) bool {
 	if len(key) > 4 && key[:5] == "DIRENV_" {
