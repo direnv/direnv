@@ -1,7 +1,7 @@
-package main
+package command
 
 import (
-	"env"
+	"../env"
 	"flag"
 	"fmt"
 )

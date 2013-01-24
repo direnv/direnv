@@ -15,9 +15,9 @@ all: build man
 
 build: libexec/direnv
 
-libexec/direnv: src/**/*.go
-	go build direnv
-	cp direnv libexec/direnv
+libexec/direnv: direnv.go src/**/*.go
+	go fmt
+	go build -o libexec/direnv
 
 %.1: %.1.ronn
 	$(RONN) -r $<

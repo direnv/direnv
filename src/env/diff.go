@@ -1,7 +1,7 @@
 package env
 
 import (
-	"shell"
+	"../shell"
 )
 
 type EnvDiff map[string]string

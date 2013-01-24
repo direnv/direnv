@@ -1,7 +1,7 @@
-package main
+package command
 
 import (
-	"env"
+	"../env"
 	"flag"
 	"fmt"
 )
@@ -15,6 +15,6 @@ func Dump(args []string) (err error) {
 	if err != nil {
 		return
 	}
-	fmt.Print(str)
+	fmt.Println(str)
 	return
 }

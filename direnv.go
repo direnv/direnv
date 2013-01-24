@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./src/command"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,16 +13,14 @@ import (
 // Settings
 var libexecDir string
 
-type Command func([]string) error
-
-var commands = map[string]Command{
+var commands = map[string]command.Command{
 	// Public commands
-	"dump": Dump,
-	"diff": Diff,
+	"dump": command.Dump,
+	"diff": command.Diff,
 	// Private commands
-	"expand-path": ExpandPath,
-	"file-mtime":  FileMtime,
-	"file-hash":   FileHash,
+	"expand-path": command.ExpandPath,
+	"file-mtime":  command.FileMtime,
+	"file-hash":   command.FileHash,
 	"-h":          Usage,
 	"-help":       Usage,
 	"--help":      Usage,
@@ -29,7 +28,7 @@ var commands = map[string]Command{
 
 var publicCommands = []string{"dump", "diff"}
 
-func findCommand(commandName string) (command Command) {
+func findCommand(commandName string) (command command.Command) {
 	if command = commands[commandName]; command != nil {
 		return
 	}
@@ -46,7 +45,7 @@ func findCommand(commandName string) (command Command) {
 	return commandFromPath(path)
 }
 
-func commandFromPath(path string) Command {
+func commandFromPath(path string) command.Command {
 	return func(args []string) (err error) {
 		var files []*os.File
 		var process *os.Process
@@ -117,7 +116,7 @@ func init() {
 
 func main() {
 	var err error
-	var command Command
+	var command command.Command
 
 	// Dispatch
 	if len(os.Args) > 1 {
