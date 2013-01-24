@@ -56,7 +56,7 @@ func FilteredEnv() Env {
 }
 
 func ParseEnv(base64env string) (Env, error) {
-	zlibData, err := base64.StdEncoding.DecodeString(base64env)
+	zlibData, err := base64.URLEncoding.DecodeString(base64env)
 	if err != nil {
 		return nil, fmt.Errorf("base64 decoding: %v", err)
 	}
@@ -95,7 +95,7 @@ func (env Env) Serialize() (string, error) {
 	w.Write(jsonData)
 	w.Close()
 
-	base64Data := base64.StdEncoding.EncodeToString(zlibData.Bytes())
+	base64Data := base64.URLEncoding.EncodeToString(zlibData.Bytes())
 
 	return base64Data, nil
 }

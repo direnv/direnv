@@ -2,28 +2,13 @@
 # vim: ft=sh
 
 has() {
-  which "$1" &>/dev/null
+  type "$1" &>/dev/null
   return $?
-}
-
-abspath() {
-  echo "abspath() renamed to expand_path()"
-  expand_path "$1"
 }
 
 # Usage: expand_path ./rel/path
 expand_path() {
-  if [ -d "$1" ]; then
-    cd "$1"
-    echo $PWD
-    return
-  fi
-
-  if [ -n "${parent-}" ] && [ "${parent:0:1}" = "/" ]; then
-    echo $1
-  else
-    echo $PWD/$1
-  fi
+  direnv expand-path $@
 }
 
 # Usage: user_rel_path /Users/you/some_path => ~/some_path
@@ -98,11 +83,24 @@ path_add() {
 layout_ruby() {
   # TODO: ruby_version should be the ABI version
   local ruby_version=`ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION"`
-  PATH_add ".direnv/${ruby_version}/bin"
-  PATH_add "bin"
-  export RUBYLIB=$PWD/lib
+
   export GEM_HOME=$PWD/.direnv/${ruby_version}
-  export RBXOPT=-Xrbc.db=$PWD/.direnv/rbx-cache
+  export BUNDLE_BIN=$PWD/.direnv/bin
+
+  PATH_add ".direnv/${ruby_version}/bin"
+  PATH_add ".direnv/bin"
+}
+
+layout_python() {
+  if ! [ -d .direnv/virtualenv ]; then
+    virtualenv --no-site-packages --distribute .direnv/virtualenv
+    virtualenv --relocatable .direnv/virtualenv
+  fi
+  source .direnv/virtualenv/bin/activate
+}
+
+layout_node() {
+  PATH_add node_modules/.bin
 }
 
 layout() {
@@ -118,21 +116,21 @@ set_cellar_path() {
 # Usage: use PROGRAM_NAME VERSION
 # Example: use ruby 1.9.3
 use() {
+  if has use_$1 ; then
+    echo "Using $1 v$2"
+    eval "use_$1 $2"
+    return $?
+  fi
+  
   local path="$cellar_path/$1/$2/bin"
   if [ -d "$path" ]; then
     echo "Using $1 v$2"
     PATH_add "$path"
-  else
-    echo "* Unable to load $path"
+    return
   fi
-}
-
-set_program_prefix() {
-  echo '`set_program_prefix` was renamed to `set_cellar_path`'
-}
-
-add_program() {
-  echo '`add_program` does not exist anymore and was replaced by `use`'
+    
+  echo "* Unable to load $path"
+  return 1
 }
 
 # Inherit another .envrc

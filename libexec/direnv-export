@@ -7,16 +7,10 @@ set -e -u
 # load the stdlib
 . "$DIRENV_LIBEXEC/direnv-stdlib" >&2
 
-direnv="$DIRENV_LIBEXEC/direnv"
-
 if direnv_find_rc; then
   unset direnv_find_rc
 
-  if [ $(uname) = Linux ]; then
-    st_mtime=`stat --dereference -c '%Y' "$PWD/.envrc"`
-  else
-    eval `stat -L -s "$PWD/.envrc"`
-  fi
+  st_mtime=`direnv file-mtime "$PWD/.envrc"`
 
   if [ -n "${DIRENV_BACKUP-}" ]; then
     if [ -n "${DIRENV_DIR-}" ] &&
@@ -31,13 +25,13 @@ if direnv_find_rc; then
     fi
 
     # restore the old environment
-    diff=`$direnv diff "$DIRENV_BACKUP"`
+    diff=`direnv diff "$DIRENV_BACKUP"`
     echo $diff
     eval "$diff"
     unset diff
   else
     # save the original environment
-    export DIRENV_BACKUP=`$direnv dump`
+    export DIRENV_BACKUP=`direnv dump`
     echo "export DIRENV_BACKUP=\"${DIRENV_BACKUP}\";"
     echo "export DIRENV_LIBEXEC=\"${DIRENV_LIBEXEC}\";"
   fi
@@ -45,6 +39,7 @@ if direnv_find_rc; then
   # DIRENV variables
   export DIRENV_DIR=-$PWD
   export DIRENV_MTIME=$st_mtime
+  unset st_mtime
 
   # Load a maser envrc if it exists
   if [ -f "$HOME/.direnvrc" ]; then
@@ -55,10 +50,10 @@ if direnv_find_rc; then
   source_env "$PWD/.envrc" >&2
 
   # export the diff
-  $direnv diff -r "$DIRENV_BACKUP"
+  direnv diff -reverse "$DIRENV_BACKUP"
 elif [ -n "${DIRENV_BACKUP-}" ]; then
   echo "direnv: unloading `user_rel_path $DIRENV_DIR`" >&2
 
-  $direnv diff "$DIRENV_BACKUP"
+  direnv diff "$DIRENV_BACKUP"
   echo "unset DIRENV_BACKUP"
 fi

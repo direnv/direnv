@@ -1,2 +1,4 @@
 .direnv
+/direnv
+/libexec/direnv
 man/*.html

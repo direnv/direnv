@@ -6,12 +6,18 @@ RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv --or
 RONNS = $(wildcard man/*.ronn)
 ROFFS = $(RONNS:.ronn=)
 
+export GOPATH=$(PWD)
+
 .PHONY: all man html test release install gh-pages
-all: build man test
+#all: build man test
+all: build man
+
 
 build: libexec/direnv
-	cd src/direnv && go build || (cd ../../libexec && ln -s direnv.sh direnv)
-	cp src/direnv/direnv libexec/direnv
+
+libexec/direnv: src/**/*.go
+	go build direnv
+	cp direnv libexec/direnv
 
 %.1: %.1.ronn
 	$(RONN) -r $<

@@ -6,7 +6,7 @@ import (
 
 type EnvDiff map[string]string
 
-func (env EnvDiff) ToShell() string {
+func ToBash(env EnvDiff) string {
 	str := ""
 	for key, value := range env {
 		// FIXME: This is not exacly as the ruby nil

@@ -1,17 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"flag"
 	"env"
+	"flag"
+	"fmt"
 )
 
 func Dump(args []string) (err error) {
 	flagset := flag.NewFlagSet("direnv dump", flag.ExitOnError)
-	err = flagset.Parse(args)
-	if err != nil {
-		return
-	}
+	flagset.Parse(args[1:])
 
 	e := env.FilteredEnv()
 	str, err := e.Serialize()
@@ -21,4 +18,3 @@ func Dump(args []string) (err error) {
 	fmt.Print(str)
 	return
 }
-

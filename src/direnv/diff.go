@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"flag"
 	"env"
+	"flag"
+	"fmt"
 )
 
 func Diff(args []string) (err error) {
@@ -11,10 +11,7 @@ func Diff(args []string) (err error) {
 
 	flagset := flag.NewFlagSet("direnv dump", flag.ExitOnError)
 	flagset.BoolVar(&reverse, "reverse", false, "Reverses the diff")
-	err = flagset.Parse(args)
-	if err != nil {
-		return
-	}
+	flagset.Parse(args[1:])
 
 	oldEnvStr := flagset.Arg(0)
 
@@ -36,7 +33,7 @@ func Diff(args []string) (err error) {
 		diff = env.Diff(newEnv, oldEnv)
 	}
 
-	fmt.Print(diff.ToShell())
+	fmt.Println(env.ToBash(diff))
 
 	return
 }
