@@ -1,7 +1,7 @@
 package command
 
 import (
-	"../env"
+	"github.com/zimbatm/direnv/src/env"
 	"flag"
 	"fmt"
 )

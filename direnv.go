@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./src/command"
 	"fmt"
+	"github.com/zimbatm/direnv/src/command"
 	"os"
 	"os/exec"
 	"os/signal"

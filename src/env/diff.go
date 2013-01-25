@@ -1,7 +1,7 @@
 package env
 
 import (
-	"../shell"
+	"github.com/zimbatm/direnv/src/shell"
 )
 
 type EnvDiff map[string]string
