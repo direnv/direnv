@@ -5,7 +5,6 @@ import (
 	"compress/zlib"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -63,9 +62,8 @@ func ParseEnv(base64env string) (Env, error) {
 		return nil, fmt.Errorf("zlib opening: %v", err)
 	}
 
-	envData := new(bytesReceiver)
-	io.Copy(envData, w)
-	//_, err = io.Copy(w, envData)
+	envData := bytes.NewBuffer([]byte{})
+	_, err = io.Copy(envData, w)
 	if err != nil {
 		return nil, fmt.Errorf("zlib decoding: %v", err)
 	}
@@ -86,32 +84,12 @@ func (env Env) Serialize() (string, error) {
 		return "", err
 	}
 
-	var zlibData bytes.Buffer
-	w := zlib.NewWriter(&zlibData)
+	zlibData := bytes.NewBuffer([]byte{})
+	w := zlib.NewWriter(zlibData)
 	w.Write(jsonData)
 	w.Close()
 
 	base64Data := base64.URLEncoding.EncodeToString(zlibData.Bytes())
 
 	return base64Data, nil
-}
-
-// Erk. There's probably something in the stdlib that does what this
-// micro type does.
-type bytesReceiver struct {
-	bytes []byte
-}
-
-func (self *bytesReceiver) Bytes() []byte {
-	return self.bytes
-}
-
-func (self *bytesReceiver) Write(data []byte) (int, error) {
-	// HACK: We know only one write is going to happen :)
-	// ..... but still make sure the assertion is correct
-	if len(self.bytes) > 0 {
-		return 0, errors.New("You fool, thinking you can be right")
-	}
-	self.bytes = data
-	return len(data), nil
 }
