@@ -68,3 +68,10 @@ test_start "space dir"
   direnv_eval
   test "$SPACE_DIR" = "true"
 test_stop
+
+test_start "utils"
+  LINK_TIME=`direnv file-mtime link-to-somefile`
+  touch somefile
+  NEW_LINK_TIME=`direnv file-mtime link-to-somefile`
+  test "$LINK_TIME" = "$NEW_LINK_TIME"
+test_stop

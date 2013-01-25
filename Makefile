@@ -15,6 +15,9 @@ all: build man
 
 build: libexec/direnv
 
+clean:
+	rm -f libexec/direnv
+
 libexec/direnv: direnv.go src/**/*.go
 	go fmt
 	go build -o libexec/direnv
