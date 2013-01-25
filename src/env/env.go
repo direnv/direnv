@@ -12,19 +12,15 @@ import (
 )
 
 // A list of keys we don't want to deal with
-var IGNORED_KEYS = []string{"_", "PWD", "OLDPWD", "SHLVL", "SHELL"}
+var IGNORED_KEYS = map[string]bool{"_": true, "PWD": true, "OLDPWD": true, "SHLVL": true, "SHELL": true}
 
 func IgnoredKey(key string) bool {
 	if len(key) > 4 && key[:5] == "DIRENV_" {
 		return true
 	}
-	// FIXME: Is there a higher-level function for that ? Eg. indexOf in JavaScript
-	for _, ikey := range IGNORED_KEYS {
-		if ikey == key {
-			return true
-		}
-	}
-	return false
+
+	_, found := IGNORED_KEYS[key]
+	return found
 }
 
 type Env map[string]string
