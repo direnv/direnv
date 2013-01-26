@@ -20,6 +20,8 @@ direnv: *.go
 clean:
 	rm -f direnv
 
+stdlib.go: stdlib.sh
+	./script/str2go.rb main STDLIB stdlib.sh > stdlib.go
 
 %.1: %.1.ronn
 	$(RONN) -r $<
