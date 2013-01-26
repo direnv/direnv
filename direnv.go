@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/zimbatm/direnv/src/command"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -13,14 +12,17 @@ import (
 // Settings
 var libexecDir string
 
-var commands = map[string]command.Command{
+var commands = map[string]Command{
 	// Public commands
-	"dump": command.Dump,
-	"diff": command.Diff,
+	"dump":   Dump,
+	"diff":   Diff,
+	"export": Export,
+	"hook":   Hook,
 	// Private commands
-	"expand-path": command.ExpandPath,
-	"file-mtime":  command.FileMtime,
-	"file-hash":   command.FileHash,
+	"expand-path": ExpandPath,
+	"file-mtime":  FileMtime,
+	"file-hash":   FileHash,
+	"stdlib":      Stdlib,
 	"-h":          Usage,
 	"-help":       Usage,
 	"--help":      Usage,
@@ -28,7 +30,7 @@ var commands = map[string]command.Command{
 
 var publicCommands = []string{"dump", "diff"}
 
-func findCommand(commandName string) (command command.Command) {
+func findCommand(commandName string) (command Command) {
 	if command = commands[commandName]; command != nil {
 		return
 	}
@@ -45,7 +47,7 @@ func findCommand(commandName string) (command command.Command) {
 	return commandFromPath(path)
 }
 
-func commandFromPath(path string) command.Command {
+func commandFromPath(path string) Command {
 	return func(args []string) (err error) {
 		var files []*os.File
 		var process *os.Process
@@ -116,7 +118,7 @@ func init() {
 
 func main() {
 	var err error
-	var command command.Command
+	var command Command
 
 	// Dispatch
 	if len(os.Args) > 1 {

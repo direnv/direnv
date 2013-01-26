@@ -6,21 +6,20 @@ RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv --or
 RONNS = $(wildcard man/*.ronn)
 ROFFS = $(RONNS:.ronn=)
 
-export GOPATH=$(PWD)
-
 .PHONY: all man html test release install gh-pages
 #all: build man test
 all: build man
 
 
-build: libexec/direnv
+build: direnv
+
+direnv: *.go
+	go fmt
+	go build -o direnv
 
 clean:
-	rm -f libexec/direnv
+	rm -f direnv
 
-libexec/direnv: direnv.go src/**/*.go
-	go fmt
-	go build -o libexec/direnv
 
 %.1: %.1.ronn
 	$(RONN) -r $<
@@ -46,12 +45,10 @@ gh-pages: html
 	git checkout master
 	git stash pop || true
 
-install:
+install: all
 	install -d bin $(DESTDIR)/bin
-	install -d libexec $(DESTDIR)/libexec
 	install -d man $(DESTDIR)/share/man/man1
-	cp -R bin/* $(DESTDIR)/bin
-	cp -R libexec/* $(DESTDIR)/libexec
+	cp direnv $(DESTDIR)/bin
 	cp -R man/*.1 $(DESTDIR)/share/man/man1
 
 export GOPATH=$(PWD)

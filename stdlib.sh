@@ -1,5 +1,6 @@
-#!/bin/echo
-# vim: ft=sh
+#!/usr/bin/env bash
+#
+#
 
 has() {
   type "$1" &>/dev/null

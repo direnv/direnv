@@ -1,4 +1,4 @@
-package shell
+package main
 
 import (
 	"regexp"
@@ -9,7 +9,7 @@ var ESCAPE_REG = regexp.MustCompile("([^A-Za-z0-9_\\-.,:/@\n])")
 
 // This function and comments have been copied over from Ruby's
 // stdlib shellwords.rb library.
-func Escape(str string) string {
+func ShellEscape(str string) string {
 	if str == "" {
 		return ""
 	}
