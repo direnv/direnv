@@ -11,9 +11,9 @@ import (
 	"strings"
 )
 
-type EnvDiff map[string]string
+type Env map[string]string
 
-func EnvToBash(env EnvDiff) string {
+func EnvToBash(env Env) string {
 	str := ""
 	for key, value := range env {
 		// FIXME: This is not exacly as the ruby nil
@@ -30,18 +30,18 @@ func EnvToBash(env EnvDiff) string {
 	return str
 }
 
-func DiffEnv(env1 map[string]string, env2 map[string]string) EnvDiff {
-	envDiff := make(EnvDiff)
+func EnvDiff(env1 map[string]string, env2 map[string]string) Env {
+	envDiff := make(Env)
 
 	for key, _ := range env1 {
-		if env2[key] != env1[key] && !IgnoredKey(key) {
+		if env2[key] != env1[key] && !ignoredKey(key) {
 			envDiff[key] = env2[key]
 		}
 	}
 
 	// FIXME: I'm sure there is a smarter way to do that
 	for key, _ := range env2 {
-		if env2[key] != env1[key] && !IgnoredKey(key) {
+		if env2[key] != env1[key] && !ignoredKey(key) {
 			envDiff[key] = env2[key]
 		}
 	}
@@ -52,7 +52,7 @@ func DiffEnv(env1 map[string]string, env2 map[string]string) EnvDiff {
 // A list of keys we don't want to deal with
 var IGNORED_KEYS = map[string]bool{"_": true, "PWD": true, "OLDPWD": true, "SHLVL": true, "SHELL": true}
 
-func IgnoredKey(key string) bool {
+func ignoredKey(key string) bool {
 	if len(key) > 4 && key[:5] == "DIRENV_" {
 		return true
 	}
@@ -61,27 +61,35 @@ func IgnoredKey(key string) bool {
 	return found
 }
 
-type Env map[string]string
-
-// FIXME: apparently it's possible to have two variables with the
-//        same name in the env but I never seen that.
-//        If that happens I might have to change the return
-//        type signature
-func FilteredEnv() Env {
+// NOTE:  We don't support having two variables with the same name.
+//        I've never seen it used in the wild but accoding to POSIX
+//        it's allowed.
+func GetEnv() Env {
 	env := make(Env)
 
 	for _, kv := range os.Environ() {
 		kv2 := strings.SplitN(kv, "=", 2)
-		// Is there a better way to deconstruct a tuple ?
+
 		key := kv2[0]
 		value := kv2[1]
 
-		if !IgnoredKey(key) {
-			env[key] = value
-		}
+		env[key] = value
 	}
 
 	return env
+}
+
+func (env Env) Filtered() Env {
+	newEnv := make(Env)
+
+	for key, value := range env {
+
+		if !ignoredKey(key) {
+			newEnv[key] = value
+		}
+	}
+
+	return newEnv
 }
 
 func ParseEnv(base64env string) (Env, error) {

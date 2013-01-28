@@ -9,7 +9,11 @@ has() {
 
 # Usage: expand_path ./rel/path
 expand_path() {
-  direnv expand-path $@
+  direnv private expand_path $@
+}
+
+mtime() {
+  direnv private mtime $@
 }
 
 # Usage: user_rel_path /Users/you/some_path => ~/some_path

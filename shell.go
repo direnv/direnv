@@ -5,13 +5,20 @@ import (
 	"strings"
 )
 
+type Shell string
+
+const (
+	BASH = Shell("bash")
+	ZSH  = Shell("zsh")
+)
+
 var ESCAPE_REG = regexp.MustCompile("([^A-Za-z0-9_\\-.,:/@\n])")
 
 // This function and comments have been copied over from Ruby's
 // stdlib shellwords.rb library.
 func ShellEscape(str string) string {
 	if str == "" {
-		return ""
+		return "''"
 	}
 
 	// Treat multibyte characters as is.  It is caller's responsibility
