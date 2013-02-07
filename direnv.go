@@ -21,7 +21,7 @@ var publicCommands = CommandDispatcher(map[string]Command{
 	"hook":    Hook,
 	"private": privateCommands,
 	"status":  Status,
-	"switch":  TODO,
+	"switch":  Switch,
 })
 
 func TODO(env Env, args []string) error {

@@ -25,6 +25,7 @@ type Context struct {
 	WorkDir string // Current directory
 	ConfDir string
 	ExecDir string
+	RCDir   string
 }
 
 func LoadContext(env Env) (context *Context, err error) {
@@ -60,6 +61,11 @@ func LoadContext(env Env) (context *Context, err error) {
 		return
 	}
 
+	context.RCDir = env["DIRENV_DIR"]
+	if len(context.RCDir) > 0 && context.RCDir[0:1] == "-" {
+		context.RCDir = context.RCDir[1:]
+	}
+
 	return
 }
 
@@ -67,15 +73,11 @@ func (self *Context) AllowDir() string {
 	return filepath.Join(self.ConfDir, "allow")
 }
 
-func (self *Context) IsLoaded() bool {
-	return self.Env["DIRENV_BACKUP"] != ""
-}
-
 func (self *Context) LoadedRC() *RC {
-	if self.Env["DIRENV_DIR"] == "" {
+	if self.RCDir == "" {
 		return nil
 	}
-	rcPath := filepath.Join(self.Env["DIRENV_DIR"], ".envrc")
+	rcPath := filepath.Join(self.RCDir, ".envrc")
 
 	mtime, err := strconv.ParseInt(self.Env["DIRENV_MTIME"], 10, 64)
 	if err != nil {

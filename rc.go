@@ -166,7 +166,7 @@ func (rc *RC) Load(env Env, workDir string) (newEnv Env, err error) {
 		Files: []*os.File{os.Stdin, w, os.Stderr},
 	}
 
-	command := fmt.Sprintf("eval `%s/direnv private stdlib` >&2; source %s >&2 && %s/direnv private dump", workDir, rc.path, workDir)
+	command := fmt.Sprintf("source %s/stdlib.bash >&2 && source %s >&2 && %s/direnv private dump", workDir, rc.path, workDir)
 
 	process, err := os.StartProcess("/bin/bash", []string{"bash", "-c", command}, attr)
 	if err != nil {
@@ -188,8 +188,9 @@ func (rc *RC) Load(env Env, workDir string) (newEnv Env, err error) {
 		return
 	}
 
-	newEnv["DIRENV_DIR"] = filepath.Dir(rc.path)
+	newEnv["DIRENV_DIR"] = "-" + filepath.Dir(rc.path)
 	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", rc.mtime)
+	newEnv["DIRENV_HASH"] = rc.hash
 	newEnv["DIRENV_BACKUP"] = env.Serialize()
 
 	return newEnv, nil

@@ -123,9 +123,5 @@ func Status(env Env, args []string) error {
 		fmt.Println("No .envrc found")
 	}
 
-	fmt.Println("is loaded?", context.IsLoaded())
-
-	fmt.Println("context", context)
-
 	return nil
 }
