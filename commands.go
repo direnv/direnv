@@ -5,10 +5,10 @@ import (
 	"strings"
 )
 
-type Command func(args []string) error
+type Command func(env Env, args []string) error
 
 func CommandDispatcher(commands map[string]Command) Command {
-	return func(args []string) error {
+	return func(env Env, args []string) error {
 		var command Command
 		var commandName string
 		var commandPrefix string
@@ -30,12 +30,12 @@ func CommandDispatcher(commands map[string]Command) Command {
 			command = commandNotFound(commandPrefix)
 		}
 
-		return command(commandArgs)
+		return command(env, commandArgs)
 	}
 }
 
 func commandNotFound(commandPrefix string) Command {
-	return func(args []string) error {
+	return func(env Env, args []string) error {
 		return fmt.Errorf("Command \"%s\" not found", commandPrefix)
 	}
 }

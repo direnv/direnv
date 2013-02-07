@@ -6,46 +6,33 @@ import (
 )
 
 var privateCommands = CommandDispatcher(map[string]Command{
-	"dump":    Dump,
-	"diff":    Diff,
-	"export":  Export,
-	"default": Usage,
-})
-
-var stdlibCommands = CommandDispatcher(map[string]Command{
-	"default":     Stdlib,
+	"dump":        Dump,
 	"expand_path": ExpandPath,
-	"mtime":       FileMtime,
-	"hash":        FileHash,
+	"export":      Export,
+	"load":        Load,
+	"stdlib":      Stdlib,
 })
 
 var publicCommands = CommandDispatcher(map[string]Command{
-	"status":  TODO,
-	"allow":   TODO,
-	"deny":    TODO,
-	"switch":  TODO,
+	"allow":   Allow,
+	"default": TODO,
+	"deny":    Deny,
+	"help":    TODO,
 	"hook":    Hook,
 	"private": privateCommands,
-	"stdlib":  stdlibCommands,
-	"help":    Usage,
-	"default": Usage,
+	"status":  Status,
+	"switch":  TODO,
 })
 
-func TODO(args []string) error {
+func TODO(env Env, args []string) error {
 	fmt.Println("TODO")
 	return nil
 }
 
 func main() {
 	env := GetEnv()
-	context := LoadContext(env)
-	CONTEXT = context
 
-	if false {
-		fmt.Println(context)
-	}
-
-	if err := publicCommands(os.Args); err != nil {
+	if err := publicCommands(env, os.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}

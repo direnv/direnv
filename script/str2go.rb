@@ -5,14 +5,12 @@
 
 package_name  = ARGV[0]
 constant_name = ARGV[1]
-path_to_file  = ARGV[2]
 
-data = File.read path_to_file
-
-out = $stdout
+input = $stdin
+output = $stdout
 
 def line_to_go(line)
-  '"' + line.gsub("\n", '\n').gsub('"', '\"').gsub(/[^[:ascii:]]/) do |char|
+  '"' + line.gsub('\\', '\\\\\\').gsub("\n", '\n').gsub('"', '\"').gsub(/[^[:ascii:]]/) do |char|
     "\\#{char.ord}"
   end + '"'
 end
@@ -23,7 +21,7 @@ def lines_to_go(lines)
   end.join(" +\n").sub("\t", '')
 end
 
-out.puts "package #{package_name}"
-out.puts
+output.puts "package #{package_name}"
+output.puts
 
-out.puts "const #{constant_name} = #{lines_to_go(data.lines)}"
+output.puts "const #{constant_name} = #{lines_to_go(input.lines)}"

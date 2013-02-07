@@ -20,8 +20,14 @@ direnv: *.go
 clean:
 	rm -f direnv
 
-stdlib.go: stdlib.sh
-	./script/str2go.rb main STDLIB stdlib.sh > stdlib.go
+stdlib.go: stdlib.bash
+	cat $< | ./script/str2go.rb main STDLIB > $@
+
+hook_zsh.go: hook.zsh
+	cat $< | ./script/str2go.rb main HOOK_ZSH > $@
+
+hook_bash.go: hook.bash
+	cat $< | ./script/str2go.rb main HOOK_BASH > $@
 
 %.1: %.1.ronn
 	$(RONN) -r $<
@@ -53,9 +59,3 @@ install: all
 	cp direnv $(DESTDIR)/bin
 	cp -R man/*.1 $(DESTDIR)/share/man/man1
 
-export GOPATH=$(PWD)
-go:
-	cd src/direnv-dump && go build
-	mv src/direnv-dump/direnv-dump libexec/direnv-dump-`uname`-`uname -m`
-	cd src/direnv-diff && go build
-	mv src/direnv-diff/direnv-diff libexec/direnv-diff-`uname`-`uname -m`

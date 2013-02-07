@@ -1,19 +1,17 @@
-#!/usr/bin/env bash
-#
-#
+# These are the commands available in an .envrc context
 
+set -e
+
+# Usage: has something
+# determines if "something" is availabe as a command
 has() {
   type "$1" &>/dev/null
-  return $?
 }
 
-# Usage: expand_path ./rel/path
+# Usage: expand_path ./rel/path [RELATIVE_TO]
+# RELATIVE_TO is $PWD by default
 expand_path() {
-  direnv private expand_path $@
-}
-
-mtime() {
-  direnv private mtime $@
+  $DIRENV_LIBEXEC/direnv private expand_path "$@"
 }
 
 # Usage: user_rel_path /Users/you/some_path => ~/some_path
@@ -166,7 +164,7 @@ source_up() {
 }
 
 if [ -n "${rvm_path-}" ]; then
-  # source rvm on first call, haha :)
+  # source rvm on first call
   rvm() {
     unset rvm
     set +e

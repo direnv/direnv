@@ -1,17 +1,19 @@
 package main
 
-const STDLIB = "#!/usr/bin/env bash\n" +
-	"#\n" +
-	"#\n" +
+const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"\n" +
+	"set -e\n" +
+	"\n" +
+	"# Usage: has something\n" +
+	"# determines if \"something\" is availabe as a command\n" +
 	"has() {\n" +
 	"  type \"$1\" &>/dev/null\n" +
-	"  return $?\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: expand_path ./rel/path\n" +
+	"# Usage: expand_path ./rel/path [RELATIVE_TO]\n" +
+	"# RELATIVE_TO is $PWD by default\n" +
 	"expand_path() {\n" +
-	"  direnv expand-path $@\n" +
+	"  $DIRENV_LIBEXEC/direnv private expand_path \"$@\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: user_rel_path /Users/you/some_path => ~/some_path\n" +
@@ -164,7 +166,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"}\n" +
 	"\n" +
 	"if [ -n \"${rvm_path-}\" ]; then\n" +
-	"  # source rvm on first call, haha :)\n" +
+	"  # source rvm on first call\n" +
 	"  rvm() {\n" +
 	"    unset rvm\n" +
 	"    set +e\n" +

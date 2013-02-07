@@ -4,7 +4,7 @@ set -e
 
 cd `dirname $0`
 TEST_DIR=$PWD
-export PATH=$PWD/../bin:$PATH
+export PATH=$PWD/..:$PATH
 
 # Remove things we could have in our env
 unset GOPATH

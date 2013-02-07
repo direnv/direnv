@@ -92,7 +92,19 @@ func (env Env) Filtered() Env {
 	return newEnv
 }
 
+func (env Env) ToGoEnv() []string {
+	goEnv := make([]string, len(env))
+	index := 0
+	for key, value := range env {
+		goEnv[index] = strings.Join([]string{key, value}, "=")
+		index += 1
+	}
+	return goEnv
+}
+
 func ParseEnv(base64env string) (Env, error) {
+	base64env = strings.TrimSpace(base64env)
+
 	zlibData, err := base64.URLEncoding.DecodeString(base64env)
 	if err != nil {
 		return nil, fmt.Errorf("base64 decoding: %v", err)
@@ -120,10 +132,13 @@ func ParseEnv(base64env string) (Env, error) {
 	return env, nil
 }
 
-func (env Env) Serialize() (string, error) {
+func (env Env) Serialize() string {
+	// We can safely ignore the err because it's only thrown
+	// for unsupported datatype. We know that a map[string]string
+	// is supported.
 	jsonData, err := json.Marshal(env)
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 
 	zlibData := bytes.NewBuffer([]byte{})
@@ -133,5 +148,5 @@ func (env Env) Serialize() (string, error) {
 
 	base64Data := base64.URLEncoding.EncodeToString(zlibData.Bytes())
 
-	return base64Data, nil
+	return base64Data
 }

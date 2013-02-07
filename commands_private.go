@@ -8,55 +8,124 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"path/filepath"
 )
 
-func Diff(args []string) (err error) {
-	var reverse bool
-
-	flagset := flag.NewFlagSet("direnv dump", flag.ExitOnError)
-	flagset.BoolVar(&reverse, "reverse", false, "Reverses the diff")
+func Load(env Env, args []string) (err error) {
+	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
 	flagset.Parse(args[1:])
 
-	oldEnvStr := flagset.Arg(0)
-
-	if oldEnvStr == "" {
-		return fmt.Errorf("Missing OLD_ENV argument")
-	}
-
-	oldEnv, err := ParseEnv(oldEnvStr)
-	if err != nil {
-		return fmt.Errorf("Parse env error: %v", err)
-	}
-
-	newEnv := GetEnv().Filtered()
-
-	var diff Env
-	if reverse {
-		diff = EnvDiff(oldEnv, newEnv)
-	} else {
-		diff = EnvDiff(newEnv, oldEnv)
-	}
-
-	fmt.Println(EnvToBash(diff))
-
+	str := flagset.Arg(0)
+	env, err = ParseEnv(str)
+	fmt.Println(env)
 	return
 }
 
-func Dump(args []string) (err error) {
-	flagset := flag.NewFlagSet("direnv dump", flag.ExitOnError)
+func Dump(env Env, args []string) (err error) {
+	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
 	flagset.Parse(args[1:])
 
-	e := GetEnv().Filtered()
-	str, err := e.Serialize()
+	fmt.Println(env.Filtered().Serialize())
+	return
+}
+
+func Export(env Env, args []string) (err error) {
+	var newEnv Env
+	var loadedRC *RC
+	var foundRC *RC
+	var context *Context
+
+	if context, err = LoadContext(env); err != nil {
+		return
+	}
+
+	loadedRC = context.LoadedRC()
+	foundRC = context.FoundRC()
+
+	if loadedRC != nil {
+		var backupEnv Env
+		if backupEnv, err = context.EnvBackup(); err != nil {
+			return
+		}
+
+		if foundRC == nil {
+			fmt.Fprintf(os.Stderr, "Unloading %s\n", loadedRC.path)
+			newEnv = backupEnv
+		} else if loadedRC.path != foundRC.path {
+			fmt.Fprintf(os.Stderr, "Switching from %s to %s\n", loadedRC.path, foundRC.path)
+			newEnv, err = foundRC.Load(backupEnv, context.WorkDir)
+		} else if loadedRC.mtime != foundRC.mtime {
+			fmt.Fprintf(os.Stderr, "Reloading %s\n", loadedRC.path)
+			newEnv, err = foundRC.Load(backupEnv, context.WorkDir)
+		} else {
+			// Nothing to do. Env is loaded and hasn't changed
+			return nil
+		}
+	} else {
+		if foundRC == nil {
+			// Done here
+			return
+		}
+
+		fmt.Fprintf(os.Stderr, "Loading %s\n", foundRC.path)
+		newEnv, err = foundRC.Load(env, context.WorkDir)
+	}
+
 	if err != nil {
 		return
 	}
+
+	// FIXME: EnvToBash should be switched with the current shell
+	str := EnvToBash(EnvDiff(env, newEnv))
+
 	fmt.Println(str)
 	return
 }
 
-func Export(args []string) (err error) {
-	// TODO
+func expandPath(path, relTo string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+	return filepath.Clean(filepath.Join(relTo, path))
+}
 
+func ExpandPath(env Env, args []string) (err error) {
+	var path string
+
+	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
+	flagset.Parse(args[1:])
+
+	path = flagset.Arg(0)
+	if path == "" {
+		return fmt.Errorf("PATH missing")
+	}
+
+	if !filepath.IsAbs(path) {
+		wd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+
+		relTo := flagset.Arg(1)
+		if relTo == "" {
+			relTo = wd
+		} else {
+			relTo = expandPath(relTo, wd)
+		}
+
+		path = expandPath(path, relTo)
+	}
+
+	_, err = fmt.Println(path)
+
+	return
+}
+
+func Stdlib(env Env, args []string) (err error) {
+	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
+	flagset.Parse(args[1:])
+
+	fmt.Println(STDLIB)
 	return
 }

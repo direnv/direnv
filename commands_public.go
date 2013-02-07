@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 )
 
-// NOTE: direnv hook $0
+// `direnv hook $0`
 // $0 starts with "-" and go tries to parse it as an argument
 //
 // This command is public for historical reasons
-func Hook(args []string) (err error) {
+func Hook(env Env, args []string) (err error) {
 	var target string
 
 	if len(args) > 1 {
@@ -27,18 +27,14 @@ func Hook(args []string) (err error) {
 		target = string(data)
 	}
 
-	// $0 starts with "-"
-	if target[0:1] == "-" {
-		target = target[1:]
-	}
-
+	// $0 starts with "-" but Base doesn't care
 	target = filepath.Base(target)
 
 	switch target {
 	case "bash":
-		fmt.Println("PROMPT_COMMAND=\"eval \\`direnv export\\`;$PROMPT_COMMAND")
+		fmt.Print(HOOK_BASH)
 	case "zsh":
-		fmt.Println("direnv_hook() { eval `direnv export` }; [[ -z $precmd_functions ]] && precmd_functions=(); precmd_functions=($precmd_functions direnv_hook)")
+		fmt.Print(HOOK_ZSH)
 	default:
 		return fmt.Errorf("Unknown target shell '%s'", target)
 	}
@@ -46,7 +42,90 @@ func Hook(args []string) (err error) {
 	return
 }
 
-func Usage(args []string) error {
-	fmt.Println("HI !")
+// `direnv allow [PATH_TO_RC]`
+func Allow(env Env, args []string) (err error) {
+	var rcPath string
+	var context *Context
+	if len(args) > 1 {
+		rcPath = args[2]
+	} else {
+		if rcPath, err = os.Getwd(); err != nil {
+			return
+		}
+	}
+
+	if context, err = LoadContext(env); err != nil {
+		return
+	}
+
+	rc := FindRC(rcPath, context.AllowDir())
+	if rc == nil {
+		return fmt.Errorf(".envrc file not found")
+	}
+	return rc.Allow()
+}
+
+// `direnv deny [PATH_TO_RC]`
+func Deny(env Env, args []string) (err error) {
+	var rcPath string
+	var context *Context
+
+	if len(args) > 1 {
+		rcPath = args[2]
+	} else {
+		if rcPath, err = os.Getwd(); err != nil {
+			return
+		}
+	}
+
+	if context, err = LoadContext(env); err != nil {
+		return
+	}
+
+	rc := FindRC(rcPath, context.AllowDir())
+	if rc == nil {
+		return fmt.Errorf(".envrc file not found")
+	}
+	return rc.Deny()
+}
+
+func Switch(env Env, args []string) error {
+	return fmt.Errorf("Woops ! This should be handled by the shell wrapper")
+}
+
+func Status(env Env, args []string) error {
+	context, err := LoadContext(env)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("DIRENV_LIBEXEC", context.ExecDir)
+	fmt.Println("DIRENV_CONFIG", context.ConfDir)
+
+	loadedRC := context.LoadedRC()
+	foundRC := context.FoundRC()
+
+	if loadedRC != nil {
+		fmt.Println("Loaded RC path", loadedRC.path)
+		fmt.Println("Loaded RC mtime", loadedRC.mtime)
+		fmt.Println("Loaded RC allowed", loadedRC.Allowed())
+		fmt.Println("Loaded RC allowPath", loadedRC.allowPath)
+	} else {
+		fmt.Println("No .envrc loaded")
+	}
+
+	if foundRC != nil {
+		fmt.Println("Found RC path", foundRC.path)
+		fmt.Println("Found RC mtime", foundRC.mtime)
+		fmt.Println("Found RC allowed", foundRC.Allowed())
+		fmt.Println("Found RC allowPath", foundRC.allowPath)
+	} else {
+		fmt.Println("No .envrc found")
+	}
+
+	fmt.Println("is loaded?", context.IsLoaded())
+
+	fmt.Println("context", context)
+
 	return nil
 }
