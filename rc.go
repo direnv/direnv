@@ -152,7 +152,7 @@ func (self *RC) Allowed() bool {
 	return err == nil
 }
 
-func (rc *RC) Load(env Env, workDir string) (newEnv Env, err error) {
+func (rc *RC) Load(env Env, libexecDir string) (newEnv Env, err error) {
 	r, w, err := os.Pipe()
 	if err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (rc *RC) Load(env Env, workDir string) (newEnv Env, err error) {
 		Files: []*os.File{os.Stdin, w, os.Stderr},
 	}
 
-	command := fmt.Sprintf("source %s/stdlib.bash >&2 && source %s >&2 && %s/direnv private dump", workDir, rc.path, workDir)
+	command := fmt.Sprintf("source %s/stdlib.bash >&2 && source %s >&2 && %s/direnv private dump", libexecDir, rc.path, libexecDir)
 
 	process, err := os.StartProcess("/bin/bash", []string{"bash", "-c", command}, attr)
 	if err != nil {

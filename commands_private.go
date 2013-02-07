@@ -54,10 +54,10 @@ func Export(env Env, args []string) (err error) {
 			newEnv = backupEnv
 		} else if loadedRC.path != foundRC.path {
 			fmt.Fprintf(os.Stderr, "Switching from %s to %s\n", loadedRC.path, foundRC.path)
-			newEnv, err = foundRC.Load(backupEnv, context.WorkDir)
+			newEnv, err = foundRC.Load(backupEnv, context.ExecDir)
 		} else if loadedRC.mtime != foundRC.mtime {
 			fmt.Fprintf(os.Stderr, "Reloading %s\n", loadedRC.path)
-			newEnv, err = foundRC.Load(backupEnv, context.WorkDir)
+			newEnv, err = foundRC.Load(backupEnv, context.ExecDir)
 		} else {
 			// Nothing to do. Env is loaded and hasn't changed
 			return nil
@@ -69,7 +69,7 @@ func Export(env Env, args []string) (err error) {
 		}
 
 		fmt.Fprintf(os.Stderr, "Loading %s\n", foundRC.path)
-		newEnv, err = foundRC.Load(env, context.WorkDir)
+		newEnv, err = foundRC.Load(env, context.ExecDir)
 	}
 
 	if err != nil {
