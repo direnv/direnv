@@ -20,9 +20,6 @@ direnv: *.go
 clean:
 	rm -f direnv
 
-stdlib.go: stdlib.bash
-	cat $< | ./script/str2go.rb main STDLIB > $@
-
 hook_zsh.go: hook.zsh
 	cat $< | ./script/str2go.rb main HOOK_ZSH > $@
 

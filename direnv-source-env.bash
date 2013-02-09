@@ -1,6 +1,16 @@
+#!/usr/bin/env bash
+#
 # These are the commands available in an .envrc context
 
 set -e
+
+if [ -z "$1" ]; then
+  echo "Missing .envrc path" >&2
+  exit 1
+fi
+
+DIRENV_LIBEXEC=`dirname $0`
+ENVRC_PATH=$1
 
 # Usage: has something
 # determines if "something" is availabe as a command
@@ -124,14 +134,14 @@ use() {
     eval "use_$1 $2"
     return $?
   fi
-  
+
   local path="$cellar_path/$1/$2/bin"
   if [ -d "$path" ]; then
     echo "Using $1 v$2"
     PATH_add "$path"
     return
   fi
-    
+
   echo "* Unable to load $path"
   return 1
 }
@@ -173,3 +183,14 @@ if [ -n "${rvm_path-}" ]; then
     set -e
   }
 fi
+
+
+## The actual runtime ##
+
+if [ -f ~/.direnvrc ]; then
+  source_env ~/.direnvrc >&2
+fi
+
+source_env $ENVRC_PATH >&2
+
+$DIRENV_LIBEXEC/direnv private dump

@@ -166,7 +166,7 @@ func (rc *RC) Load(env Env, libexecDir string) (newEnv Env, err error) {
 		Files: []*os.File{os.Stdin, w, os.Stderr},
 	}
 
-	command := fmt.Sprintf("source %s/stdlib.bash >&2 && source %s >&2 && %s/direnv private dump", libexecDir, rc.path, libexecDir)
+	command := fmt.Sprintf("%s/direnv-source-env.bash %s", libexecDir, rc.path)
 
 	process, err := os.StartProcess("/bin/bash", []string{"bash", "-c", command}, attr)
 	if err != nil {
