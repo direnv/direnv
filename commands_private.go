@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func Load(env Env, args []string) (err error) {
@@ -76,8 +77,15 @@ func Export(env Env, args []string) (err error) {
 		return
 	}
 
+	diff := EnvDiff(env, newEnv)
+
+	diff2 := diff.Filtered()
+	if len(diff2) > 0 {
+		fmt.Fprintf(os.Stderr, "Changed: %s\n", strings.Join(stringKeys(diff2), ","))
+	}
+
 	// FIXME: EnvToBash should be switched with the current shell
-	str := EnvToBash(EnvDiff(env, newEnv))
+	str := EnvToBash(diff)
 
 	fmt.Println(str)
 	return
@@ -122,10 +130,14 @@ func ExpandPath(env Env, args []string) (err error) {
 	return
 }
 
-func Stdlib(env Env, args []string) (err error) {
-	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
-	flagset.Parse(args[1:])
+// Utils
 
-	fmt.Println(STDLIB)
-	return
+func stringKeys(hash map[string]string) []string {
+	keys := make([]string, len(hash))
+	i := 0
+	for key, _ := range hash {
+		keys[i] = key
+		i += 1
+	}
+	return keys
 }

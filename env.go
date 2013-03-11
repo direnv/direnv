@@ -53,7 +53,7 @@ func EnvDiff(env1 map[string]string, env2 map[string]string) Env {
 var IGNORED_KEYS = map[string]bool{"_": true, "PWD": true, "OLDPWD": true, "SHLVL": true, "SHELL": true}
 
 func ignoredKey(key string) bool {
-	if len(key) > 4 && key[:5] == "DIRENV_" {
+	if len(key) > 6 && key[:7] == "DIRENV_" {
 		return true
 	}
 
@@ -83,7 +83,6 @@ func (env Env) Filtered() Env {
 	newEnv := make(Env)
 
 	for key, value := range env {
-
 		if !ignoredKey(key) {
 			newEnv[key] = value
 		}

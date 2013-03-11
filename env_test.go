@@ -7,10 +7,7 @@ import (
 func TestEnv(t *testing.T) {
 	env := Env{"FOO": "bar"}
 
-	out, err := env.Serialize()
-	if err != nil {
-		t.Fail()
-	}
+	out := env.Serialize()
 
 	env2, err := ParseEnv(out)
 	if err != nil {
@@ -22,6 +19,15 @@ func TestEnv(t *testing.T) {
 	}
 
 	if len(env2) != 1 {
+		t.Fail()
+	}
+}
+
+func TestIgnoredKeys(t *testing.T) {
+	if !ignoredKey("DIRENV_FOOBAR") {
+		t.Fail()
+	}
+	if !ignoredKey("DIRENV_") {
 		t.Fail()
 	}
 }

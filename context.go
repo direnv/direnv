@@ -43,7 +43,7 @@ func LoadContext(env Env) (context *Context, err error) {
 		return
 	}
 
-	context.ExecDir = env["DIRENV_LIBEXEC"]
+	//context.ExecDir = env["DIRENV_LIBEXEC"]
 	if context.ExecDir == "" {
 		var exePath string
 		if exePath, err = exec.LookPath(os.Args[0]); err != nil {
