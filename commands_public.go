@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 )
 
 // `direnv hook $0`
@@ -16,28 +14,14 @@ func Hook(env Env, args []string) (err error) {
 
 	if len(args) > 1 {
 		target = args[1]
-	} else {
-		// Try to find out the shell on Linux systems
-		ppid := os.Getppid()
-		data, err := ioutil.ReadFile(fmt.Sprintf("/proc/%d/cmdline", ppid))
-		if err != nil {
-			return fmt.Errorf("Please specify a target shell")
-		}
-
-		target = string(data)
 	}
 
-	// $0 starts with "-" but Base doesn't care
-	target = filepath.Base(target)
-
-	switch target {
-	case "bash":
-		fmt.Print(HOOK_BASH)
-	case "zsh":
-		fmt.Print(HOOK_ZSH)
-	default:
+	shell := DetectShell(target)
+	if shell == nil {
 		return fmt.Errorf("Unknown target shell '%s'", target)
 	}
+
+	fmt.Println(shell.Hook())
 
 	return
 }

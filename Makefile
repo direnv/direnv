@@ -20,12 +20,6 @@ direnv: *.go
 clean:
 	rm -f direnv
 
-hook_zsh.go: hook.zsh
-	cat $< | ./script/str2go.rb main HOOK_ZSH > $@
-
-hook_bash.go: hook.bash
-	cat $< | ./script/str2go.rb main HOOK_BASH > $@
-
 %.1: %.1.ronn
 	$(RONN) -r $<
 
