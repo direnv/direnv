@@ -11,6 +11,8 @@ import (
 type Shell interface {
 	Hook() string
 	Escape(string) string
+	Export(key, value string) string
+	Unset(key string) string
 }
 
 func DetectShell(target string) Shell {
@@ -19,9 +21,9 @@ func DetectShell(target string) Shell {
 
 	switch target {
 	case "bash":
-		return new(BASH)
+		return BASH
 	case "zsh":
-		return new(ZSH)
+		return ZSH
 	}
 
 	return nil

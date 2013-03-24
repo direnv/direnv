@@ -13,7 +13,7 @@ import (
 
 type Env map[string]string
 
-func EnvToBash(env Env) string {
+func EnvToShell(env Env, shell Shell) string {
 	str := ""
 	for key, value := range env {
 		// FIXME: This is not exacly as the ruby nil
@@ -21,10 +21,10 @@ func EnvToBash(env Env) string {
 			if key == "PS1" {
 				// unsetting PS1 doesn't restore the default in OSX's bash
 			} else {
-				str += "unset " + key + ";"
+				str += shell.Unset(key)
 			}
 		} else {
-			str += "export " + key + "=" + ShellEscape(value) + ";"
+			str += shell.Export(key, value)
 		}
 	}
 	return str

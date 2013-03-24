@@ -36,6 +36,16 @@ func Export(env Env, args []string) (err error) {
 	var loadedRC *RC
 	var foundRC *RC
 	var config *Config
+	var target string
+
+	if len(args) > 0 {
+		target = args[1]
+	}
+
+	shell := DetectShell(target)
+	if shell == nil {
+		return fmt.Errorf("Unknown target shell '%s'", target)
+	}
 
 	if config, err = LoadConfig(env); err != nil {
 		return
@@ -84,8 +94,7 @@ func Export(env Env, args []string) (err error) {
 		fmt.Fprintf(os.Stderr, "Changed: %s\n", strings.Join(stringKeys(diff2), ","))
 	}
 
-	// FIXME: EnvToBash should be switched with the current shell
-	str := EnvToBash(diff)
+	str := EnvToShell(diff, shell)
 
 	fmt.Println(str)
 	return
