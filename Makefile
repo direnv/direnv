@@ -28,9 +28,9 @@ man: $(ROFFS)
 html:
 	$(RONN) -W5 -s toc man/*.ronn
 
-# Maybe use https://github.com/bmizerany/roundup
+# FIXME: restore the integration tests ./test/direnv-test.sh
 test:
-	./test/direnv-test.sh
+	go test
 
 release:
 	git tag v$(VERSION)
