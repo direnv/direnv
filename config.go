@@ -19,7 +19,7 @@ type Config struct {
 
 func LoadConfig(env Env) (context *Config, err error) {
 	context = &Config{
-		Env:    env,
+		Env: env,
 	}
 
 	context.ConfDir = env["DIRENV_CONFIG"]
