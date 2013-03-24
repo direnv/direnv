@@ -1,3 +1,4 @@
 .direnv
 /direnv
+/direnv.test
 man/*.html
