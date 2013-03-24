@@ -8,19 +8,8 @@ import (
 	"strconv"
 )
 
-type LoadStatus uint
-
-const (
-	None LoadStatus = iota
-	Loaded
-	Unauthorized
-	ScriptError
-	InternalError
-)
-
-type Context struct {
+type Config struct {
 	Env     Env
-	Status  LoadStatus
 	Error   error
 	WorkDir string // Current directory
 	ConfDir string
@@ -28,10 +17,9 @@ type Context struct {
 	RCDir   string
 }
 
-func LoadContext(env Env) (context *Context, err error) {
-	context = &Context{
+func LoadConfig(env Env) (context *Config, err error) {
+	context = &Config{
 		Env:    env,
-		Status: None,
 	}
 
 	context.ConfDir = env["DIRENV_CONFIG"]
@@ -69,11 +57,11 @@ func LoadContext(env Env) (context *Context, err error) {
 	return
 }
 
-func (self *Context) AllowDir() string {
+func (self *Config) AllowDir() string {
 	return filepath.Join(self.ConfDir, "allow")
 }
 
-func (self *Context) LoadedRC() *RC {
+func (self *Config) LoadedRC() *RC {
 	if self.RCDir == "" {
 		return nil
 	}
@@ -92,11 +80,11 @@ func (self *Context) LoadedRC() *RC {
 	return RCFromEnv(rcPath, mtime, hash, self.AllowDir())
 }
 
-func (self *Context) FoundRC() *RC {
+func (self *Config) FoundRC() *RC {
 	return FindRC(self.WorkDir, self.AllowDir())
 }
 
-func (self *Context) EnvBackup() (Env, error) {
+func (self *Config) EnvBackup() (Env, error) {
 	if self.Env["DIRENV_BACKUP"] == "" {
 		return nil, fmt.Errorf("DIRENV_BACKUP is empty")
 	}

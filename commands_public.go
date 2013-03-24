@@ -45,7 +45,7 @@ func Hook(env Env, args []string) (err error) {
 // `direnv allow [PATH_TO_RC]`
 func Allow(env Env, args []string) (err error) {
 	var rcPath string
-	var context *Context
+	var config *Config
 	if len(args) > 1 {
 		rcPath = args[2]
 	} else {
@@ -54,11 +54,11 @@ func Allow(env Env, args []string) (err error) {
 		}
 	}
 
-	if context, err = LoadContext(env); err != nil {
+	if config, err = LoadConfig(env); err != nil {
 		return
 	}
 
-	rc := FindRC(rcPath, context.AllowDir())
+	rc := FindRC(rcPath, config.AllowDir())
 	if rc == nil {
 		return fmt.Errorf(".envrc file not found")
 	}
@@ -68,7 +68,7 @@ func Allow(env Env, args []string) (err error) {
 // `direnv deny [PATH_TO_RC]`
 func Deny(env Env, args []string) (err error) {
 	var rcPath string
-	var context *Context
+	var config *Config
 
 	if len(args) > 1 {
 		rcPath = args[2]
@@ -78,11 +78,11 @@ func Deny(env Env, args []string) (err error) {
 		}
 	}
 
-	if context, err = LoadContext(env); err != nil {
+	if config, err = LoadConfig(env); err != nil {
 		return
 	}
 
-	rc := FindRC(rcPath, context.AllowDir())
+	rc := FindRC(rcPath, config.AllowDir())
 	if rc == nil {
 		return fmt.Errorf(".envrc file not found")
 	}
@@ -94,16 +94,16 @@ func Switch(env Env, args []string) error {
 }
 
 func Status(env Env, args []string) error {
-	context, err := LoadContext(env)
+	config, err := LoadConfig(env)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("DIRENV_LIBEXEC", context.ExecDir)
-	fmt.Println("DIRENV_CONFIG", context.ConfDir)
+	fmt.Println("DIRENV_LIBEXEC", config.ExecDir)
+	fmt.Println("DIRENV_CONFIG", config.ConfDir)
 
-	loadedRC := context.LoadedRC()
-	foundRC := context.FoundRC()
+	loadedRC := config.LoadedRC()
+	foundRC := config.FoundRC()
 
 	if loadedRC != nil {
 		fmt.Println("Loaded RC path", loadedRC.path)
