@@ -59,7 +59,7 @@ var IGNORED_KEYS = map[string]bool{
 }
 
 func ignoredKey(key string) bool {
-	if len(key) > 6 && key[:7] == "DIRENV_" {
+	if strings.HasPrefix(key, "DIRENV_") {
 		return true
 	}
 
