@@ -50,7 +50,13 @@ func EnvDiff(env1 map[string]string, env2 map[string]string) Env {
 }
 
 // A list of keys we don't want to deal with
-var IGNORED_KEYS = map[string]bool{"_": true, "PWD": true, "OLDPWD": true, "SHLVL": true, "SHELL": true}
+var IGNORED_KEYS = map[string]bool{
+	"_":      true,
+	"PWD":    true,
+	"OLDPWD": true,
+	"SHLVL":  true,
+	"SHELL":  true,
+}
 
 func ignoredKey(key string) bool {
 	if len(key) > 6 && key[:7] == "DIRENV_" {
