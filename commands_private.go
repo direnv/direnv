@@ -13,16 +13,7 @@ import (
 	"strings"
 )
 
-func Load(env Env, args []string) (err error) {
-	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
-	flagset.Parse(args[1:])
-
-	str := flagset.Arg(0)
-	env, err = ParseEnv(str)
-	fmt.Println(env)
-	return
-}
-
+// Used to export the inner bash state at the end of execution.
 func Dump(env Env, args []string) (err error) {
 	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
 	flagset.Parse(args[1:])
@@ -31,6 +22,7 @@ func Dump(env Env, args []string) (err error) {
 	return
 }
 
+// This is run by the shell before every prompt
 func Export(env Env, args []string) (err error) {
 	var newEnv Env
 	var loadedRC *RC
@@ -76,7 +68,7 @@ func Export(env Env, args []string) (err error) {
 	} else {
 		if foundRC == nil {
 			// Done here
-			return
+			return nil
 		}
 
 		fmt.Fprintf(os.Stderr, "Loading %s\n", foundRC.path)
