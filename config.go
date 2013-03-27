@@ -10,7 +10,6 @@ import (
 
 type Config struct {
 	Env     Env
-	Error   error
 	WorkDir string // Current directory
 	ConfDir string
 	ExecDir string
