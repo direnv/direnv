@@ -73,10 +73,6 @@ func Deny(env Env, args []string) (err error) {
 	return rc.Deny()
 }
 
-func Switch(env Env, args []string) error {
-	return fmt.Errorf("Woops ! This should be handled by the shell wrapper")
-}
-
 func Status(env Env, args []string) error {
 	config, err := LoadConfig(env)
 	if err != nil {

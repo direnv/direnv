@@ -19,7 +19,6 @@ var publicCommands = CommandDispatcher(map[string]Command{
 	"hook":    Hook,
 	"private": privateCommands,
 	"status":  Status,
-	"switch":  Switch,
 	// edit
 	// init
 })
