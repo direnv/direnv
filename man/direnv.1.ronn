@@ -53,7 +53,7 @@ For Mac users, you can also use `brew install direnv`
 
 Add this line at the very end of your .bashrc or .zshrc:
 
-    eval `direnv hook $0`
+    eval "$(direnv hook $0)"
 
 Make sure it's even after rvm, git-prompt and other shell extensions that manipulate your prompt.
 

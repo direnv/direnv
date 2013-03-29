@@ -13,7 +13,7 @@ Small utility function to install the shell hook in your .bashrc or .zshrc
 
 in ~/.bashrc or ~/.zshrc :
 
-    eval `direnv hook $0`
+    eval "$(direnv hook $0)"
 
 put it at the end to make sure it doesn't interfere with the rest.
 
