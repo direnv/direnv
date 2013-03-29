@@ -9,48 +9,51 @@ import (
 )
 
 type Config struct {
-	Env     Env
-	WorkDir string // Current directory
-	ConfDir string
-	ExecDir string
-	RCDir   string
+	Env      Env
+	WorkDir  string // Current directory
+	ConfDir  string
+	ExecDir  string
+	BashPath string
+	RCDir    string
 }
 
-func LoadConfig(env Env) (context *Config, err error) {
-	context = &Config{
+func LoadConfig(env Env) (config *Config, err error) {
+	config = &Config{
 		Env: env,
 	}
 
-	context.ConfDir = env["DIRENV_CONFIG"]
-	if context.ConfDir == "" {
-		context.ConfDir = XdgConfigDir(env, "direnv")
+	config.ConfDir = env["DIRENV_CONFIG"]
+	if config.ConfDir == "" {
+		config.ConfDir = XdgConfigDir(env, "direnv")
 	}
-	if context.ConfDir == "" {
+	if config.ConfDir == "" {
 		err = fmt.Errorf("Couldn't find a configuration directory for direnv")
 		return
 	}
 
-	//context.ExecDir = env["DIRENV_LIBEXEC"]
-	if context.ExecDir == "" {
-		var exePath string
-		if exePath, err = exec.LookPath(os.Args[0]); err != nil {
+	var exePath string
+	if exePath, err = exec.LookPath(os.Args[0]); err != nil {
+		return
+	}
+	if exePath, err = filepath.EvalSymlinks(exePath); err != nil {
+		return
+	}
+	config.ExecDir = filepath.Dir(exePath)
+
+	config.BashPath = env["DIRENV_BASH"]
+	if config.BashPath == "" {
+		if config.BashPath, err = exec.LookPath("bash"); err != nil {
 			return
 		}
-
-		if exePath, err = filepath.EvalSymlinks(exePath); err != nil {
-			return
-		}
-
-		context.ExecDir = filepath.Dir(exePath)
 	}
 
-	if context.WorkDir, err = os.Getwd(); err != nil {
+	if config.WorkDir, err = os.Getwd(); err != nil {
 		return
 	}
 
-	context.RCDir = env["DIRENV_DIR"]
-	if len(context.RCDir) > 0 && context.RCDir[0:1] == "-" {
-		context.RCDir = context.RCDir[1:]
+	config.RCDir = env["DIRENV_DIR"]
+	if len(config.RCDir) > 0 && config.RCDir[0:1] == "-" {
+		config.RCDir = config.RCDir[1:]
 	}
 
 	return
