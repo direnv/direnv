@@ -9,8 +9,8 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-DIRENV_LIBEXEC=`dirname $0`
-ENVRC_PATH=$1
+DIRENV_LIBEXEC="$(dirname $0)"
+ENVRC_PATH="$1"
 
 # Usage: has something
 # determines if "something" is availabe as a command
@@ -21,12 +21,12 @@ has() {
 # Usage: expand_path ./rel/path [RELATIVE_TO]
 # RELATIVE_TO is $PWD by default
 expand_path() {
-  $DIRENV_LIBEXEC/direnv private expand_path "$@"
+  "$DIRENV_LIBEXEC/direnv" private expand_path "$@"
 }
 
 # Usage: user_rel_path /Users/you/some_path => ~/some_path
 user_rel_path() {
-  local path=${1#-}
+  local path="${1#-}"
 
   if [ -z "$path" ]; then return; fi
 
@@ -43,7 +43,7 @@ user_rel_path() {
 # Usage: find_up some_file
 find_up() {
   (
-    cd "`pwd -P 2>/dev/null`"
+    cd "$(pwd -P 2>/dev/null)"
     while true; do
       if [ -f "$1" ]; then
         echo $PWD/$1
@@ -58,7 +58,7 @@ find_up() {
 }
 
 direnv_find_rc() {
-  local path=`find_up .envrc`
+  local path="$(find_up .envrc)"
   if [ -n "$path" ]; then
     cd "$(dirname "$path")"
     return 0
@@ -72,7 +72,7 @@ direnv_find_rc() {
 # Usage: PATH_add PATH
 # Example: PATH_add bin
 PATH_add() {
-  export PATH="`expand_path "$1"`:$PATH"
+  export PATH="$(expand_path "$1"):$PATH"
 }
 
 # Safer path handling
@@ -81,7 +81,7 @@ PATH_add() {
 # Example: path_add LD_LIBRARY_PATH ./lib
 path_add() {
   local old_paths=${!1}
-  local path=`expand_path "$2"`
+  local path="$(expand_path "$2")"
 
   if [ -z "$old_paths" ]; then
     old_paths="$path"
@@ -95,10 +95,10 @@ path_add() {
 # Usage: layout ruby
 layout_ruby() {
   # TODO: ruby_version should be the ABI version
-  local ruby_version=`ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION"`
+  local ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
 
-  export GEM_HOME=$PWD/.direnv/${ruby_version}
-  export BUNDLE_BIN=$PWD/.direnv/bin
+  export GEM_HOME="$PWD/.direnv/${ruby_version}"
+  export BUNDLE_BIN="$PWD/.direnv/bin"
 
   PATH_add ".direnv/${ruby_version}/bin"
   PATH_add ".direnv/bin"
@@ -123,7 +123,7 @@ layout() {
 # This folder contains a <program-name>/<version> structure
 cellar_path=/usr/local/Cellar
 set_cellar_path() {
-  cellar_path=$1
+  cellar_path="$1"
 }
 
 # Usage: use PROGRAM_NAME VERSION
@@ -154,9 +154,9 @@ source_env() {
     rcfile="$rcfile/.envrc"
   fi
   echo "direnv: loading $(user_rel_path "$rcfile")"
-  pushd "`dirname "$rcfile"`" > /dev/null
+  pushd "$(dirname "$rcfile")" > /dev/null
   set +u
-  . "./`basename "$rcfile"`"
+  . "./$(basename "$rcfile")"
   popd > /dev/null
 }
 
@@ -167,7 +167,7 @@ source_up() {
   if [ -z "$file" ]; then
     file=".envrc"
   fi
-  local path=`cd .. && find_up "$file"`
+  local path="$(cd .. && find_up "$file")"
   if [ -n "$path" ]; then
     source_env "$path"
   fi
@@ -191,6 +191,6 @@ if [ -f ~/.direnvrc ]; then
   source_env ~/.direnvrc >&2
 fi
 
-source_env $ENVRC_PATH >&2
+source_env "$ENVRC_PATH" >&2
 
-$DIRENV_LIBEXEC/direnv private dump
+"$DIRENV_LIBEXEC/direnv" private dump
