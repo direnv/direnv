@@ -5,29 +5,6 @@ import (
 	"os"
 )
 
-var privateCommands = CommandDispatcher(map[string]Command{
-	"dump":        Dump,
-	"expand_path": ExpandPath,
-	"export":      Export,
-})
-
-var publicCommands = CommandDispatcher(map[string]Command{
-	"allow":   Allow,
-	"default": TODO,
-	"deny":    Deny,
-	"help":    TODO,
-	"hook":    Hook,
-	"private": privateCommands,
-	"status":  Status,
-	// edit
-	// init
-})
-
-func TODO(env Env, args []string) error {
-	fmt.Println("TODO")
-	return nil
-}
-
 func main() {
 	env := GetEnv()
 
