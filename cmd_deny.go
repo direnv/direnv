@@ -6,12 +6,13 @@ import (
 )
 
 // `direnv deny [PATH_TO_RC]`
+// Revokes the auhorization of a given .envrc
 func Deny(env Env, args []string) (err error) {
 	var rcPath string
 	var config *Config
 
 	if len(args) > 1 {
-		rcPath = args[2]
+		rcPath = args[1]
 	} else {
 		if rcPath, err = os.Getwd(); err != nil {
 			return

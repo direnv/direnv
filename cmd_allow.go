@@ -6,11 +6,12 @@ import (
 )
 
 // `direnv allow [PATH_TO_RC]`
+// Grants direnv to load the given .envrc
 func Allow(env Env, args []string) (err error) {
 	var rcPath string
 	var config *Config
 	if len(args) > 1 {
-		rcPath = args[2]
+		rcPath = args[1]
 	} else {
 		if rcPath, err = os.Getwd(); err != nil {
 			return
