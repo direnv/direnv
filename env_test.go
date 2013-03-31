@@ -24,10 +24,13 @@ func TestEnv(t *testing.T) {
 }
 
 func TestIgnoredKeys(t *testing.T) {
-	if !ignoredKey("DIRENV_FOOBAR") {
+	if ignoredKey("DIRENV_FOOBAR") {
 		t.Fail()
 	}
-	if !ignoredKey("DIRENV_") {
+	if ignoredKey("DIRENV_") {
+		t.Fail()
+	}
+	if !ignoredKey("_") {
 		t.Fail()
 	}
 }
