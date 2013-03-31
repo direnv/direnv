@@ -15,12 +15,11 @@ var publicCommands = CommandDispatcher(map[string]Command{
 	"allow":   Allow,
 	"default": TODO,
 	"deny":    Deny,
+	"edit":    Edit,
 	"help":    TODO,
 	"hook":    Hook,
 	"private": privateCommands,
 	"status":  Status,
-	// edit
-	// init
 })
 
 func TODO(env Env, args []string) error {
