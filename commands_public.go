@@ -83,7 +83,7 @@ func Status(env Env, args []string) error {
 	fmt.Println("DIRENV_CONFIG", config.ConfDir)
 
 	loadedRC := config.LoadedRC()
-	foundRC := config.FoundRC()
+	foundRC := config.FindRC()
 
 	if loadedRC != nil {
 		fmt.Println("Loaded RC path", loadedRC.path)

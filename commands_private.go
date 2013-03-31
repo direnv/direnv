@@ -24,13 +24,14 @@ func Dump(env Env, args []string) (err error) {
 
 // This is run by the shell before every prompt
 func Export(env Env, args []string) (err error) {
+	var oldEnv Env = env.Filtered()
 	var newEnv Env
 	var loadedRC *RC
 	var foundRC *RC
 	var config *Config
 	var target string
 
-	if len(args) > 0 {
+	if len(args) > 1 {
 		target = args[1]
 	}
 
@@ -44,39 +45,48 @@ func Export(env Env, args []string) (err error) {
 	}
 
 	loadedRC = config.LoadedRC()
-	foundRC = config.FoundRC()
+	foundRC = config.FindRC()
 
-	if loadedRC != nil {
-		var backupEnv Env
-		if backupEnv, err = config.EnvBackup(); err != nil {
-			return
-		}
+	//fmt.Fprintf(os.Stderr, "%v %v\n", loadedRC, foundRC)
 
+	if loadedRC == nil {
 		if foundRC == nil {
-			fmt.Fprintf(os.Stderr, "Unloading %s\n", loadedRC.path)
-			newEnv = backupEnv
-		} else if loadedRC.path != foundRC.path {
-			fmt.Fprintf(os.Stderr, "Switching from %s to %s\n", loadedRC.path, foundRC.path)
-			newEnv, err = foundRC.Load(backupEnv, config)
-		} else if loadedRC.mtime != foundRC.mtime {
-			fmt.Fprintf(os.Stderr, "Reloading %s\n", loadedRC.path)
-			newEnv, err = foundRC.Load(backupEnv, config)
-		} else {
-			// Nothing to do. Env is loaded and hasn't changed
-			return nil
-		}
-	} else {
-		if foundRC == nil {
-			// Done here
+			// We're done here.
 			return nil
 		}
 
 		fmt.Fprintf(os.Stderr, "Loading %s\n", foundRC.path)
-		newEnv, err = foundRC.Load(env, config)
+		newEnv, err = foundRC.Load(config, oldEnv)
+	} else {
+		var backupEnv Env
+		if backupEnv, err = config.EnvBackup(); err != nil {
+			goto error
+		}
+		oldEnv = backupEnv.Filtered()
+		if foundRC == nil {
+			fmt.Fprintf(os.Stderr, "Unloading %s\n", loadedRC.path)
+			newEnv = oldEnv
+		} else if loadedRC.path != foundRC.path {
+			fmt.Fprintf(os.Stderr, "Switching from %s to %s\n", loadedRC.path, foundRC.path)
+			newEnv, err = foundRC.Load(config, oldEnv)
+		} else if loadedRC.mtime != foundRC.mtime {
+			fmt.Fprintf(os.Stderr, "Reloading %s\n", loadedRC.path)
+			newEnv, err = foundRC.Load(config, oldEnv)
+		} else {
+			// Nothing to do. Env is loaded and hasn't changed
+			return nil
+		}
 	}
 
+error:
 	if err != nil {
-		return
+		newEnv = oldEnv
+		if foundRC != nil {
+			// This should be nearby rc.Load()'s similar statement
+			newEnv["DIRENV_DIR"] = "-" + filepath.Dir(foundRC.path)
+			newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", foundRC.mtime)
+			newEnv["DIRENV_BACKUP"] = oldEnv.Serialize()
+		}
 	}
 
 	diff := EnvDiff(env, newEnv)
@@ -90,6 +100,7 @@ func Export(env Env, args []string) (err error) {
 
 	fmt.Println(str)
 	return
+
 }
 
 func expandPath(path, relTo string) string {

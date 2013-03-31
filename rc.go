@@ -13,7 +13,6 @@ import (
 type RC struct {
 	path      string
 	mtime     int64
-	hash      string
 	allowPath string
 }
 
@@ -124,15 +123,17 @@ func LoadRC(path string, allowDir string) *RC {
 		mtime = allowMtime
 	}
 
-	return &RC{path, mtime, hash, allowPath}
+	return &RC{path, mtime, allowPath}
 }
 
-func RCFromEnv(path string, mtime int64, hash string, allowDir string) *RC {
-	allowPath := filepath.Join(allowDir, hash)
-	return &RC{path, mtime, hash, allowPath}
+func RCFromEnv(path string, mtime int64) *RC {
+	return &RC{path, mtime, ""}
 }
 
 func (self *RC) Allow() (err error) {
+	if self.allowPath == "" {
+		return fmt.Errorf("Cannot allow empty path")
+	}
 	if err = os.MkdirAll(filepath.Dir(self.allowPath), 0755); err != nil {
 		return
 	}
@@ -152,7 +153,11 @@ func (self *RC) Allowed() bool {
 	return err == nil
 }
 
-func (rc *RC) Load(env Env, config *Config) (newEnv Env, err error) {
+func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
+	if !rc.Allowed() {
+		return nil, fmt.Errorf("%s is not allowed\n", rc.path)
+	}
+
 	r, w, err := os.Pipe()
 	if err != nil {
 		return nil, err
@@ -190,7 +195,6 @@ func (rc *RC) Load(env Env, config *Config) (newEnv Env, err error) {
 
 	newEnv["DIRENV_DIR"] = "-" + filepath.Dir(rc.path)
 	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", rc.mtime)
-	newEnv["DIRENV_HASH"] = rc.hash
 	newEnv["DIRENV_BACKUP"] = env.Serialize()
 
 	return newEnv, nil

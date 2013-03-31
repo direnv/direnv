@@ -74,15 +74,10 @@ func (self *Config) LoadedRC() *RC {
 		return nil
 	}
 
-	if self.Env["DIRENV_HASH"] == "" {
-		return nil
-	}
-	hash := self.Env["DIRENV_HASH"]
-
-	return RCFromEnv(rcPath, mtime, hash, self.AllowDir())
+	return RCFromEnv(rcPath, mtime)
 }
 
-func (self *Config) FoundRC() *RC {
+func (self *Config) FindRC() *RC {
 	return FindRC(self.WorkDir, self.AllowDir())
 }
 

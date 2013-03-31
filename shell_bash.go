@@ -5,7 +5,7 @@ type bash int
 var BASH bash
 
 func (b bash) Hook() string {
-	return `PROMPT_COMMAND="eval \$(direnv private export bash);$PROMPT_COMMAND"`
+	return `PROMPT_COMMAND="eval \"\$(direnv private export bash) ;$PROMPT_COMMAND\""`
 }
 
 func (b bash) Escape(str string) string {

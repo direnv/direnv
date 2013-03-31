@@ -51,20 +51,21 @@ func EnvDiff(env1 map[string]string, env2 map[string]string) Env {
 
 // A list of keys we don't want to deal with
 var IGNORED_KEYS = map[string]bool{
-	"_":      true,
-	"PWD":    true,
 	"OLDPWD": true,
-	"SHLVL":  true,
+	"PS1":    true,
+	"PWD":    true,
 	"SHELL":  true,
+	"SHLVL":  true,
+	"_":      true,
 }
 
 func ignoredKey(key string) bool {
-	if strings.HasPrefix(key, "DIRENV_") {
-		return true
-	}
-
 	_, found := IGNORED_KEYS[key]
 	return found
+}
+
+func direnvVar(key string) bool {
+	return strings.HasPrefix(key, "DIRENV_")
 }
 
 // NOTE:  We don't support having two variables with the same name.
@@ -89,7 +90,7 @@ func (env Env) Filtered() Env {
 	newEnv := make(Env)
 
 	for key, value := range env {
-		if !ignoredKey(key) {
+		if !ignoredKey(key) && !direnvVar(key) {
 			newEnv[key] = value
 		}
 	}
