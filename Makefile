@@ -14,6 +14,9 @@ direnv: *.go
 	go fmt
 	go build -o direnv
 
+site/CNAME:
+	git clone --branch gh-pages --single-branch https://github.com/zimbatm/direnv.git site
+
 clean:
 	rm -f direnv
 
