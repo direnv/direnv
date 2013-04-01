@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -45,7 +46,7 @@ var CmdExport = &Cmd{
 				return nil
 			}
 
-			newEnv, err = foundRC.Load(config, oldEnv)
+			newEnv, err = loadRC(foundRC, config, oldEnv)
 		} else {
 			var backupEnv Env
 			if backupEnv, err = config.EnvBackup(); err != nil {
@@ -57,10 +58,10 @@ var CmdExport = &Cmd{
 				newEnv = oldEnv
 			} else if loadedRC.path != foundRC.path {
 				fmt.Fprintf(os.Stderr, "direnv: switching\n")
-				newEnv, err = foundRC.Load(config, oldEnv)
+				newEnv, err = loadRC(foundRC, config, oldEnv)
 			} else if loadedRC.mtime != foundRC.mtime {
 				fmt.Fprintf(os.Stderr, "direnv: reloading\n")
-				newEnv, err = foundRC.Load(config, oldEnv)
+				newEnv, err = loadRC(foundRC, config, oldEnv)
 			} else {
 				// Nothing to do. Env is loaded and hasn't changed
 				return nil
@@ -104,4 +105,51 @@ var CmdExport = &Cmd{
 		return
 
 	},
+}
+
+func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
+	if !rc.Allowed() {
+		return nil, fmt.Errorf("%s is not allowed\n", rc.path)
+	}
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		return nil, err
+	}
+
+	r2 := bufio.NewReader(r)
+
+	attr := &os.ProcAttr{
+		Dir:   filepath.Dir(rc.path),
+		Env:   env.ToGoEnv(),
+		Files: []*os.File{os.Stdin, w, os.Stderr},
+	}
+
+	command := fmt.Sprintf(`eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`, config.SelfPath, rc.path, config.SelfPath)
+
+	process, err := os.StartProcess(config.BashPath, []string{"bash", "-c", command}, attr)
+	if err != nil {
+		return nil, err
+	}
+
+	output, err := r2.ReadString('\n')
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = process.Wait()
+	if err != nil {
+		return nil, err
+	}
+
+	newEnv, err = ParseEnv(output)
+	if err != nil {
+		return
+	}
+
+	newEnv["DIRENV_DIR"] = "-" + filepath.Dir(rc.path)
+	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", rc.mtime)
+	newEnv["DIRENV_BACKUP"] = env.Serialize()
+
+	return newEnv, nil
 }
