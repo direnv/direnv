@@ -1,8 +1,3 @@
-//
-// Commands that we want to expose in the stdlib.
-// Generally they exist because of cross-platform issues.
-//
-
 package main
 
 import (
@@ -22,7 +17,8 @@ func expandPath(path, relTo string) string {
 // `direnv expand_path PATH [REL_TO]`
 var CmdExpandPath = &Cmd{
 	Name:    "expand_path",
-	Desc:    "Transforms a $PATH to an absolute path to $REL_TO or $PWD",
+	Desc:    "Transforms a PATH to an absolute path to REL_TO or $PWD",
+	Args:    []string{"PATH", "[REL_TO]"},
 	Private: true,
 	Fn: func(env Env, args []string) (err error) {
 		var path string

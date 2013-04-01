@@ -11,15 +11,15 @@ var DOTENV_REG = regexp.MustCompile("([A-Za-z0-9_]+)=(.*)")
 var DOTENV_LF_REG = regexp.MustCompile("\\\\n")
 var DOTENV_ESC_REG = regexp.MustCompile("\\\\.")
 
-// `direnv private dotenv [PATH]`
+// `direnv private dotenv [PATH_TO_DOTENV]`
 // Transforms a .env file to evaluatable `export KEY=PAIR` statements.
 //
 // See: https://github.com/bkeepers/dotenv and
 //   https://github.com/ddollar/foreman
-
 var CmdDotEnv = &Cmd{
 	Name:    "dotenv",
 	Desc:    "Transforms a .env file to evaluatable `export KEY=PAIR` statements",
+	Args:    []string{"[PATH_TO_DOTENV]"},
 	Private: true,
 	Fn: func(env Env, args []string) (err error) {
 		var target string

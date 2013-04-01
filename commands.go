@@ -8,6 +8,7 @@ import (
 type Cmd struct {
 	Name    string
 	Desc    string
+	Args    []string
 	Private bool
 	Fn      func(env Env, args []string) error
 }

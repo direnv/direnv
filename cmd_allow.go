@@ -9,6 +9,7 @@ import (
 var CmdAllow = &Cmd{
 	Name: "allow",
 	Desc: "Grants direnv to load the given .envrc",
+	Args: []string{"[PATH_TO_RC]"},
 	Fn: func(env Env, args []string) (err error) {
 		var rcPath string
 		var config *Config

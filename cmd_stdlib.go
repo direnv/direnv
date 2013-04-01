@@ -4,6 +4,22 @@ import (
 	"fmt"
 )
 
+// `direnv stdlib`
+var CmdStdlib = &Cmd{
+	Name:    "stdlib",
+	Desc:    "Outputs the stdlib that is available in the .envrc",
+	Private: true,
+	Fn: func(env Env, args []string) (err error) {
+		var config *Config
+		if config, err = LoadConfig(env); err != nil {
+			return
+		}
+
+		fmt.Printf(STDLIB, config.SelfPath)
+		return
+	},
+}
+
 const STDLIB = `
 # These are the commands available in an .envrc context
 set -e
@@ -199,19 +215,3 @@ fi
 
 #"$DIRENV_PATH" dump
 `
-
-// `direnv stdlib`
-var CmdStdlib = &Cmd{
-	Name:    "stdlib",
-	Desc:    "Outputs the stdlib that is available in the .envrc",
-	Private: true,
-	Fn: func(env Env, args []string) (err error) {
-		var config *Config
-		if config, err = LoadConfig(env); err != nil {
-			return
-		}
-
-		fmt.Printf(STDLIB, config.SelfPath)
-		return
-	},
-}

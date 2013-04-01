@@ -13,6 +13,7 @@ import (
 var CmdExport = &Cmd{
 	Name:    "export",
 	Desc:    "loads an .envrc and prints the diff in terms of exports",
+	Args:    []string{"SHELL"},
 	Private: true,
 	Fn: func(env Env, args []string) (err error) {
 		var oldEnv Env = env.Filtered()

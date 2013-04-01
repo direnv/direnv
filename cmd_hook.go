@@ -8,6 +8,7 @@ import (
 var CmdHook = &Cmd{
 	Name: "hook",
 	Desc: "Used to setup the shell hook",
+	Args: []string{"SHELL"},
 	Fn: func(env Env, args []string) (err error) {
 		var target string
 
