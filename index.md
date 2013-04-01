@@ -74,8 +74,6 @@ Or discuss by email <direnv@librelist.com>
 Or if you have some cool usages of direnv that you want to share, feel free to put them in the wiki
 <https://github.com/zimbatm/direnv/wiki>
 
-[![Build Status](https://secure.travis-ci.org/zimbatm/direnv.png)](http://travis-ci.org/zimbatm/direnv)
-
 ## COPYRIGHT
 
 Thank you for making direnv better
