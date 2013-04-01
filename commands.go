@@ -6,6 +6,7 @@ import (
 )
 
 var privateCommands = CommandDispatcher(map[string]Command{
+	"dotenv":      DotEnv,
 	"dump":        Dump,
 	"expand_path": ExpandPath,
 	"export":      Export,

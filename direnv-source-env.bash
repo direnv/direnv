@@ -24,6 +24,12 @@ expand_path() {
   "$DIRENV_LIBEXEC/direnv" private expand_path "$@"
 }
 
+# Usage: dotenv
+# Loads a .env in the current environment
+dotenv() {
+  eval "$("$DIRENV_LIBEXEC/direnv" private dotenv "$@")"
+}
+
 # Usage: user_rel_path /Users/you/some_path => ~/some_path
 user_rel_path() {
   local path="${1#-}"
