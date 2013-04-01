@@ -39,6 +39,7 @@ test:
 	go test
 
 release:
+	./script/release $(VERSION)
 	git tag v$(VERSION)
 
 gh-pages: html

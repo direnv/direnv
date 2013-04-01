@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Creates a static build for all platforms. You need to have golang
+# compiled to all these targets.
+#
+# `brew install go --cross-compile-all`
+
+VERSION="$1"
+PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 linux/386
+linux/amd64 linux/arm windows/386 windows/amd64"
+OUTPUT="direnv$VERSION"
+
+cd `dirname $0`/..
+mkdir -p release
+
+for PLATFORM in $PLATFORMS; do
+  export GOOS=${PLATFORM%/*}
+  export GOARCH=${PLATFORM#*/}
+  CMD="go build -o release/$OUTPUT.${GOOS}-${GOARCH}"
+  echo "GOOS=${GOOS} GOARCH=${GOARCH} $CMD"
+  $CMD
+done
+
+
