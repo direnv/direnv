@@ -84,13 +84,14 @@ Or if you have some cool usages of direnv that you want to share, feel free to p
 
 Thank you for making direnv better
 
-* Joshua Peek (aka. josh) for his patch and support
-* Magnus Holm (aka. judofyr) for his patches and ideas
-* Laurie Young (aka. wildfalcon) for fixing my engrish
-* Martin Aumüller (aka. aumuell) for his patches and awesomeness
-* Sam Stephenson (aka. sstephenson) for his expand_path code that I stole from https://github.com/sstephenson/bats
 * Alexander Kobel for his patches
 * Brian M. Clapper (aka. bmc) for his patch
+* Joshua Peek (aka. josh) for his patch and support
+* Laurie Young (aka. wildfalcon) for fixing my engrish
+* Magnus Holm (aka. judofyr) for his patches and ideas
+* Martin Aumüller (aka. aumuell) for his patches and awesomeness
+* Peter Waller (aka. pwaller) for his patches and insights
+* Sam Stephenson (aka. sstephenson) for his expand_path code that I stole from https://github.com/sstephenson/bats
 
 Copyright (C) 2011 Jonas Pfenniger and contributors under the MIT licence.
 
