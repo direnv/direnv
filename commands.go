@@ -12,18 +12,22 @@ type Cmd struct {
 	Fn      func(env Env, args []string) error
 }
 
-var CmdList = []*Cmd{
-	CmdAllow,
-	CmdDeny,
-	CmdDotEnv,
-	CmdDump,
-	CmdEdit,
-	CmdExpandPath,
-	CmdExport,
-	CmdHelp,
-	CmdHook,
-	CmdStatus,
-	CmdStdlib,
+var CmdList []*Cmd
+
+func init() {
+	CmdList = []*Cmd{
+		CmdAllow,
+		CmdDeny,
+		CmdDotEnv,
+		CmdDump,
+		CmdEdit,
+		CmdExpandPath,
+		CmdExport,
+		CmdHelp,
+		CmdHook,
+		CmdStatus,
+		CmdStdlib,
+	}
 }
 
 func CommandsDispatch(env Env, args []string) error {
