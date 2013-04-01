@@ -23,7 +23,6 @@ var CmdStdlib = &Cmd{
 const STDLIB = `
 # These are the commands available in an .envrc context
 set -e
-
 DIRENV_PATH="%s"
 
 # Usage: has something
@@ -193,25 +192,22 @@ source_up() {
 	fi
 }
 
-if [ -n "${rvm_path-}" ]; then
-	# source rvm on first call
-	rvm() {
-		unset rvm
-		set +e
-		. "$rvm_path/scripts/rvm"
-		rvm $@
-		set -e
-	}
-fi
+# Sources rvm on first call. Should work like the rvm command-line.
+rvm() {
+	unset rvm
+	if [ -n "${rvm_scripts_path:-}" ]; then
+		source "${rvm_scripts_path}/rvm"
+	elif [ -n "${rvm_path:-}" ]; then
+		source "${rvm_path}/scripts/rvm"
+	else
+		source "$HOME/.rvm/scripts/rvm"
+	fi
+	rvm "$@"
+}
 
-
-## The actual runtime ##
+## Load the global ~/.direnvrc
 
 if [ -f ~/.direnvrc ]; then
 	source_env ~/.direnvrc >&2
 fi
-
-#source_env "$ENVRC_PATH" >&2
-
-#"$DIRENV_PATH" dump
 `
