@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -77,12 +78,25 @@ error:
 
 	diff2 := diff.Filtered()
 	if len(diff2) > 0 {
-		fmt.Fprintf(os.Stderr, "direnv: changed: %s\n", strings.Join(mapKeys(diff2), ","))
+		out := make([]string, len(diff2))
+		i := 0
+		for key, value := range diff2 {
+			if value == "" {
+				out[i] = "-" + key
+			} else if oldEnv[key] == "" {
+				out[i] = "+" + key
+			} else {
+				out[i] = "~" + key
+			}
+			i += 1
+		}
+		sort.Strings(out)
+		fmt.Fprintf(os.Stderr, "direnv: %s\n", strings.Join(out, ","))
 	}
 
 	str := EnvToShell(diff, shell)
 
-	fmt.Println(str)
+	fmt.Print(str)
 	return
 
 }
