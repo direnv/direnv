@@ -1,6 +1,3 @@
-COMMIT_COUNT := $(shell git log --oneline | wc -l | sed -e "s/ //g")
-VERSION := 2.0.$(COMMIT_COUNT)-rc.1
-
 DESTDIR ?= /usr/local
 
 RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv --organization=0x2a" || echo "@echo 'Could not generate manpage because ronn is missing. gem install ronn' || ")
@@ -12,12 +9,6 @@ ROFFS = $(RONNS:.ronn=)
 all: build man
 
 build: direnv
-
-.mk-$(VERSION):
-	touch .mk-$(VERSION)
-
-version.go: .mk-$(VERSION)
-	echo "package main\n\nconst VERSION = \"$(VERSION)\"" > version.go
 
 direnv: *.go
 	go fmt
@@ -38,16 +29,16 @@ html:
 test:
 	go test
 
-release:
-	./script/release $(VERSION)
-	git tag v$(VERSION)
+release: build
+	./script/release `./direnv version`
+	git tag v`./direnv version`
 
 gh-pages: html
 	git stash
 	git checkout gh-pages
 	mv man/*.html .
 	git add *.html
-	git commit -m "$(VERSION)"
+	git commit -m "auto"
 	git checkout master
 	git stash pop || true
 

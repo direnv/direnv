@@ -1,7 +1,5 @@
 .direnv
-/.mk-*
 /direnv
 /direnv.test
 /release
-/version.go
 man/*.html

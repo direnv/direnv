@@ -27,6 +27,7 @@ func init() {
 		CmdHook,
 		CmdStatus,
 		CmdStdlib,
+		CmdVersion,
 	}
 }
 
