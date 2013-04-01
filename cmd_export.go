@@ -40,7 +40,6 @@ func Export(env Env, args []string) (err error) {
 			return nil
 		}
 
-		fmt.Fprintf(os.Stderr, "Loading %s\n", foundRC.path)
 		newEnv, err = foundRC.Load(config, oldEnv)
 	} else {
 		var backupEnv Env
@@ -49,13 +48,13 @@ func Export(env Env, args []string) (err error) {
 		}
 		oldEnv = backupEnv.Filtered()
 		if foundRC == nil {
-			fmt.Fprintf(os.Stderr, "Unloading %s\n", loadedRC.path)
+			fmt.Fprintf(os.Stderr, "direnv: unloading\n")
 			newEnv = oldEnv
 		} else if loadedRC.path != foundRC.path {
-			fmt.Fprintf(os.Stderr, "Switching from %s to %s\n", loadedRC.path, foundRC.path)
+			fmt.Fprintf(os.Stderr, "direnv: switching\n")
 			newEnv, err = foundRC.Load(config, oldEnv)
 		} else if loadedRC.mtime != foundRC.mtime {
-			fmt.Fprintf(os.Stderr, "Reloading %s\n", loadedRC.path)
+			fmt.Fprintf(os.Stderr, "direnv: reloading\n")
 			newEnv, err = foundRC.Load(config, oldEnv)
 		} else {
 			// Nothing to do. Env is loaded and hasn't changed
@@ -78,7 +77,7 @@ error:
 
 	diff2 := diff.Filtered()
 	if len(diff2) > 0 {
-		fmt.Fprintf(os.Stderr, "Changed: %s\n", strings.Join(mapKeys(diff2), ","))
+		fmt.Fprintf(os.Stderr, "direnv: changed: %s\n", strings.Join(mapKeys(diff2), ","))
 	}
 
 	str := EnvToShell(diff, shell)
