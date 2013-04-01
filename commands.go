@@ -10,6 +10,7 @@ var privateCommands = CommandDispatcher(map[string]Command{
 	"dump":        Dump,
 	"expand_path": ExpandPath,
 	"export":      Export,
+	"stdlib":      Stdlib,
 })
 
 var publicCommands = CommandDispatcher(map[string]Command{

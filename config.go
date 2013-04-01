@@ -12,7 +12,7 @@ type Config struct {
 	Env      Env
 	WorkDir  string // Current directory
 	ConfDir  string
-	ExecDir  string
+	SelfPath string
 	BashPath string
 	RCDir    string
 }
@@ -38,7 +38,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 	if exePath, err = filepath.EvalSymlinks(exePath); err != nil {
 		return
 	}
-	config.ExecDir = filepath.Dir(exePath)
+	config.SelfPath = exePath
 
 	config.BashPath = env["DIRENV_BASH"]
 	if config.BashPath == "" {

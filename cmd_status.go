@@ -10,7 +10,7 @@ func Status(env Env, args []string) error {
 		return err
 	}
 
-	fmt.Println("DIRENV_LIBEXEC", config.ExecDir)
+	fmt.Println("direnv exec path", config.SelfPath)
 	fmt.Println("DIRENV_CONFIG", config.ConfDir)
 
 	loadedRC := config.LoadedRC()
