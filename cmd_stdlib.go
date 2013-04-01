@@ -205,6 +205,13 @@ rvm() {
 	rvm "$@"
 }
 
+# Sources rbenv on first call. Should work like the rbenv command-line.
+rbenv() {
+	unset rbenv
+	eval "$(rbenv init -)"
+	rbenv "$@"
+}
+
 ## Load the global ~/.direnvrc
 
 if [ -f ~/.direnvrc ]; then
