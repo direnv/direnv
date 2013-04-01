@@ -16,43 +16,49 @@ var DOTENV_ESC_REG = regexp.MustCompile("\\\\.")
 //
 // See: https://github.com/bkeepers/dotenv and
 //   https://github.com/ddollar/foreman
-func DotEnv(env Env, args []string) (err error) {
-	var target string
-	var dotenv = make(Env)
 
-	if len(args) > 1 {
-		target = args[1]
-	}
+var CmdDotEnv = &Cmd{
+	Name:    "dotenv",
+	Desc:    "Transforms a .env file to evaluatable `export KEY=PAIR` statements",
+	Private: true,
+	Fn: func(env Env, args []string) (err error) {
+		var target string
+		var dotenv = make(Env)
 
-	if target == "" {
-		target = ".env"
-	}
-
-	var data []byte
-	if data, err = ioutil.ReadFile(target); err != nil {
-		return
-	}
-
-	result := DOTENV_REG.FindAllStringSubmatch(string(data), -1)
-	for _, match := range result {
-		key := match[1]
-		value := strings.TrimSpace(match[2])
-
-		if value[0:1] == "'" && value[len(value)-1:len(value)] == "'" {
-			value = value[1 : len(value)-1]
-		} else if value[0:1] == `"` && value[len(value)-1:len(value)] == `"` {
-			value = value[1 : len(value)-1]
-			value = DOTENV_LF_REG.ReplaceAllString(value, "\n")
-			value = DOTENV_ESC_REG.ReplaceAllStringFunc(value, func(str string) string {
-				return str[1:2]
-			})
+		if len(args) > 1 {
+			target = args[1]
 		}
 
-		dotenv[key] = value
-	}
+		if target == "" {
+			target = ".env"
+		}
 
-	str := EnvToShell(dotenv, BASH)
-	fmt.Println(str)
+		var data []byte
+		if data, err = ioutil.ReadFile(target); err != nil {
+			return
+		}
 
-	return
+		result := DOTENV_REG.FindAllStringSubmatch(string(data), -1)
+		for _, match := range result {
+			key := match[1]
+			value := strings.TrimSpace(match[2])
+
+			if value[0:1] == "'" && value[len(value)-1:len(value)] == "'" {
+				value = value[1 : len(value)-1]
+			} else if value[0:1] == `"` && value[len(value)-1:len(value)] == `"` {
+				value = value[1 : len(value)-1]
+				value = DOTENV_LF_REG.ReplaceAllString(value, "\n")
+				value = DOTENV_ESC_REG.ReplaceAllStringFunc(value, func(str string) string {
+					return str[1:2]
+				})
+			}
+
+			dotenv[key] = value
+		}
+
+		str := EnvToShell(dotenv, BASH)
+		fmt.Println(str)
+
+		return
+	},
 }

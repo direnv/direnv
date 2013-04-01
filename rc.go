@@ -171,7 +171,7 @@ func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		Files: []*os.File{os.Stdin, w, os.Stderr},
 	}
 
-	command := fmt.Sprintf(`eval "$("%s" private stdlib)" >&2 && source_env "%s" >&2 && "%s" private dump`, config.SelfPath, rc.path, config.SelfPath)
+	command := fmt.Sprintf(`eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`, config.SelfPath, rc.path, config.SelfPath)
 
 	process, err := os.StartProcess(config.BashPath, []string{"bash", "-c", command}, attr)
 	if err != nil {

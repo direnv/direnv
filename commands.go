@@ -5,61 +5,53 @@ import (
 	"strings"
 )
 
-var privateCommands = CommandDispatcher(map[string]Command{
-	"dotenv":      DotEnv,
-	"dump":        Dump,
-	"expand_path": ExpandPath,
-	"export":      Export,
-	"stdlib":      Stdlib,
-})
-
-var publicCommands = CommandDispatcher(map[string]Command{
-	"allow":   Allow,
-	"default": TODO,
-	"deny":    Deny,
-	"edit":    Edit,
-	"help":    TODO,
-	"hook":    Hook,
-	"private": privateCommands,
-	"status":  Status,
-})
-
-func TODO(env Env, args []string) error {
-	fmt.Println("TODO")
-	return nil
+type Cmd struct {
+	Name    string
+	Desc    string
+	Private bool
+	Fn      func(env Env, args []string) error
 }
 
-type Command func(env Env, args []string) error
+var CmdList = []*Cmd{
+	CmdAllow,
+	CmdDeny,
+	CmdDotEnv,
+	CmdDump,
+	CmdEdit,
+	CmdExpandPath,
+	CmdExport,
+	CmdHelp,
+	CmdHook,
+	CmdStatus,
+	CmdStdlib,
+}
 
-func CommandDispatcher(commands map[string]Command) Command {
-	return func(env Env, args []string) error {
-		var command Command
-		var commandName string
-		var commandPrefix string
-		var commandArgs []string
+func CommandsDispatch(env Env, args []string) error {
+	var command *Cmd
+	var commandName string
+	var commandPrefix string
+	var commandArgs []string
 
-		if len(args) < 2 {
-			commandName = "default"
-			commandPrefix = args[0]
-			commandArgs = []string{}
-		} else {
-			commandName = args[1]
-			commandPrefix = strings.Join(args[0:2], " ")
-			commandArgs = append([]string{commandPrefix}, args[2:]...)
-		}
-
-		command = commands[commandName]
-
-		if command == nil {
-			command = commandNotFound(commandPrefix)
-		}
-
-		return command(env, commandArgs)
+	if len(args) < 2 {
+		commandName = "help"
+		commandPrefix = args[0]
+		commandArgs = []string{}
+	} else {
+		commandName = args[1]
+		commandPrefix = strings.Join(args[0:2], " ")
+		commandArgs = append([]string{commandPrefix}, args[2:]...)
 	}
-}
 
-func commandNotFound(commandPrefix string) Command {
-	return func(env Env, args []string) error {
+	for _, cmd := range CmdList {
+		if cmd.Name == commandName {
+			command = cmd
+			break
+		}
+	}
+
+	if command == nil {
 		return fmt.Errorf("Command \"%s\" not found", commandPrefix)
 	}
+
+	return command.Fn(env, commandArgs)
 }

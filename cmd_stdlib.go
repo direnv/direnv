@@ -19,13 +19,13 @@ has() {
 # Usage: expand_path ./rel/path [RELATIVE_TO]
 # RELATIVE_TO is $PWD by default
 expand_path() {
-	"$DIRENV_PATH" private expand_path "$@"
+	"$DIRENV_PATH" expand_path "$@"
 }
 
 # Usage: dotenv
 # Loads a .env in the current environment
 dotenv() {
-	eval "$("$DIRENV_PATH" private dotenv "$@")"
+	eval "$("$DIRENV_PATH" dotenv "$@")"
 }
 
 # Usage: user_rel_path /Users/you/some_path => ~/some_path
@@ -197,18 +197,21 @@ fi
 
 #source_env "$ENVRC_PATH" >&2
 
-#"$DIRENV_PATH" private dump
+#"$DIRENV_PATH" dump
 `
 
-// `direnv private stdlib`
-//
-// Returns the stdlib that is available in the .envrc
-func Stdlib(env Env, args []string) (err error) {
-	var config *Config
-	if config, err = LoadConfig(env); err != nil {
-		return
-	}
+// `direnv stdlib`
+var CmdStdlib = &Cmd{
+	Name:    "stdlib",
+	Desc:    "Outputs the stdlib that is available in the .envrc",
+	Private: true,
+	Fn: func(env Env, args []string) (err error) {
+		var config *Config
+		if config, err = LoadConfig(env); err != nil {
+			return
+		}
 
-	fmt.Printf(STDLIB, config.SelfPath)
-	return
+		fmt.Printf(STDLIB, config.SelfPath)
+		return
+	},
 }

@@ -7,7 +7,7 @@ var ZSH zsh
 
 func (z zsh) Hook() string {
 	return `
-direnv_hook() { eval "$(direnv private export zsh)"; };
+direnv_hook() { eval "$(direnv export zsh)"; };
 [[ -z $precmd_functions ]] && precmd_functions=();
 precmd_functions=($precmd_functions direnv_hook)
 	`

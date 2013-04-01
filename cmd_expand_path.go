@@ -19,36 +19,40 @@ func expandPath(path, relTo string) string {
 	return filepath.Clean(filepath.Join(relTo, path))
 }
 
-func ExpandPath(env Env, args []string) (err error) {
-	var path string
+// `direnv expand_path PATH [REL_TO]`
+var CmdExpandPath = &Cmd{
+	Name:    "expand_path",
+	Desc:    "Transforms a $PATH to an absolute path to $REL_TO or $PWD",
+	Private: true,
+	Fn: func(env Env, args []string) (err error) {
+		var path string
 
-	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
-	flagset.Parse(args[1:])
+		flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
+		flagset.Parse(args[1:])
 
-	path = flagset.Arg(0)
-	if path == "" {
-		return fmt.Errorf("PATH missing")
-	}
-
-	if !filepath.IsAbs(path) {
-		wd, err := os.Getwd()
-		if err != nil {
-			return err
+		path = flagset.Arg(0)
+		if path == "" {
+			return fmt.Errorf("PATH missing")
 		}
 
-		relTo := flagset.Arg(1)
-		if relTo == "" {
-			relTo = wd
-		} else {
-			relTo = expandPath(relTo, wd)
+		if !filepath.IsAbs(path) {
+			wd, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+
+			relTo := flagset.Arg(1)
+			if relTo == "" {
+				relTo = wd
+			} else {
+				relTo = expandPath(relTo, wd)
+			}
+
+			path = expandPath(path, relTo)
 		}
 
-		path = expandPath(path, relTo)
-	}
+		_, err = fmt.Println(path)
 
-	_, err = fmt.Println(path)
-
-	return
+		return
+	},
 }
-
-// Utils
