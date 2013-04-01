@@ -8,10 +8,15 @@ var CmdHelp = &Cmd{
 	Name: "help",
 	Desc: "shows this help",
 	Fn: func(env Env, args []string) (err error) {
-		fmt.Println("direnv COMMAND [...ARGS]")
+		fmt.Printf(`direnv v%s
+Usage: direnv COMMAND [...ARGS]
+
+Available commands
+------------------
+`, VERSION)
 		for _, cmd := range CmdList {
 			if !cmd.Private {
-				fmt.Printf("%s: %s\n", cmd.Name, cmd.Desc)
+				fmt.Printf("%s:\n  %s\n", cmd.Name, cmd.Desc)
 			}
 		}
 		return

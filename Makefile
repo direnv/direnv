@@ -1,4 +1,5 @@
-VERSION := 0.1.$(shell git log --oneline | wc -l | sed -e "s/ //g")
+COMMIT_COUNT := $(shell git log --oneline | wc -l | sed -e "s/ //g")
+VERSION := 2.0.$(COMMIT_COUNT)-rc.1
 
 DESTDIR ?= /usr/local
 
@@ -10,8 +11,13 @@ ROFFS = $(RONNS:.ronn=)
 #all: build man test
 all: build man
 
-
 build: direnv
+
+.mk-$(VERSION):
+	touch .mk-$(VERSION)
+
+version.go: .mk-$(VERSION)
+	echo "package main\n\nconst VERSION = \"$(VERSION)\"" > version.go
 
 direnv: *.go
 	go fmt
