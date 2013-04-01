@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>{{ page.title ? page.title + ' - direnv' : site.title }}</title>
+    <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
+    <link rel="stylesheet" href="/stylesheets/styles.css">
+    <link rel="stylesheet" href="/stylesheets/pygment_trac.css">
+    <link href="/atom.xml" rel="alternate" title="Latest posts from direnv" type="application/atom+xml">
+    <script src="/javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
     <!--[if lt IE 9]>
@@ -27,6 +28,15 @@
         </ul>
       </header>
       <section>
+        <h2>Latest posts <sub>(<a href="/atom.xml">atom feed</a>)</sub></h2>
+        <ul>
+        {% for post in site.posts %}
+          <li><span>{{ post.date | date_to_string }}</span>  : <a href="{{ post.url }}">{{ post.title }}</a></li>
+        {% endfor %}
+        </ul>
+      </section>
+      <section>
+        {% if page.title %}<h1>{{ page.title }}</h1>{% endif %}
         {{ content }}
       </section>
     </div>
