@@ -205,11 +205,13 @@ rvm() {
 	rvm "$@"
 }
 
-# Sources rbenv on first call. Should work like the rbenv command-line.
+# Activates rbenv shims if they're not in your path.
+# Then use RBENV_VERSION or the .ruby-version file to set ruby version.
 rbenv() {
 	unset rbenv
 	eval "$(rbenv init -)"
-	rbenv "$@"
+	# disable next calls
+	rbenv() { : }
 }
 
 ## Load the global ~/.direnvrc
