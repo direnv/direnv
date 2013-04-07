@@ -211,7 +211,9 @@ rbenv() {
 	unset rbenv
 	eval "$(rbenv init -)"
 	# disable next calls
-	rbenv() { : }
+	rbenv() {
+		:
+	}
 }
 
 ## Load the global ~/.direnvrc
