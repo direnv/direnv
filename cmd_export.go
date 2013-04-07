@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -114,38 +114,23 @@ func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
 		return nil, fmt.Errorf("%s is not allowed\n", rc.path)
 	}
 
-	r, w, err := os.Pipe()
+	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
+	arg := fmt.Sprintf(argtmpl, config.SelfPath, rc.path, config.SelfPath)
+	cmd := exec.Command(config.BashPath, "-c", arg)
+
+	cmd.Stderr = os.Stderr
+	cmd.Env = env.ToGoEnv()
+	cmd.Dir = filepath.Dir(rc.path)
+
+	out, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		err = fmt.Errorf("loadRC() failed to run bash: %q", err)
+		return
 	}
 
-	r2 := bufio.NewReader(r)
-
-	attr := &os.ProcAttr{
-		Dir:   filepath.Dir(rc.path),
-		Env:   env.ToGoEnv(),
-		Files: []*os.File{os.Stdin, w, os.Stderr},
-	}
-
-	command := fmt.Sprintf(`eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`, config.SelfPath, rc.path, config.SelfPath)
-
-	process, err := os.StartProcess(config.BashPath, []string{"bash", "-c", command}, attr)
+	newEnv, err = ParseEnv(string(out))
 	if err != nil {
-		return nil, err
-	}
-
-	output, err := r2.ReadString('\n')
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = process.Wait()
-	if err != nil {
-		return nil, err
-	}
-
-	newEnv, err = ParseEnv(output)
-	if err != nil {
+		err = fmt.Errorf("loadRC() ParseEnv failed: %q", err)
 		return
 	}
 
@@ -153,5 +138,5 @@ func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
 	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", rc.mtime)
 	newEnv["DIRENV_BACKUP"] = env.Serialize()
 
-	return newEnv, nil
+	return
 }
