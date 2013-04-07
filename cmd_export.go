@@ -51,6 +51,7 @@ var CmdExport = &Cmd{
 		} else {
 			var backupEnv Env
 			if backupEnv, err = config.EnvBackup(); err != nil {
+				err = fmt.Errorf("EnvBackup() failed: %q", err)
 				goto error
 			}
 			oldEnv = backupEnv.Filtered()
@@ -97,7 +98,7 @@ var CmdExport = &Cmd{
 				i += 1
 			}
 			sort.Strings(out)
-			fmt.Fprintf(os.Stderr, "direnv: %s\n", strings.Join(out, " "))
+			fmt.Fprintf(os.Stderr, "direnv-export: %s\n", strings.Join(out, " "))
 		}
 
 		str := EnvToShell(diff, shell)
