@@ -113,26 +113,26 @@ func ParseEnv(base64env string) (Env, error) {
 
 	zlibData, err := base64.URLEncoding.DecodeString(base64env)
 	if err != nil {
-		return nil, fmt.Errorf("base64 decoding: %v", err)
+		return nil, fmt.Errorf("ParseEnv() base64 decoding: %v", err)
 	}
 
 	zlibReader := bytes.NewReader(zlibData)
 	w, err := zlib.NewReader(zlibReader)
 	if err != nil {
-		return nil, fmt.Errorf("zlib opening: %v", err)
+		return nil, fmt.Errorf("ParseEnv() zlib opening: %v", err)
 	}
 
 	envData := bytes.NewBuffer([]byte{})
 	_, err = io.Copy(envData, w)
 	if err != nil {
-		return nil, fmt.Errorf("zlib decoding: %v", err)
+		return nil, fmt.Errorf("ParseEnv() zlib decoding: %v", err)
 	}
 	w.Close()
 
 	env := make(Env)
 	err = json.Unmarshal(envData.Bytes(), &env)
 	if err != nil {
-		return nil, fmt.Errorf("json parsing: %v", err)
+		return nil, fmt.Errorf("ParseEnv() json parsing: %v", err)
 	}
 
 	return env, nil
@@ -144,7 +144,7 @@ func (env Env) Serialize() string {
 	// is supported.
 	jsonData, err := json.Marshal(env)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("Serialize(): %q", err))
 	}
 
 	zlibData := bytes.NewBuffer([]byte{})

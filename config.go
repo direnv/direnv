@@ -33,9 +33,11 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 	var exePath string
 	if exePath, err = exec.LookPath(os.Args[0]); err != nil {
+		err = fmt.Errorf("LoadConfig() Lookpath failed: %q", err)
 		return
 	}
 	if exePath, err = filepath.EvalSymlinks(exePath); err != nil {
+		err = fmt.Errorf("LoadConfig() symlink resolution: %q", err)
 		return
 	}
 	config.SelfPath = exePath
@@ -43,11 +45,13 @@ func LoadConfig(env Env) (config *Config, err error) {
 	config.BashPath = env["DIRENV_BASH"]
 	if config.BashPath == "" {
 		if config.BashPath, err = exec.LookPath("bash"); err != nil {
+			err = fmt.Errorf("Can't find bash: %q", err)
 			return
 		}
 	}
 
 	if config.WorkDir, err = os.Getwd(); err != nil {
+		err = fmt.Errorf("LoadConfig() Getwd failed: %q", err)
 		return
 	}
 
