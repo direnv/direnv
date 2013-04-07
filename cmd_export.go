@@ -1,9 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -114,44 +115,60 @@ func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
 		return nil, fmt.Errorf("%s is not allowed\n", rc.path)
 	}
 
-	r, w, err := os.Pipe()
+	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
+	arg := fmt.Sprintf(argtmpl, config.SelfPath, rc.path, config.SelfPath)
+	cmd := exec.Command(config.BashPath, "-c", arg)
+
+	cmd.Stderr = os.Stderr
+	cmd.Env = env.ToGoEnv()
+	cmd.Dir = filepath.Dir(rc.path)
+
+	err = cmd.Start()
 	if err != nil {
-		return nil, err
-	}
-
-	r2 := bufio.NewReader(r)
-
-	attr := &os.ProcAttr{
-		Dir:   filepath.Dir(rc.path),
-		Env:   env.ToGoEnv(),
-		Files: []*os.File{os.Stdin, w, os.Stderr},
-	}
-
-	command := fmt.Sprintf(`eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`, config.SelfPath, rc.path, config.SelfPath)
-
-	process, err := os.StartProcess(config.BashPath, []string{"bash", "-c", command}, attr)
-	if err != nil {
-		return nil, err
-	}
-
-	output, err := r2.ReadString('\n')
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = process.Wait()
-	if err != nil {
-		return nil, err
-	}
-
-	newEnv, err = ParseEnv(output)
-	if err != nil {
+		err = fmt.Errorf("bash failed to start: %q", err)
 		return
 	}
 
-	newEnv["DIRENV_DIR"] = "-" + filepath.Dir(rc.path)
-	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", rc.mtime)
-	newEnv["DIRENV_BACKUP"] = env.Serialize()
+	result := make(chan Env, 1)
+	var env_err error
+	go func() {
+		var err error // Shadow outer scope
+		var out []byte
 
-	return newEnv, nil
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			err = fmt.Errorf("unable to open stdout pipe: %q", err)
+			goto error
+		}
+
+		out, err = ioutil.ReadAll(stdout)
+		if err != nil {
+			err = fmt.Errorf("read from bash's stdout failed: %q", err)
+			goto error
+		}
+
+		newEnv, err = ParseEnv(string(out))
+		if err != nil {
+			goto error
+		}
+
+		newEnv["DIRENV_DIR"] = "-" + filepath.Dir(rc.path)
+		newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", rc.mtime)
+		newEnv["DIRENV_BACKUP"] = env.Serialize()
+
+		result <- newEnv
+		return
+	error:
+		env_err = err // So that it's visible in the above scope
+		result <- nil
+	}()
+
+	err = cmd.Wait()
+	if err != nil {
+		err = fmt.Errorf("bash failed in loadRC(): %q", err)
+		return
+	}
+
+	// Error state is whatever the result of the above is.
+	return <-result, env_err
 }
