@@ -98,7 +98,7 @@ var CmdExport = &Cmd{
 				i += 1
 			}
 			sort.Strings(out)
-			fmt.Fprintf(os.Stderr, "direnv-export: %s\n", strings.Join(out, " "))
+			fmt.Fprintf(os.Stderr, "direnv export: %s\n", strings.Join(out, " "))
 		}
 
 		str := EnvToShell(diff, shell)
