@@ -148,9 +148,11 @@ set_cellar_path() {
 # Usage: use PROGRAM_NAME VERSION
 # Example: use ruby 1.9.3
 use() {
-	if has use_$1 ; then
-		echo "Using $1 v$2"
-		eval "use_$1 $2"
+	local cmd="$1"
+	if has use_$cmd ; then
+		echo "Using $@"
+		shift
+		use_$cmd "$@"
 		return $?
 	fi
 
@@ -163,6 +165,10 @@ use() {
 
 	echo "* Unable to load $path"
 	return 1
+}
+
+use_rbenv() {
+	eval "$(rbenv init -)"
 }
 
 # Inherit another .envrc
@@ -203,17 +209,6 @@ rvm() {
 		source "$HOME/.rvm/scripts/rvm"
 	fi
 	rvm "$@"
-}
-
-# Activates rbenv shims if they're not in your path.
-# Then use RBENV_VERSION or the .ruby-version file to set ruby version.
-rbenv() {
-	unset rbenv
-	eval "$(rbenv init -)"
-	# disable next calls
-	rbenv() {
-		:
-	}
 }
 
 ## Load the global ~/.direnvrc
