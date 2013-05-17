@@ -116,7 +116,7 @@ func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
 
 	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
 	arg := fmt.Sprintf(argtmpl, config.SelfPath, rc.path, config.SelfPath)
-	cmd := exec.Command(config.BashPath, "-c", arg)
+	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
 
 	cmd.Stderr = os.Stderr
 	cmd.Env = env.ToGoEnv()
