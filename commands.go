@@ -2,13 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
+	"time"
 )
 
 type Cmd struct {
 	Name    string
 	Desc    string
 	Args    []string
+	NoWait  bool
 	Private bool
 	Fn      func(env Env, args []string) error
 }
@@ -59,5 +62,19 @@ func CommandsDispatch(env Env, args []string) error {
 		return fmt.Errorf("Command \"%s\" not found", commandPrefix)
 	}
 
-	return command.Fn(env, commandArgs)
+	done := make(chan bool, 1)
+	if !command.NoWait {
+		go func() {
+			select {
+			case <-done:
+				return
+			case <-time.After(2 * time.Second):
+				fmt.Fprintf(os.Stderr, "direnv(%v) is taking a while to execute. Use CTRL-C to give up.", args)
+			}
+		}()
+	}
+
+	err := command.Fn(env, commandArgs)
+	done <- true
+	return err
 }

@@ -8,9 +8,10 @@ import (
 
 // `direnv edit [PATH_TO_RC]`
 var CmdEdit = &Cmd{
-	Name: "edit",
-	Desc: `Opens PATH_TO_RC or the current .envrc or a new .envrc into an $EDITOR and allow the file to be loaded afterwards.`,
-	Args: []string{"[PATH_TO_RC]"},
+	Name:   "edit",
+	Desc:   `Opens PATH_TO_RC or the current .envrc or a new .envrc into an $EDITOR and allow the file to be loaded afterwards.`,
+	Args:   []string{"[PATH_TO_RC]"},
+	NoWait: true,
 	Fn: func(env Env, args []string) (err error) {
 		var config *Config
 		var rcPath string

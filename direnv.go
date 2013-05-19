@@ -1,27 +1,17 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
-	"time"
 )
 
 func main() {
-	env := GetEnv()
+	var env = GetEnv()
+	var args = os.Args
 
-	done := make(chan bool, 1)
-	go func() {
-		select {
-		case <-done:
-			return
-		case <-time.After(2 * time.Second):
-			log.Printf("direnv(%v) is taking a while to execute. Use CTRL-C to give up.", os.Args)
-		}
-	}()
-
-	err := CommandsDispatch(env, os.Args)
-	done <- true
+	err := CommandsDispatch(env, args)
 	if err != nil {
+		fmt.Sprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
