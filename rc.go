@@ -88,13 +88,6 @@ func findUp(searchDir string, fileName string) (path string) {
 }
 
 func FindRC(wd string, allowDir string) *RC {
-	if wd == "" {
-		var err error
-		if wd, err = os.Getwd(); err != nil {
-			return nil
-		}
-	}
-
 	rcPath := findUp(wd, ".envrc")
 	if rcPath == "" {
 		return nil
