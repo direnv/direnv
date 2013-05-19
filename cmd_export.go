@@ -111,16 +111,16 @@ var CmdExport = &Cmd{
 
 func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
 	if !rc.Allowed() {
-		return nil, fmt.Errorf("%s is not allowed\n", rc.path)
+		return nil, fmt.Errorf("%s is not allowed\n", rc.RelTo(config.WorkDir))
 	}
 
 	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
-	arg := fmt.Sprintf(argtmpl, config.SelfPath, rc.path, config.SelfPath)
+	arg := fmt.Sprintf(argtmpl, config.SelfPath, rc.RelTo(config.WorkDir), config.SelfPath)
 	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
 
 	cmd.Stderr = os.Stderr
 	cmd.Env = env.ToGoEnv()
-	cmd.Dir = filepath.Dir(rc.path)
+	cmd.Dir = config.WorkDir
 
 	out, err := cmd.Output()
 	if err != nil {

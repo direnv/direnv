@@ -150,3 +150,11 @@ func (self *RC) Allowed() bool {
 	_, err := os.Stat(self.allowPath)
 	return err == nil
 }
+
+func (self *RC) RelTo(wd string) string {
+	x, err := filepath.Rel(wd, self.path)
+	if err != nil {
+		panic(err)
+	}
+	return x
+}
