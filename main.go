@@ -11,7 +11,7 @@ func main() {
 
 	err := CommandsDispatch(env, args)
 	if err != nil {
-		fmt.Sprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
