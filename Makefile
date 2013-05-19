@@ -31,6 +31,7 @@ html:
 # FIXME: restore the integration tests ./test/direnv-test.sh
 test:
 	go test
+	./test/direnv-test.sh
 
 release: build
 	./script/release `./direnv version`
