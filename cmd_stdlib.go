@@ -198,6 +198,19 @@ source_up() {
 	fi
 }
 
+#
+# Usage: load_prefix PATH
+load_prefix() {
+	local path="$(expand_path "$1")"
+	path_add CPATH "$path/include"
+	path_add LD_LIBRARY_PATH "$path/lib"
+	path_add LIBRARY_PATH "$path/lib"
+	path_add MANPATH "$path/man"
+	path_add MANPATH "$path/share/man"
+	path_add PATH "$path/bin"
+	path_add PKG_CONFIG_PATH "$path/lib/pkgconfig"
+}
+
 # Sources rvm on first call. Should work like the rvm command-line.
 rvm() {
 	unset rvm
