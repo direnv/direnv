@@ -146,7 +146,8 @@ load_prefix() {
 	path_add PKG_CONFIG_PATH "$path/lib/pkgconfig"
 }
 
-
+# Pre-programmed project layout. Add your own in your ~/.direnvrc.
+#
 # Usage: layout TYPE
 layout() {
 	eval "layout_$1"
@@ -178,32 +179,15 @@ layout_node() {
 	PATH_add node_modules/.bin
 }
 
-# This folder contains a <program-name>/<version> structure
-use_prefix=/usr/local/Cellar
-set_use_prefix() {
-	use_prefix="$1"
-}
-
+# Intended to load external dependencies into the environment.
+#
 # Usage: use PROGRAM_NAME VERSION
 # Example: use ruby 1.9.3
 use() {
 	local cmd="$1"
-	if has use_$cmd ; then
-		echo "Using $@"
-		shift
-		use_$cmd "$@"
-		return $?
-	fi
-
-	local path="$use_prefix/$1/$2"
-	if [ -d "$path" ]; then
-		echo "Using $1 v$2"
-		load_prefix "$path"
-		return
-	fi
-
-	echo "* Unable to load $path"
-	return 1
+	echo "Using $@"
+	shift
+	use_$cmd "$@"
 }
 
 # Usage: use rbenv
