@@ -4,7 +4,7 @@ RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv --or
 RONNS = $(wildcard man/*.ronn)
 ROFFS = $(RONNS:.ronn=)
 
-.PHONY: all man html test release install gh-pages
+.PHONY: all man html test release install
 #all: build man test
 all: build man
 
@@ -14,9 +14,6 @@ direnv: *.go
 	go fmt
 	go build -o direnv
 
-site/CNAME:
-	git clone --branch gh-pages --single-branch https://github.com/zimbatm/direnv.git site
-
 clean:
 	rm -f direnv
 
@@ -25,10 +22,6 @@ clean:
 
 man: $(ROFFS)
 
-html:
-	$(RONN) -W5 -s toc man/*.ronn
-
-# FIXME: restore the integration tests ./test/direnv-test.sh
 test:
 	go test
 	./test/direnv-test.sh
@@ -36,15 +29,6 @@ test:
 release: build
 	./script/release `./direnv version`
 	git tag v`./direnv version`
-
-gh-pages: html
-	git stash
-	git checkout gh-pages
-	mv man/*.html .
-	git add *.html
-	git commit -m "auto"
-	git checkout master
-	git stash pop || true
 
 install: all
 	install -d bin $(DESTDIR)/bin
