@@ -151,3 +151,7 @@ func (self *RC) RelTo(wd string) string {
 	}
 	return x
 }
+
+func (self *RC) Touch() error {
+	return touch(self.path)
+}

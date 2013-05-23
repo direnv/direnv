@@ -29,6 +29,7 @@ func init() {
 		CmdExport,
 		CmdHelp,
 		CmdHook,
+		CmdReload,
 		CmdStatus,
 		CmdStdlib,
 		CmdVersion,
