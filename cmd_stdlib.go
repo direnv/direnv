@@ -179,6 +179,13 @@ layout_node() {
 	PATH_add node_modules/.bin
 }
 
+# Put the project's root in the GOPATH.
+#
+# Usage: layout go
+layout_go() {
+	path_add GOPATH "$PWD"
+}
+
 # Intended to load external dependencies into the environment.
 #
 # Usage: use PROGRAM_NAME VERSION
