@@ -6,9 +6,8 @@ import (
 
 // `direnv stdlib`
 var CmdStdlib = &Cmd{
-	Name:    "stdlib",
-	Desc:    "Outputs the stdlib that is available in the .envrc",
-	Private: true,
+	Name: "stdlib",
+	Desc: "Displays the stdlib available in the .envrc execution context",
 	Fn: func(env Env, args []string) (err error) {
 		var config *Config
 		if config, err = LoadConfig(env); err != nil {
@@ -20,8 +19,7 @@ var CmdStdlib = &Cmd{
 	},
 }
 
-const STDLIB = `
-# These are the commands available in an .envrc context
+const STDLIB = `# These are the commands available in an .envrc context
 set -e
 DIRENV_PATH="%s"
 
