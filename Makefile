@@ -22,7 +22,7 @@ clean:
 
 man: $(ROFFS)
 
-test:
+test: direnv
 	go test
 	./test/direnv-test.sh
 
