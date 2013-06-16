@@ -66,6 +66,18 @@ test_start "space dir"
   test "$SPACE_DIR" = "true"
 test_stop
 
+# Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
+# BUG: foo/bar is resolved in the .envrc execution context and so can't find
+#      the .envrc file.
+#
+# Apparently, the CHDIR syscall does that so I don't know how to work around
+# the issue.
+#
+# test_start "symlink-bug"
+#   cd foo/bar
+#   direnv_eval
+# test_stop
+
 # Pending: test that the mtime is looked on the original file
 # test_start "utils"
 #   LINK_TIME=`direnv file-mtime link-to-somefile`

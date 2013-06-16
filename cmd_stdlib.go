@@ -6,9 +6,8 @@ import (
 
 // `direnv stdlib`
 var CmdStdlib = &Cmd{
-	Name:    "stdlib",
-	Desc:    "Outputs the stdlib that is available in the .envrc",
-	Private: true,
+	Name: "stdlib",
+	Desc: "Displays the stdlib available in the .envrc execution context",
 	Fn: func(env Env, args []string) (err error) {
 		var config *Config
 		if config, err = LoadConfig(env); err != nil {
@@ -20,13 +19,13 @@ var CmdStdlib = &Cmd{
 	},
 }
 
-const STDLIB = `
-# These are the commands available in an .envrc context
+const STDLIB = `# These are the commands available in an .envrc context
 set -e
 DIRENV_PATH="%s"
 
+# Determines if "something" is availabe as a command
+#
 # Usage: has something
-# determines if "something" is availabe as a command
 has() {
 	type "$1" &>/dev/null
 }
@@ -37,8 +36,9 @@ expand_path() {
 	"$DIRENV_PATH" expand_path "$@"
 }
 
-# Usage: dotenv
 # Loads a .env in the current environment
+#
+# Usage: dotenv
 dotenv() {
 	eval "$("$DIRENV_PATH" dotenv "$@")"
 }
@@ -59,7 +59,7 @@ user_rel_path() {
 	echo $path
 }
 
-# Usage: find_up some_file
+# Usage: find_up FILENAME
 find_up() {
 	(
 		cd "$(pwd -P 2>/dev/null)"
@@ -76,13 +76,33 @@ find_up() {
 	)
 }
 
-direnv_find_rc() {
-	local path="$(find_up .envrc)"
+# Inherit another .envrc
+#
+# Usage: source_env <FILE_OR_DIR_PATH>
+source_env() {
+	local rcfile="$1"
+	local rcpath="${1/#\~/$HOME}"
+	if ! [ -f "$rcpath" ]; then
+		rcfile="$rcfile/.envrc"
+		rcpath="$rcpath/.envrc"
+	fi
+	echo "direnv: loading $rcfile"
+	pushd "$(dirname "$rcpath")" > /dev/null
+	. "./$(basename "$rcpath")"
+	popd > /dev/null
+}
+
+# Inherits the first .envrc (or given FILENAME) it finds in the path
+#
+# Usage: source_up [FILENAME]
+source_up() {
+	local file="$1"
+	if [ -z "$file" ]; then
+		file=".envrc"
+	fi
+	local path="$(cd .. && find_up "$file")"
 	if [ -n "$path" ]; then
-		cd "$(dirname "$path")"
-		return 0
-	else
-		return 1
+		source_env "$(user_rel_path "$path")"
 	fi
 }
 
@@ -99,7 +119,7 @@ PATH_add() {
 # Usage: path_add VARNAME PATH
 # Example: path_add LD_LIBRARY_PATH ./lib
 path_add() {
-	local old_paths=${!1}
+	local old_paths="${!1}"
 	local path="$(expand_path "$2")"
 
 	if [ -z "$old_paths" ]; then
@@ -111,6 +131,40 @@ path_add() {
 	export $1="$old_paths"
 }
 
+# Sets some common variables for the given PREFIX_PATH.
+#
+# This is useful if you installed something in the PREFIX_PATH using
+# $(./configure --prefix=PREFIX_PATH && make install) and want to use it in the
+# project.
+#
+# Usage: load_prefix PREFIX_PATH
+load_prefix() {
+	local path="$(expand_path "$1")"
+	path_add CPATH "$path/include"
+	path_add LD_LIBRARY_PATH "$path/lib"
+	path_add LIBRARY_PATH "$path/lib"
+	path_add MANPATH "$path/man"
+	path_add MANPATH "$path/share/man"
+	path_add PATH "$path/bin"
+	path_add PKG_CONFIG_PATH "$path/lib/pkgconfig"
+}
+
+# Pre-programmed project layout.
+#
+# It's possible to add your own layout or override the existing ones in your
+# ~/.direnvrc file.
+#
+# Usage: layout TYPE
+layout() {
+	eval "layout_$1"
+}
+
+# This layout sets the $GEM_HOME into the project's directory to allow
+# independent gem sets.
+#
+# It also allows bundler to provide bin-wrappers so you don't have to type
+# bundle exec all the time.
+#
 # Usage: layout ruby
 layout_ruby() {
 	# TODO: ruby_version should be the ABI version
@@ -123,6 +177,9 @@ layout_ruby() {
 	PATH_add ".direnv/bin"
 }
 
+# This layout loads a per-project virtualenv.
+#
+# Usage: layout python
 layout_python() {
 	if ! [ -d .direnv/virtualenv ]; then
 		virtualenv --no-site-packages --distribute .direnv/virtualenv
@@ -131,68 +188,39 @@ layout_python() {
 	source .direnv/virtualenv/bin/activate
 }
 
+# Adds the node_modules/.bin on the PATH to make the default tools accessible.
+#
+# Usage: layout node
 layout_node() {
 	PATH_add node_modules/.bin
 }
 
-layout() {
-	eval "layout_$1"
+# Put the project's root in the GOPATH.
+#
+# Usage: layout go
+layout_go() {
+	path_add GOPATH "$PWD"
 }
 
-# This folder contains a <program-name>/<version> structure
-cellar_path=/usr/local/Cellar
-set_cellar_path() {
-	cellar_path="$1"
-}
-
+# Intended to load external dependencies into the environment.
+#
 # Usage: use PROGRAM_NAME VERSION
 # Example: use ruby 1.9.3
 use() {
-	if has use_$1 ; then
-		echo "Using $1 v$2"
-		eval "use_$1 $2"
-		return $?
-	fi
-
-	local path="$cellar_path/$1/$2/bin"
-	if [ -d "$path" ]; then
-		echo "Using $1 v$2"
-		PATH_add "$path"
-		return
-	fi
-
-	echo "* Unable to load $path"
-	return 1
+	local cmd="$1"
+	echo "Using $@"
+	shift
+	use_$cmd "$@"
 }
 
-# Inherit another .envrc
-# Usage: source_env <FILE_OR_DIR_PATH>
-source_env() {
-	local rcfile="$1"
-	if ! [ -f "$1" ]; then
-		rcfile="$rcfile/.envrc"
-	fi
-	echo "direnv: loading $(user_rel_path "$rcfile")"
-	pushd "$(dirname "$rcfile")" > /dev/null
-	set +u
-	. "./$(basename "$rcfile")"
-	popd > /dev/null
+# Loads rbenv which makes the rbenv wrappers avaible on the $PATH.
+#
+# Usage: use rbenv
+use_rbenv() {
+	eval "$(rbenv init -)"
 }
 
-# Inherits the first .envrc (or given FILE_NAME) it finds in the path
-# Usage: source_up [FILE_NAME]
-source_up() {
-	local file="$1"
-	if [ -z "$file" ]; then
-		file=".envrc"
-	fi
-	local path="$(cd .. && find_up "$file")"
-	if [ -n "$path" ]; then
-		source_env "$path"
-	fi
-}
-
-# Sources rvm on first call. Should work like the rvm command-line.
+# Should work like the rvm command-line.
 rvm() {
 	unset rvm
 	if [ -n "${rvm_scripts_path:-}" ]; then
@@ -205,20 +233,8 @@ rvm() {
 	rvm "$@"
 }
 
-# Activates rbenv shims if they're not in your path.
-# Then use RBENV_VERSION or the .ruby-version file to set ruby version.
-rbenv() {
-	unset rbenv
-	eval "$(rbenv init -)"
-	# disable next calls
-	rbenv() {
-		:
-	}
-}
-
-## Load the global ~/.direnvrc
-
-if [ -f ~/.direnvrc ]; then
-	source_env ~/.direnvrc >&2
+## Load the global ~/.direnvrc if present
+if [ -f "$HOME/.direnvrc" ]; then
+	source_env "~/.direnvrc" >&2
 fi
 `
