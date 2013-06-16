@@ -133,8 +133,13 @@ path_add() {
 	export $1="$old_paths"
 }
 
+# Sets some common variables for the given PREFIX_PATH.
 #
-# Usage: load_prefix PATH
+# This is useful if you installed something in the PREFIX_PATH using
+# $(./configure --prefix=PREFIX_PATH && make install) and want to use it in the
+# project.
+#
+# Usage: load_prefix PREFIX_PATH
 load_prefix() {
 	local path="$(expand_path "$1")"
 	path_add CPATH "$path/include"
@@ -146,13 +151,22 @@ load_prefix() {
 	path_add PKG_CONFIG_PATH "$path/lib/pkgconfig"
 }
 
-# Pre-programmed project layout. Add your own in your ~/.direnvrc.
+# Pre-programmed project layout.
+#
+# It's possible to add your own layout or override the existing ones in your
+# ~/.direnvrc file.
 #
 # Usage: layout TYPE
 layout() {
 	eval "layout_$1"
 }
 
+# This layout sets the $GEM_HOME into the project's directory to allow
+# independent gem sets.
+#
+# It also allows bundler to provide bin-wrappers so you don't have to type
+# bundle exec all the time.
+#
 # Usage: layout ruby
 layout_ruby() {
 	# TODO: ruby_version should be the ABI version
@@ -165,6 +179,8 @@ layout_ruby() {
 	PATH_add ".direnv/bin"
 }
 
+# This layout loads a per-project virtualenv.
+#
 # Usage: layout python
 layout_python() {
 	if ! [ -d .direnv/virtualenv ]; then
@@ -174,6 +190,8 @@ layout_python() {
 	source .direnv/virtualenv/bin/activate
 }
 
+# Adds the node_modules/.bin on the PATH to make the default tools accessible.
+#
 # Usage: layout node
 layout_node() {
 	PATH_add node_modules/.bin
@@ -197,12 +215,14 @@ use() {
 	use_$cmd "$@"
 }
 
+# Loads rbenv which makes the rbenv wrappers avaible on the $PATH.
+#
 # Usage: use rbenv
 use_rbenv() {
 	eval "$(rbenv init -)"
 }
 
-# Sources rvm on first call. Should work like the rvm command-line.
+# Should work like the rvm command-line.
 rvm() {
 	unset rvm
 	if [ -n "${rvm_scripts_path:-}" ]; then
