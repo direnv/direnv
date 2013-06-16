@@ -66,6 +66,12 @@ test_start "space dir"
   test "$SPACE_DIR" = "true"
 test_stop
 
+# Make sure this bug doesn't come back
+test_start "symlink-bug"
+  cd foo/bar
+  direnv_eval
+test_stop
+
 # Pending: test that the mtime is looked on the original file
 # test_start "utils"
 #   LINK_TIME=`direnv file-mtime link-to-somefile`
