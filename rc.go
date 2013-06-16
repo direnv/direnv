@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type RC struct {
@@ -67,14 +68,16 @@ func fileHash(path string) (string, error) {
 }
 
 // Creates a file
-func touch(path string) error {
-	fd, err := os.Create(path)
+
+func touch(path string) (err error) {
+	file, err := os.OpenFile(path, os.O_CREATE, 0644)
 	if err != nil {
-		return err
+		return
 	}
-	//	fd.Write([]byte{})
-	fd.Close()
-	return nil
+	file.Close()
+
+	t := time.Now()
+	return os.Chtimes(path, t, t)
 }
 
 func findUp(searchDir string, fileName string) (path string) {
