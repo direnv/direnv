@@ -1,3 +1,6 @@
 ---
 language: go
 script: make test
+go:
+  - 1.0
+  - 1.1
