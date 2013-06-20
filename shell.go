@@ -16,8 +16,11 @@ type Shell interface {
 }
 
 func DetectShell(target string) Shell {
-	// $0 starts with "-" but Base doesn't care
 	target = filepath.Base(target)
+	// $0 starts with "-"
+	if target[0:1] == "-" {
+		target = target[1:]
+	}
 
 	switch target {
 	case "bash":
