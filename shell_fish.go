@@ -9,7 +9,11 @@ type fish int
 var FISH fish
 
 func (f fish) Hook() string {
-	return ""
+	return `
+function direnv-export --on-event fish_prompt;
+	eval (direnv export fish)
+end
+`
 }
 
 func (f fish) Escape(str string) string {
