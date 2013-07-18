@@ -10,8 +10,8 @@ var FISH fish
 
 func (f fish) Hook() string {
 	return `
-function direnv-export --on-event fish_prompt;
-	eval (direnv export fish)
+function __direnv_export_eval --on-event fish_prompt;
+	eval (direnv export fish);
 end
 `
 }
