@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 type fish int
@@ -94,6 +95,13 @@ func (f fish) Escape(str string) string {
 }
 
 func (f fish) Export(key, value string) string {
+	if key == "PATH" {
+		command := "set -x -g PATH"
+		for _, path := range strings.Split(value, ":") {
+			command += " " + f.Escape(path)
+		}
+		return command + ";"
+	}
 	return "set -x -g " + f.Escape(key) + " " + f.Escape(value) + ";"
 }
 
