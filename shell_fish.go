@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 type fish int
@@ -9,7 +10,11 @@ type fish int
 var FISH fish
 
 func (f fish) Hook() string {
-	return ""
+	return `
+function __direnv_export_eval --on-event fish_prompt;
+	eval (direnv export fish);
+end
+`
 }
 
 func (f fish) Escape(str string) string {
@@ -90,6 +95,13 @@ func (f fish) Escape(str string) string {
 }
 
 func (f fish) Export(key, value string) string {
+	if key == "PATH" {
+		command := "set -x -g PATH"
+		for _, path := range strings.Split(value, ":") {
+			command += " " + f.Escape(path)
+		}
+		return command + ";"
+	}
 	return "set -x -g " + f.Escape(key) + " " + f.Escape(value) + ";"
 }
 
