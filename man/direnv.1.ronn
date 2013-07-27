@@ -9,9 +9,9 @@ direnv(1) -- Unclutter your .profile
 
 The `direnv` project is a bash/zsh shell extension that allows you to load/unload environment variables depending on your path.
 
-It has many uses but mine it to have project-specific settings so as to not clutter my `~/.profile`. I'm using it to specify ruby version, set AWS or SSH keys, ...
+It has many uses but mine it to have project-specific settings so as to not clutter my "~/.profile". I'm using it to specify ruby version, set AWS or SSH keys, ...
 
-The `direnv` command-line is a proxy to the sub-commands and it work like the git(1) wrapper. You don't usually use that. Once the shell extension is loaded, most of the interaction is done in your `.envrc` files.
+The `direnv` command-line is a proxy to the sub-commands and it work like the git(1) wrapper. You don't usually use that. Once the shell extension is loaded, most of the interaction is done in your ".envrc" files.
 
 ## EXAMPLE
 
@@ -36,19 +36,40 @@ The `direnv` command-line is a proxy to the sub-commands and it work like the gi
 
 ## INSTALL
 
-Add this line at the very end of your .bashrc or .zshrc:
+This is what is going to enable the direnv extension. It's going to allow
+direnv to execute before every prompt command and adjust the environment.
 
-    eval "$(direnv hook $0)"
+### BASH
 
-Make sure it's even after rvm, git-prompt and other shell extensions that manipulate your prompt.
+Add the following line at the end of your "~/.bashrc" file:
+
+`eval "$(direnv hook $0)"`
+
+Make sure it appears even after rvm, git-prompt and other shell extensions
+that manipulate your prompt.
+
+### ZSH
+
+Add the previous line at the end of you "~/.zshrc" file:
+
+`eval "$(direnv hook $0)"`
+
+If you want to place it in another file replace $0 with "zsh" as zsh changes
+the value dynamically.
+
+### FISH
+
+Add the previous line at the end of your "~/.config/fish/config.fish" file:
+
+`eval (direnv hook fish)`
 
 ## USAGE
 
-Place a `.envrc` file in the folder you want and add some export(1) in it. If you cd(1) in that directory or child, the exported variables are available. If you cd(1) out of it, they are unloaded.
+Place a ".envrc" file in the folder you want and add some export(1) in it. If you cd(1) in that directory or child, the exported variables are available. If you cd(1) out of it, they are unloaded.
 
-A range of utility functions are available in the `.envrc` context and are documented in the direnv-stdlib(1) page.
+A range of utility functions are available in the ".envrc" context and are documented in the direnv-stdlib(1) page.
 
-If the `.envrc` file is added/changed/removed or you is no longer in the path, the environment is reloaded.
+If the ".envrc" file is added/changed/removed or you is no longer in the path, the environment is reloaded.
 
 ## CONTRIBUTE
 

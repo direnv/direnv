@@ -33,4 +33,10 @@ func TestIgnoredKeys(t *testing.T) {
 	if !ignoredKey("_") {
 		t.Fail()
 	}
+	if !ignoredKey("__fish_foo") {
+		t.Fail()
+	}
+	if !ignoredKey("__fishx") {
+		t.Fail()
+	}
 }
