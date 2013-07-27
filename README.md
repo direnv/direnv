@@ -105,6 +105,7 @@ to put them in the wiki <https://github.com/zimbatm/direnv/wiki>
 
 Thank you for making direnv better
 
+* Alan Brenner (aka. alanbbr) for the fish shell support
 * Alexander Kobel for his patches
 * Brian M. Clapper (aka. bmc) for his patch
 * Joshua Peek (aka. josh) for his patch and support
