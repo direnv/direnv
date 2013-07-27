@@ -1,4 +1,9 @@
 
+n.n.n / 2013-07-27 
+==================
+
+ * Added support for the fish shell. See README.md for install instructions.
+
 2.0.1 / 2013-07-27 
 ==================
 
