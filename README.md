@@ -49,15 +49,37 @@ For Mac users, you can also use `brew install direnv`
 
 ### 2. Add the hook for your shell
 
-This is what is going to enable the direnv extension. Add this line at the
-very end of your .bashrc or .zshrc:
+This is what is going to enable the direnv extension. It's going to allow
+direnv to execute before every prompt command and adjust the environment.
 
+#### BASH
+
+Add the following line at the end of your "~/.bashrc" file:
 ```bash
 eval "$(direnv hook $0)"
 ```
 
 Make sure it appears even after rvm, git-prompt and other shell extensions
 that manipulate your prompt.
+
+#### ZSH
+
+Add the following line at the end of you "~/.zshrc" file:
+
+```zsh
+eval "$(direnv hook $0)"
+```
+
+If you want to place it in another file replace $0 with "zsh" as zsh changes
+the value dynamically.
+
+#### FISH
+
+Add the following line at the end of your "~/.config/fish/config.fish" file:
+
+```fish
+eval (direnv hook fish)
+```
 
 ## Usage
 
@@ -83,6 +105,7 @@ to put them in the wiki <https://github.com/zimbatm/direnv/wiki>
 
 Thank you for making direnv better
 
+* Alan Brenner (aka. alanbbr) for the fish shell support
 * Alexander Kobel for his patches
 * Brian M. Clapper (aka. bmc) for his patch
 * Joshua Peek (aka. josh) for his patch and support

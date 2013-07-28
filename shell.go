@@ -27,6 +27,8 @@ func DetectShell(target string) Shell {
 		return BASH
 	case "zsh":
 		return ZSH
+	case "fish":
+		return FISH
 	}
 
 	return nil

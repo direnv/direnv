@@ -60,6 +60,9 @@ var IGNORED_KEYS = map[string]bool{
 }
 
 func ignoredKey(key string) bool {
+	if len(key) > 6 && key[0:6] == "__fish" {
+		return true
+	}
 	_, found := IGNORED_KEYS[key]
 	return found
 }
