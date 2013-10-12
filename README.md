@@ -55,6 +55,7 @@ direnv to execute before every prompt command and adjust the environment.
 #### BASH
 
 Add the following line at the end of your "~/.bashrc" file:
+
 ```bash
 eval "$(direnv hook bash)"
 ```
@@ -66,7 +67,7 @@ that manipulate your prompt.
 
 Add the following line at the end of you "~/.zshrc" file:
 
-```zsh
+```bash
 eval "$(direnv hook zsh)"
 ```
 
@@ -77,7 +78,7 @@ the value dynamically.
 
 Add the following line at the end of your "~/.config/fish/config.fish" file:
 
-```fish
+```
 eval (direnv hook fish)
 ```
 
