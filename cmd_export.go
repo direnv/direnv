@@ -109,9 +109,11 @@ var CmdExport = &Cmd{
 	},
 }
 
+const NOT_ALLOWED = "%s is blocked from loading. Run `direnv allow` to approve it's content for loading.\n"
+
 func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
 	if !rc.Allowed() {
-		return nil, fmt.Errorf("%s is not allowed\n", rc.RelTo(config.WorkDir))
+		return nil, fmt.Errorf(NOT_ALLOWED, rc.RelTo(config.WorkDir))
 	}
 
 	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
