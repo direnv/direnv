@@ -56,7 +56,7 @@ direnv to execute before every prompt command and adjust the environment.
 
 Add the following line at the end of your "~/.bashrc" file:
 ```bash
-eval "$(direnv hook $0)"
+eval "$(direnv hook bash)"
 ```
 
 Make sure it appears even after rvm, git-prompt and other shell extensions
@@ -67,7 +67,7 @@ that manipulate your prompt.
 Add the following line at the end of you "~/.zshrc" file:
 
 ```zsh
-eval "$(direnv hook $0)"
+eval "$(direnv hook zsh)"
 ```
 
 If you want to place it in another file replace $0 with "zsh" as zsh changes

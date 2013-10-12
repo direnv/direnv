@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "DIRENV" "1" "July 2013" "" "direnv"
+.TH "DIRENV" "1" "October 2013" "" "direnv"
 .
 .SH "NAME"
 \fBdirenv\fR \- Unclutter your \.profile
@@ -50,7 +50,7 @@ This is what is going to enable the direnv extension\. It\'s going to allow dire
 Add the following line at the end of your "~/\.bashrc" file:
 .
 .P
-\fBeval "$(direnv hook $0)"\fR
+\fBeval "$(direnv hook bash)"\fR
 .
 .P
 Make sure it appears even after rvm, git\-prompt and other shell extensions that manipulate your prompt\.
@@ -59,7 +59,7 @@ Make sure it appears even after rvm, git\-prompt and other shell extensions that
 Add the previous line at the end of you "~/\.zshrc" file:
 .
 .P
-\fBeval "$(direnv hook $0)"\fR
+\fBeval "$(direnv hook zsh)"\fR
 .
 .P
 If you want to place it in another file replace $0 with "zsh" as zsh changes the value dynamically\.
