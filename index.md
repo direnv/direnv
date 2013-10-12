@@ -1,83 +1,116 @@
 ---
 layout: default
 ---
-## DESCRIPTION
 
-The `direnv` project is a bash/zsh shell extension that allows you to load/unload environment variables depending on your path.
+direnv -- Unclutter your .profile
+=================================
 
-It has many uses but mine it to have project-specific settings so as to not clutter my `~/.profile`. I'm using it to specify ruby version, set AWS or SSH keys, ...
+`direnv` is a shell extension that loads different environment variables
+depending on your path.
 
-The `direnv` command-line is a proxy to the sub-commands and it work like the git(1) wrapper. You don't usually use that. Once the shell extension is loaded, most of the interaction is done in your `.envrc` files.
+Instead of putting every environment variable in your "~/.profile", have
+directory-specific ".envrc" files for your AWS_ACCESS_KEY, LIBRARY_PATH or
+other environment variables.
 
-## EXAMPLE
+It does some of the job of rvm, rbenv or virtualenv but in a
+language-agnostic way.
 
-    $ cd ~/code/my_project
-    $ ls
-    bin/ lib/ Rakefile README.md
-    $ echo $PATH
-    /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
-    $ echo PATH_add bin > .envrc
-    direnv: loading /Users/zimbatm/code/my_project
-    $ echo $PATH
-    /Users/zimbatm/code/my_project/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
-    $ cd ..
-    direnv: unloading /Users/zimbatm/code/my_project
-    $ echo $PATH
-    /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+## Example
 
+```
+$ cd ~/code/my_project
+$ ls
+bin/ lib/ Rakefile README.md
+$ echo $PATH
+/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+$ direnv edit .
+# Opens in your `$EDITOR .envrc`. Add:
+export PATH=$PWD/bin:$PATH
+$
+direnv: loading .envrc
+direnv export: ~PATH
+$ echo $PATH
+/Users/zimbatm/code/my_project/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+$ cd ..
+direnv: unloading
+direnv export: ~PATH
+$ echo $PATH
+/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+```
 
-## USAGE
-
-Place a `.envrc` file in the folder you want and add some export(1) in it. If you cd(1) in that directory or child, the exported variables are available. If you cd(1) out of it, they are unloaded.
-
-A range of utility functions are available in the `.envrc` context and are documented in the direnv-stdlib(1) page.
-
-If the `.envrc` file is added/changed/removed or you is no longer in the path, the environment is reloaded.
-
-## INSTALL
+## Install
 
 ### 1. Install the code
 
-    git clone http://github.com/zimbatm/direnv
-    cd direnv
-    make install
-    # or symlink bin/direnv into your $PATH
+```bash
+git clone http://github.com/zimbatm/direnv
+cd direnv
+make install
+# or symlink bin/direnv into your $PATH
+```
 
 For Mac users, you can also use `brew install direnv`
 
 ### 2. Add the hook for your shell
 
-Add this line at the very end of your .bashrc or .zshrc:
+This is what is going to enable the direnv extension. It's going to allow
+direnv to execute before every prompt command and adjust the environment.
 
-    eval "$(direnv hook $0)"
+#### BASH
 
-Make sure it's even after rvm, git-prompt and other shell extensions that manipulate your prompt.
+Add the following line at the end of your "~/.bashrc" file:
 
-## HOW IT WORKS
+```bash
+eval "$(direnv hook bash)"
+```
 
-The first thing, `direnv hook` is going tell your shell to eval the output of `direnv export` before any prompt is displayed. This is the magic sauce. Notice how we didn't call `direnv-hook`. This is because `direnv` is a command dispatcher like `git`.
+Make sure it appears even after rvm, git-prompt and other shell extensions
+that manipulate your prompt.
 
-Now when `direnv export` is executed, it checks your $PWD and parents for an .envrc file. If one is found, it loads it in bash and constructs a diff of the environment variables. It then prints the difference so that your shell can adjust, along with direnv-specific environment variables. This is how it stores it states and knows how to revert the changes when you cd to a different path.
+#### ZSH
 
-Notice that the .envrc is just a bash script from which direnv extracts the environment variables that are `export`-ed. It also sources some utility functions that may be handy to you. See the direnv-stdlib(1) man page for these.
+Add the following line at the end of you "~/.zshrc" file:
 
-That's about it ! I try to keep the tool simple and as an enabler.
+```bash
+eval "$(direnv hook zsh)"
+```
 
-## CONTRIBUTE
+If you want to place it in another file replace $0 with "zsh" as zsh changes
+the value dynamically.
+
+#### FISH
+
+Add the following line at the end of your "~/.config/fish/config.fish" file:
+
+```
+eval (direnv hook fish)
+```
+
+## Usage
+
+Use `direnv edit .` to open an ".envrc" in your $EDITOR. This script is going
+to be executed once you exit the editor. Every `export` is going to be
+available in your shell until you `cd ..` out of the directory.
+
+To make your life convenient there is a couple of additional commands in the
+.envrc execution context that are loaded from the `direnv stdlib`.
+
+## Contribute
 
 Bug reports, contributions and forks are welcome.
 
 For bugs, report them on <http://github.com/zimbatm/direnv/issues>
 
-Or discuss by email <direnv@librelist.com>
+Or if you have some cool usages of direnv that you want to share, feel free
+to put them in the wiki <https://github.com/zimbatm/direnv/wiki>
 
-Or if you have some cool usages of direnv that you want to share, feel free to put them in the wiki
-<https://github.com/zimbatm/direnv/wiki>
+[![Build Status](https://api.travis-ci.org/zimbatm/direnv.png?branch=master)](http://travis-ci.org/zimbatm/direnv)
 
 ## COPYRIGHT
 
 Thank you for making direnv better
 
+* Alan Brenner (aka. alanbbr) for the fish shell support
 * Alexander Kobel for his patches
 * Brian M. Clapper (aka. bmc) for his patch
 * Joshua Peek (aka. josh) for his patch and support
@@ -87,4 +120,4 @@ Thank you for making direnv better
 * Peter Waller (aka. pwaller) for his patches and insights
 * Sam Stephenson (aka. sstephenson) for his expand_path code that I stole from https://github.com/sstephenson/bats
 
-Copyright (C) 2011 Jonas Pfenniger and contributors under the MIT licence.
+Copyright (C) 2013 Jonas Pfenniger and contributors under the MIT licence.

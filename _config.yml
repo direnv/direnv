@@ -1,9 +1,8 @@
 ---
-pygments: true
-markdown: rdiscount
+markdown: redcarpet
 exclude: ["Gemfile", "README.md"]
 title: direnv - unclutter your .profile
 production_url : http://direnv.net/
 author:
   name: Jonas Pfenniger
-  email: jonas@pfenniger.name
+  email: zimbatm@zimbatm.com
