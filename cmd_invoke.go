@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 )
 
 var CmdInvoke = &Cmd{
 	Name: "invoke",
-	Desc: "run EXECUTABLE with appropriate environment for WORKDIR",
-	Args: []string{"WORKDIR EXECUTABLE [ARGS...]"},
+	Desc: "run EXECUTABLE with appropriate environment for DIR",
+	Args: []string{"DIR EXECUTABLE [ARGS...]"},
 	Fn: func(env Env, args []string) (err error) {
 
 		flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
@@ -16,7 +17,7 @@ var CmdInvoke = &Cmd{
 
 		workdir := flagset.Arg(0)
 		if workdir == "" {
-			return fmt.Errorf("WORKDIR missing")
+			return fmt.Errorf("DIR missing")
 		}
 		program := flagset.Args()[1:]
 		if len(program) < 1 {
@@ -28,12 +29,18 @@ var CmdInvoke = &Cmd{
 			return
 		}
 
+		pwd, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+
 		script := `
-	        DIRENV_PATH="%s"
-    	    eval "$(${DIRENV_PATH} export bash)"    
-    	    exec "$@"
-	    `
-		script = fmt.Sprintf(script, config.SelfPath)
+			DIRENV_PATH="%s"
+			eval "$(${DIRENV_PATH} export bash)"
+			cd "%s"
+			exec "$@"
+		`
+		script = fmt.Sprintf(script, config.SelfPath, pwd)
 
 		// Invoke `bash -c "eval \"$($DIRENV export bash)\"; exec $@" -- program [args]`
 		// in the destination directory so as to have the correct environment
