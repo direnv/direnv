@@ -4,8 +4,17 @@ type bash int
 
 var BASH bash
 
+const BASH_HOOK = `
+_direnv_hook() {
+  eval "$(direnv export bash)";
+}
+if ! [[ "$PROMPT_COMMAND" =~ _direnv_hook ]]; then
+  PROMPT_COMMAND="_direnv_hook;$PROMPT_COMMAND";
+fi
+`
+
 func (b bash) Hook() string {
-	return `PROMPT_COMMAND="eval \"\$(direnv export bash)\";$PROMPT_COMMAND"`
+	return BASH_HOOK
 }
 
 func (b bash) Escape(str string) string {
