@@ -1,8 +1,12 @@
 
-n.n.n / 2013-07-27 
+2.1.0 / 2013-11-10 
 ==================
 
  * Added support for the fish shell. See README.md for install instructions.
+ * Stop recommending using $0 to detect the shell. Fixes #64.
+ * Makes the zsh hook resistant to double-hooking.
+ * Makes the bash hook resistant to double-hooking.
+ * More precise direnv allow error message. Fixes #72
 
 2.0.1 / 2013-07-27 
 ==================
