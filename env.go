@@ -33,14 +33,14 @@ func EnvToShell(env Env, shell Shell) string {
 func EnvDiff(env1 map[string]string, env2 map[string]string) Env {
 	envDiff := make(Env)
 
-	for key, _ := range env1 {
+	for key := range env1 {
 		if env2[key] != env1[key] && !ignoredKey(key) {
 			envDiff[key] = env2[key]
 		}
 	}
 
 	// FIXME: I'm sure there is a smarter way to do that
-	for key, _ := range env2 {
+	for key := range env2 {
 		if env2[key] != env1[key] && !ignoredKey(key) {
 			envDiff[key] = env2[key]
 		}

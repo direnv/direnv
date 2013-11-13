@@ -43,9 +43,9 @@ var CmdDotEnv = &Cmd{
 			key := match[1]
 			value := strings.TrimSpace(match[2])
 
-			if value[0:1] == "'" && value[len(value)-1:len(value)] == "'" {
+			if value[0:1] == "'" && value[len(value)-1:] == "'" {
 				value = value[1 : len(value)-1]
-			} else if value[0:1] == `"` && value[len(value)-1:len(value)] == `"` {
+			} else if value[0:1] == `"` && value[len(value)-1:] == `"` {
 				value = value[1 : len(value)-1]
 				value = DOTENV_LF_REG.ReplaceAllString(value, "\n")
 				value = DOTENV_ESC_REG.ReplaceAllStringFunc(value, func(str string) string {
