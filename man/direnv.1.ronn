@@ -7,7 +7,7 @@ direnv(1) -- Unclutter your .profile
 
 ## DESCRIPTION
 
-The `direnv` project is a bash/zsh shell extension that allows you to load/unload environment variables depending on your path.
+direnv is a fast shell extension for bash,zsh and fish that allows you to load/unload environment variables depending on your path.
 
 It has many uses but mine is to have project-specific settings so as to not clutter my "~/.profile". I'm using it to specify ruby version, set AWS or SSH keys, ...
 
@@ -81,4 +81,9 @@ Or if you have some cool usages of direnv that you want to share, feel free to p
 
 ## COPYRIGHT
 
-Copyright (C) 2013 Jonas Pfenniger and contributors under the MIT licence.
+Copyright (C) 2013 zimbatm <http://zimbatm.com> and contributors under the MIT licence.
+
+## SEE ALSO
+
+* direnv-stdlib(1)
+
