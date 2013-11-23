@@ -126,7 +126,7 @@ func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
 
 	out, err := cmd.Output()
 	if err != nil {
-		err = fmt.Errorf("loadRC() failed to run bash: %q", err)
+		err = fmt.Errorf("direnv: loading error, %q", err)
 		return
 	}
 
