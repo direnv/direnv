@@ -31,18 +31,22 @@ Example:
 
     cd /usr/local/games
     expand_path ../foo
-    # 1> /usr/local/foo
+    # output: /usr/local/foo
 
-* `dotenv` [`<dotenv_path>`]: 
+* `dotenv` [`<dotenv_path>`]:
     Loads a ".env" file into the current environment
 
 * `user_rel_path` `<abs_path>`:
-    Outputs a path relative to the user's home if possible.
+    Transforms an absolute path `<abs_path>` into a user-relative path if possible.
 
 Example:
 
-    user_rel_path $HOME/my/project
-    # 1> ~/my/project
+    echo $HOME
+    # output: /home/user
+    user_rel_path /home/user/my/project
+    # output: ~/my/project
+    user_rel_path /usr/local/lib
+    # output: /usr/local/lib
 
 * `find_up` `<filename>`:
     Outputs the path of `<filename>` when searched from the current directory up to /. Returns 1 if the file has not been found.
@@ -54,7 +58,7 @@ Example:
     touch bar
     cd project/foo
     find_up bar
-    # 1> /usr/local/my/bar
+    # output: /usr/local/my/bar
 
 * `source_env` `<file_or_dir_path>`:
     Loads another ".envrc" either by specifying it's path or filename.
@@ -68,15 +72,15 @@ Example:
 Example:
 
     pwd
-    # 1> /home/user/my/project
+    # output: /home/user/my/project
     PATH_add bin
     echo $PATH
-    # 1> /home/user/my/project/bin:/usr/bin:/bin
+    # output: /home/user/my/project/bin:/usr/bin:/bin
 
 * `path_add` `<varname>` `<path>`:
     Works like `PATH_add` except that it's for an arbitrary <varname>.
 
-* `load_prefix` `<prefix_path>`: 
+* `load_prefix` `<prefix_path>`:
     Expands some common path variables for the given `<prefix_path>` prefix.
 
 Variables set:
@@ -102,13 +106,13 @@ Example:
     Sets the GEM_HOME environment variable to "$PWD/.direnv/ruby/RUBY_VERSION". This forces the installation of any gems into the project's sub-folder.
     If you're using bundler it will create wrapper programs that can be invoked directly instead of using the `bundle exec` prefix.
 
-* `layout python`: 
+* `layout python`:
     Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv". This forces the installation of any egg into the project's sub-folder.
 
 * `layout node`:
     Adds "$PWD/node_modules/.bin" to the PATH environment variable.
 
-* `layout go`: 
+* `layout go`:
     Sets the GOPATH environment variable to the current directory.
 
 * `use` `<program_name>` [`<version>`]:
@@ -120,11 +124,11 @@ Example:
       echo "Ruby $1"
     }
     use ruby 1.9.3
-    # 1> Ruby 1.9.3
+    # output: Ruby 1.9.3
 
-* `use rbenv`: 
+* `use rbenv`:
     Loads rbenv which add the ruby wrappers available on the PATH.
 
-* `rvm` [...]: 
+* `rvm` [...]:
     Should work just like in the shell if you have rvm installed.
 
