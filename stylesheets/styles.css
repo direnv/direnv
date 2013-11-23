@@ -354,3 +354,10 @@ footer p + p {
     content: 'at http://github.com/';
   }
 }
+
+#stdlib-doc {
+  display: block;
+  float: right;
+  font-weight: bold;
+  padding-top: 0.5em;
+}
