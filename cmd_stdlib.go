@@ -87,7 +87,7 @@ user_rel_path() {
 		fi
 	fi
 
-	echo $path
+	echo "$path"
 }
 
 # Usage: find_up <filename>
@@ -109,7 +109,7 @@ find_up() {
 		cd "$(pwd -P 2>/dev/null)"
 		while true; do
 			if [ -f "$1" ]; then
-				echo $PWD/$1
+				echo "$PWD/$1"
 				return 0
 			fi
 			if [ "$PWD" = "/" ] || [ "$PWD" = "//" ]; then
