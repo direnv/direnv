@@ -7,7 +7,9 @@ TEST_DIR=$PWD
 export PATH=`dirname $TEST_DIR`:$PATH
 
 # Reset the direnv loading if any
+export DIRENV_CONFIG=$PWD
 unset DIRENV_BACKUP
+unset DIRENV_BASH
 unset DIRENV_DIR
 unset DIRENV_MTIME
 
@@ -28,6 +30,7 @@ test_stop() {
 
 ### RUN ###
 
+direnv allow || true
 direnv_eval
 
 test_start base
@@ -64,6 +67,16 @@ test_stop
 test_start "space dir"
   direnv_eval
   test "$SPACE_DIR" = "true"
+test_stop
+
+test_start "special-vars"
+  export DIRENV_BASH=`which bash`
+  export DIRENV_CONFIG=foobar
+  direnv_eval || true
+  test -n "$DIRENV_BASH"
+  test "$DIRENV_CONFIG" = "foobar"
+  unset DIRENV_BASH
+  unset DIRENV_CONFIG
 test_stop
 
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
