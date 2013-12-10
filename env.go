@@ -51,14 +51,15 @@ func EnvDiff(env1 map[string]string, env2 map[string]string) Env {
 
 // A list of keys we don't want to deal with
 var IGNORED_KEYS = map[string]bool{
-	"OLDPWD":        true,
-	"PS1":           true,
-	"PWD":           true,
-	"SHELL":         true,
-	"SHLVL":         true,
-	"_":             true,
-	"DIRENV_CONFIG": true,
-	"DIRENV_BASH":   true,
+	"COMP_WORDBREAKS": true, // Avoids segfaults in bash
+	"DIRENV_BASH":     true,
+	"DIRENV_CONFIG":   true,
+	"OLDPWD":          true,
+	"PS1":             true, // Avoids segfaults in bash
+	"PWD":             true,
+	"SHELL":           true,
+	"SHLVL":           true,
+	"_":               true,
 }
 
 func ignoredKey(key string) bool {
