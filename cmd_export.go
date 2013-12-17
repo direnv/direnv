@@ -109,7 +109,7 @@ var CmdExport = &Cmd{
 	},
 }
 
-const NOT_ALLOWED = "%s is blocked from loading. Run `direnv allow` to approve it's content for loading.\n"
+const NOT_ALLOWED = "%s is blocked from loading. Run `direnv allow` to approve its content for loading.\n"
 
 func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
 	if !rc.Allowed() {

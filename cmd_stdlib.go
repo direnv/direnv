@@ -122,7 +122,7 @@ find_up() {
 
 # Usage: source_env <file_or_dir_path>
 #
-# Loads another ".envrc" either by specifying it's path or filename.
+# Loads another ".envrc" either by specifying its path or filename.
 source_env() {
 	local rcfile="$1"
 	local rcpath="${1/#\~/$HOME}"
