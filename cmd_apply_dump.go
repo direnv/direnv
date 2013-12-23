@@ -26,14 +26,14 @@ var CmdApplyDump = &Cmd{
 			return err
 		}
 
-		dumpedEnv, err := ParseEnv(string(dumped))
+		dumpedEnv, err := LoadEnv(string(dumped))
 		if err != nil {
 			return err
 		}
 
-		diff := EnvDiff(env, dumpedEnv)
+		diff := env.Diff(dumpedEnv)
 
-		exports := EnvToShell(diff, BASH)
+		exports := diff.ToShell(BASH)
 
 		_, err = fmt.Println(exports)
 		if err != nil {

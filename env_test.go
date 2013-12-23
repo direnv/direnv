@@ -9,25 +9,25 @@ func TestEnv(t *testing.T) {
 
 	out := env.Serialize()
 
-	env2, err := ParseEnv(out)
+	env2, err := LoadEnv(out)
 	if err != nil {
-		t.Fail()
+		t.Errorf("parse error", err)
 	}
 
 	if env2["FOO"] != "bar" {
-		t.Fail()
+		t.Errorf("FOO != bar", env2["FOO"])
 	}
 
 	if len(env2) != 1 {
-		t.Fail()
+		t.Errorf("len != 1", len(env2))
 	}
 }
 
 func TestIgnoredKeys(t *testing.T) {
-	if ignoredKey("DIRENV_FOOBAR") {
+	if !ignoredKey("DIRENV_FOOBAR") {
 		t.Fail()
 	}
-	if ignoredKey("DIRENV_") {
+	if !ignoredKey("DIRENV_") {
 		t.Fail()
 	}
 	if !ignoredKey("_") {

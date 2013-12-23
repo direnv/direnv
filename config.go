@@ -85,9 +85,9 @@ func (self *Config) FindRC() *RC {
 	return FindRC(self.WorkDir, self.AllowDir())
 }
 
-func (self *Config) EnvBackup() (Env, error) {
+func (self *Config) EnvBackup() (*EnvDiff, error) {
 	if self.Env["DIRENV_BACKUP"] == "" {
 		return nil, fmt.Errorf("DIRENV_BACKUP is empty")
 	}
-	return ParseEnv(self.Env["DIRENV_BACKUP"])
+	return LoadEnvDiff(self.Env["DIRENV_BACKUP"])
 }
