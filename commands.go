@@ -10,6 +10,7 @@ type Cmd struct {
 	Name    string
 	Desc    string
 	Args    []string
+	Aliases []string
 	NoWait  bool
 	Private bool
 	Fn      func(env Env, args []string) error
@@ -55,6 +56,13 @@ func CommandsDispatch(env Env, args []string) error {
 		if cmd.Name == commandName {
 			command = cmd
 			break
+		}
+		if cmd.Aliases != nil {
+			for _, alias := range cmd.Aliases {
+				if alias == commandName {
+					command = cmd
+				}
+			}
 		}
 	}
 

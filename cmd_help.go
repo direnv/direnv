@@ -7,9 +7,10 @@ import (
 
 // `direnv help`
 var CmdHelp = &Cmd{
-	Name: "help",
-	Desc: "shows this help",
-	Args: []string{"[SHOW_PRIVATE]"},
+	Name:    "help",
+	Desc:    "shows this help",
+	Args:    []string{"[SHOW_PRIVATE]"},
+	Aliases: []string{"--help"},
 	Fn: func(env Env, args []string) (err error) {
 		var showPrivate = len(args) > 1
 		fmt.Printf(`direnv v%s
