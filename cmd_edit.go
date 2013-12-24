@@ -17,10 +17,16 @@ var CmdEdit = &Cmd{
 	Fn: func(env Env, args []string) (err error) {
 		var config *Config
 		var rcPath string
+		var mtime int64
 		var foundRC *RC
 
 		if config, err = LoadConfig(env); err != nil {
 			return
+		}
+
+		foundRC = config.FindRC()
+		if foundRC != nil {
+			mtime = foundRC.mtime
 		}
 
 		if len(args) > 1 {
@@ -30,7 +36,6 @@ var CmdEdit = &Cmd{
 				rcPath = filepath.Join(rcPath, ".envrc")
 			}
 		} else {
-			foundRC = config.FindRC()
 			if foundRC == nil {
 				return fmt.Errorf(".envrc not found. Use `direnv edit .` to create a new envrc in the current directory.")
 			}
@@ -52,7 +57,7 @@ var CmdEdit = &Cmd{
 		}
 
 		foundRC = FindRC(rcPath, config.AllowDir())
-		if foundRC != nil {
+		if foundRC != nil && foundRC.mtime > mtime {
 			foundRC.Allow()
 		}
 
