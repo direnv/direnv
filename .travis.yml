@@ -1,6 +1,10 @@
----
 language: go
 script: make test
 go:
-  - 1.0
-  - 1.1
+- 1.0
+- 1.1
+- 1.2
+- release
+branches:
+  except:
+  - gh-pages
