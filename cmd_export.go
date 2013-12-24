@@ -56,13 +56,13 @@ var CmdExport = &Cmd{
 			}
 			oldEnv = backupEnv.Filtered()
 			if foundRC == nil {
-				fmt.Fprintf(os.Stderr, "direnv: unloading\n")
+				log("unloading")
 				newEnv = oldEnv
 			} else if loadedRC.path != foundRC.path {
-				fmt.Fprintf(os.Stderr, "direnv: switching\n")
+				log("switching")
 				newEnv, err = loadRC(foundRC, config, oldEnv)
 			} else if loadedRC.mtime != foundRC.mtime {
-				fmt.Fprintf(os.Stderr, "direnv: reloading\n")
+				log("reloading")
 				newEnv, err = loadRC(foundRC, config, oldEnv)
 			} else {
 				// Nothing to do. Env is loaded and hasn't changed
@@ -98,7 +98,7 @@ var CmdExport = &Cmd{
 				i += 1
 			}
 			sort.Strings(out)
-			fmt.Fprintf(os.Stderr, "direnv export: %s\n", strings.Join(out, " "))
+			log("export %s", strings.Join(out, " "))
 		}
 
 		str := EnvToShell(diff, shell)

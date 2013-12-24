@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"time"
 )
@@ -70,7 +69,7 @@ func CommandsDispatch(env Env, args []string) error {
 			case <-done:
 				return
 			case <-time.After(2 * time.Second):
-				fmt.Fprintf(os.Stderr, "direnv(%v) is taking a while to execute. Use CTRL-C to give up.", args)
+				log("(%v) is taking a while to execute. Use CTRL-C to give up.", args)
 			}
 		}()
 	}

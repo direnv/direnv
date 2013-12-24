@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -11,7 +10,7 @@ func main() {
 
 	err := CommandsDispatch(env, args)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log("error %v", err)
 		os.Exit(1)
 	}
 }
