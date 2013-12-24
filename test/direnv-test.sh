@@ -19,7 +19,7 @@ direnv_eval() {
 
 test_start() {
   cd "$TEST_DIR/scenarios/$1"
-  direnv allow
+  #direnv allow
   echo "## Testing $1 ##"
 }
 
@@ -30,7 +30,7 @@ test_stop() {
 
 ### RUN ###
 
-direnv allow || true
+#direnv allow || true
 direnv_eval
 
 test_start base
