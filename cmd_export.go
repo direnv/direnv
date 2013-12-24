@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -47,7 +45,7 @@ var CmdExport = &Cmd{
 				return nil
 			}
 
-			newEnv, err = loadRC(foundRC, config, oldEnv)
+			newEnv, err = foundRC.Load(config, oldEnv)
 		} else {
 			var backupEnv Env
 			if backupEnv, err = config.EnvBackup(); err != nil {
@@ -60,10 +58,10 @@ var CmdExport = &Cmd{
 				newEnv = oldEnv
 			} else if loadedRC.path != foundRC.path {
 				log("switching")
-				newEnv, err = loadRC(foundRC, config, oldEnv)
+				newEnv, err = foundRC.Load(config, oldEnv)
 			} else if loadedRC.mtime != foundRC.mtime {
 				log("reloading")
-				newEnv, err = loadRC(foundRC, config, oldEnv)
+				newEnv, err = foundRC.Load(config, oldEnv)
 			} else {
 				// Nothing to do. Env is loaded and hasn't changed
 				return nil
@@ -107,38 +105,4 @@ var CmdExport = &Cmd{
 		return
 
 	},
-}
-
-const NOT_ALLOWED = "%s is blocked from loading. Run `direnv allow` to approve its content for loading.\n"
-
-func loadRC(rc *RC, config *Config, env Env) (newEnv Env, err error) {
-	if !rc.Allowed() {
-		return nil, fmt.Errorf(NOT_ALLOWED, rc.RelTo(config.WorkDir))
-	}
-
-	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
-	arg := fmt.Sprintf(argtmpl, config.SelfPath, rc.RelTo(config.WorkDir), config.SelfPath)
-	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
-
-	cmd.Stderr = os.Stderr
-	cmd.Env = env.ToGoEnv()
-	cmd.Dir = config.WorkDir
-
-	out, err := cmd.Output()
-	if err != nil {
-		err = fmt.Errorf("loading error, %q", err)
-		return
-	}
-
-	newEnv, err = ParseEnv(string(out))
-	if err != nil {
-		err = fmt.Errorf("loadRC() ParseEnv failed: %q", err)
-		return
-	}
-
-	newEnv["DIRENV_DIR"] = "-" + filepath.Dir(rc.path)
-	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", rc.mtime)
-	newEnv["DIRENV_BACKUP"] = env.Serialize()
-
-	return
 }

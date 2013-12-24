@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 )
@@ -14,6 +15,113 @@ type RC struct {
 	mtime     int64
 	allowPath string
 }
+
+func FindRC(wd string, allowDir string) *RC {
+	rcPath := findUp(wd, ".envrc")
+	if rcPath == "" {
+		return nil
+	}
+
+	return RCFromPath(rcPath, allowDir)
+}
+
+func RCFromPath(path string, allowDir string) *RC {
+	mtime, err := fileMtime(path)
+	if err != nil {
+		return nil
+	}
+
+	hash, err := fileHash(path)
+	if err != nil {
+		return nil
+	}
+
+	allowPath := filepath.Join(allowDir, hash)
+	allowMtime, _ := fileMtime(allowPath)
+
+	if allowMtime > mtime {
+		mtime = allowMtime
+	}
+
+	return &RC{path, mtime, allowPath}
+}
+
+func RCFromEnv(path string, mtime int64) *RC {
+	return &RC{path, mtime, ""}
+}
+
+func (self *RC) Allow() (err error) {
+	if self.allowPath == "" {
+		return fmt.Errorf("Cannot allow empty path")
+	}
+	if err = os.MkdirAll(filepath.Dir(self.allowPath), 0755); err != nil {
+		return
+	}
+	if err = touch(self.allowPath); err != nil {
+		return
+	}
+	self.mtime, err = fileMtime(self.allowPath)
+	return
+}
+
+func (self *RC) Deny() error {
+	return os.Remove(self.allowPath)
+}
+
+func (self *RC) Allowed() bool {
+	_, err := os.Stat(self.allowPath)
+	return err == nil
+}
+
+func (self *RC) RelTo(wd string) string {
+	x, err := filepath.Rel(wd, self.path)
+	if err != nil {
+		panic(err)
+	}
+	return x
+}
+
+func (self *RC) Touch() error {
+	return touch(self.path)
+}
+
+const NOT_ALLOWED = "%s is blocked because unknown. Run `direnv allow` to approve its content."
+
+func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
+	wd := config.WorkDir
+	direnv := config.SelfPath
+
+	if !self.Allowed() {
+		return nil, fmt.Errorf(NOT_ALLOWED, self.RelTo(wd))
+	}
+
+	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
+	arg := fmt.Sprintf(argtmpl, direnv, self.RelTo(wd), direnv)
+	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
+
+	cmd.Stderr = os.Stderr
+	cmd.Env = env.ToGoEnv()
+	cmd.Dir = wd
+
+	out, err := cmd.Output()
+	if err != nil {
+		return
+	}
+
+	newEnv, err = ParseEnv(string(out))
+	if err != nil {
+		return
+	}
+
+	// Save state
+	newEnv["DIRENV_DIR"] = "-" + filepath.Dir(self.path)
+	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", self.mtime)
+	newEnv["DIRENV_BACKUP"] = env.Serialize()
+
+	return
+}
+
+/// Utils
 
 func eachDir(path string) (paths []string) {
 	path, err := filepath.Abs(path)
@@ -88,73 +196,4 @@ func findUp(searchDir string, fileName string) (path string) {
 		}
 	}
 	return ""
-}
-
-func FindRC(wd string, allowDir string) *RC {
-	rcPath := findUp(wd, ".envrc")
-	if rcPath == "" {
-		return nil
-	}
-
-	return RCFromPath(rcPath, allowDir)
-}
-
-func RCFromPath(path string, allowDir string) *RC {
-	mtime, err := fileMtime(path)
-	if err != nil {
-		return nil
-	}
-
-	hash, err := fileHash(path)
-	if err != nil {
-		return nil
-	}
-
-	allowPath := filepath.Join(allowDir, hash)
-	allowMtime, _ := fileMtime(allowPath)
-
-	if allowMtime > mtime {
-		mtime = allowMtime
-	}
-
-	return &RC{path, mtime, allowPath}
-}
-
-func RCFromEnv(path string, mtime int64) *RC {
-	return &RC{path, mtime, ""}
-}
-
-func (self *RC) Allow() (err error) {
-	if self.allowPath == "" {
-		return fmt.Errorf("Cannot allow empty path")
-	}
-	if err = os.MkdirAll(filepath.Dir(self.allowPath), 0755); err != nil {
-		return
-	}
-	if err = touch(self.allowPath); err != nil {
-		return
-	}
-	self.mtime, err = fileMtime(self.allowPath)
-	return
-}
-
-func (self *RC) Deny() error {
-	return os.Remove(self.allowPath)
-}
-
-func (self *RC) Allowed() bool {
-	_, err := os.Stat(self.allowPath)
-	return err == nil
-}
-
-func (self *RC) RelTo(wd string) string {
-	x, err := filepath.Rel(wd, self.path)
-	if err != nil {
-		panic(err)
-	}
-	return x
-}
-
-func (self *RC) Touch() error {
-	return touch(self.path)
 }
