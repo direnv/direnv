@@ -58,7 +58,7 @@ expand_path() {
 # Loads a ".env" file into the current environment
 #
 dotenv() {
-	eval "$("$DIRENV_PATH" dotenv "$@")"
+	eval "$("$DIRENV_PATH" dotenv bash "$@")"
 }
 
 # Usage: user_rel_path <abs_path>

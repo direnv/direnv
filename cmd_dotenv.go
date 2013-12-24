@@ -35,7 +35,7 @@ func ParseDotEnv(data string) Env {
 	return dotenv
 }
 
-// `direnv private dotenv [PATH_TO_DOTENV]`
+// `direnv private dotenv [SHELL [PATH_TO_DOTENV]]`
 // Transforms a .env file to evaluatable `export KEY=PAIR` statements.
 //
 // See: https://github.com/bkeepers/dotenv and
@@ -43,12 +43,19 @@ func ParseDotEnv(data string) Env {
 var CmdDotEnv = &Cmd{
 	Name:    "dotenv",
 	Desc:    "Transforms a .env file to evaluatable `export KEY=PAIR` statements",
-	Args:    []string{"[PATH_TO_DOTENV]"},
+	Args:    []string{"[SHELL]", "[PATH_TO_DOTENV]"},
 	Private: true,
 	Fn: func(env Env, args []string) (err error) {
+		var shell Shell
 		var target string
 
 		if len(args) > 1 {
+			shell = DetectShell(args[1])
+		} else {
+			shell = BASH
+		}
+
+		if len(args) > 2 {
 			target = args[1]
 		}
 
@@ -63,7 +70,7 @@ var CmdDotEnv = &Cmd{
 
 		dotenv := ParseDotEnv(string(data))
 
-		str := EnvToShell(dotenv, BASH)
+		str := EnvToShell(dotenv, shell)
 		fmt.Println(str)
 
 		return
