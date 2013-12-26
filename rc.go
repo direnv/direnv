@@ -169,6 +169,7 @@ func fileHash(path string) (string, error) {
 	}
 
 	hasher := sha256.New()
+	hasher.Write([]byte(path + "\n"))
 	io.Copy(hasher, fd)
 	num := hasher.Sum(nil)
 
