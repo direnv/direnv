@@ -115,8 +115,6 @@ func (env Env) ToGoEnv() []string {
 }
 
 func ParseEnv(base64env string) (Env, error) {
-	base64env = strings.TrimSpace(base64env)
-
 	zlibData, err := base64.URLEncoding.DecodeString(base64env)
 	if err != nil {
 		return nil, fmt.Errorf("ParseEnv() base64 decoding: %v", err)

@@ -69,6 +69,13 @@ test_start "space dir"
   test "$SPACE_DIR" = "true"
 test_stop
 
+test_start "child-env"
+  direnv_eval
+  test "$PARENT_PRE" = "1"
+  test "$CHILD" = "1"
+  test -z "$PARENT_POST"
+test_stop
+
 test_start "special-vars"
   export DIRENV_BASH=`which bash`
   export DIRENV_CONFIG=foobar
