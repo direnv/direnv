@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"fmt"
 	"io"
@@ -95,20 +96,33 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		return nil, fmt.Errorf(NOT_ALLOWED, self.RelTo(wd))
 	}
 
-	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
+	dump_r, dump_w, err := os.Pipe()
+	if err != nil {
+		return nil, fmt.Errorf("Load() can't create pipe: %v", err)
+	}
+	defer dump_r.Close()
+	defer dump_w.Close()
+
+	argtmpl := `exec >&2 && eval "$("%s" stdlib)" && source_env "%s" && "%s" dump`
 	arg := fmt.Sprintf(argtmpl, direnv, self.RelTo(wd), direnv)
 	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
 
 	cmd.Stderr = os.Stderr
 	cmd.Env = env.ToGoEnv()
 	cmd.Dir = wd
+	cmd.ExtraFiles = []*os.File{dump_w}
 
-	out, err := cmd.Output()
+	err = cmd.Run()
 	if err != nil {
 		return
 	}
 
-	newEnv, err = ParseEnv(string(out))
+	reader := bufio.NewReader(dump_r)
+	output, err := reader.ReadString(byte(0))
+	if err != nil {
+		return nil, fmt.Errorf("Load() can't read environment dump: %v", err)
+	}
+	newEnv, err = ParseEnv(output[:len(output)-1])
 	if err != nil {
 		return
 	}
