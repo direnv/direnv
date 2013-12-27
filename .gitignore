@@ -3,4 +3,5 @@
 /direnv.test
 /release
 /site
+/test/allow
 man/*.html
