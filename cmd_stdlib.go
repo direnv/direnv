@@ -151,6 +151,23 @@ source_up() {
 	fi
 }
 
+# Usage: direnv_apply_dump <(direnv dump)
+#
+# Applies the environment received on stdin. This is useful for
+# adopting the environment of a child process - cause that process
+# to run "direnv dump" and then evaluate the results with direnv_apply_dump
+#
+# NOTE: "direnv dump | direnv_apply_dump" will not work, as the right-hand-side
+# of the pipe in this case is executed in a subshell.
+#
+direnv_apply_dump() {
+	exports="$(direnv apply-dump "$@")"
+	if test "$?" -ne 0; then
+		exit 1
+	fi
+	eval "$exports"
+}
+
 # Usage: PATH_add <path>
 #
 # Prepends the expanded <path> to the PATH environment variable. It prevents a
