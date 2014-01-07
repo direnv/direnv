@@ -45,7 +45,11 @@ make install
 # or symlink bin/direnv into your $PATH
 ```
 
-For Mac users, you can also use `brew install direnv`
+Installing from the repository requires the Go language.
+
+For Homebrew users, you can also use `brew install direnv`
+
+For MacPorts users, install Go with `sudo port install go`, then install from the repository.
 
 ### 2. Add the hook for your shell
 
