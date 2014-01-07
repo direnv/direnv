@@ -160,7 +160,7 @@ source_up() {
 # the results with direnv_apply_dump.
 #
 direnv_apply_dump() {
-	exports="$(direnv apply-dump <("$@"))"
+	exports="$("$direnv" apply-dump <("$@"))"
 	if test "$?" -ne 0; then
 		exit 1
 	fi
