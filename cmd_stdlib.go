@@ -21,7 +21,7 @@ var CmdStdlib = &Cmd{
 
 const STDLIB = `# These are the commands available in an .envrc context
 set -e
-DIRENV_PATH="%s"
+direnv="%s"
 
 # Usage: has <command>
 #
@@ -50,7 +50,7 @@ has() {
 #    # output: /usr/local/foo
 #
 expand_path() {
-	"$DIRENV_PATH" expand_path "$@"
+	"$direnv" expand_path "$@"
 }
 
 # Usage: dotenv [<dotenv>]
@@ -58,7 +58,7 @@ expand_path() {
 # Loads a ".env" file into the current environment
 #
 dotenv() {
-	eval "$("$DIRENV_PATH" dotenv bash "$@")"
+	eval "$("$direnv" dotenv bash "$@")"
 }
 
 # Usage: user_rel_path <abs_path>
