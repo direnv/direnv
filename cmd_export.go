@@ -37,6 +37,10 @@ var CmdExport = &Cmd{
 		loadedRC = config.LoadedRC()
 		foundRC = config.FindRC()
 
+		loadRC := func() {
+			newEnv, err = foundRC.Load(config, oldEnv)
+		}
+
 		//fmt.Fprintf(os.Stderr, "%v %v\n", loadedRC, foundRC)
 
 		if loadedRC == nil {
@@ -45,23 +49,23 @@ var CmdExport = &Cmd{
 				return nil
 			}
 
-			newEnv, err = foundRC.Load(config, oldEnv)
+			loadRC()
 		} else {
-			var backupEnv Env
+			var backupEnv *EnvDiff
 			if backupEnv, err = config.EnvBackup(); err != nil {
 				err = fmt.Errorf("EnvBackup() failed: %q", err)
 				goto error
 			}
-			oldEnv = backupEnv.Filtered()
+			oldEnv = backupEnv.Reverse().Patch(env)
 			if foundRC == nil {
 				log("unloading")
-				newEnv = oldEnv
+				newEnv = oldEnv.Filtered()
 			} else if loadedRC.path != foundRC.path {
 				log("switching")
-				newEnv, err = foundRC.Load(config, oldEnv)
+				loadRC()
 			} else if loadedRC.mtime != foundRC.mtime {
 				log("reloading")
-				newEnv, err = foundRC.Load(config, oldEnv)
+				loadRC()
 			} else {
 				// Nothing to do. Env is loaded and hasn't changed
 				return nil
@@ -75,34 +79,38 @@ var CmdExport = &Cmd{
 				// This should be nearby rc.Load()'s similar statement
 				newEnv["DIRENV_DIR"] = "-" + filepath.Dir(foundRC.path)
 				newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", foundRC.mtime)
-				newEnv["DIRENV_BACKUP"] = oldEnv.Serialize()
+				newEnv["DIRENV_BACKUP"] = oldEnv.Filtered().Diff(newEnv).Serialize()
 			}
 		}
 
-		diff := EnvDiff(env, newEnv)
+		diff := env.Filtered().Diff(newEnv)
 
-		diff2 := diff.Filtered()
-		if len(diff2) > 0 {
-			out := make([]string, len(diff2))
-			i := 0
-			for key, value := range diff2 {
-				if value == "" {
-					out[i] = "-" + key
-				} else if oldEnv[key] == "" {
-					out[i] = "+" + key
-				} else {
-					out[i] = "~" + key
+		if diff.Any() {
+			var out []string
+			for key, _ := range diff.Prev {
+				_, ok := diff.Next[key]
+				if !ok && !ignoredKey(key) {
+					out = append(out, "-"+key)
 				}
-				i += 1
+			}
+			for key := range diff.Next {
+				if ignoredKey(key) {
+					continue
+				}
+				_, ok := diff.Prev[key]
+				if ok {
+					out = append(out, "~"+key)
+				} else {
+					out = append(out, "+"+key)
+				}
 			}
 			sort.Strings(out)
 			log("export %s", strings.Join(out, " "))
 		}
 
-		str := EnvToShell(diff, shell)
-
+		str := diff.ToShell(shell)
 		fmt.Print(str)
-		return
 
+		return
 	},
 }

@@ -1,53 +1,9 @@
 package main
 
 import (
-	"bytes"
-	"compress/zlib"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
-	"io"
 	"os"
 	"strings"
 )
-
-type Env map[string]string
-
-func EnvToShell(env Env, shell Shell) string {
-	str := ""
-	for key, value := range env {
-		// FIXME: This is not exacly as the ruby nil
-		if value == "" {
-			if key == "PS1" {
-				// unsetting PS1 doesn't restore the default in OSX's bash
-			} else {
-				str += shell.Unset(key)
-			}
-		} else {
-			str += shell.Export(key, value)
-		}
-	}
-	return str
-}
-
-func EnvDiff(env1 map[string]string, env2 map[string]string) Env {
-	envDiff := make(Env)
-
-	for key := range env1 {
-		if env2[key] != env1[key] && !ignoredKey(key) {
-			envDiff[key] = env2[key]
-		}
-	}
-
-	// FIXME: I'm sure there is a smarter way to do that
-	for key := range env2 {
-		if env2[key] != env1[key] && !ignoredKey(key) {
-			envDiff[key] = env2[key]
-		}
-	}
-
-	return envDiff
-}
 
 // A list of keys we don't want to deal with
 var IGNORED_KEYS = map[string]bool{
@@ -62,17 +18,7 @@ var IGNORED_KEYS = map[string]bool{
 	"_":               true,
 }
 
-func ignoredKey(key string) bool {
-	if len(key) > 6 && key[0:6] == "__fish" {
-		return true
-	}
-	_, found := IGNORED_KEYS[key]
-	return found
-}
-
-func direnvVar(key string) bool {
-	return strings.HasPrefix(key, "DIRENV_")
-}
+type Env map[string]string
 
 // NOTE:  We don't support having two variables with the same name.
 //        I've never seen it used in the wild but accoding to POSIX
@@ -92,11 +38,17 @@ func GetEnv() Env {
 	return env
 }
 
+func LoadEnv(base64env string) (env Env, err error) {
+	env = make(Env)
+	err = unmarshal(base64env, &env)
+	return
+}
+
 func (env Env) Filtered() Env {
 	newEnv := make(Env)
 
 	for key, value := range env {
-		if !ignoredKey(key) && !direnvVar(key) {
+		if !ignoredKey(key) {
 			newEnv[key] = value
 		}
 	}
@@ -114,51 +66,33 @@ func (env Env) ToGoEnv() []string {
 	return goEnv
 }
 
-func ParseEnv(base64env string) (Env, error) {
-	base64env = strings.TrimSpace(base64env)
+func (env Env) ToShell(shell Shell) string {
+	str := ""
 
-	zlibData, err := base64.URLEncoding.DecodeString(base64env)
-	if err != nil {
-		return nil, fmt.Errorf("ParseEnv() base64 decoding: %v", err)
+	for key, value := range env {
+		str += shell.Export(key, value)
 	}
 
-	zlibReader := bytes.NewReader(zlibData)
-	w, err := zlib.NewReader(zlibReader)
-	if err != nil {
-		return nil, fmt.Errorf("ParseEnv() zlib opening: %v", err)
-	}
-
-	envData := bytes.NewBuffer([]byte{})
-	_, err = io.Copy(envData, w)
-	if err != nil {
-		return nil, fmt.Errorf("ParseEnv() zlib decoding: %v", err)
-	}
-	w.Close()
-
-	env := make(Env)
-	err = json.Unmarshal(envData.Bytes(), &env)
-	if err != nil {
-		return nil, fmt.Errorf("ParseEnv() json parsing: %v", err)
-	}
-
-	return env, nil
+	return str
 }
 
 func (env Env) Serialize() string {
-	// We can safely ignore the err because it's only thrown
-	// for unsupported datatype. We know that a map[string]string
-	// is supported.
-	jsonData, err := json.Marshal(env)
-	if err != nil {
-		panic(fmt.Errorf("Serialize(): %q", err))
+	return marshal(env)
+}
+
+func (e1 Env) Diff(e2 Env) *EnvDiff {
+	return BuildEnvDiff(e1, e2)
+}
+
+//// Utils
+
+func ignoredKey(key string) bool {
+	if strings.HasPrefix(key, "__fish") {
+		return true
 	}
-
-	zlibData := bytes.NewBuffer([]byte{})
-	w := zlib.NewWriter(zlibData)
-	w.Write(jsonData)
-	w.Close()
-
-	base64Data := base64.URLEncoding.EncodeToString(zlibData.Bytes())
-
-	return base64Data
+	if strings.HasPrefix(key, "DIRENV_") {
+		return true
+	}
+	_, found := IGNORED_KEYS[key]
+	return found
 }

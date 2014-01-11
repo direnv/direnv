@@ -68,9 +68,8 @@ var CmdDotEnv = &Cmd{
 			return
 		}
 
-		dotenv := ParseDotEnv(string(data))
-
-		str := EnvToShell(dotenv, shell)
+		env = ParseDotEnv(string(data))
+		str := env.ToShell(shell)
 		fmt.Println(str)
 
 		return

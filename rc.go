@@ -108,15 +108,17 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		return
 	}
 
-	newEnv, err = ParseEnv(string(out))
+	newEnv, err = LoadEnv(string(out))
 	if err != nil {
 		return
 	}
 
+	newEnv = newEnv.Filtered()
+
 	// Save state
 	newEnv["DIRENV_DIR"] = "-" + filepath.Dir(self.path)
 	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", self.mtime)
-	newEnv["DIRENV_BACKUP"] = env.Serialize()
+	newEnv["DIRENV_BACKUP"] = env.Filtered().Diff(newEnv).Serialize()
 
 	return
 }
