@@ -1,5 +1,22 @@
 
-2.1.0 / 2013-11-10 
+2.2.0 / 2014-01-11
+==================
+
+Restart your shells on upgrade, the format of DIRENV_BACKUP has changed and is
+incompatible with previous versions.
+
+ * NEW: `direnv_load <command-that-outputs-a-direnv-dump>` stdlib function
+ * CHANGE: Only backup the diff of environments. Fixes #82
+ * CHANGE: Renames `$DIRENV_PATH` to `$direnv` in the stdlib.
+ * CHANGE: Allow/Deny mechanism now includes the path to make it more secure.
+ * CHANGE: `direnv --help` is an alias to `direnv help`
+ * CHANGE: more consistent log outputs and error messages
+ * CHANGE: `direnv edit` only auto-allows the .envrc if it's mtime has changed.
+ * CHANGE: Fixes old bash (OSX) segfault in some cases. See #81
+ * CHANGE: The stdlib `dotenv` now supports more .env syntax
+ * FIX: Restore the environment properly after loading errors.
+
+2.1.0 / 2013-11-10
 ==================
 
  * Added support for the fish shell. See README.md for install instructions.
@@ -8,7 +25,7 @@
  * Makes the bash hook resistant to double-hooking.
  * More precise direnv allow error message. Fixes #72
 
-2.0.1 / 2013-07-27 
+2.0.1 / 2013-07-27
 ==================
 
  * Fixes shell detection corner case
