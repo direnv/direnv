@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 )
 
-// `direnv apply-dump FILE`
+// `direnv apply_dump FILE`
 var CmdApplyDump = &Cmd{
-	Name:    "apply-dump",
+	Name:    "apply_dump",
 	Desc:    "Accepts a filename containing `direnv dump` output and generates a series of bash export statements to apply the given env",
 	Args:    []string{"FILE"},
 	Private: true,
