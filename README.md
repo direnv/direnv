@@ -119,5 +119,6 @@ Thank you for making direnv better
 * Martin Aumüller (aka. aumuell) for his patches and awesomeness
 * Peter Waller (aka. pwaller) for his patches and insights
 * Sam Stephenson (aka. sstephenson) for his expand_path code that I stole from https://github.com/sstephenson/bats
+* Tim Cuthbertson (aka. gfxmonk) for his contribution over the last months
 
 Copyright (C) 2013 Jonas Pfenniger and contributors under the MIT licence.
