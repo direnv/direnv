@@ -70,7 +70,7 @@ var CmdExport = &Cmd{
 
 	error:
 		if err != nil {
-			newEnv = oldEnv
+			newEnv = oldEnv.Filtered()
 			if foundRC != nil {
 				// This should be nearby rc.Load()'s similar statement
 				newEnv["DIRENV_DIR"] = "-" + filepath.Dir(foundRC.path)
