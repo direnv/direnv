@@ -113,12 +113,10 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		return
 	}
 
-	newEnv = newEnv.Filtered()
-
 	// Save state
-	newEnv["DIRENV_DIR"] = "-" + filepath.Dir(self.path)
-	newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", self.mtime)
-	newEnv["DIRENV_BACKUP"] = env.Filtered().Diff(newEnv).Serialize()
+	newEnv[DIRENV_DIR] = "-" + filepath.Dir(self.path)
+	newEnv[DIRENV_MTIME] = fmt.Sprintf("%d", self.mtime)
+	newEnv[DIRENV_DIFF] = env.Diff(newEnv).Serialize()
 
 	return
 }

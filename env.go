@@ -5,19 +5,6 @@ import (
 	"strings"
 )
 
-// A list of keys we don't want to deal with
-var IGNORED_KEYS = map[string]bool{
-	"COMP_WORDBREAKS": true, // Avoids segfaults in bash
-	"DIRENV_BASH":     true,
-	"DIRENV_CONFIG":   true,
-	"OLDPWD":          true,
-	"PS1":             true, // Avoids segfaults in bash
-	"PWD":             true,
-	"SHELL":           true,
-	"SHLVL":           true,
-	"_":               true,
-}
-
 type Env map[string]string
 
 // NOTE:  We don't support having two variables with the same name.
@@ -44,13 +31,11 @@ func LoadEnv(base64env string) (env Env, err error) {
 	return
 }
 
-func (env Env) Filtered() Env {
+func (env Env) Copy() Env {
 	newEnv := make(Env)
 
 	for key, value := range env {
-		if !ignoredKey(key) {
-			newEnv[key] = value
-		}
+		newEnv[key] = value
 	}
 
 	return newEnv
@@ -82,17 +67,4 @@ func (env Env) Serialize() string {
 
 func (e1 Env) Diff(e2 Env) *EnvDiff {
 	return BuildEnvDiff(e1, e2)
-}
-
-//// Utils
-
-func ignoredKey(key string) bool {
-	if strings.HasPrefix(key, "__fish") {
-		return true
-	}
-	if strings.HasPrefix(key, "DIRENV_") {
-		return true
-	}
-	_, found := IGNORED_KEYS[key]
-	return found
 }

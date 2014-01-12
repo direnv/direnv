@@ -1,5 +1,26 @@
 package main
 
+import (
+	"strings"
+)
+
+// A list of keys we don't want to deal with
+var IGNORED_KEYS = map[string]bool{
+	// direnv env config
+	"DIRENV_CONFIG": true,
+	"DIRENV_BASH":   true,
+
+	"COMP_WORDBREAKS": true, // Avoids segfaults in bash
+	"PS1":             true, // PS1 should not be exported, fixes problem in bash
+
+	// variables that should change freely
+	"OLDPWD": true,
+	"PWD":    true,
+	"SHELL":  true,
+	"SHLVL":  true,
+	"_":      true,
+}
+
 type EnvDiff struct {
 	Prev map[string]string `json:"p"`
 	Next map[string]string `json:"n"`
@@ -9,13 +30,13 @@ func BuildEnvDiff(e1, e2 Env) *EnvDiff {
 	diff := &EnvDiff{make(map[string]string), make(map[string]string)}
 
 	for key := range e1 {
-		if e2[key] != e1[key] {
+		if e2[key] != e1[key] && !IgnoredEnv(key) {
 			diff.Prev[key] = e1[key]
 		}
 	}
 
 	for key := range e2 {
-		if e2[key] != e1[key] {
+		if e2[key] != e1[key] && !IgnoredEnv(key) {
 			diff.Next[key] = e2[key]
 		}
 	}
@@ -74,4 +95,14 @@ func (self *EnvDiff) Reverse() *EnvDiff {
 
 func (self *EnvDiff) Serialize() string {
 	return marshal(self)
+}
+
+//// Utils
+
+func IgnoredEnv(key string) bool {
+	if strings.HasPrefix(key, "__fish") {
+		return true
+	}
+	_, found := IGNORED_KEYS[key]
+	return found
 }

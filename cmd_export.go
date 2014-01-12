@@ -14,7 +14,7 @@ var CmdExport = &Cmd{
 	Args:    []string{"SHELL"},
 	Private: true,
 	Fn: func(env Env, args []string) (err error) {
-		var oldEnv Env = env.Filtered()
+		var oldEnv Env = env.Copy()
 		var newEnv Env
 		var loadedRC *RC
 		var foundRC *RC
@@ -51,15 +51,18 @@ var CmdExport = &Cmd{
 
 			loadRC()
 		} else {
-			var backupEnv *EnvDiff
-			if backupEnv, err = config.EnvBackup(); err != nil {
-				err = fmt.Errorf("EnvBackup() failed: %q", err)
+			var backupDiff *EnvDiff
+			if backupDiff, err = config.EnvDiff(); err != nil {
+				err = fmt.Errorf("EnvDiff() failed: %q", err)
 				goto error
 			}
-			oldEnv = backupEnv.Reverse().Patch(env)
+			oldEnv = backupDiff.Reverse().Patch(env)
 			if foundRC == nil {
 				log("unloading")
-				newEnv = oldEnv.Filtered()
+				newEnv = oldEnv.Copy()
+				delete(newEnv, DIRENV_DIR)
+				delete(newEnv, DIRENV_MTIME)
+				delete(newEnv, DIRENV_DIFF)
 			} else if loadedRC.path != foundRC.path {
 				log("switching")
 				loadRC()
@@ -74,29 +77,30 @@ var CmdExport = &Cmd{
 
 	error:
 		if err != nil {
-			newEnv = oldEnv.Filtered()
+			newEnv = oldEnv.Copy()
+			delete(oldEnv, DIRENV_DIR)
+			delete(oldEnv, DIRENV_MTIME)
+			delete(oldEnv, DIRENV_DIFF)
 			if foundRC != nil {
+				delete(newEnv, DIRENV_DIFF)
 				// This should be nearby rc.Load()'s similar statement
-				newEnv["DIRENV_DIR"] = "-" + filepath.Dir(foundRC.path)
-				newEnv["DIRENV_MTIME"] = fmt.Sprintf("%d", foundRC.mtime)
-				newEnv["DIRENV_BACKUP"] = oldEnv.Filtered().Diff(newEnv).Serialize()
+				newEnv[DIRENV_DIR] = "-" + filepath.Dir(foundRC.path)
+				newEnv[DIRENV_MTIME] = fmt.Sprintf("%d", foundRC.mtime)
+				newEnv[DIRENV_DIFF] = oldEnv.Diff(newEnv).Serialize()
 			}
 		}
 
-		diff := env.Filtered().Diff(newEnv)
+		diff := env.Diff(newEnv)
 
 		if diff.Any() {
 			var out []string
 			for key, _ := range diff.Prev {
 				_, ok := diff.Next[key]
-				if !ok && !ignoredKey(key) {
+				if !ok {
 					out = append(out, "-"+key)
 				}
 			}
 			for key := range diff.Next {
-				if ignoredKey(key) {
-					continue
-				}
 				_, ok := diff.Prev[key]
 				if ok {
 					out = append(out, "~"+key)

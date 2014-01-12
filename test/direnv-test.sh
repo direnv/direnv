@@ -8,10 +8,10 @@ export PATH=`dirname $TEST_DIR`:$PATH
 
 # Reset the direnv loading if any
 export DIRENV_CONFIG=$PWD
-unset DIRENV_BACKUP
 unset DIRENV_BASH
 unset DIRENV_DIR
 unset DIRENV_MTIME
+unset DIRENV_DIFF
 
 direnv_eval() {
   eval `direnv export bash`

@@ -22,7 +22,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		Env: env,
 	}
 
-	config.ConfDir = env["DIRENV_CONFIG"]
+	config.ConfDir = env[DIRENV_CONFIG]
 	if config.ConfDir == "" {
 		config.ConfDir = XdgConfigDir(env, "direnv")
 	}
@@ -42,7 +42,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 	config.SelfPath = exePath
 
-	config.BashPath = env["DIRENV_BASH"]
+	config.BashPath = env[DIRENV_BASH]
 	if config.BashPath == "" {
 		if config.BashPath, err = exec.LookPath("bash"); err != nil {
 			err = fmt.Errorf("Can't find bash: %q", err)
@@ -55,7 +55,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		return
 	}
 
-	config.RCDir = env["DIRENV_DIR"]
+	config.RCDir = env[DIRENV_DIR]
 	if len(config.RCDir) > 0 && config.RCDir[0:1] == "-" {
 		config.RCDir = config.RCDir[1:]
 	}
@@ -73,7 +73,7 @@ func (self *Config) LoadedRC() *RC {
 	}
 	rcPath := filepath.Join(self.RCDir, ".envrc")
 
-	mtime, err := strconv.ParseInt(self.Env["DIRENV_MTIME"], 10, 64)
+	mtime, err := strconv.ParseInt(self.Env[DIRENV_MTIME], 10, 64)
 	if err != nil {
 		return nil
 	}
@@ -85,9 +85,9 @@ func (self *Config) FindRC() *RC {
 	return FindRC(self.WorkDir, self.AllowDir())
 }
 
-func (self *Config) EnvBackup() (*EnvDiff, error) {
-	if self.Env["DIRENV_BACKUP"] == "" {
-		return nil, fmt.Errorf("DIRENV_BACKUP is empty")
+func (self *Config) EnvDiff() (*EnvDiff, error) {
+	if self.Env[DIRENV_DIFF] == "" {
+		return nil, fmt.Errorf("DIRENV_DIFF is empty")
 	}
-	return LoadEnvDiff(self.Env["DIRENV_BACKUP"])
+	return LoadEnvDiff(self.Env[DIRENV_DIFF])
 }

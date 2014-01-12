@@ -22,3 +22,21 @@ func TestEnvDiff(t *testing.T) {
 		t.Errorf("len(diff2.next) != 0", len(diff2.Next))
 	}
 }
+
+func TestIgnoredEnv(t *testing.T) {
+	if !IgnoredEnv(DIRENV_BASH) {
+		t.Fail()
+	}
+	if IgnoredEnv(DIRENV_DIFF) {
+		t.Fail()
+	}
+	if !IgnoredEnv("_") {
+		t.Fail()
+	}
+	if !IgnoredEnv("__fish_foo") {
+		t.Fail()
+	}
+	if !IgnoredEnv("__fishx") {
+		t.Fail()
+	}
+}

@@ -22,21 +22,3 @@ func TestEnv(t *testing.T) {
 		t.Errorf("len != 1", len(env2))
 	}
 }
-
-func TestIgnoredKeys(t *testing.T) {
-	if !ignoredKey("DIRENV_FOOBAR") {
-		t.Fail()
-	}
-	if !ignoredKey("DIRENV_") {
-		t.Fail()
-	}
-	if !ignoredKey("_") {
-		t.Fail()
-	}
-	if !ignoredKey("__fish_foo") {
-		t.Fail()
-	}
-	if !ignoredKey("__fishx") {
-		t.Fail()
-	}
-}
