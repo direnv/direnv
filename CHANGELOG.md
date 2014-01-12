@@ -1,4 +1,12 @@
 
+2.2.1 / 2014-01-12
+==================
+
+The last release was heavily broken. Ooops !
+
+ * FIX: Refactored the whole export and diff mechanism. Fixes #92 regression.
+ * CHANGE: DIRENV_BACKUP has been renamed to DIRENV_DIFF
+
 2.2.0 / 2014-01-11
 ==================
 
