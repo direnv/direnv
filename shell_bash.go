@@ -7,7 +7,7 @@ var BASH bash
 const BASH_HOOK = `
 _direnv_hook() {
   eval "$(direnv export bash)";
-}
+};
 if ! [[ "$PROMPT_COMMAND" =~ _direnv_hook ]]; then
   PROMPT_COMMAND="_direnv_hook;$PROMPT_COMMAND";
 fi
