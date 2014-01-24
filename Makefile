@@ -33,6 +33,6 @@ release: build
 install: all
 	install -d bin $(DESTDIR)/bin
 	install -d man $(DESTDIR)/share/man/man1
-	cp direnv $(DESTDIR)/bin
+	install direnv $(DESTDIR)/bin
 	cp -R man/*.1 $(DESTDIR)/share/man/man1
 
