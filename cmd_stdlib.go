@@ -265,11 +265,12 @@ layout_ruby() {
 # This forces the installation of any egg into the project's sub-folder.
 #
 layout_python() {
-	if ! [ -d .direnv/virtualenv ]; then
-		virtualenv --no-site-packages --distribute .direnv/virtualenv
-		virtualenv --relocatable .direnv/virtualenv
+	export VIRTUAL_ENV=$PWD/.direnv/virtualenv
+	if ! [ -d "$VIRTUAL_ENV" ]; then
+		virtualenv --no-site-packages --distribute "$VIRTUAL_ENV"
 	fi
-	source .direnv/virtualenv/bin/activate
+	virtualenv --relocatable "$VIRTUAL_ENV"
+	PATH_add "$VIRTUAL_ENV/bin"
 }
 
 # Usage: layout node
