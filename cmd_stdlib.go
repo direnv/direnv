@@ -285,6 +285,7 @@ layout_node() {
 #
 layout_go() {
 	path_add GOPATH "$PWD"
+	PATH_add bin
 }
 
 # Usage: use <program_name> [<version>]
