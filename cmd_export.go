@@ -96,12 +96,15 @@ var CmdExport = &Cmd{
 			var out []string
 			for key, _ := range diff.Prev {
 				_, ok := diff.Next[key]
-				if !ok {
+				if !ok && !direnvKey(key) {
 					out = append(out, "-"+key)
 				}
 			}
 			for key := range diff.Next {
 				_, ok := diff.Prev[key]
+				if direnvKey(key) {
+					continue
+				}
 				if ok {
 					out = append(out, "~"+key)
 				} else {
@@ -117,4 +120,8 @@ var CmdExport = &Cmd{
 
 		return
 	},
+}
+
+func direnvKey(key string) bool {
+	return strings.HasPrefix(key, "DIRENV_")
 }
