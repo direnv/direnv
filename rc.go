@@ -162,18 +162,23 @@ func fileMtime(path string) (int64, error) {
 	return fileInfo.ModTime().Unix(), nil
 }
 
-func fileHash(path string) (string, error) {
+func fileHash(path string) (hash string, err error) {
+	if path, err = filepath.Abs(path); err != nil {
+		return
+	}
+
 	fd, err := os.Open(path)
 	if err != nil {
-		return "", err
+		return
 	}
 
 	hasher := sha256.New()
 	hasher.Write([]byte(path + "\n"))
-	io.Copy(hasher, fd)
-	num := hasher.Sum(nil)
+	if _, err = io.Copy(hasher, fd); err != nil {
+		return
+	}
 
-	return fmt.Sprintf("%x", num), nil
+	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
 }
 
 // Creates a file
