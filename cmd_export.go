@@ -64,10 +64,8 @@ var CmdExport = &Cmd{
 				delete(newEnv, DIRENV_MTIME)
 				delete(newEnv, DIRENV_DIFF)
 			} else if loadedRC.path != foundRC.path {
-				log("switching")
 				loadRC()
 			} else if loadedRC.mtime != foundRC.mtime {
-				log("reloading")
 				loadRC()
 			} else {
 				// Nothing to do. Env is loaded and hasn't changed
@@ -112,7 +110,9 @@ var CmdExport = &Cmd{
 				}
 			}
 			sort.Strings(out)
-			log("export %s", strings.Join(out, " "))
+			if len(out) > 0 {
+				log("export %s", strings.Join(out, " "))
+			}
 		}
 
 		str := diff.ToShell(shell)
