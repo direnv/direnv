@@ -23,6 +23,20 @@ const STDLIB = `# These are the commands available in an .envrc context
 set -e
 direnv="%s"
 
+# Usage: log_status <command>
+#
+# Logs a status message. Acts like echo,
+# but wraps output in the standard direnv status color
+# and directs it to stderr rather than stdout.
+#
+# Example:
+#
+#    log_status "Loading ..."
+#
+log_status() {
+	echo -e "\e[30m$@\e[0m" >&2
+}
+
 # Usage: has <command>
 #
 # Returns 0 if the <command> is available. Returns 1 otherwise. It can be a
@@ -130,7 +144,7 @@ source_env() {
 		rcfile="$rcfile/.envrc"
 		rcpath="$rcpath/.envrc"
 	fi
-	echo "direnv: loading $rcfile"
+	log_status "direnv: loading $rcfile"
 	pushd "$(dirname "$rcpath")" > /dev/null
 	. "./$(basename "$rcpath")"
 	popd > /dev/null
@@ -304,7 +318,7 @@ layout_go() {
 #
 use() {
 	local cmd="$1"
-	echo "Using $@"
+	log_status "Using $@"
 	shift
 	use_$cmd "$@"
 }

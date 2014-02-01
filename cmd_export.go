@@ -58,7 +58,7 @@ var CmdExport = &Cmd{
 			}
 			oldEnv = backupDiff.Reverse().Patch(env)
 			if foundRC == nil {
-				log("unloading")
+				log_status("unloading")
 				newEnv = oldEnv.Copy()
 				delete(newEnv, DIRENV_DIR)
 				delete(newEnv, DIRENV_MTIME)
@@ -111,7 +111,7 @@ var CmdExport = &Cmd{
 			}
 			sort.Strings(out)
 			if len(out) > 0 {
-				log("export %s", strings.Join(out, " "))
+				log_status("export %s", strings.Join(out, " "))
 			}
 		}
 
