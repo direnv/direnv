@@ -26,15 +26,16 @@ direnv="%s"
 # Usage: log_status <command>
 #
 # Logs a status message. Acts like echo,
-# but wraps output in the standard direnv status color
-# and directs it to stderr rather than stdout.
+# but wraps output in the standard direnv log format
+# (controlled by $DIRENV_LOG_FORMAT), and directs it
+# to stderr rather than stdout.
 #
 # Example:
 #
 #    log_status "Loading ..."
 #
 log_status() {
-	echo -e "\e[30m$@\e[0m" >&2
+	printf "${DIRENV_LOG_FORMAT:-direnv: %%s}\n" "$1" >&2
 }
 
 # Usage: has <command>
@@ -144,7 +145,7 @@ source_env() {
 		rcfile="$rcfile/.envrc"
 		rcpath="$rcpath/.envrc"
 	fi
-	log_status "direnv: loading $rcfile"
+	log_status "loading $rcfile"
 	pushd "$(dirname "$rcpath")" > /dev/null
 	. "./$(basename "$rcpath")"
 	popd > /dev/null
