@@ -88,18 +88,17 @@ var CmdExport = &Cmd{
 			}
 		}
 
-		diff := env.Diff(newEnv)
-
-		if diff.Any() {
+		oldDiff := oldEnv.Diff(newEnv)
+		if oldDiff.Any() {
 			var out []string
-			for key, _ := range diff.Prev {
-				_, ok := diff.Next[key]
+			for key, _ := range oldDiff.Prev {
+				_, ok := oldDiff.Next[key]
 				if !ok && !direnvKey(key) {
 					out = append(out, "-"+key)
 				}
 			}
-			for key := range diff.Next {
-				_, ok := diff.Prev[key]
+			for key := range oldDiff.Next {
+				_, ok := oldDiff.Prev[key]
 				if direnvKey(key) {
 					continue
 				}
@@ -115,6 +114,7 @@ var CmdExport = &Cmd{
 			}
 		}
 
+		diff := env.Diff(newEnv)
 		str := diff.ToShell(shell)
 		fmt.Print(str)
 
