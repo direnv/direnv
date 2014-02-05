@@ -26,6 +26,7 @@ func init() {
 		CmdDotEnv,
 		CmdDump,
 		CmdEdit,
+		CmdExec,
 		CmdExpandPath,
 		CmdExport,
 		CmdHelp,
