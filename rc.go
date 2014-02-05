@@ -85,7 +85,7 @@ func (self *RC) Touch() error {
 	return touch(self.path)
 }
 
-const NOT_ALLOWED = "%s is blocked because unknown. Run `direnv allow` to approve its content."
+const NOT_ALLOWED = "%s is blocked. Run `direnv allow` to approve its content."
 
 func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	wd := config.WorkDir
