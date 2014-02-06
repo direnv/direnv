@@ -1,4 +1,17 @@
 
+2.3.0 / 2014-02-06
+==================
+
+ * NEW: DIRENV_LOG_FORMAT environment variable can be used tocontrol log formatting
+ * NEW: `direnv exec [DIR] <COMMAND>` to execute programs with an .envrc context
+ * CHANGE: layout_python now tries to make your virtualenv relocatable
+ * CHANGE: the export diff is not from the old env, not the current env
+ * CHANGE: layout_go now also adds $PWD/bin in the PATH
+ * FIX: Hides the DIRENV_ variables in the output diff. Fixes #94
+ * FIX: Makes sure the path used in the allow hash is absolute. See #95
+ * FIX: Set the executable bit on direnv on install
+ * FIX: Some bash installs had a parse error in the hook.
+
 2.2.1 / 2014-01-12
 ==================
 
