@@ -284,7 +284,7 @@ layout_python() {
 	if ! [ -d "$VIRTUAL_ENV" ]; then
 		virtualenv --no-site-packages --distribute "$VIRTUAL_ENV"
 	fi
-	virtualenv --relocatable "$VIRTUAL_ENV"
+	virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
 	PATH_add "$VIRTUAL_ENV/bin"
 }
 
