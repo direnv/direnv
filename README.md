@@ -95,6 +95,19 @@ available in your shell until you `cd ..` out of the directory.
 To make your life convenient there is a couple of additional commands in the
 .envrc execution context that are loaded from the `direnv stdlib`.
 
+### Loading layered .envrc
+
+Lets say you have the following `.envrc`s
+
+- `/a/.envrc`
+- `/a/b/.envrc`
+
+If you add the following line in `/a/b/.envrc`, you can load both of the `.envrc` when you are in `/a/b`:
+
+```
+source_env ..
+```
+
 ## Contribute
 
 Bug reports, contributions and forks are welcome.
