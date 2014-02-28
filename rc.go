@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -73,7 +74,14 @@ func (self *RC) Allowed() bool {
 	return err == nil
 }
 
+// Makes the path relative to the current directory. Except when both paths
+// are completely different.
+// Eg:  /home/foo and /home/bar => ../foo
+// But: /home/foo and /tmp/bar  => /home/foo
 func (self *RC) RelTo(wd string) string {
+	if rootDir(wd) != rootDir(self.path) {
+		return self.path
+	}
 	x, err := filepath.Rel(wd, self.path)
 	if err != nil {
 		panic(err)
@@ -122,6 +130,18 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 }
 
 /// Utils
+
+func rootDir(path string) string {
+	path, err := filepath.Abs(path)
+	if err != nil {
+		panic(err)
+	}
+	i := strings.Index(path[1:], "/")
+	if i < 0 {
+		return path
+	}
+	return path[:i+1]
+}
 
 func eachDir(path string) (paths []string) {
 	path, err := filepath.Abs(path)
