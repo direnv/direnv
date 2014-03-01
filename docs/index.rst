@@ -14,7 +14,7 @@ Contents:
    overview
    install
    usage
-   commands
+   cli
    stdlib
    releases
 
