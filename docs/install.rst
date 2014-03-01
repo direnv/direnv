@@ -38,7 +38,7 @@ To install type::
 
 
 Build from source
------------------
+^^^^^^^^^^^^^^^^^
 
 direnv depends on `Go <http://golang.org>`_ to compile properly. Once installed
 building direnv is quite easy::
@@ -52,7 +52,7 @@ destination by setting the DESTDIR environment varialbe. eg:
 ``make install DESTDIR=/opt/direnv``
 
 Binary builds
--------------
+^^^^^^^^^^^^^
 
 Get the binary for your OS below and put it in your path.
 
