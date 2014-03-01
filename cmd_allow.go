@@ -5,11 +5,11 @@ import (
 	"os"
 )
 
-// `direnv allow [PATH_TO_RC]`
+// `direnv allow [path_to_rc]`
 var CmdAllow = &Cmd{
 	Name: "allow",
 	Desc: "Grants direnv to load the given .envrc",
-	Args: []string{"[PATH_TO_RC]"},
+	Args: []string{"[path_to_rc]"},
 	Fn: func(env Env, args []string) (err error) {
 		var rcPath string
 		var config *Config

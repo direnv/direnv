@@ -6,7 +6,7 @@ import (
 
 var CmdReload = &Cmd{
 	Name: "reload",
-	Desc: "triggers an env reload",
+	Desc: "Triggers an env reload",
 	Fn: func(env Env, args []string) error {
 		config, err := LoadConfig(env)
 		if err != nil {

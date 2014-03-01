@@ -14,11 +14,11 @@ func expandPath(path, relTo string) string {
 	return filepath.Clean(filepath.Join(relTo, path))
 }
 
-// `direnv expand_path PATH [REL_TO]`
+// `direnv expand_path <path> [rel_to]`
 var CmdExpandPath = &Cmd{
 	Name:    "expand_path",
 	Desc:    "Transforms a PATH to an absolute path to REL_TO or $PWD",
-	Args:    []string{"PATH", "[REL_TO]"},
+	Args:    []string{"<path>", "[rel_to]"},
 	Private: true,
 	Fn: func(env Env, args []string) (err error) {
 		var path string
