@@ -365,8 +365,11 @@ rvm() {
 	rvm "$@"
 }
 
-## Load the global ~/.direnvrc if present
-if [ -f "$HOME/.direnvrc" ]; then
+## Load the global direnvrc if present
+if [ -f "$direnv_config/direnvrc" ]; then
+	source_env "$(user_rel_path "$direnv_config/direnvrc")"
+# Deprecated
+elif [ -f "$HOME/.direnvrc" ]; then
 	source_env "~/.direnvrc" >&2
 fi
 `
