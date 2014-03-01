@@ -58,16 +58,19 @@ Get the binary for your OS below and put it in your path.
 
 .. tip:: don't forget to make the file executable. eg: ``chmod +x direnv``
 
-* `Darwin/386 <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.darwin-386>`_
-* `Darwin/amd64 <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.darwin-amd64>`_
-* `FreeBSD/386 <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.freebsd-386>`_
-* `FreeBSD/amd64 <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.freebsd-amd64>`_
-* `Linux/386 <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.linux-386>`_
-* `Linux/amd64 <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.linux-amd64>`_
-* `Linux/arm <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.linux-arm>`_
-* `Windows/386 <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.windows-386>`_
-* `Windows/amd64 <http://zimbatm.s3.amazonaws.com/direnv/direnv2.2.1.windows-amd64>`_
-
+=======  =====  ==============
+OS       Arch   Download
+=======  =====  ==============
+Darwin   386    Darwin_386_
+Darwin   amd64  Darwin_amd64_
+FreeBSD  386    FreeBSD_386_
+FreeBSD  amd64  FreeBSD_amd64_
+Linux    386    Linux_386_
+Linux    amd64  Linux_amd64_
+Linux    arm    Linux_arm_
+Windows  386    Windows_386_
+Windows  amd64  Windows_amd64_
+=======  =====  ==============
 
 Shell configuration
 -------------------
