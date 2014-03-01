@@ -133,7 +133,7 @@ Example::
     echo $PATH
     # output: /home/user/my/project/bin:/usr/bin:/bin
 
-.. _stdlib_path_add:
+.. _stdlib_path_add_var:
 
 ``path_add <varname> <path>``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
