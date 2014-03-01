@@ -105,7 +105,7 @@ Loads another ".envrc" either by specifying its path or filename.
 ``source_up [<filename>]``
 --------------------------
 
-Like :ref:`stdlib_source_env` except that the file is looked up using :ref:`find_up`. <filename> is ".envrc" by default.
+Like :ref:`stdlib_source_env` except that the file is looked up using :ref:`stdlib_find_up`. <filename> is ".envrc" by default.
 
 .. _stdlib_direnv_load:
 
