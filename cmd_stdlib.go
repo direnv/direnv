@@ -15,7 +15,7 @@ var CmdStdlib = &Cmd{
 			return
 		}
 
-		fmt.Printf(STDLIB, config.SelfPath)
+		fmt.Printf(STDLIB, config.SelfPath, config.ConfDir, config.BashPath, logFormat)
 		return
 	},
 }
@@ -23,6 +23,9 @@ var CmdStdlib = &Cmd{
 const STDLIB = `# These are the commands available in an .envrc context
 set -e
 direnv="%s"
+direnv_config="%s"
+direnv_bash="%s"
+direnv_log_format="%s"
 
 # Usage: log_status <text>
 #
@@ -36,7 +39,7 @@ direnv="%s"
 #    log_status "Loading ..."
 #
 log_status() {
-	printf "${DIRENV_LOG_FORMAT:-direnv: %%s}\n" "$1" >&2
+	printf "${direnv_log_format}\n" "$1" >&2
 }
 
 # Usage: has <command>
