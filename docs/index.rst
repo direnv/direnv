@@ -17,7 +17,6 @@ Contents:
    usage
    cli
    stdlib
-   releases
 
 
 Indices and tables
