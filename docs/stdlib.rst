@@ -176,7 +176,13 @@ Example::
 ``layout <type>``
 ^^^^^^^^^^^^^^^^^
 
-A semantic command dispatch used to describe common project layouts.
+A semantic command dispatch used to describe common project layouts. For example
+if ruby projects have a GEM_HOME set under the project root then define a
+use_ruby() function that does just that.
+
+Some default layouts are provided with the stdlib when they seem to be
+applicable everywhere. If this doesn't work for you it's always possible to
+override them by creating the same function inside the ``direnvrc``.
 
 .. _stdlib_layout_ruby:
 
@@ -211,7 +217,11 @@ Sets the GOPATH environment variable to the current directory and adds $PWD/bin 
 ``use <program_name> [<version>]``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A semantic command dispatch intended for loading external dependencies into the environment.
+A semantic command dispatch intended for loading external dependencies into the
+environment. It's used to express the dependency on something like a program.
+
+The stdlib doesn't define default use dispatch functions because they are
+dependent on your operating system and setup (well, except rbenv).
 
 Example::
 
@@ -233,4 +243,11 @@ Loads rbenv which in turn makes the ruby wrappers available on the PATH.
 ``rvm [...]``
 ^^^^^^^^^^^^^
 
-Should work just like in the shell if you have RVM installed. Should because RVM changes a lot. Please submit a bug report if this is not working properly.
+Used to activate `RVM <http://rvm.io>`_ in the context of the envrc. Activation
+is done on first usage and the command should work just like in the shell.
+
+Because RVM changes a lot this function might not work as expected. Please
+submit a bug report if you're encountering issues with it's usage.
+
+This function works best if RVM is not activated in the main shell.
+
