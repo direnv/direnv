@@ -1,5 +1,5 @@
-Installing direnv
-=================
+Installation
+============
 
 Installing direnv is a two-step process. First install the binary into your path
 and then activate the shell hook. Various methods are availble for both steps so
