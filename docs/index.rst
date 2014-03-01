@@ -13,6 +13,7 @@ Contents:
 
    overview
    install
+   config
    usage
    cli
    stdlib
