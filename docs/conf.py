@@ -238,7 +238,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('cli', 'direnv', u'direnv documentation', [u'zimbatm'], 1),
+    ('cli', 'direnv', u'unclutter your .profile', [u'zimbatm'], 1),
     ('stdlib', 'direnv-stdlib', u'direnv standard library', [u'zimbatm'], 1)
 ]
 
