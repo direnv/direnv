@@ -11,12 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   overview
    install
-   config
-   usage
-   cli
-   stdlib
+   commands/index
 
 
 Indices and tables

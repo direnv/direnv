@@ -8,8 +8,8 @@ choose accordingly to your setup.
 Installing the binary
 ---------------------
 
-On OSX
-^^^^^^
+OSX: Install from Homebrew
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you're using `Homebrew <http://brew.sh>`_ then installing direnv is just a
 single command away::
@@ -18,8 +18,8 @@ single command away::
 
 Otherwise you can always take the binary from below.
 
-On Arch Linux
-^^^^^^^^^^^^^
+Arch Linux: Install from AUR
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 direnv is available as an AUR. See https://aur.archlinux.org/packages/direnv/
 
@@ -28,31 +28,16 @@ installing is just a single command away::
 
     $ yaourt -S direnv
 
-On NixOS
-^^^^^^^^
+NixOS: Install from nixpkgs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 direnv is available in the `nixpkgs repository <http://nixos.org/nixpkgs/>`_. 
 To install type::
 
     $ nix-env -i direnv
 
-
-Build from source
-^^^^^^^^^^^^^^^^^
-
-direnv depends on `Go <http://golang.org>`_ to compile properly. Once installed
-building direnv is quite easy::
-
-    $ git clone https://github.com/zimbatm/direnv.git
-    $ cd direnv
-    $ make install
-
-By default direnv will be installed in /usr/local. It's possible to change the
-destination by setting the DESTDIR environment varialbe. eg: 
-``make install DESTDIR=/opt/direnv``
-
-Binary builds
-^^^^^^^^^^^^^
+Other: Binary builds
+^^^^^^^^^^^^^^^^^^^^
 
 Get the binary for your OS below and put it in your path.
 
@@ -71,6 +56,20 @@ Linux    arm    Linux_arm_
 Windows  386    Windows_386_
 Windows  amd64  Windows_amd64_
 =======  =====  ==============
+
+Other: Build from source
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+direnv depends on `Go <http://golang.org>`_ to compile properly. Once installed
+building direnv is quite easy::
+
+    $ git clone https://github.com/zimbatm/direnv.git
+    $ cd direnv
+    $ make install
+
+By default direnv will be installed in /usr/local. It's possible to change the
+destination by setting the DESTDIR environment varialbe. eg: 
+``make install DESTDIR=/opt/direnv``
 
 Shell configuration
 -------------------

@@ -1,3 +1,5 @@
+.. _direnv-stdlib:
+
 The standard library
 ====================
 
@@ -13,7 +15,6 @@ Commands
 --------
 
 .. _stdlib_log_status:
-
 ``log_status <text>``
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -23,8 +24,8 @@ Example::
 
     log_status "Loading ..."
 
-.. _stdlib_has:
 
+.. _stdlib_has:
 ``has <command>``
 ^^^^^^^^^^^^^^^^^
 
@@ -36,8 +37,8 @@ Example::
       echo "Yes we do"
     fi
 
-.. _stdlib_expand_path:
 
+.. _stdlib_expand_path:
 ``expand_path <rel_path> [<relative_to>]``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -51,8 +52,8 @@ Example::
     expand_path ../foo
     # output: /usr/local/foo
 
-.. _stdlib_dotenv:
 
+.. _stdlib_dotenv:
 ``dotenv [<dotenv>]``
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -61,8 +62,8 @@ Loads a ".env" file into the current environment. The format of this file is
 
 .. note:: implented by the ``direnv dotenv`` internal command.
 
-.. _stdlib_user_rel_path:
 
+.. _stdlib_user_rel_path:
 ``user_rel_path <abs_path>``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -77,8 +78,8 @@ Example::
     user_rel_path /usr/local/lib
     # output: /usr/local/lib
 
-.. _stdlib_find_up:
 
+.. _stdlib_find_up:
 ``find_up <filename>``
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -93,22 +94,22 @@ Example::
     find_up bar
     # output: /usr/local/my/bar
 
-.. _stdlib_source_env:
 
+.. _stdlib_source_env:
 ``source_env <file_or_dir_path>``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Loads another ".envrc" either by specifying its path or filename.
 
-.. _stdlib_source_up:
 
+.. _stdlib_source_up:
 ``source_up [<filename>]``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Like :ref:`stdlib_source_env` except that the file is looked up using :ref:`stdlib_find_up`. <filename> is ".envrc" by default.
 
-.. _stdlib_direnv_load:
 
+.. _stdlib_direnv_load:
 ``direnv_load <command-generating-dump-output>``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -118,8 +119,8 @@ Example::
 
     direnv_load opam-env exec -- direnv dump
 
-.. _stdlib_PATH_add:
 
+.. _stdlib_PATH_add:
 ``PATH_add <path>``
 ^^^^^^^^^^^^^^^^^^^
 
@@ -133,8 +134,8 @@ Example::
     echo $PATH
     # output: /home/user/my/project/bin:/usr/bin:/bin
 
-.. _stdlib_path_add_var:
 
+.. _stdlib_path_add_var:
 ``path_add <varname> <path>``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -148,8 +149,8 @@ Example::
     echo $LIBRARY_PATH
     # output: /usr/lib:/lib
 
-.. _stdlib_load_prefix:
 
+.. _stdlib_load_prefix:
 ``load_prefix <prefix_path>``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -171,8 +172,8 @@ Example::
     # Then in the .envrc
     load_prefix ~/rubies/ruby-1.9.3
 
-.. _stdlib_layout:
 
+.. _stdlib_layout:
 ``layout <type>``
 ^^^^^^^^^^^^^^^^^
 
@@ -184,36 +185,36 @@ Some default layouts are provided with the stdlib when they seem to be
 applicable everywhere. If this doesn't work for you it's always possible to
 override them by creating the same function inside the ``direnvrc``.
 
-.. _stdlib_layout_ruby:
 
+.. _stdlib_layout_ruby:
 ``layout ruby``
 ^^^^^^^^^^^^^^^
 
 Sets the GEM_HOME environment variable to "$PWD/.direnv/ruby/RUBY_VERSION".This forces the installation of any gems into the project's sub-folder. If you're using bundler it will create wrapper programs that can be invoked directly instead of using the $(bundle exec) prefix.
 
-.. _stdlib_layout_python:
 
+.. _stdlib_layout_python:
 ``layout python``
 ^^^^^^^^^^^^^^^^^
 
 Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv". This forces the installation of any egg into the project's sub-folder.
 
-.. _stdlib_layout_node:
 
+.. _stdlib_layout_node:
 ``layout node``
 ^^^^^^^^^^^^^^^
 
 Adds "$PWD/node_modules/.bin" to the PATH environment variable.
 
-.. _stdlib_layout_go:
 
+.. _stdlib_layout_go:
 ``layout go``
 ^^^^^^^^^^^^^
 
 Sets the GOPATH environment variable to the current directory and adds $PWD/bin to the PATH.
 
-.. _stdlib_use:
 
+.. _stdlib_use:
 ``use <program_name> [<version>]``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -231,15 +232,15 @@ Example::
     use ruby 1.9.3
     # output: Ruby 1.9.3
 
-.. _stdlib_rbenv:
 
+.. _stdlib_rbenv:
 ``use rbenv``
 ^^^^^^^^^^^^^
 
 Loads rbenv which in turn makes the ruby wrappers available on the PATH.
 
-.. _stdlib_rvm:
 
+.. _stdlib_rvm:
 ``rvm [...]``
 ^^^^^^^^^^^^^
 
