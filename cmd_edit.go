@@ -48,7 +48,7 @@ var CmdEdit = &Cmd{
 			return
 		}
 
-		cmd := exec.Command(editor, rcPath)
+		cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", editor, rcPath))
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
