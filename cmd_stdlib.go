@@ -295,6 +295,20 @@ layout_node() {
 	PATH_add node_modules/.bin
 }
 
+# Usage: layout perl
+#
+# Setup environment variables required by perl's local::lib
+# See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details
+#
+layout_perl() {
+  export LOCAL_LIB_DIR=$PWD/.direnv/perl5
+  export PERL_MB_OPT="--install_base $LOCAL_LIB_DIR"
+  export PERL_MM_OPT="INSTALL_BASE=$LOCAL_LIB_DIR"
+  export PERL5LIB="$LOCAL_LIB_DIR/lib/perl5"
+  export PERL_LOCAL_LIB_ROOT="$LOCAL_LIB_DIR:$PERL_LOCAL_LIB_ROOT";
+  PATH_add $LOCAL_LIB_DIR/bin
+}
+
 # Usage: layout go
 #
 # Sets the GOPATH environment variable to the current directory.
