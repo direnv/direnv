@@ -1,6 +1,16 @@
 Installation
 ============
 
+Requirements
+------------
+
+direnv is a go program and thus compiles to most POSIX systems and Windows.
+
+direnv is built for all go build targets although Windows is probably
+less likely to work. One of the following compatible shell is also necessary: 
+bash, fish or zsh.
+
+
 Installing direnv is a two-step process. First install the binary into your path
 and then activate the shell hook. Various methods are availble for both steps so
 choose accordingly to your setup.
