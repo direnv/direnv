@@ -6,15 +6,16 @@ import (
 
 // `direnv stdlib`
 var CmdStdlib = &Cmd{
-	Name: "stdlib",
-	Desc: "Displays the stdlib available in the .envrc execution context",
+	Name:    "stdlib",
+	Desc:    "Displays the stdlib available in the .envrc execution context",
+	Private: true,
 	Fn: func(env Env, args []string) (err error) {
 		var config *Config
 		if config, err = LoadConfig(env); err != nil {
 			return
 		}
 
-		fmt.Printf(STDLIB, config.SelfPath)
+		fmt.Printf(STDLIB, config.SelfPath, config.ConfDir, config.BashPath, logFormat)
 		return
 	},
 }
@@ -22,8 +23,11 @@ var CmdStdlib = &Cmd{
 const STDLIB = `# These are the commands available in an .envrc context
 set -e
 direnv="%s"
+direnv_config="%s"
+direnv_bash="%s"
+direnv_log_format="%s"
 
-# Usage: log_status <command>
+# Usage: log_status <text>
 #
 # Logs a status message. Acts like echo,
 # but wraps output in the standard direnv log format
@@ -35,13 +39,13 @@ direnv="%s"
 #    log_status "Loading ..."
 #
 log_status() {
-	printf "${DIRENV_LOG_FORMAT:-direnv: %%s}\n" "$1" >&2
+	printf "${direnv_log_format}\n" "$1" >&2
 }
 
 # Usage: has <command>
 #
-# Returns 0 if the <command> is available. Returns 1 otherwise. It can be a
-# binary in the PATH or a shell function.
+# Returns 0 if the <command> is available. Returns 1 otherwise. The command can 
+# be a binary in the PATH or a shell function.
 #
 # Example:
 #
@@ -70,7 +74,8 @@ expand_path() {
 
 # Usage: dotenv [<dotenv>]
 #
-# Loads a ".env" file into the current environment
+# Loads a ".env" file into the current environment. The format of this file is
+# defined by the dotenv project.
 #
 dotenv() {
 	eval "$("$direnv" dotenv bash "$@")"
@@ -79,7 +84,7 @@ dotenv() {
 # Usage: user_rel_path <abs_path>
 #
 # Transforms an absolute path <abs_path> into a user-relative path if
-# possible.
+# possible. Useful to shorten printed outputs of a path.
 #
 # Example:
 #
@@ -153,7 +158,8 @@ source_env() {
 
 # Usage: source_up [<filename>]
 #
-# Loads another ".envrc" if found with the find_up command.
+# Like source_env except that the file is looked up using find_up. <filename> is
+# ".envrc" by default.
 #
 source_up() {
 	local file="$1"
@@ -202,6 +208,15 @@ PATH_add() {
 # Usage: path_add <varname> <path>
 #
 # Works like PATH_add except that it's for an arbitrary <varname>.
+#
+# Example:
+#
+#    export LIBRARY_PATH=/lib
+#    cd /usr
+#    path_add LIBRARY_PATH lib
+#    echo $LIBRARY_PATH
+#    # output: /usr/lib:/lib
+#
 path_add() {
 	local old_paths="${!1}"
 	local path="$(expand_path "$2")"
@@ -251,7 +266,7 @@ load_prefix() {
 
 # Usage: layout <type>
 #
-# A semantic dispatch used to describe common project layouts.
+# A semantic command dispatch used to describe common project layouts.
 #
 layout() {
 	eval "layout_$1"
@@ -311,7 +326,8 @@ layout_perl() {
 
 # Usage: layout go
 #
-# Sets the GOPATH environment variable to the current directory.
+# Sets the GOPATH environment variable to the current directory and adds
+# $PWD/bin to the PATH.
 #
 layout_go() {
 	path_add GOPATH "$PWD"
@@ -340,7 +356,7 @@ use() {
 
 # Usage: use rbenv
 #
-# Loads rbenv which add the ruby wrappers available on the PATH.
+# Loads rbenv which in turn makes the ruby wrappers available on the PATH.
 #
 use_rbenv() {
 	eval "$(rbenv init -)"
@@ -348,7 +364,8 @@ use_rbenv() {
 
 # Usage: rvm [...]
 #
-# Should work just like in the shell if you have rvm installed.#
+# Should work just like in the shell if you have RVM installed. Should because
+# RVM changes a lot. Please submit a bug report if this is not working properly.
 #
 rvm() {
 	unset rvm
@@ -362,8 +379,11 @@ rvm() {
 	rvm "$@"
 }
 
-## Load the global ~/.direnvrc if present
-if [ -f "$HOME/.direnvrc" ]; then
+## Load the global direnvrc if present
+if [ -f "$direnv_config/direnvrc" ]; then
+	source_env "$(user_rel_path "$direnv_config/direnvrc")"
+# Deprecated
+elif [ -f "$HOME/.direnvrc" ]; then
 	source_env "~/.direnvrc" >&2
 fi
 `

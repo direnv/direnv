@@ -5,11 +5,11 @@ import (
 	"strings"
 )
 
-// `direnv help`
+// `direnv help [show_private]`
 var CmdHelp = &Cmd{
 	Name:    "help",
-	Desc:    "shows this help",
-	Args:    []string{"[SHOW_PRIVATE]"},
+	Desc:    "Shows this help",
+	Args:    []string{"[show_private]"},
 	Aliases: []string{"--help"},
 	Fn: func(env Env, args []string) (err error) {
 		var showPrivate = len(args) > 1

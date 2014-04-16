@@ -1,6 +1,7 @@
 .direnv
 /direnv
 /direnv.test
+/docs/_build
 /release
 /site
 /test/allow

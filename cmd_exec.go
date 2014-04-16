@@ -9,11 +9,11 @@ import (
 	"syscall"
 )
 
-// `direnv exec [DIR] <COMMAND> ...`
+// `direnv exec [dir] <command> ...`
 var CmdExec = &Cmd{
 	Name: "exec",
 	Desc: "Executes a command after loading the first .envrc found in DIR",
-	Args: []string{"[DIR]", "COMMAND", "[...ARGS]"},
+	Args: []string{"[dir]", "<command>", "[...args]"},
 	Fn: func(env Env, args []string) (err error) {
 		var (
 			backupDiff *EnvDiff

@@ -12,13 +12,14 @@ const (
 
 var logFormat = ""
 
-func formatLog(msg string) string {
+func init() {
+	logFormat = os.Getenv("DIRENV_LOG_FORMAT")
 	if logFormat == "" {
-		logFormat = os.Getenv("DIRENV_LOG_FORMAT")
-		if logFormat == "" {
-			logFormat = defaultLogFormat
-		}
+		logFormat = defaultLogFormat
 	}
+}
+
+func formatLog(msg string) string {
 	return fmt.Sprintf(logFormat, msg)
 }
 

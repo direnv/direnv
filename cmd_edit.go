@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 )
 
-// `direnv edit [PATH_TO_RC]`
+// `direnv edit [path_to_rc]`
 var CmdEdit = &Cmd{
 	Name: "edit",
-	Desc: `Opens PATH_TO_RC or the current .envrc into an $EDITOR and allow
+	Desc: `Opens [path_to_rc] or the current .envrc into an $EDITOR and allow
   the file to be loaded afterwards.`,
-	Args:   []string{"[PATH_TO_RC]"},
+	Args:   []string{"[path_to_rc]"},
 	NoWait: true,
 	Fn: func(env Env, args []string) (err error) {
 		var config *Config

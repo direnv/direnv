@@ -5,11 +5,11 @@ import (
 	"io/ioutil"
 )
 
-// `direnv apply_dump FILE`
+// `direnv apply_dump <file>`
 var CmdApplyDump = &Cmd{
 	Name:    "apply_dump",
 	Desc:    "Accepts a filename containing `direnv dump` output and generates a series of bash export statements to apply the given env",
-	Args:    []string{"FILE"},
+	Args:    []string{"<file>"},
 	Private: true,
 	Fn: func(env Env, args []string) (err error) {
 		if len(args) < 2 {

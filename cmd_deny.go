@@ -5,11 +5,11 @@ import (
 	"os"
 )
 
-// `direnv deny [PATH_TO_RC]`
+// `direnv deny [path_to_rc]`
 var CmdDeny = &Cmd{
 	Name: "deny",
 	Desc: "Revokes the auhorization of a given .envrc",
-	Args: []string{"[PATH_TO_RC]"},
+	Args: []string{"[path_to_rc]"},
 	Fn: func(env Env, args []string) (err error) {
 		var rcPath string
 		var config *Config
