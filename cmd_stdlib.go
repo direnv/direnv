@@ -279,12 +279,13 @@ layout_node() {
 # See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details
 #
 layout_perl() {
-  export LOCAL_LIB_DIR=$PWD/.direnv/perl5
-  export PERL_MB_OPT="--install_base $LOCAL_LIB_DIR"
-  export PERL_MM_OPT="INSTALL_BASE=$LOCAL_LIB_DIR"
-  export PERL5LIB="$LOCAL_LIB_DIR/lib/perl5"
-  export PERL_LOCAL_LIB_ROOT="$LOCAL_LIB_DIR:$PERL_LOCAL_LIB_ROOT";
-  PATH_add $LOCAL_LIB_DIR/bin
+  local libdir="$PWD/.direnv/perl5"
+  export LOCAL_LIB_DIR="$libdir"
+  export PERL_MB_OPT="--install_base '$libdir'"
+  export PERL_MM_OPT="INSTALL_BASE=$libdir"
+  path_add PERL5LIB "$libdir/lib/perl5"
+  path_add PERL_LOCAL_LIB_ROOT "$libdir"
+  PATH_add "$libdir/bin"
 }
 
 # Usage: layout python
