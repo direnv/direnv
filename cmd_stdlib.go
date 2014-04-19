@@ -257,35 +257,13 @@ layout() {
 	eval "layout_$1"
 }
 
-# Usage: layout ruby
+# Usage: layout go
 #
-# Sets the GEM_HOME environment variable to "$PWD/.direnv/ruby/RUBY_VERSION".
-# This forces the installation of any gems into the project's sub-folder.
-# If you're using bundler it will create wrapper programs that can be invoked
-# directly instead of using the $(bundle exec) prefix.
+# Sets the GOPATH environment variable to the current directory.
 #
-layout_ruby() {
-	local ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
-
-	export GEM_HOME="$PWD/.direnv/${ruby_version}"
-	export BUNDLE_BIN="$PWD/.direnv/bin"
-
-	PATH_add ".direnv/${ruby_version}/bin"
-	PATH_add ".direnv/bin"
-}
-
-# Usage: layout python
-#
-# Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv".
-# This forces the installation of any egg into the project's sub-folder.
-#
-layout_python() {
-	export VIRTUAL_ENV=$PWD/.direnv/virtualenv
-	if ! [ -d "$VIRTUAL_ENV" ]; then
-		virtualenv --no-site-packages --distribute "$VIRTUAL_ENV"
-	fi
-	virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
-	PATH_add "$VIRTUAL_ENV/bin"
+layout_go() {
+	path_add GOPATH "$PWD"
+	PATH_add bin
 }
 
 # Usage: layout node
@@ -309,13 +287,35 @@ layout_perl() {
   PATH_add $LOCAL_LIB_DIR/bin
 }
 
-# Usage: layout go
+# Usage: layout python
 #
-# Sets the GOPATH environment variable to the current directory.
+# Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv".
+# This forces the installation of any egg into the project's sub-folder.
 #
-layout_go() {
-	path_add GOPATH "$PWD"
-	PATH_add bin
+layout_python() {
+	export VIRTUAL_ENV=$PWD/.direnv/virtualenv
+	if ! [ -d "$VIRTUAL_ENV" ]; then
+		virtualenv --no-site-packages --distribute "$VIRTUAL_ENV"
+	fi
+	virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
+	PATH_add "$VIRTUAL_ENV/bin"
+}
+
+# Usage: layout ruby
+#
+# Sets the GEM_HOME environment variable to "$PWD/.direnv/ruby/RUBY_VERSION".
+# This forces the installation of any gems into the project's sub-folder.
+# If you're using bundler it will create wrapper programs that can be invoked
+# directly instead of using the $(bundle exec) prefix.
+#
+layout_ruby() {
+	local ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
+
+	export GEM_HOME="$PWD/.direnv/${ruby_version}"
+	export BUNDLE_BIN="$PWD/.direnv/bin"
+
+	PATH_add ".direnv/${ruby_version}/bin"
+	PATH_add ".direnv/bin"
 }
 
 # Usage: use <program_name> [<version>]

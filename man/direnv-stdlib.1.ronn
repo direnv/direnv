@@ -108,18 +108,23 @@ Example:
 * `layout` <type>:
     A semantic dispatch used to describe common project layouts.
 
-* `layout ruby`:
-    Sets the GEM_HOME environment variable to "$PWD/.direnv/ruby/RUBY_VERSION". This forces the installation of any gems into the project's sub-folder.
-    If you're using bundler it will create wrapper programs that can be invoked directly instead of using the `bundle exec` prefix.
-
-* `layout python`: 
-    Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv". This forces the installation of any egg into the project's sub-folder.
+* `layout go`:
+    Sets the GOPATH environment variable to the current directory.
 
 * `layout node`:
     Adds "$PWD/node_modules/.bin" to the PATH environment variable.
 
-* `layout go`: 
-    Sets the GOPATH environment variable to the current directory.
+* `layout perl`:
+    Setup environment variables required by perl's local::lib
+    See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more
+    details
+
+* `layout python`:
+    Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv". This forces the installation of any egg into the project's sub-folder.
+
+* `layout ruby`:
+    Sets the GEM_HOME environment variable to "$PWD/.direnv/ruby/RUBY_VERSION". This forces the installation of any gems into the project's sub-folder.
+    If you're using bundler it will create wrapper programs that can be invoked directly instead of using the `bundle exec` prefix.
 
 * `use` <program_name> [<version>]:
     A semantic command dispatch intended for loading external dependencies into the environment.
