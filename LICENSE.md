@@ -1,6 +1,7 @@
 (The MIT License)
 
-Copyright (c) 2013 Jonas Pfenniger and contributors
+Copyright (c) 2014 zimbatm and
+[contributors](https://github.com/zimbatm/direnv/graphs/contributors)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the 'Software'), to deal
