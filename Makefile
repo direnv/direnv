@@ -10,6 +10,9 @@ all: build man
 
 build: direnv
 
+stdlib.go: stdlib.sh
+	cat $< | ./script/str2go main STDLIB $< > $@
+
 direnv: *.go
 	go fmt
 	go build -o direnv

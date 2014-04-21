@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# str2go <package_name> <constant_name> <path_to_file>
+# str2go <package_name> <constant_name>
 #
 
 package_name  = ARGV[0]
