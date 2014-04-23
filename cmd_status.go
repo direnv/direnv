@@ -6,7 +6,7 @@ import (
 
 var CmdStatus = &Cmd{
 	Name: "status",
-	Desc: "prints some debug status informations",
+	Desc: "prints some debug status information",
 	Fn: func(env Env, args []string) error {
 		config, err := LoadConfig(env)
 		if err != nil {
