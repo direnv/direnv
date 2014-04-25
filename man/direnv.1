@@ -1,100 +1,100 @@
-.\" generated with Ronn/v0.7.3
-.\" http://github.com/rtomayko/ronn/tree/0.7.3
-.
-.TH "DIRENV" "1" "November 2013" "" "direnv"
-.
-.SH "NAME"
-\fBdirenv\fR \- Unclutter your \.profile
-.
-.SH "SYNOPSIS"
-\fBdirenv\fR \fIcommand\fR [\.\.\.]
-.
-.SH "DESCRIPTION"
-direnv is a fast shell extension for bash,zsh and fish that allows you to load/unload environment variables depending on your path\.
-.
-.P
-It has many uses but mine is to have project\-specific settings so as to not clutter my "~/\.profile"\. I\'m using it to specify ruby version, set AWS or SSH keys, \.\.\.
-.
-.P
-The \fBdirenv\fR command\-line is a proxy to the sub\-commands and it work like the git(1) wrapper\. You don\'t usually use that\. Once the shell extension is loaded, most of the interaction is done in your "\.envrc" files\.
-.
-.SH "EXAMPLE"
-.
+.TH DIRENV 1 "APRIL 2014" direnv "User Manuals"
+.SH NAME
+.PP
+direnv \- unclutter your .profile
+.SH SYNOPSIS
+.PP
+\fB\fCdirenv\fR \fIcommand\fP ...
+.SH DESCRIPTION
+.PP
+direnv is a fast shell extension for bash,zsh and fish that allows you to load/unload environment variables depending on your path.
+.PP
+It has many uses but mine is to have project\-specific settings so as to not clutter my "~/.profile". I'm using it to specify ruby version, set AWS or SSH keys, ...
+.PP
+The \fB\fCdirenv\fR command\-line is a proxy to the sub\-commands and it work like the 
+.BR git (1) 
+wrapper. You don't usually use that. Once the shell extension is loaded, most of the interaction is done in your ".envrc" files.
+.SH EXAMPLE
+.PP
+.RS
 .nf
-
 $ cd ~/my_project
 $ ls
-bin/ lib/ Rakefile README\.md
+bin/ lib/ Rakefile README.md
 $ echo $PATH
 /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
-$ echo PATH_add bin > \.envrc
+$ echo PATH_add bin > .envrc
 \&.envrc is not allowed
 $ direnv allow
 direnv: reloading
-direnv: loading \.envrc
+direnv: loading .envrc
 direnv export: ~PATH
 $ echo $PATH
 /Users/you/my_project/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
-$ cd \.\.
+$ cd ..
 direnv: unloading
 direnv export: ~PATH
 $ echo $PATH
 /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
-.
 .fi
-.
-.SH "INSTALL"
-This is what is going to enable the direnv extension\. It\'s going to allow direnv to execute before every prompt command and adjust the environment\.
-.
-.SS "BASH"
-Add the following line at the end of your "~/\.bashrc" file:
-.
-.P
-\fBeval "$(direnv hook bash)"\fR
-.
-.P
-Make sure it appears even after rvm, git\-prompt and other shell extensions that manipulate your prompt\.
-.
-.SS "ZSH"
-Add the previous line at the end of you "~/\.zshrc" file:
-.
-.P
-\fBeval "$(direnv hook zsh)"\fR
-.
-.P
-If you want to place it in another file replace $0 with "zsh" as zsh changes the value dynamically\.
-.
-.SS "FISH"
-Add the previous line at the end of your "~/\.config/fish/config\.fish" file:
-.
-.P
-\fBeval (direnv hook fish)\fR
-.
-.SH "USAGE"
-Place a "\.envrc" file in the folder you want and add some export(1) in it\. If you cd(1) in that directory or child, the exported variables are available\. If you cd(1) out of it, they are unloaded\.
-.
-.P
-A range of utility functions are available in the "\.envrc" context and are documented in the direnv\-stdlib(1) page\.
-.
-.P
-If the "\.envrc" file is added/changed/removed or you is no longer in the path, the environment is reloaded\.
-.
-.SH "CONTRIBUTE"
-Bug reports, contributions and forks are welcome\.
-.
-.P
-For bugs, report them on \fIhttp://github\.com/zimbatm/direnv/issues\fR
-.
-.P
-Or if you have some cool usages of direnv that you want to share, feel free to put them in the wiki \fIhttps://github\.com/zimbatm/direnv/wiki\fR
-.
-.SH "COPYRIGHT"
-Copyright (C) 2013 zimbatm \fIhttp://zimbatm\.com\fR and contributors under the MIT licence\.
-.
-.SH "SEE ALSO"
-.
-.IP "\(bu" 4
-direnv\-stdlib(1)
-.
-.IP "" 0
-
+.RE
+.SH INSTALL
+.PP
+This is what is going to enable the direnv extension. It's going to allow
+direnv to execute before every prompt command and adjust the environment.
+.SS BASH
+.PP
+Add the following line at the end of your "~/.bashrc" file:
+.PP
+\fB\fCeval "$(direnv hook bash)"\fR
+.PP
+Make sure it appears even after rvm, git\-prompt and other shell extensions
+that manipulate your prompt.
+.SS ZSH
+.PP
+Add the previous line at the end of you "~/.zshrc" file:
+.PP
+\fB\fCeval "$(direnv hook zsh)"\fR
+.PP
+If you want to place it in another file replace $0 with "zsh" as zsh changes
+the value dynamically.
+.SS FISH
+.PP
+Add the previous line at the end of your "~/.config/fish/config.fish" file:
+.PP
+\fB\fCeval (direnv hook fish)\fR
+.SH USAGE
+.PP
+Place a ".envrc" file in the folder you want and add some 
+.BR export (1) 
+in it. If you 
+.BR cd (1) 
+in that directory or child, the exported variables are available. If you 
+.BR cd (1) 
+out of it, they are unloaded.
+.PP
+A range of utility functions are available in the ".envrc" context and are documented in the 
+.BR direnv-stdlib (1) 
+page.
+.PP
+If the ".envrc" file is added/changed/removed or you is no longer in the path, the environment is reloaded.
+.SH CONTRIBUTE
+.PP
+Bug reports, contributions and forks are welcome.
+.PP
+For bugs, report them on 
+.UR http://github.com/zimbatm/direnv/issues
+.UE
+.PP
+Or if you have some cool usages of direnv that you want to share, feel free to put them in the wiki 
+.UR https://github.com/zimbatm/direnv/wiki
+.UE
+.SH COPYRIGHT
+.PP
+Copyright (C) 2014 zimbatm 
+.UR http://zimbatm.com
+.UE
+and contributors under the MIT licence.
+.SH SEE ALSO
+.PP
+.BR direnv-stdlib (1)

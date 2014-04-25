@@ -1,11 +1,18 @@
-direnv(1) -- Unclutter your .profile
-====================================
+DIRENV 1 "APRIL 2014" direnv "User Manuals"
+===========================================
 
-## SYNOPSIS
+NAME
+----
 
-`direnv` <command> [...]
+direnv - unclutter your .profile
 
-## DESCRIPTION
+SYNOPSIS
+--------
+
+`direnv` *command* ...
+
+DESCRIPTION
+-----------
 
 direnv is a fast shell extension for bash,zsh and fish that allows you to load/unload environment variables depending on your path.
 
@@ -13,7 +20,8 @@ It has many uses but mine is to have project-specific settings so as to not clut
 
 The `direnv` command-line is a proxy to the sub-commands and it work like the git(1) wrapper. You don't usually use that. Once the shell extension is loaded, most of the interaction is done in your ".envrc" files.
 
-## EXAMPLE
+EXAMPLE
+-------
 
     $ cd ~/my_project
     $ ls
@@ -34,7 +42,8 @@ The `direnv` command-line is a proxy to the sub-commands and it work like the gi
     $ echo $PATH
     /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
 
-## INSTALL
+INSTALL
+-------
 
 This is what is going to enable the direnv extension. It's going to allow
 direnv to execute before every prompt command and adjust the environment.
@@ -63,7 +72,8 @@ Add the previous line at the end of your "~/.config/fish/config.fish" file:
 
 `eval (direnv hook fish)`
 
-## USAGE
+USAGE
+-----
 
 Place a ".envrc" file in the folder you want and add some export(1) in it. If you cd(1) in that directory or child, the exported variables are available. If you cd(1) out of it, they are unloaded.
 
@@ -71,7 +81,8 @@ A range of utility functions are available in the ".envrc" context and are docum
 
 If the ".envrc" file is added/changed/removed or you is no longer in the path, the environment is reloaded.
 
-## CONTRIBUTE
+CONTRIBUTE
+----------
 
 Bug reports, contributions and forks are welcome.
 
@@ -79,11 +90,12 @@ For bugs, report them on <http://github.com/zimbatm/direnv/issues>
 
 Or if you have some cool usages of direnv that you want to share, feel free to put them in the wiki <https://github.com/zimbatm/direnv/wiki>
 
-## COPYRIGHT
+COPYRIGHT
+---------
 
-Copyright (C) 2013 zimbatm <http://zimbatm.com> and contributors under the MIT licence.
+Copyright (C) 2014 zimbatm <http://zimbatm.com> and contributors under the MIT licence.
 
-## SEE ALSO
+SEE ALSO
+--------
 
-* direnv-stdlib(1)
-
+direnv-stdlib(1)
