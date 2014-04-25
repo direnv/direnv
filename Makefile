@@ -34,8 +34,8 @@ release: build
 	git tag v`./direnv version`
 
 install: all
-	install -d bin $(DESTDIR)/bin
-	install -d man $(DESTDIR)/share/man/man1
+	install -d $(DESTDIR)/bin
+	install -d $(DESTDIR)/share/man/man1
 	install direnv $(DESTDIR)/bin
 	cp -R man/*.1 $(DESTDIR)/share/man/man1
 
