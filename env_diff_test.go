@@ -1,6 +1,7 @@
 package main
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -20,6 +21,19 @@ func TestEnvDiff(t *testing.T) {
 
 	if len(diff2.Next) != 1 {
 		t.Errorf("len(diff2.next) != 0", len(diff2.Next))
+	}
+}
+
+// Issue #114
+// Check that empty environment variables correctly appear in the diff
+func TestEnvDiffEmptyValue(t *testing.T) {
+	before := Env{}
+	after := Env{"FOO": ""}
+
+	diff := BuildEnvDiff(before, after)
+
+	if !reflect.DeepEqual(diff.Next, map[string]string(after)) {
+		t.Errorf("diff.Next != after (%#+v != %#+v)", diff.Next, after)
 	}
 }
 
