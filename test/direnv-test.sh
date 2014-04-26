@@ -87,6 +87,19 @@ test_start "special-vars"
   unset DIRENV_CONFIG
 test_stop
 
+test_start "empty-var"
+  direnv_eval
+  test "${FOO-unset}" != "unset"
+  test "${FOO}" = ""
+test_stop
+
+test_start "empty-var-unset"
+  export FOO=""
+  direnv_eval
+  test "${FOO-unset}" == "unset"
+  unset FOO
+test_stop
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.
