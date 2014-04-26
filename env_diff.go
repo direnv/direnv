@@ -29,14 +29,25 @@ type EnvDiff struct {
 func BuildEnvDiff(e1, e2 Env) *EnvDiff {
 	diff := &EnvDiff{make(map[string]string), make(map[string]string)}
 
+	in := func(key string, e Env) bool {
+		_, ok := e[key]
+		return ok
+	}
+
 	for key := range e1 {
-		if e2[key] != e1[key] && !IgnoredEnv(key) {
+		if IgnoredEnv(key) {
+			continue
+		}
+		if e2[key] != e1[key] || !in(key, e2) {
 			diff.Prev[key] = e1[key]
 		}
 	}
 
 	for key := range e2 {
-		if e2[key] != e1[key] && !IgnoredEnv(key) {
+		if IgnoredEnv(key) {
+			continue
+		}
+		if e2[key] != e1[key] || !in(key, e1) {
 			diff.Next[key] = e2[key]
 		}
 	}
