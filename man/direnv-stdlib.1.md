@@ -4,7 +4,7 @@ DIRENV-STDLIB 1 "APRIL 2014" direnv "User Manuals"
 NAME
 ----
 
-direnv stdlib - the ".envrc" stdlib
+direnv_stdlib - the ".envrc" stdlib
 
 SYNOPSIS
 --------
