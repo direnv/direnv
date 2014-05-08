@@ -317,7 +317,7 @@ layout_ruby() {
 #
 use() {
 	local cmd="$1"
-	log_status "Using $@"
+	log_status "using $@"
 	shift
 	use_$cmd "$@"
 }

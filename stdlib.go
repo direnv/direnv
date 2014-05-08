@@ -319,7 +319,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#\n" +
 	"use() {\n" +
 	"	local cmd=\"$1\"\n" +
-	"	log_status \"Using $@\"\n" +
+	"	log_status \"using $@\"\n" +
 	"	shift\n" +
 	"	use_$cmd \"$@\"\n" +
 	"}\n" +
