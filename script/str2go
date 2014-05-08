@@ -24,4 +24,4 @@ end
 output.puts "package #{package_name}"
 output.puts
 
-output.puts "const #{constant_name} = #{lines_to_go(input.lines)}"
+output.puts "const #{constant_name} = #{lines_to_go(input.each_line)}"
