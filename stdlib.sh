@@ -2,6 +2,8 @@
 set -e
 direnv="%s"
 
+DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
+
 # Usage: log_status <command>
 #
 # Logs a status message. Acts like echo,
@@ -14,7 +16,9 @@ direnv="%s"
 #    log_status "Loading ..."
 #
 log_status() {
-	printf "${DIRENV_LOG_FORMAT:-direnv: %%s}\n" "$1" >&2
+  if [[ -n $DIRENV_LOG_FORMAT ]]; then
+	  printf "${DIRENV_LOG_FORMAT}\n" "$1" >&2
+  fi
 }
 
 # Usage: has <command>

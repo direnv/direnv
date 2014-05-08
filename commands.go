@@ -79,7 +79,7 @@ func CommandsDispatch(env Env, args []string) error {
 			case <-done:
 				return
 			case <-time.After(5 * time.Second):
-				log("(%v) is taking a while to execute. Use CTRL-C to give up.", args)
+				log_error("(%v) is taking a while to execute. Use CTRL-C to give up.", args)
 			}
 		}()
 	}

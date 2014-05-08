@@ -4,6 +4,8 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"set -e\n" +
 	"direnv=\"%s\"\n" +
 	"\n" +
+	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %%s}\"\n" +
+	"\n" +
 	"# Usage: log_status <command>\n" +
 	"#\n" +
 	"# Logs a status message. Acts like echo,\n" +
@@ -16,7 +18,9 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#    log_status \"Loading ...\"\n" +
 	"#\n" +
 	"log_status() {\n" +
-	"	printf \"${DIRENV_LOG_FORMAT:-direnv: %%s}\\n\" \"$1\" >&2\n" +
+	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
+	"	  printf \"${DIRENV_LOG_FORMAT}\\n\" \"$1\" >&2\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: has <command>\n" +
