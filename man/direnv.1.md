@@ -14,39 +14,47 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-direnv is a fast shell extension for bash,zsh and fish that allows you to load/unload environment variables depending on your path.
+`direnv` is an environment variable manager for your shell. It knows how to
+hook into bash, zsh and fish shell to load or unload environment variables
+depending on your current directory. This allows to have project-specific
+environment variables and not clutter the "~/.profile" file.
 
-It has many uses but mine is to have project-specific settings so as to not clutter my "~/.profile". I'm using it to specify ruby version, set AWS or SSH keys, ...
+Before each prompt it checks for the existence of an ".envrc" file in the
+current and parent directories. If the file exists, it is loaded into a bash
+sub-shell and all exported variables are then captured by direnv and then made
+available to your current shell.
 
-The `direnv` command-line is a proxy to the sub-commands and it work like the git(1) wrapper. You don't usually use that. Once the shell extension is loaded, most of the interaction is done in your ".envrc" files.
+Because direnv is compiled into a single static executable it is fast enough
+to be unnoticeable on each prompt. It is also language agnostic and can be
+used to build solutions similar to rbenv, pyenv, phpenv, ...
 
 EXAMPLE
 -------
 
-    $ cd ~/my_project
-    $ ls
-    bin/ lib/ Rakefile README.md
-    $ echo $PATH
-    /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
-    $ echo PATH_add bin > .envrc
-    .envrc is not allowed
-    $ direnv allow
-    direnv: reloading
-    direnv: loading .envrc
-    direnv export: ~PATH
-    $ echo $PATH
-    /Users/you/my_project/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
-    $ cd ..
-    direnv: unloading
-    direnv export: ~PATH
-    $ echo $PATH
-    /usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+```
+$ cd ~/my_project
+$ echo ${FOO-nope}
+nope
+$ echo export FOO=foo > .envrc
+.envrc is not allowed
+$ direnv allow .
+direnv: reloading
+direnv: loading .envrc
+direnv export: +FOO
+$ echo ${FOO-nope}
+foo
+$ cd ..
+direnv: unloading
+direnv export: ~PATH
+$ echo ${FOO-nope}
+nope
+```
 
-INSTALL
--------
+SETUP
+-----
 
-This is what is going to enable the direnv extension. It's going to allow
-direnv to execute before every prompt command and adjust the environment.
+For direnv to work properly it needs to be hooked into the shell. Each shell
+has it's own extension mechanism:
 
 ### BASH
 
@@ -63,9 +71,6 @@ Add the previous line at the end of you "~/.zshrc" file:
 
 `eval "$(direnv hook zsh)"`
 
-If you want to place it in another file replace $0 with "zsh" as zsh changes
-the value dynamically.
-
 ### FISH
 
 Add the previous line at the end of your "~/.config/fish/config.fish" file:
@@ -75,25 +80,49 @@ Add the previous line at the end of your "~/.config/fish/config.fish" file:
 USAGE
 -----
 
-Place a ".envrc" file in the folder you want and add some export(1) in it. If you cd(1) in that directory or child, the exported variables are available. If you cd(1) out of it, they are unloaded.
+In some target folder, create an ".envrc" file and add some export(1)
+directives in it.
 
-A range of utility functions are available in the ".envrc" context and are documented in the direnv-stdlib(1) page.
+On the next prompt you will notice that direnv complains about the ".envrc"
+being blocked. This is the security mechanism to avoid loading new files
+automatically. Otherwise and git repo that you pull, or tar archive that you
+unpack, would be able to wipe your hard drive once you `cd` into it.
 
-If the ".envrc" file is added/changed/removed or you is no longer in the path, the environment is reloaded.
+So here we are pretty sure that it won't do anything bad. Type `direnv allow .`
+and watch direnv loading your new environment. Note that `direnv edit .` is a
+handy shortcut that open the file in your $EDITOR and automatically allows it
+if the file's modification time has changed.
+
+Now that the environment is loaded you can notice that once your `cd` out
+of the directory it automatically gets unloaded. If you `cd` back into it it's
+loaded again. That's the base of the mechanism that allows you to build cool
+things.
+
+Exporting variables by hand is a bit repetitive so direnv provides a set of
+utility functions that are made available in the context of the ".envrc" file.
+Check the direnv-stdlib(1) man page for more details. You can also define
+your own extensions inside a "~/.direnvrc" file.
+
+Hopefully this is enough to get you started.
 
 CONTRIBUTE
 ----------
 
 Bug reports, contributions and forks are welcome.
 
-For bugs, report them on <http://github.com/zimbatm/direnv/issues>
+All bugs or other forms of discussion happen on
+<http://github.com/zimbatm/direnv/issues>
 
-Or if you have some cool usages of direnv that you want to share, feel free to put them in the wiki <https://github.com/zimbatm/direnv/wiki>
+There is also a wiki available where you can share your usage patterns or
+other tips and tricks <https://github.com/zimbatm/direnv/wiki>
+
+Or drop by on the [#direnv channel on FreeNode](irc://#direnv@FreeNode) to
+have a chat.
 
 COPYRIGHT
 ---------
 
-Copyright (C) 2014 zimbatm <http://zimbatm.com> and contributors under the MIT licence.
+Copyright (C) 2014 zimbatm and contributors under the MIT licence.
 
 SEE ALSO
 --------
