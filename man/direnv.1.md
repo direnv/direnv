@@ -1,119 +1,130 @@
-.TH DIRENV 1 "APRIL 2014" direnv "User Manuals"
-.SH NAME
-.PP
-direnv \- unclutter your .profile
-.SH SYNOPSIS
-.PP
-\fB\fCdirenv\fR \fIcommand\fP ...
-.SH DESCRIPTION
-.PP
-\fB\fCdirenv\fR is an environment variable manager for your shell. It knows how to
+DIRENV 1 "APRIL 2014" direnv "User Manuals"
+===========================================
+
+NAME
+----
+
+direnv - unclutter your .profile
+
+SYNOPSIS
+--------
+
+`direnv` *command* ...
+
+DESCRIPTION
+-----------
+
+`direnv` is an environment variable manager for your shell. It knows how to
 hook into bash, zsh and fish shell to load or unload environment variables
-depending on your current directory. This allows to have project\-specific
+depending on your current directory. This allows to have project-specific
 environment variables and not clutter the "~/.profile" file.
-.PP
+
 Before each prompt it checks for the existence of an ".envrc" file in the
 current and parent directories. If the file exists, it is loaded into a bash
-sub\-shell and all exported variables are then captured by direnv and then made
+sub-shell and all exported variables are then captured by direnv and then made
 available to your current shell.
-.PP
+
 Because direnv is compiled into a single static executable it is fast enough
 to be unnoticeable on each prompt. It is also language agnostic and can be
 used to build solutions similar to rbenv, pyenv, phpenv, ...
-.SH EXAMPLE
-.PP
-.RS
-.nf
+
+EXAMPLE
+-------
+
+```
 $ cd ~/my_project
-$ echo ${FOO\-nope}
+$ echo ${FOO-nope}
 nope
 $ echo export FOO=foo > .envrc
-\&.envrc is not allowed
+.envrc is not allowed
 $ direnv allow .
 direnv: reloading
 direnv: loading .envrc
 direnv export: +FOO
-$ echo ${FOO\-nope}
+$ echo ${FOO-nope}
 foo
 $ cd ..
 direnv: unloading
 direnv export: ~PATH
-$ echo ${FOO\-nope}
+$ echo ${FOO-nope}
 nope
-.fi
-.RE
-.SH SETUP
-.PP
+```
+
+SETUP
+-----
+
 For direnv to work properly it needs to be hooked into the shell. Each shell
 has it's own extension mechanism:
-.SS BASH
-.PP
+
+### BASH
+
 Add the following line at the end of your "~/.bashrc" file:
-.PP
-\fB\fCeval "$(direnv hook bash)"\fR
-.PP
-Make sure it appears even after rvm, git\-prompt and other shell extensions
+
+`eval "$(direnv hook bash)"`
+
+Make sure it appears even after rvm, git-prompt and other shell extensions
 that manipulate your prompt.
-.SS ZSH
-.PP
+
+### ZSH
+
 Add the previous line at the end of you "~/.zshrc" file:
-.PP
-\fB\fCeval "$(direnv hook zsh)"\fR
-.SS FISH
-.PP
+
+`eval "$(direnv hook zsh)"`
+
+### FISH
+
 Add the previous line at the end of your "~/.config/fish/config.fish" file:
-.PP
-\fB\fCeval (direnv hook fish)\fR
-.SH USAGE
-.PP
-In some target folder, create an ".envrc" file and add some 
-.BR export (1)
+
+`eval (direnv hook fish)`
+
+USAGE
+-----
+
+In some target folder, create an ".envrc" file and add some export(1)
 directives in it.
-.PP
+
 On the next prompt you will notice that direnv complains about the ".envrc"
 being blocked. This is the security mechanism to avoid loading new files
 automatically. Otherwise and git repo that you pull, or tar archive that you
-unpack, would be able to wipe your hard drive once you \fB\fCcd\fR into it.
-.PP
-So here we are pretty sure that it won't do anything bad. Type \fB\fCdirenv allow .\fR
-and watch direnv loading your new environment. Note that \fB\fCdirenv edit .\fR is a
+unpack, would be able to wipe your hard drive once you `cd` into it.
+
+So here we are pretty sure that it won't do anything bad. Type `direnv allow .`
+and watch direnv loading your new environment. Note that `direnv edit .` is a
 handy shortcut that open the file in your $EDITOR and automatically allows it
 if the file's modification time has changed.
-.PP
-Now that the environment is loaded you can notice that once your \fB\fCcd\fR out
-of the directory it automatically gets unloaded. If you \fB\fCcd\fR back into it it's
+
+Now that the environment is loaded you can notice that once your `cd` out
+of the directory it automatically gets unloaded. If you `cd` back into it it's
 loaded again. That's the base of the mechanism that allows you to build cool
 things.
-.PP
+
 Exporting variables by hand is a bit repetitive so direnv provides a set of
 utility functions that are made available in the context of the ".envrc" file.
-Check the 
-.BR direnv-stdlib (1) 
-man page for more details. You can also define
+Check the direnv-stdlib(1) man page for more details. You can also define
 your own extensions inside a "~/.direnvrc" file.
-.PP
+
 Hopefully this is enough to get you started.
-.SH CONTRIBUTE
-.PP
+
+CONTRIBUTE
+----------
+
 Bug reports, contributions and forks are welcome.
-.PP
+
 All bugs or other forms of discussion happen on
-.UR http://github.com/zimbatm/direnv/issues
-.UE
-.PP
+<http://github.com/zimbatm/direnv/issues>
+
 There is also a wiki available where you can share your usage patterns or
-other tips and tricks 
-.UR https://github.com/zimbatm/direnv/wiki
-.UE
-.PP
-Or drop by on the #direnv channel on FreeNode
-.UR irc://#direnv@FreeNode
-.UE
-to
+other tips and tricks <https://github.com/zimbatm/direnv/wiki>
+
+Or drop by on the [#direnv channel on FreeNode](irc://#direnv@FreeNode) to
 have a chat.
-.SH COPYRIGHT
-.PP
+
+COPYRIGHT
+---------
+
 Copyright (C) 2014 zimbatm and contributors under the MIT licence.
-.SH SEE ALSO
-.PP
-.BR direnv-stdlib (1)
+
+SEE ALSO
+--------
+
+direnv-stdlib(1)

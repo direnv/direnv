@@ -1,8 +1,7 @@
 DESTDIR ?= /usr/local
 
-RONN := $(shell which ronn >/dev/null 2>&1 && echo "ronn -w --manual=direnv" || echo "@echo 'Could not generate manpage because ronn is missing. gem install ronn' || ")
-RONNS = $(wildcard man/*.ronn)
-ROFFS = $(RONNS:.ronn=)
+MAN_MD = $(wildcard man/*.md)
+ROFFS = $(MAN_MD:.md=)
 
 .PHONY: all man html test release install
 #all: build man test
@@ -20,8 +19,9 @@ direnv: *.go
 clean:
 	rm -f direnv
 
-%.1: %.1.ronn
-	$(RONN) -r $<
+%.1: %.1.md
+	@which md2man-roff >/dev/null || (echo "Could not generate man page because md2man is missing, gem install md2man"; false)
+	md2man-roff $< > $@
 
 man: $(ROFFS)
 
