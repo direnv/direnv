@@ -19,7 +19,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#\n" +
 	"log_status() {\n" +
 	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
-	"	  printf \"${DIRENV_LOG_FORMAT}\\n\" \"$1\" >&2\n" +
+	"    printf \"${DIRENV_LOG_FORMAT}\\n\" \"$1\" >&2\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
@@ -35,7 +35,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#    fi\n" +
 	"#\n" +
 	"has() {\n" +
-	"	type \"$1\" &>/dev/null\n" +
+	"  type \"$1\" &>/dev/null\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: expand_path <rel_path> [<relative_to>]\n" +
@@ -50,7 +50,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#    # output: /usr/local/foo\n" +
 	"#\n" +
 	"expand_path() {\n" +
-	"	\"$direnv\" expand_path \"$@\"\n" +
+	"  \"$direnv\" expand_path \"$@\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: dotenv [<dotenv>]\n" +
@@ -58,7 +58,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# Loads a \".env\" file into the current environment\n" +
 	"#\n" +
 	"dotenv() {\n" +
-	"	eval \"$(\"$direnv\" dotenv bash \"$@\")\"\n" +
+	"  eval \"$(\"$direnv\" dotenv bash \"$@\")\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: user_rel_path <abs_path>\n" +
@@ -76,18 +76,18 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#    # output: /usr/local/lib\n" +
 	"#\n" +
 	"user_rel_path() {\n" +
-	"	local path=\"${1#-}\"\n" +
+	"  local path=\"${1#-}\"\n" +
 	"\n" +
-	"	if [ -z \"$path\" ]; then return; fi\n" +
+	"  if [ -z \"$path\" ]; then return; fi\n" +
 	"\n" +
-	"	if [ -n \"$HOME\" ]; then\n" +
-	"		local rel_path=\"${path#$HOME}\"\n" +
-	"		if [ \"$rel_path\" != \"$path\" ]; then\n" +
-	"			path=\"~${rel_path}\"\n" +
-	"		fi\n" +
-	"	fi\n" +
+	"  if [ -n \"$HOME\" ]; then\n" +
+	"    local rel_path=\"${path#$HOME}\"\n" +
+	"    if [ \"$rel_path\" != \"$path\" ]; then\n" +
+	"      path=\"~${rel_path}\"\n" +
+	"    fi\n" +
+	"  fi\n" +
 	"\n" +
-	"	echo \"$path\"\n" +
+	"  echo \"$path\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: find_up <filename>\n" +
@@ -105,35 +105,35 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#    # output: /usr/local/my/bar\n" +
 	"#\n" +
 	"find_up() {\n" +
-	"	(\n" +
-	"		cd \"$(pwd -P 2>/dev/null)\"\n" +
-	"		while true; do\n" +
-	"			if [ -f \"$1\" ]; then\n" +
-	"				echo \"$PWD/$1\"\n" +
-	"				return 0\n" +
-	"			fi\n" +
-	"			if [ \"$PWD\" = \"/\" ] || [ \"$PWD\" = \"//\" ]; then\n" +
-	"				return 1\n" +
-	"			fi\n" +
-	"			cd ..\n" +
-	"		done\n" +
-	"	)\n" +
+	"  (\n" +
+	"    cd \"$(pwd -P 2>/dev/null)\"\n" +
+	"    while true; do\n" +
+	"      if [ -f \"$1\" ]; then\n" +
+	"        echo \"$PWD/$1\"\n" +
+	"        return 0\n" +
+	"      fi\n" +
+	"      if [ \"$PWD\" = \"/\" ] || [ \"$PWD\" = \"//\" ]; then\n" +
+	"        return 1\n" +
+	"      fi\n" +
+	"      cd ..\n" +
+	"    done\n" +
+	"  )\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: source_env <file_or_dir_path>\n" +
 	"#\n" +
 	"# Loads another \".envrc\" either by specifying its path or filename.\n" +
 	"source_env() {\n" +
-	"	local rcfile=\"$1\"\n" +
-	"	local rcpath=\"${1/#\\~/$HOME}\"\n" +
-	"	if ! [ -f \"$rcpath\" ]; then\n" +
-	"		rcfile=\"$rcfile/.envrc\"\n" +
-	"		rcpath=\"$rcpath/.envrc\"\n" +
-	"	fi\n" +
-	"	log_status \"loading $rcfile\"\n" +
-	"	pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
-	"	. \"./$(basename \"$rcpath\")\"\n" +
-	"	popd > /dev/null\n" +
+	"  local rcfile=\"$1\"\n" +
+	"  local rcpath=\"${1/#\\~/$HOME}\"\n" +
+	"  if ! [ -f \"$rcpath\" ]; then\n" +
+	"    rcfile=\"$rcfile/.envrc\"\n" +
+	"    rcpath=\"$rcpath/.envrc\"\n" +
+	"  fi\n" +
+	"  log_status \"loading $rcfile\"\n" +
+	"  pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
+	"  . \"./$(basename \"$rcpath\")\"\n" +
+	"  popd > /dev/null\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: source_up [<filename>]\n" +
@@ -141,14 +141,14 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# Loads another \".envrc\" if found with the find_up command.\n" +
 	"#\n" +
 	"source_up() {\n" +
-	"	local file=\"$1\"\n" +
-	"	if [ -z \"$file\" ]; then\n" +
-	"		file=\".envrc\"\n" +
-	"	fi\n" +
-	"	local path=\"$(cd .. && find_up \"$file\")\"\n" +
-	"	if [ -n \"$path\" ]; then\n" +
-	"		source_env \"$(user_rel_path \"$path\")\"\n" +
-	"	fi\n" +
+	"  local file=\"$1\"\n" +
+	"  if [ -z \"$file\" ]; then\n" +
+	"    file=\".envrc\"\n" +
+	"  fi\n" +
+	"  local path=\"$(cd .. && find_up \"$file\")\"\n" +
+	"  if [ -n \"$path\" ]; then\n" +
+	"    source_env \"$(user_rel_path \"$path\")\"\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: direnv_load <command-generating-dump-output>\n" +
@@ -160,11 +160,11 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# the results with direnv_load.\n" +
 	"#\n" +
 	"direnv_load() {\n" +
-	"	exports=\"$(\"$direnv\" apply_dump <(\"$@\"))\"\n" +
-	"	if test \"$?\" -ne 0; then\n" +
-	"		exit 1\n" +
-	"	fi\n" +
-	"	eval \"$exports\"\n" +
+	"  exports=\"$(\"$direnv\" apply_dump <(\"$@\"))\"\n" +
+	"  if test \"$?\" -ne 0; then\n" +
+	"    exit 1\n" +
+	"  fi\n" +
+	"  eval \"$exports\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: PATH_add <path>\n" +
@@ -181,23 +181,23 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#    # output: /home/user/my/project/bin:/usr/bin:/bin\n" +
 	"#\n" +
 	"PATH_add() {\n" +
-	"	export PATH=\"$(expand_path \"$1\"):$PATH\"\n" +
+	"  export PATH=\"$(expand_path \"$1\"):$PATH\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: path_add <varname> <path>\n" +
 	"#\n" +
 	"# Works like PATH_add except that it's for an arbitrary <varname>.\n" +
 	"path_add() {\n" +
-	"	local old_paths=\"${!1}\"\n" +
-	"	local path=\"$(expand_path \"$2\")\"\n" +
+	"  local old_paths=\"${!1}\"\n" +
+	"  local path=\"$(expand_path \"$2\")\"\n" +
 	"\n" +
-	"	if [ -z \"$old_paths\" ]; then\n" +
-	"		old_paths=\"$path\"\n" +
-	"	else\n" +
-	"		old_paths=\"$path:$old_paths\"\n" +
-	"	fi\n" +
+	"  if [ -z \"$old_paths\" ]; then\n" +
+	"    old_paths=\"$path\"\n" +
+	"  else\n" +
+	"    old_paths=\"$path:$old_paths\"\n" +
+	"  fi\n" +
 	"\n" +
-	"	export $1=\"$old_paths\"\n" +
+	"  export $1=\"$old_paths\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: load_prefix <prefix_path>\n" +
@@ -224,14 +224,14 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#    load_prefix ~/rubies/ruby-1.9.3\n" +
 	"#\n" +
 	"load_prefix() {\n" +
-	"	local path=\"$(expand_path \"$1\")\"\n" +
-	"	path_add CPATH \"$path/include\"\n" +
-	"	path_add LD_LIBRARY_PATH \"$path/lib\"\n" +
-	"	path_add LIBRARY_PATH \"$path/lib\"\n" +
-	"	path_add MANPATH \"$path/man\"\n" +
-	"	path_add MANPATH \"$path/share/man\"\n" +
-	"	path_add PATH \"$path/bin\"\n" +
-	"	path_add PKG_CONFIG_PATH \"$path/lib/pkgconfig\"\n" +
+	"  local path=\"$(expand_path \"$1\")\"\n" +
+	"  path_add CPATH \"$path/include\"\n" +
+	"  path_add LD_LIBRARY_PATH \"$path/lib\"\n" +
+	"  path_add LIBRARY_PATH \"$path/lib\"\n" +
+	"  path_add MANPATH \"$path/man\"\n" +
+	"  path_add MANPATH \"$path/share/man\"\n" +
+	"  path_add PATH \"$path/bin\"\n" +
+	"  path_add PKG_CONFIG_PATH \"$path/lib/pkgconfig\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout <type>\n" +
@@ -239,7 +239,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# A semantic dispatch used to describe common project layouts.\n" +
 	"#\n" +
 	"layout() {\n" +
-	"	eval \"layout_$1\"\n" +
+	"  eval \"layout_$1\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout go\n" +
@@ -247,15 +247,15 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# Sets the GOPATH environment variable to the current directory.\n" +
 	"#\n" +
 	"layout_go() {\n" +
-	"	path_add GOPATH \"$PWD\"\n" +
-	"	PATH_add bin\n" +
+	"  path_add GOPATH \"$PWD\"\n" +
+	"  PATH_add bin\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout node\n" +
 	"#\n" +
 	"# Adds \"$PWD/node_modules/.bin\" to the PATH environment variable.\n" +
 	"layout_node() {\n" +
-	"	PATH_add node_modules/.bin\n" +
+	"  PATH_add node_modules/.bin\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout perl\n" +
@@ -279,12 +279,12 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# This forces the installation of any egg into the project's sub-folder.\n" +
 	"#\n" +
 	"layout_python() {\n" +
-	"	export VIRTUAL_ENV=$PWD/.direnv/virtualenv\n" +
-	"	if ! [ -d \"$VIRTUAL_ENV\" ]; then\n" +
-	"		virtualenv --no-site-packages --distribute \"$VIRTUAL_ENV\"\n" +
-	"	fi\n" +
-	"	virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
-	"	PATH_add \"$VIRTUAL_ENV/bin\"\n" +
+	"  export VIRTUAL_ENV=$PWD/.direnv/virtualenv\n" +
+	"  if ! [ -d \"$VIRTUAL_ENV\" ]; then\n" +
+	"    virtualenv --no-site-packages --distribute \"$VIRTUAL_ENV\"\n" +
+	"  fi\n" +
+	"  virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
+	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout ruby\n" +
@@ -295,13 +295,13 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# directly instead of using the $(bundle exec) prefix.\n" +
 	"#\n" +
 	"layout_ruby() {\n" +
-	"	local ruby_version=\"$(ruby -e\"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION\")\"\n" +
+	"  local ruby_version=\"$(ruby -e\"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION\")\"\n" +
 	"\n" +
-	"	export GEM_HOME=\"$PWD/.direnv/${ruby_version}\"\n" +
-	"	export BUNDLE_BIN=\"$PWD/.direnv/bin\"\n" +
+	"  export GEM_HOME=\"$PWD/.direnv/${ruby_version}\"\n" +
+	"  export BUNDLE_BIN=\"$PWD/.direnv/bin\"\n" +
 	"\n" +
-	"	PATH_add \".direnv/${ruby_version}/bin\"\n" +
-	"	PATH_add \".direnv/bin\"\n" +
+	"  PATH_add \".direnv/${ruby_version}/bin\"\n" +
+	"  PATH_add \".direnv/bin\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: use <program_name> [<version>]\n" +
@@ -318,10 +318,10 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#    # output: Ruby 1.9.3\n" +
 	"#\n" +
 	"use() {\n" +
-	"	local cmd=\"$1\"\n" +
-	"	log_status \"using $@\"\n" +
-	"	shift\n" +
-	"	use_$cmd \"$@\"\n" +
+	"  local cmd=\"$1\"\n" +
+	"  log_status \"using $@\"\n" +
+	"  shift\n" +
+	"  use_$cmd \"$@\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: use rbenv\n" +
@@ -329,7 +329,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# Loads rbenv which add the ruby wrappers available on the PATH.\n" +
 	"#\n" +
 	"use_rbenv() {\n" +
-	"	eval \"$(rbenv init -)\"\n" +
+	"  eval \"$(rbenv init -)\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: rvm [...]\n" +
@@ -337,18 +337,18 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# Should work just like in the shell if you have rvm installed.#\n" +
 	"#\n" +
 	"rvm() {\n" +
-	"	unset rvm\n" +
-	"	if [ -n \"${rvm_scripts_path:-}\" ]; then\n" +
-	"		source \"${rvm_scripts_path}/rvm\"\n" +
-	"	elif [ -n \"${rvm_path:-}\" ]; then\n" +
-	"		source \"${rvm_path}/scripts/rvm\"\n" +
-	"	else\n" +
-	"		source \"$HOME/.rvm/scripts/rvm\"\n" +
-	"	fi\n" +
-	"	rvm \"$@\"\n" +
+	"  unset rvm\n" +
+	"  if [ -n \"${rvm_scripts_path:-}\" ]; then\n" +
+	"    source \"${rvm_scripts_path}/rvm\"\n" +
+	"  elif [ -n \"${rvm_path:-}\" ]; then\n" +
+	"    source \"${rvm_path}/scripts/rvm\"\n" +
+	"  else\n" +
+	"    source \"$HOME/.rvm/scripts/rvm\"\n" +
+	"  fi\n" +
+	"  rvm \"$@\"\n" +
 	"}\n" +
 	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [ -f \"$HOME/.direnvrc\" ]; then\n" +
-	"	source_env \"~/.direnvrc\" >&2\n" +
+	"  source_env \"~/.direnvrc\" >&2\n" +
 	"fi\n"

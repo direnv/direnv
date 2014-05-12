@@ -17,7 +17,7 @@ DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
 #
 log_status() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
-	  printf "${DIRENV_LOG_FORMAT}\n" "$1" >&2
+    printf "${DIRENV_LOG_FORMAT}\n" "$1" >&2
   fi
 }
 
@@ -33,7 +33,7 @@ log_status() {
 #    fi
 #
 has() {
-	type "$1" &>/dev/null
+  type "$1" &>/dev/null
 }
 
 # Usage: expand_path <rel_path> [<relative_to>]
@@ -48,7 +48,7 @@ has() {
 #    # output: /usr/local/foo
 #
 expand_path() {
-	"$direnv" expand_path "$@"
+  "$direnv" expand_path "$@"
 }
 
 # Usage: dotenv [<dotenv>]
@@ -56,7 +56,7 @@ expand_path() {
 # Loads a ".env" file into the current environment
 #
 dotenv() {
-	eval "$("$direnv" dotenv bash "$@")"
+  eval "$("$direnv" dotenv bash "$@")"
 }
 
 # Usage: user_rel_path <abs_path>
@@ -74,18 +74,18 @@ dotenv() {
 #    # output: /usr/local/lib
 #
 user_rel_path() {
-	local path="${1#-}"
+  local path="${1#-}"
 
-	if [ -z "$path" ]; then return; fi
+  if [ -z "$path" ]; then return; fi
 
-	if [ -n "$HOME" ]; then
-		local rel_path="${path#$HOME}"
-		if [ "$rel_path" != "$path" ]; then
-			path="~${rel_path}"
-		fi
-	fi
+  if [ -n "$HOME" ]; then
+    local rel_path="${path#$HOME}"
+    if [ "$rel_path" != "$path" ]; then
+      path="~${rel_path}"
+    fi
+  fi
 
-	echo "$path"
+  echo "$path"
 }
 
 # Usage: find_up <filename>
@@ -103,35 +103,35 @@ user_rel_path() {
 #    # output: /usr/local/my/bar
 #
 find_up() {
-	(
-		cd "$(pwd -P 2>/dev/null)"
-		while true; do
-			if [ -f "$1" ]; then
-				echo "$PWD/$1"
-				return 0
-			fi
-			if [ "$PWD" = "/" ] || [ "$PWD" = "//" ]; then
-				return 1
-			fi
-			cd ..
-		done
-	)
+  (
+    cd "$(pwd -P 2>/dev/null)"
+    while true; do
+      if [ -f "$1" ]; then
+        echo "$PWD/$1"
+        return 0
+      fi
+      if [ "$PWD" = "/" ] || [ "$PWD" = "//" ]; then
+        return 1
+      fi
+      cd ..
+    done
+  )
 }
 
 # Usage: source_env <file_or_dir_path>
 #
 # Loads another ".envrc" either by specifying its path or filename.
 source_env() {
-	local rcfile="$1"
-	local rcpath="${1/#\~/$HOME}"
-	if ! [ -f "$rcpath" ]; then
-		rcfile="$rcfile/.envrc"
-		rcpath="$rcpath/.envrc"
-	fi
-	log_status "loading $rcfile"
-	pushd "$(dirname "$rcpath")" > /dev/null
-	. "./$(basename "$rcpath")"
-	popd > /dev/null
+  local rcfile="$1"
+  local rcpath="${1/#\~/$HOME}"
+  if ! [ -f "$rcpath" ]; then
+    rcfile="$rcfile/.envrc"
+    rcpath="$rcpath/.envrc"
+  fi
+  log_status "loading $rcfile"
+  pushd "$(dirname "$rcpath")" > /dev/null
+  . "./$(basename "$rcpath")"
+  popd > /dev/null
 }
 
 # Usage: source_up [<filename>]
@@ -139,14 +139,14 @@ source_env() {
 # Loads another ".envrc" if found with the find_up command.
 #
 source_up() {
-	local file="$1"
-	if [ -z "$file" ]; then
-		file=".envrc"
-	fi
-	local path="$(cd .. && find_up "$file")"
-	if [ -n "$path" ]; then
-		source_env "$(user_rel_path "$path")"
-	fi
+  local file="$1"
+  if [ -z "$file" ]; then
+    file=".envrc"
+  fi
+  local path="$(cd .. && find_up "$file")"
+  if [ -n "$path" ]; then
+    source_env "$(user_rel_path "$path")"
+  fi
 }
 
 # Usage: direnv_load <command-generating-dump-output>
@@ -158,11 +158,11 @@ source_up() {
 # the results with direnv_load.
 #
 direnv_load() {
-	exports="$("$direnv" apply_dump <("$@"))"
-	if test "$?" -ne 0; then
-		exit 1
-	fi
-	eval "$exports"
+  exports="$("$direnv" apply_dump <("$@"))"
+  if test "$?" -ne 0; then
+    exit 1
+  fi
+  eval "$exports"
 }
 
 # Usage: PATH_add <path>
@@ -179,23 +179,23 @@ direnv_load() {
 #    # output: /home/user/my/project/bin:/usr/bin:/bin
 #
 PATH_add() {
-	export PATH="$(expand_path "$1"):$PATH"
+  export PATH="$(expand_path "$1"):$PATH"
 }
 
 # Usage: path_add <varname> <path>
 #
 # Works like PATH_add except that it's for an arbitrary <varname>.
 path_add() {
-	local old_paths="${!1}"
-	local path="$(expand_path "$2")"
+  local old_paths="${!1}"
+  local path="$(expand_path "$2")"
 
-	if [ -z "$old_paths" ]; then
-		old_paths="$path"
-	else
-		old_paths="$path:$old_paths"
-	fi
+  if [ -z "$old_paths" ]; then
+    old_paths="$path"
+  else
+    old_paths="$path:$old_paths"
+  fi
 
-	export $1="$old_paths"
+  export $1="$old_paths"
 }
 
 # Usage: load_prefix <prefix_path>
@@ -222,14 +222,14 @@ path_add() {
 #    load_prefix ~/rubies/ruby-1.9.3
 #
 load_prefix() {
-	local path="$(expand_path "$1")"
-	path_add CPATH "$path/include"
-	path_add LD_LIBRARY_PATH "$path/lib"
-	path_add LIBRARY_PATH "$path/lib"
-	path_add MANPATH "$path/man"
-	path_add MANPATH "$path/share/man"
-	path_add PATH "$path/bin"
-	path_add PKG_CONFIG_PATH "$path/lib/pkgconfig"
+  local path="$(expand_path "$1")"
+  path_add CPATH "$path/include"
+  path_add LD_LIBRARY_PATH "$path/lib"
+  path_add LIBRARY_PATH "$path/lib"
+  path_add MANPATH "$path/man"
+  path_add MANPATH "$path/share/man"
+  path_add PATH "$path/bin"
+  path_add PKG_CONFIG_PATH "$path/lib/pkgconfig"
 }
 
 # Usage: layout <type>
@@ -237,7 +237,7 @@ load_prefix() {
 # A semantic dispatch used to describe common project layouts.
 #
 layout() {
-	eval "layout_$1"
+  eval "layout_$1"
 }
 
 # Usage: layout go
@@ -245,15 +245,15 @@ layout() {
 # Sets the GOPATH environment variable to the current directory.
 #
 layout_go() {
-	path_add GOPATH "$PWD"
-	PATH_add bin
+  path_add GOPATH "$PWD"
+  PATH_add bin
 }
 
 # Usage: layout node
 #
 # Adds "$PWD/node_modules/.bin" to the PATH environment variable.
 layout_node() {
-	PATH_add node_modules/.bin
+  PATH_add node_modules/.bin
 }
 
 # Usage: layout perl
@@ -277,12 +277,12 @@ layout_perl() {
 # This forces the installation of any egg into the project's sub-folder.
 #
 layout_python() {
-	export VIRTUAL_ENV=$PWD/.direnv/virtualenv
-	if ! [ -d "$VIRTUAL_ENV" ]; then
-		virtualenv --no-site-packages --distribute "$VIRTUAL_ENV"
-	fi
-	virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
-	PATH_add "$VIRTUAL_ENV/bin"
+  export VIRTUAL_ENV=$PWD/.direnv/virtualenv
+  if ! [ -d "$VIRTUAL_ENV" ]; then
+    virtualenv --no-site-packages --distribute "$VIRTUAL_ENV"
+  fi
+  virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
+  PATH_add "$VIRTUAL_ENV/bin"
 }
 
 # Usage: layout ruby
@@ -293,13 +293,13 @@ layout_python() {
 # directly instead of using the $(bundle exec) prefix.
 #
 layout_ruby() {
-	local ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
+  local ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
 
-	export GEM_HOME="$PWD/.direnv/${ruby_version}"
-	export BUNDLE_BIN="$PWD/.direnv/bin"
+  export GEM_HOME="$PWD/.direnv/${ruby_version}"
+  export BUNDLE_BIN="$PWD/.direnv/bin"
 
-	PATH_add ".direnv/${ruby_version}/bin"
-	PATH_add ".direnv/bin"
+  PATH_add ".direnv/${ruby_version}/bin"
+  PATH_add ".direnv/bin"
 }
 
 # Usage: use <program_name> [<version>]
@@ -316,10 +316,10 @@ layout_ruby() {
 #    # output: Ruby 1.9.3
 #
 use() {
-	local cmd="$1"
-	log_status "using $@"
-	shift
-	use_$cmd "$@"
+  local cmd="$1"
+  log_status "using $@"
+  shift
+  use_$cmd "$@"
 }
 
 # Usage: use rbenv
@@ -327,7 +327,7 @@ use() {
 # Loads rbenv which add the ruby wrappers available on the PATH.
 #
 use_rbenv() {
-	eval "$(rbenv init -)"
+  eval "$(rbenv init -)"
 }
 
 # Usage: rvm [...]
@@ -335,18 +335,18 @@ use_rbenv() {
 # Should work just like in the shell if you have rvm installed.#
 #
 rvm() {
-	unset rvm
-	if [ -n "${rvm_scripts_path:-}" ]; then
-		source "${rvm_scripts_path}/rvm"
-	elif [ -n "${rvm_path:-}" ]; then
-		source "${rvm_path}/scripts/rvm"
-	else
-		source "$HOME/.rvm/scripts/rvm"
-	fi
-	rvm "$@"
+  unset rvm
+  if [ -n "${rvm_scripts_path:-}" ]; then
+    source "${rvm_scripts_path}/rvm"
+  elif [ -n "${rvm_path:-}" ]; then
+    source "${rvm_path}/scripts/rvm"
+  else
+    source "$HOME/.rvm/scripts/rvm"
+  fi
+  rvm "$@"
 }
 
 ## Load the global ~/.direnvrc if present
 if [ -f "$HOME/.direnvrc" ]; then
-	source_env "~/.direnvrc" >&2
+  source_env "~/.direnvrc" >&2
 fi
