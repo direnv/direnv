@@ -15,6 +15,7 @@ var CmdStatus = &Cmd{
 
 		fmt.Println("direnv exec path", config.SelfPath)
 		fmt.Println("DIRENV_CONFIG", config.ConfDir)
+		fmt.Println("DIRENV_BASH", config.BashPath)
 
 		loadedRC := config.LoadedRC()
 		foundRC := config.FindRC()
