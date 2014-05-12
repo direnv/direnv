@@ -6,7 +6,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"\n" +
 	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %%s}\"\n" +
 	"\n" +
-	"# Usage: log_status <command>\n" +
+	"# Usage: log_status [<message> ...]\n" +
 	"#\n" +
 	"# Logs a status message. Acts like echo,\n" +
 	"# but wraps output in the standard direnv log format\n" +
@@ -19,7 +19,8 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#\n" +
 	"log_status() {\n" +
 	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
-	"    printf \"${DIRENV_LOG_FORMAT}\\n\" \"$1\" >&2\n" +
+	"    local msg=\"$@\"\n" +
+	"    printf \"${DIRENV_LOG_FORMAT}\\n\" \"$msg\" >&2\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +

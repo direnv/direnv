@@ -4,7 +4,7 @@ direnv="%s"
 
 DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
 
-# Usage: log_status <command>
+# Usage: log_status [<message> ...]
 #
 # Logs a status message. Acts like echo,
 # but wraps output in the standard direnv log format
@@ -17,7 +17,8 @@ DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
 #
 log_status() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    printf "${DIRENV_LOG_FORMAT}\n" "$1" >&2
+    local msg="$@"
+    printf "${DIRENV_LOG_FORMAT}\n" "$msg" >&2
   fi
 }
 
