@@ -294,13 +294,16 @@ layout_python() {
 # directly instead of using the $(bundle exec) prefix.
 #
 layout_ruby() {
-  local ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
-
-  export GEM_HOME="$PWD/.direnv/${ruby_version}"
+  if ruby -e "exit Gem::VERSION > '2.2.0'" 2>/dev/null; then
+    export GEM_HOME="$PWD/.direnv/ruby"
+  else
+    local ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
+    export GEM_HOME="$PWD/.direnv/ruby-${ruby_version}"
+  fi
   export BUNDLE_BIN="$PWD/.direnv/bin"
 
-  PATH_add ".direnv/${ruby_version}/bin"
-  PATH_add ".direnv/bin"
+  PATH_add "$GEM_HOME/bin"
+  PATH_add "$BUNDLE_BIN"
 }
 
 # Usage: use <program_name> [<version>]

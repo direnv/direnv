@@ -296,13 +296,16 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# directly instead of using the $(bundle exec) prefix.\n" +
 	"#\n" +
 	"layout_ruby() {\n" +
-	"  local ruby_version=\"$(ruby -e\"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION\")\"\n" +
-	"\n" +
-	"  export GEM_HOME=\"$PWD/.direnv/${ruby_version}\"\n" +
+	"  if ruby -e \"exit Gem::VERSION > '2.2.0'\" 2>/dev/null; then\n" +
+	"    export GEM_HOME=\"$PWD/.direnv/ruby\"\n" +
+	"  else\n" +
+	"    local ruby_version=\"$(ruby -e\"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION\")\"\n" +
+	"    export GEM_HOME=\"$PWD/.direnv/ruby-${ruby_version}\"\n" +
+	"  fi\n" +
 	"  export BUNDLE_BIN=\"$PWD/.direnv/bin\"\n" +
 	"\n" +
-	"  PATH_add \".direnv/${ruby_version}/bin\"\n" +
-	"  PATH_add \".direnv/bin\"\n" +
+	"  PATH_add \"$GEM_HOME/bin\"\n" +
+	"  PATH_add \"$BUNDLE_BIN\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: use <program_name> [<version>]\n" +
