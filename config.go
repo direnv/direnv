@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -40,6 +41,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		err = fmt.Errorf("LoadConfig() symlink resolution: %q", err)
 		return
 	}
+	exePath = strings.Replace(exePath, "\\", "/", -1)
 	config.SelfPath = exePath
 
 	config.BashPath = env[DIRENV_BASH]
