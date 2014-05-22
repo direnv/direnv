@@ -14,9 +14,13 @@ cd `dirname $0`/..
 mkdir -p release
 
 for PLATFORM in $PLATFORMS; do
+  EXTENSION=
   export GOOS=${PLATFORM%/*}
   export GOARCH=${PLATFORM#*/}
-  CMD="go build -o release/$OUTPUT.${GOOS}-${GOARCH}"
+  if [ $GOOS = "windows" ] ; then
+    EXTENSION=".exe"
+  fi
+  CMD="go build -o release/$OUTPUT.${GOOS}-${GOARCH}${EXTENSION}"
   echo "GOOS=${GOOS} GOARCH=${GOARCH} $CMD"
   $CMD
 done
