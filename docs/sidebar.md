@@ -16,6 +16,7 @@
 
 - [Screencasts](#/docs/screencasts)
 - [Ruby](#/docs/ruby)
+- [Vim integration](https://github.com/zimbatm/direnv.vim)
 
 ## Man pages
 - [man 1 direnv](#man/direnv.1)
