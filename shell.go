@@ -10,7 +10,6 @@ import (
  */
 type Shell interface {
 	Hook() string
-	Escape(string) string
 	Export(key, value string) string
 	Unset(key string) string
 }
