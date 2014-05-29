@@ -130,8 +130,10 @@ source_env() {
     rcpath="$rcpath/.envrc"
   fi
   log_status "loading $rcfile"
-  pushd "$(dirname "$rcpath")" > /dev/null
-  . "./$(basename "$rcpath")"
+  pushd "$(pwd -P 2>/dev/null)" > /dev/null
+    pushd "$(dirname "$rcpath")" > /dev/null
+    . "./$(basename "$rcpath")"
+    popd > /dev/null
   popd > /dev/null
 }
 
