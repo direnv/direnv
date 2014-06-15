@@ -109,7 +109,7 @@ your own extensions inside a "~/.direnvrc" file.
 
 ### Loading layered .envrc
 
-Lets say you have the following `.envrc`s
+Lets say you have the following structure:
 
 - `/a/.envrc`
 - `/a/b/.envrc`
