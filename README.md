@@ -151,17 +151,6 @@ have a chat.
 
 ## COPYRIGHT
 
-Thank you for making direnv better
-
-* Alan Brenner (aka. alanbbr) for the fish shell support
-* Alexander Kobel for his patches
-* Brian M. Clapper (aka. bmc) for his patch
-* Joshua Peek (aka. josh) for his patch and support
-* Laurie Young (aka. wildfalcon) for fixing my engrish
-* Magnus Holm (aka. judofyr) for his patches and ideas
-* Martin Aumüller (aka. aumuell) for his patches and awesomeness
-* Peter Waller (aka. pwaller) for his patches and insights
-* Sam Stephenson (aka. sstephenson) for his expand_path code that I stole from https://github.com/sstephenson/bats
-* Tim Cuthbertson (aka. gfxmonk) for his contribution over the last months
-
-Copyright (C) 2014 zimbatm and contributors under the MIT licence.
+Copyright (C) 2014 shared by all
+[contributors](https://github.com/zimbatm/direnv/graphs/contributors) under
+the MIT licence.

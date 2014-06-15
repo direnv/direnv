@@ -1,4 +1,26 @@
 
+2.4.0 / 2014-06-15
+==================
+
+ * NEW: Try to detect an editor in the PATH if EDITOR is not set.
+ * NEW: Preliminary support for vim
+ * NEW: New site: put the doc inside the project so it stays in sync
+ * NEW: Support for Cygwin - Thanks @CMCDragonkai !
+ * NEW: Allow to disable logging by setting an empty `DIRENV_LOG_FORMAT`
+ * NEW: stdlib `layout perl`. Thanks @halkeye !
+ * CHANGE: layout ruby: share the gem home starting from rubygems v2.2.0
+ * CHANGE: Allow arbitrary number of args in `log_status`
+ * CHANGE: Bump command timeout to 5 seconds
+ * FIX: Adds selected bash executable in `direnv status`
+ * FIX: man changes, replaced abandonned ronn by md2man
+ * FIX: `make install` was creating a ./bin directory
+ * FIX: issue #114 - work for blank envs. Thanks @pwaller !
+ * FIX: man pages warning. Thanks @punitagrawal !
+ * FIX: Multi-arg EDITOR was broken #108
+ * FIX: typos in doc. Thanks @HeroicEric and @lmarlow !
+ * FIX: If two paths don't have a common ancestors, don't make them relative.
+ * FIX: missing doc on layered .envrc. Thanks @take !
+
 2.3.0 / 2014-02-06
 ==================
 
