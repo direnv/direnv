@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 // `direnv edit [PATH_TO_RC]`
@@ -44,8 +45,12 @@ var CmdEdit = &Cmd{
 
 		editor := env["EDITOR"]
 		if editor == "" {
-			err = fmt.Errorf("$EDITOR not found.")
-			return
+			log_error("$EDITOR not found.")
+			editor = detectEditor(env["PATH"])
+			if editor == "" {
+				err = fmt.Errorf("Could not find a default editor in the PATH")
+				return
+			}
 		}
 
 		cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", editor, rcPath))
@@ -63,4 +68,24 @@ var CmdEdit = &Cmd{
 
 		return
 	},
+}
+
+// Utils
+
+var EDITORS = [][]string{
+	{"subl", "-w"},
+	{"mate", "-w"},
+	{"open", "-t", "-W"}, // Opens with the default text editor on mac
+	{"nano"},
+	{"vim"},
+	{"emacs"},
+}
+
+func detectEditor(pathenv string) string {
+	for _, editor := range EDITORS {
+		if _, err := lookPath(editor[0], pathenv); err == nil {
+			return strings.Join(editor, " ")
+		}
+	}
+	return ""
 }
