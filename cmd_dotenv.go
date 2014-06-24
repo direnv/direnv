@@ -56,7 +56,7 @@ var CmdDotEnv = &Cmd{
 		}
 
 		if len(args) > 2 {
-			target = args[1]
+			target = args[2]
 		}
 
 		if target == "" {
