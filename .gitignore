@@ -1,7 +1,7 @@
 .direnv
 /direnv
 /direnv.test
-/release
+/dist
 /site
 /test/allow
 man/*.html

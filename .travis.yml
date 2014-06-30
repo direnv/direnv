@@ -1,10 +1,37 @@
 language: go
-script: make test
 go:
-- 1.0
-- 1.1
-- 1.2
-- release
+- 1.3
+
+script: make test
+
 branches:
   except:
   - gh-pages
+
+before_deploy:
+  - PATH="$HOME/gopath/bin:$PATH" make dist
+deploy:
+  provider: releases
+  api_key:
+    secure: eGxwIxqo4LlMVRxBzfygfj4lAqenhc28HTcHzD5neKfwWCC/PUpk0+bMcun52b3qrdk+IYF3+dQogoLRGsGZRwXYBboLdM6vuZoQP/FxwWwsIZcmaJNdfM6+Ab8jhfJGQlg7V+vxf1ZjJi/nMbipvoeiavzHXCPqUMVPd9T55fU=
+  file:
+    - dist/direnv.darwin-386
+    - dist/direnv.darwin-amd64
+    - dist/direnv.linux-386
+    - dist/direnv.linux-amd64
+    - dist/direnv.linux-arm
+    - dist/direnv.freebsd-386
+    - dist/direnv.freebsd-amd64
+    - dist/direnv.openbsd-386
+    - dist/direnv.openbsd-amd64
+    - dist/direnv.windows-386.exe
+    - dist/direnv.windows-amd64.exe
+    - dist/direnv.freebsd-arm
+    - dist/direnv.netbsd-386
+    - dist/direnv.netbsd-amd64
+    - dist/direnv.netbsd-arm
+    - dist/direnv.plan9-386
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true

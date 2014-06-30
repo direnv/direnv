@@ -3,7 +3,7 @@ DESTDIR ?= /usr/local
 MAN_MD = $(wildcard man/*.md)
 ROFFS = $(MAN_MD:.md=)
 
-.PHONY: all man html test release install
+.PHONY: all man html test install dist
 #all: build man test
 all: build man
 
@@ -29,13 +29,14 @@ test: build
 	go test
 	./test/direnv-test.sh
 
-release: build
-	./script/release `./direnv version`
-	git tag v`./direnv version`
-
 install: all
 	install -d $(DESTDIR)/bin
 	install -d $(DESTDIR)/share/man/man1
 	install direnv $(DESTDIR)/bin
 	cp -R man/*.1 $(DESTDIR)/share/man/man1
+
+dist:
+	go get github.com/mitchellh/gox
+	gox -build-toolchain
+	gox -output "dist/{{.Dir}}.{{.OS}}-{{.Arch}}"
 
