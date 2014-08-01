@@ -132,8 +132,10 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"    rcpath=\"$rcpath/.envrc\"\n" +
 	"  fi\n" +
 	"  log_status \"loading $rcfile\"\n" +
-	"  pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
-	"  . \"./$(basename \"$rcpath\")\"\n" +
+	"  pushd \"$(pwd -P 2>/dev/null)\" > /dev/null\n" +
+	"    pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
+	"    . \"./$(basename \"$rcpath\")\"\n" +
+	"    popd > /dev/null\n" +
 	"  popd > /dev/null\n" +
 	"}\n" +
 	"\n" +
@@ -282,7 +284,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"layout_python() {\n" +
 	"  export VIRTUAL_ENV=$PWD/.direnv/virtualenv\n" +
 	"  if ! [ -d \"$VIRTUAL_ENV\" ]; then\n" +
-	"    virtualenv --no-site-packages --distribute \"$VIRTUAL_ENV\"\n" +
+	"    virtualenv \"$VIRTUAL_ENV\"\n" +
 	"  fi\n" +
 	"  virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
