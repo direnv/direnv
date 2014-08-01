@@ -282,7 +282,7 @@ layout_perl() {
 layout_python() {
   export VIRTUAL_ENV=$PWD/.direnv/virtualenv
   if ! [ -d "$VIRTUAL_ENV" ]; then
-    virtualenv --no-site-packages --distribute "$VIRTUAL_ENV"
+    virtualenv "$VIRTUAL_ENV"
   fi
   virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
   PATH_add "$VIRTUAL_ENV/bin"
