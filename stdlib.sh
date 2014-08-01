@@ -294,7 +294,7 @@ layout_python() {
 # Uses the system's installation of Python 3.
 # This forces the installation of any egg into the project's sub-folder.
 #
-layout_python() {
+layout_python3() {
   export VIRTUAL_ENV=$PWD/.direnv/virtualenv
   PYTHON=`which python3`
   if ! [ -d "$VIRTUAL_ENV" ]; then
