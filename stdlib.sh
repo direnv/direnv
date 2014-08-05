@@ -284,7 +284,6 @@ layout_python() {
   if ! [ -d "$VIRTUAL_ENV" ]; then
     virtualenv "$VIRTUAL_ENV"
   fi
-  virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
   PATH_add "$VIRTUAL_ENV/bin"
 }
 
@@ -300,7 +299,6 @@ layout_python3() {
   if ! [ -d "$VIRTUAL_ENV" ]; then
     virtualenv --python=$PYTHON "$VIRTUAL_ENV"
   fi
-  virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
   PATH_add "$VIRTUAL_ENV/bin"
 }
 
