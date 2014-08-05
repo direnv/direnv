@@ -298,18 +298,10 @@ layout_python() {
 
 # Usage: layout python3
 #
-# Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv".
-# Uses the system's installation of Python 3.
-# This forces the installation of any egg into the project's sub-folder.
+# A shortcut for $(layout python python3)
 #
 layout_python3() {
-  export VIRTUAL_ENV=$PWD/.direnv/virtualenv
-  PYTHON=`which python3`
-  if ! [ -d "$VIRTUAL_ENV" ]; then
-    virtualenv --python=$PYTHON "$VIRTUAL_ENV"
-  fi
-  virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
-  PATH_add "$VIRTUAL_ENV/bin"
+  layout_python python3
 }
 
 # Usage: layout ruby
