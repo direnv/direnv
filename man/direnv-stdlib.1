@@ -165,15 +165,18 @@ Adds "$PWD/node_modules/.bin" to the PATH environment variable.
 \fB\fClayout perl\fR:
 Setup environment variables required by perl's local::lib
 See 
-.UR http://search.cpan.org/dist/local-lib/lib/local/lib.pm
-.UE
-for more
+\[la]http://search.cpan.org/dist/local-lib/lib/local/lib.pm\[ra] for more
 details
 .IP \(bu 2
 \fB\fClayout python\fR [\fIpython_exe\fP]:
-Creates and loads a virtualenv environment under \fB\fC$PWD/.direnv/virtualenv\fR\&. This forces the installation of any egg into the project's sub\-folder.
+Creates and loads a virtualenv environment under \fB\fC$PWD/.direnv/python\-$python_version\fR\&. This forces the installation of any egg into the project's sub\-folder.
 .PP
 It's possible to specify the python executable if you want to use different versions of python (eg: \fB\fClayout python python3\fR).
+.PP
+Note that previously virtualenv was located under \fB\fC$PWD/.direnv/virtualenv\fR and will be re\-used by direnv if it exists.
+.IP \(bu 2
+\fB\fClayout python3\fR:
+A shortcut for \fB\fClayout python python3\fR
 .IP \(bu 2
 \fB\fClayout ruby\fR:
 Sets the GEM\fIHOME environment variable to `$PWD/.direnv/ruby/RUBY\fPVERSION\fB\fC\&. This forces the installation of any gems into the project's sub\-folder.
@@ -205,9 +208,7 @@ Should work just like in the shell if you have rvm installed.
 .SH COPYRIGHT
 .PP
 Copyright (C) 2014 zimbatm 
-.UR http://zimbatm.com
-.UE
-and contributors under the MIT licence.
+\[la]http://zimbatm.com\[ra] and contributors under the MIT licence.
 .SH SEE ALSO
 .PP
 .BR direnv (1)

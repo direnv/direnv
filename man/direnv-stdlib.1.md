@@ -130,9 +130,14 @@ Example:
     details
 
 * `layout python` [*python_exe*]:
-    Creates and loads a virtualenv environment under `$PWD/.direnv/virtualenv`. This forces the installation of any egg into the project's sub-folder.
+    Creates and loads a virtualenv environment under `$PWD/.direnv/python-$python_version`. This forces the installation of any egg into the project's sub-folder.
 
     It's possible to specify the python executable if you want to use different versions of python (eg: `layout python python3`).
+
+    Note that previously virtualenv was located under `$PWD/.direnv/virtualenv` and will be re-used by direnv if it exists.
+
+* `layout python3`:
+    A shortcut for `layout python python3`
 
 * `layout ruby`:
     Sets the GEM_HOME environment variable to `$PWD/.direnv/ruby/RUBY_VERSION`. This forces the installation of any gems into the project's sub-folder.

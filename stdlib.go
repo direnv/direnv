@@ -280,19 +280,24 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"\n" +
 	"# Usage: layout python <python_exe>\n" +
 	"#\n" +
-	"# Creates and loads a virtualenv environment under \"$PWD/.direnv/virtualenv\".\n" +
+	"# Creates and loads a virtualenv environment under\n" +
+	"# \"$PWD/.direnv/python-$python_version\".\n" +
 	"# This forces the installation of any egg into the project's sub-folder.\n" +
 	"#\n" +
 	"# It's possible to specify the python executable if you want to use different\n" +
 	"# versions of python.\n" +
 	"#\n" +
 	"layout_python() {\n" +
-	"  export VIRTUAL_ENV=$PWD/.direnv/virtualenv\n" +
-	"  if [ -n \"$1\" ]; then\n" +
-	"    args=\"--python=$1\"\n" +
-	"  fi\n" +
-	"  if ! [ -d \"$VIRTUAL_ENV\" ]; then\n" +
-	"    virtualenv $args \"$VIRTUAL_ENV\"\n" +
+	"  local python=\"${1:-python}\"\n" +
+	"  local old_env=\"$PWD/.direnv/virtualenv\"\n" +
+	"  if [[ -d $old_env && $python = \"python\" ]]; then\n" +
+	"    export VIRTUAL_ENV=\"$old_virtualenv\"\n" +
+	"  else\n" +
+	"    local python_version=$(\"$python\" -c \"import platform as p;print(p.python_version())\")\n" +
+	"    export VIRTUAL_ENV=\"$PWD/.direnv/python-$python_version\"\n" +
+	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
+	"      virtualenv \"--python=$python\" \"$VIRTUAL_ENV\"\n" +
+	"    fi\n" +
 	"  fi\n" +
 	"  virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
