@@ -170,8 +170,10 @@ See
 for more
 details
 .IP \(bu 2
-\fB\fClayout python\fR:
+\fB\fClayout python\fR [\fIpython_exe\fP]:
 Creates and loads a virtualenv environment under \fB\fC$PWD/.direnv/virtualenv\fR\&. This forces the installation of any egg into the project's sub\-folder.
+.PP
+It's possible to specify the python executable if you want to use different versions of python (eg: \fB\fClayout python python3\fR).
 .IP \(bu 2
 \fB\fClayout ruby\fR:
 Sets the GEM\fIHOME environment variable to `$PWD/.direnv/ruby/RUBY\fPVERSION\fB\fC\&. This forces the installation of any gems into the project's sub\-folder.

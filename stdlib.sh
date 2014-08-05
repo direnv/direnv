@@ -240,7 +240,9 @@ load_prefix() {
 # A semantic dispatch used to describe common project layouts.
 #
 layout() {
-  eval "layout_$1"
+  local name=$1
+  shift
+  eval "layout_$name" "$@"
 }
 
 # Usage: layout go
@@ -274,15 +276,21 @@ layout_perl() {
   PATH_add "$libdir/bin"
 }
 
-# Usage: layout python
+# Usage: layout python <python_exe>
 #
 # Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv".
 # This forces the installation of any egg into the project's sub-folder.
 #
+# It's possible to specify the python executable if you want to use different
+# versions of python.
+#
 layout_python() {
   export VIRTUAL_ENV=$PWD/.direnv/virtualenv
+  if [ -n "$1" ]; then
+    args="--python=$1"
+  fi
   if ! [ -d "$VIRTUAL_ENV" ]; then
-    virtualenv "$VIRTUAL_ENV"
+    virtualenv $args "$VIRTUAL_ENV"
   fi
   virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
   PATH_add "$VIRTUAL_ENV/bin"

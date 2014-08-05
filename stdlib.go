@@ -242,7 +242,9 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"# A semantic dispatch used to describe common project layouts.\n" +
 	"#\n" +
 	"layout() {\n" +
-	"  eval \"layout_$1\"\n" +
+	"  local name=$1\n" +
+	"  shift\n" +
+	"  eval \"layout_$name\" \"$@\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout go\n" +
@@ -276,15 +278,37 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"  PATH_add \"$libdir/bin\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: layout python\n" +
+	"# Usage: layout python <python_exe>\n" +
 	"#\n" +
 	"# Creates and loads a virtualenv environment under \"$PWD/.direnv/virtualenv\".\n" +
 	"# This forces the installation of any egg into the project's sub-folder.\n" +
 	"#\n" +
+	"# It's possible to specify the python executable if you want to use different\n" +
+	"# versions of python.\n" +
+	"#\n" +
 	"layout_python() {\n" +
 	"  export VIRTUAL_ENV=$PWD/.direnv/virtualenv\n" +
+	"  if [ -n \"$1\" ]; then\n" +
+	"    args=\"--python=$1\"\n" +
+	"  fi\n" +
 	"  if ! [ -d \"$VIRTUAL_ENV\" ]; then\n" +
-	"    virtualenv \"$VIRTUAL_ENV\"\n" +
+	"    virtualenv $args \"$VIRTUAL_ENV\"\n" +
+	"  fi\n" +
+	"  virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
+	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: layout python3\n" +
+	"#\n" +
+	"# Creates and loads a virtualenv environment under \"$PWD/.direnv/virtualenv\".\n" +
+	"# Uses the system's installation of Python 3.\n" +
+	"# This forces the installation of any egg into the project's sub-folder.\n" +
+	"#\n" +
+	"layout_python3() {\n" +
+	"  export VIRTUAL_ENV=$PWD/.direnv/virtualenv\n" +
+	"  PYTHON=`which python3`\n" +
+	"  if ! [ -d \"$VIRTUAL_ENV\" ]; then\n" +
+	"    virtualenv --python=$PYTHON \"$VIRTUAL_ENV\"\n" +
 	"  fi\n" +
 	"  virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
