@@ -9,9 +9,9 @@ const ZSH_HOOK = `
 _direnv_hook() {
   eval "$(direnv export zsh)";
 }
-typeset -a precmd_functions
+autoload -U add-zsh-hook
 if [[ -z $precmd_functions[(r)_direnv_hook] ]]; then
-  precmd_functions+=_direnv_hook;
+  add-zsh-hook precmd _direnv_hook;
 fi
 `
 
