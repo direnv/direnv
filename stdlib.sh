@@ -17,7 +17,7 @@ DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
 #
 log_status() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg="$@"
+    local msg="$*"
     printf "${DIRENV_LOG_FORMAT}\n" "$msg" >&2
   fi
 }
@@ -339,9 +339,9 @@ layout_ruby() {
 #
 use() {
   local cmd="$1"
-  log_status "using $@"
+  log_status "using $*"
   shift
-  use_$cmd "$@"
+  "use_$cmd" "$@"
 }
 
 # Usage: use rbenv

@@ -19,7 +19,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#\n" +
 	"log_status() {\n" +
 	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
-	"    local msg=\"$@\"\n" +
+	"    local msg=\"$*\"\n" +
 	"    printf \"${DIRENV_LOG_FORMAT}\\n\" \"$msg\" >&2\n" +
 	"  fi\n" +
 	"}\n" +
@@ -290,6 +290,22 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: layout python3\n" +
+	"#\n" +
+	"# Creates and loads a virtualenv environment under \"$PWD/.direnv/virtualenv\".\n" +
+	"# Uses the system's installation of Python 3.\n" +
+	"# This forces the installation of any egg into the project's sub-folder.\n" +
+	"#\n" +
+	"layout_python3() {\n" +
+	"  export VIRTUAL_ENV=$PWD/.direnv/virtualenv\n" +
+	"  PYTHON=`which python3`\n" +
+	"  if ! [ -d \"$VIRTUAL_ENV\" ]; then\n" +
+	"    virtualenv --python=$PYTHON \"$VIRTUAL_ENV\"\n" +
+	"  fi\n" +
+	"  virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
+	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: layout ruby\n" +
 	"#\n" +
 	"# Sets the GEM_HOME environment variable to \"$PWD/.direnv/ruby/RUBY_VERSION\".\n" +
@@ -325,9 +341,9 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"#\n" +
 	"use() {\n" +
 	"  local cmd=\"$1\"\n" +
-	"  log_status \"using $@\"\n" +
+	"  log_status \"using $*\"\n" +
 	"  shift\n" +
-	"  use_$cmd \"$@\"\n" +
+	"  \"use_$cmd\" \"$@\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: use rbenv\n" +
