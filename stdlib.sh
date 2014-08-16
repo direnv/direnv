@@ -240,7 +240,9 @@ load_prefix() {
 # A semantic dispatch used to describe common project layouts.
 #
 layout() {
-  eval "layout_$1"
+  local name=$1
+  shift
+  eval "layout_$name" "$@"
 }
 
 # Usage: layout go
@@ -274,15 +276,26 @@ layout_perl() {
   PATH_add "$libdir/bin"
 }
 
-# Usage: layout python
+# Usage: layout python <python_exe>
 #
-# Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv".
+# Creates and loads a virtualenv environment under
+# "$PWD/.direnv/python-$python_version".
 # This forces the installation of any egg into the project's sub-folder.
 #
+# It's possible to specify the python executable if you want to use different
+# versions of python.
+#
 layout_python() {
-  export VIRTUAL_ENV=$PWD/.direnv/virtualenv
-  if ! [ -d "$VIRTUAL_ENV" ]; then
-    virtualenv "$VIRTUAL_ENV"
+  local python="${1:-python}"
+  local old_env="$PWD/.direnv/virtualenv"
+  if [[ -d $old_env && $python = "python" ]]; then
+    export VIRTUAL_ENV="$old_virtualenv"
+  else
+    local python_version=$("$python" -c "import platform as p;print(p.python_version())")
+    export VIRTUAL_ENV="$PWD/.direnv/python-$python_version"
+    if [[ ! -d $VIRTUAL_ENV ]]; then
+      virtualenv "--python=$python" "$VIRTUAL_ENV"
+    fi
   fi
   virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
   PATH_add "$VIRTUAL_ENV/bin"
@@ -290,18 +303,10 @@ layout_python() {
 
 # Usage: layout python3
 #
-# Creates and loads a virtualenv environment under "$PWD/.direnv/virtualenv".
-# Uses the system's installation of Python 3.
-# This forces the installation of any egg into the project's sub-folder.
+# A shortcut for $(layout python python3)
 #
 layout_python3() {
-  export VIRTUAL_ENV=$PWD/.direnv/virtualenv
-  PYTHON=`which python3`
-  if ! [ -d "$VIRTUAL_ENV" ]; then
-    virtualenv --python=$PYTHON "$VIRTUAL_ENV"
-  fi
-  virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
-  PATH_add "$VIRTUAL_ENV/bin"
+  layout_python python3
 }
 
 # Usage: layout ruby
