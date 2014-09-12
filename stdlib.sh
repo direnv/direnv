@@ -288,6 +288,7 @@ layout_perl() {
 layout_python() {
   local python="${1:-python}"
   local old_env="$PWD/.direnv/virtualenv"
+  unset PYTHONHOME
   if [[ -d $old_env && $python = "python" ]]; then
     export VIRTUAL_ENV="$old_virtualenv"
   else

@@ -290,6 +290,7 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"layout_python() {\n" +
 	"  local python=\"${1:-python}\"\n" +
 	"  local old_env=\"$PWD/.direnv/virtualenv\"\n" +
+	"  unset PYTHONHOME\n" +
 	"  if [[ -d $old_env && $python = \"python\" ]]; then\n" +
 	"    export VIRTUAL_ENV=\"$old_virtualenv\"\n" +
 	"  else\n" +
