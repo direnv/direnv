@@ -297,7 +297,6 @@ layout_python() {
       virtualenv "--python=$python" "$VIRTUAL_ENV"
     fi
   fi
-  virtualenv --relocatable "$VIRTUAL_ENV" >/dev/null
   PATH_add "$VIRTUAL_ENV/bin"
 }
 

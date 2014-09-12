@@ -299,23 +299,6 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"      virtualenv \"--python=$python\" \"$VIRTUAL_ENV\"\n" +
 	"    fi\n" +
 	"  fi\n" +
-	"  virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
-	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
-	"}\n" +
-	"\n" +
-	"# Usage: layout python3\n" +
-	"#\n" +
-	"# Creates and loads a virtualenv environment under \"$PWD/.direnv/virtualenv\".\n" +
-	"# Uses the system's installation of Python 3.\n" +
-	"# This forces the installation of any egg into the project's sub-folder.\n" +
-	"#\n" +
-	"layout_python3() {\n" +
-	"  export VIRTUAL_ENV=$PWD/.direnv/virtualenv\n" +
-	"  PYTHON=`which python3`\n" +
-	"  if ! [ -d \"$VIRTUAL_ENV\" ]; then\n" +
-	"    virtualenv --python=$PYTHON \"$VIRTUAL_ENV\"\n" +
-	"  fi\n" +
-	"  virtualenv --relocatable \"$VIRTUAL_ENV\" >/dev/null\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
 	"}\n" +
 	"\n" +
