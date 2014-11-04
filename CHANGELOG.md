@@ -1,4 +1,16 @@
 
+2.5.0 / 2014-11-04
+==================
+
+  * NEW: Use a different virtualenv per python versions for easier version
+    switching. Eg: ./.direnv/python-${python_version}
+  * NEW: Makes `layout python3` a shortcut for `layout python python3`. Thanks
+    @ghickman !
+  * NEW: Allows to specify which executable of python to use in `layout_python`
+  * CHANGE: `layout python` now unsets $PYTHONHOME to better mimic virtualenv
+  * CHANGE: Don't make virtualenvs relocatable. Fixes #137
+  * OTHER: Use Travis to push release builds to github
+
 2.4.0 / 2014-06-15
 ==================
 
