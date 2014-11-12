@@ -10,11 +10,7 @@ type tcsh int
 var TCSH tcsh
 
 func (f tcsh) Hook() string {
-	return `
-function __direnv_export_eval --on-event tcsh_prompt;
-	eval (direnv export tcsh);
-end
-`
+	return "alias precmd eval `direnv export tcsh)` "
 }
 
 func (f tcsh) Escape(str string) string {
