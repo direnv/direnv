@@ -30,6 +30,8 @@ func DetectShell(target string) Shell {
 		return FISH
 	case "vim":
 		return VIM
+	case "tcsh":
+		return TCSH
 	}
 
 	return nil
