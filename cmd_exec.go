@@ -48,9 +48,6 @@ var CmdExec = &Cmd{
 		}
 
 		rc := FindRC(rcPath, config.AllowDir())
-		if rc == nil {
-			return fmt.Errorf(".envrc not found")
-		}
 
 		// Restore pristine environment if needed
 		if backupDiff, err = config.EnvDiff(); err == nil {
@@ -61,8 +58,12 @@ var CmdExec = &Cmd{
 		delete(env, DIRENV_DIFF)
 
 		// Load the rc
-		if newEnv, err = rc.Load(config, env); err != nil {
-			return
+		if rc != nil {
+			if newEnv, err = rc.Load(config, env); err != nil {
+				return
+			}
+		} else {
+			newEnv = env
 		}
 
 		command, err = lookPath(command, newEnv["PATH"])
