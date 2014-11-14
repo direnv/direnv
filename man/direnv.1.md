@@ -67,15 +67,23 @@ that manipulate your prompt.
 
 ### ZSH
 
-Add the previous line at the end of you "~/.zshrc" file:
+Add the following line at the end of you "~/.zshrc" file:
 
 `eval "$(direnv hook zsh)"`
 
 ### FISH
 
-Add the previous line at the end of your "~/.config/fish/config.fish" file:
+Add the following line at the end of your "~/.config/fish/config.fish" file:
 
 `eval (direnv hook fish)`
+
+### TCSH
+
+Add the following line at the end of your "~/.cshrc" file:
+
+    eval `direnv hook tcsh`
+
+
 
 USAGE
 -----
