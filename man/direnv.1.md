@@ -67,7 +67,7 @@ that manipulate your prompt.
 
 ### ZSH
 
-Add the following line at the end of you "~/.zshrc" file:
+Add the following line at the end of your "~/.zshrc" file:
 
 `eval "$(direnv hook zsh)"`
 
