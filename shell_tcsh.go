@@ -10,7 +10,7 @@ type tcsh int
 var TCSH tcsh
 
 func (f tcsh) Hook() string {
-	return "alias precmd eval `direnv export tcsh)` "
+	return "alias precmd 'eval `direnv export tcsh`' "
 }
 
 func (f tcsh) Escape(str string) string {
@@ -51,6 +51,8 @@ func (f tcsh) Escape(str string) string {
 			escaped(`\n`)
 		case char == CR:
 			escaped(`\r`)
+		case char == SPACE:
+			backslash(char)
 		case char <= US:
 			hex(char)
 		case char <= AMPERSTAND:
@@ -92,11 +94,11 @@ func (f tcsh) Escape(str string) string {
 
 func (f tcsh) Export(key, value string) string {
 	if key == "PATH" {
-		command := "setenv PATH"
+		command := "set path = ("
 		for _, path := range strings.Split(value, ":") {
 			command += " " + f.Escape(path)
 		}
-		return command + ";"
+		return command + " );"
 	}
 	return "setenv " + f.Escape(key) + " " + f.Escape(value) + ";"
 }
