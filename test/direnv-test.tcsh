@@ -88,32 +88,32 @@ cd $TEST_DIR/scenarios/child-env
   test 0 -eq "$?REMOVE_ME"
 cd $TEST_DIR ; direnv_eval
 
-cd $TEST_DIR/scenarios/special-vars
-  direnv allow
-  echo "Testing special-vars"
-  setenv DIRENV_BASH `which bash`
-  setenv DIRENV_CONFIG foobar
-  direnv_eval || true
-  test -n "$DIRENV_BASH"
-  test "$DIRENV_CONFIG" = "foobar"
-  unsetenv DIRENV_BASH
-  unsetenv DIRENV_CONFIG
-cd $TEST_DIR ; direnv_eval
+# cd $TEST_DIR/scenarios/special-vars
+#   direnv allow
+#   echo "Testing special-vars"
+#   setenv DIRENV_BASH `which bash`
+#   setenv DIRENV_CONFIG foobar
+#   direnv_eval || true
+#   test -n "$DIRENV_BASH"
+#   test "$DIRENV_CONFIG" = "foobar"
+#   unsetenv DIRENV_BASH
+#   unsetenv DIRENV_CONFIG
+# cd $TEST_DIR ; direnv_eval
 
 cd $TEST_DIR/scenarios/"empty-var"
   direnv allow 
   echo "Testing empty-var"
   direnv_eval
-  test "${FOO-unsetenv}" != "unsetenv"
-  test "${FOO}" = ""
+  test "$?FOO" -eq 1 
+  test "$FOO" = ""
 cd $TEST_DIR ; direnv_eval
 
-cd $TEST_DIR/scenarios/"empty-var-unsetenv"
+cd $TEST_DIR/scenarios/"empty-var-unset"
   direnv allow
-  echo "Testing empty-var-unsetenv"
+  echo "Testing empty-var-unset"
   setenv FOO ""
   direnv_eval
-  test "${FOO-unsetenv}" == "unsetenv"
+  test "$?FOO" -eq '0'
   unsetenv FOO
 cd $TEST_DIR ; direnv_eval
 
