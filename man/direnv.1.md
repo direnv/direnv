@@ -85,7 +85,7 @@ directives in it.
 
 On the next prompt you will notice that direnv complains about the ".envrc"
 being blocked. This is the security mechanism to avoid loading new files
-automatically. Otherwise and git repo that you pull, or tar archive that you
+automatically. Otherwise any git repo that you pull, or tar archive that you
 unpack, would be able to wipe your hard drive once you `cd` into it.
 
 So here we are pretty sure that it won't do anything bad. Type `direnv allow .`
@@ -93,7 +93,7 @@ and watch direnv loading your new environment. Note that `direnv edit .` is a
 handy shortcut that open the file in your $EDITOR and automatically allows it
 if the file's modification time has changed.
 
-Now that the environment is loaded you can notice that once your `cd` out
+Now that the environment is loaded you can notice that once you `cd` out
 of the directory it automatically gets unloaded. If you `cd` back into it it's
 loaded again. That's the base of the mechanism that allows you to build cool
 things.
