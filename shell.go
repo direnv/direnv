@@ -30,6 +30,8 @@ func DetectShell(target string) Shell {
 		return FISH
 	case "vim":
 		return VIM
+	case "tcsh":
+		return TCSH
 	}
 
 	return nil
@@ -45,6 +47,7 @@ const (
 	LF            = 10
 	CR            = 13
 	US            = 31
+	SPACE         = 32
 	AMPERSTAND    = 38
 	SINGLE_QUOTE  = 39
 	PLUS          = 43

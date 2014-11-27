@@ -56,14 +56,19 @@ Make sure it appears even after rvm, git\-prompt and other shell extensions
 that manipulate your prompt.
 .SS ZSH
 .PP
-Add the previous line at the end of you "~/.zshrc" file:
+Add the following line at the end of you "~/.zshrc" file:
 .PP
 \fB\fCeval "$(direnv hook zsh)"\fR
 .SS FISH
 .PP
-Add the previous line at the end of your "~/.config/fish/config.fish" file:
+Add the following line at the end of your "~/.config/fish/config.fish" file:
 .PP
 \fB\fCeval (direnv hook fish)\fR
+.SS TCSH
+.PP
+Add the following line at the end of your "~/.cshrc" file:
+.PP
+\fB\fCeval `direnv hook tcsh`\f
 .SH USAGE
 .PP
 In some target folder, create an ".envrc" file and add some 
