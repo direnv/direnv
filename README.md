@@ -98,7 +98,7 @@ and watch direnv loading your new environment. Note that `direnv edit .` is a
 handy shortcut that opens the file in your $EDITOR and automatically allows it
 if the file's modification time has changed.
 
-Now that the environment is loaded you can notice that once your `cd` out
+Now that the environment is loaded you can notice that once you `cd` out
 of the directory it automatically gets unloaded. If you `cd` back into it it's
 loaded again. That's the base of the mechanism that allows you to build cool
 things.
