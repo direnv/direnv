@@ -44,7 +44,7 @@ nope
 Dependencies: make, golang
 
 ```bash
-git clone http://github.com/zimbatm/direnv
+git clone https://github.com/zimbatm/direnv
 cd direnv
 make install
 # or symlink ./direnv into your $PATH
