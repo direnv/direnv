@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -58,7 +59,7 @@ func (self *RC) Allow() (err error) {
 	if err = os.MkdirAll(filepath.Dir(self.allowPath), 0755); err != nil {
 		return
 	}
-	if err = touch(self.allowPath); err != nil {
+	if err = allow(self.path, self.allowPath); err != nil {
 		return
 	}
 	self.mtime, err = fileMtime(self.allowPath)
@@ -205,14 +206,12 @@ func fileHash(path string) (hash string, err error) {
 // Creates a file
 
 func touch(path string) (err error) {
-	file, err := os.OpenFile(path, os.O_CREATE, 0644)
-	if err != nil {
-		return
-	}
-	file.Close()
-
 	t := time.Now()
 	return os.Chtimes(path, t, t)
+}
+
+func allow(path string, allowPath string) (err error) {
+	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
 }
 
 func findUp(searchDir string, fileName string) (path string) {
