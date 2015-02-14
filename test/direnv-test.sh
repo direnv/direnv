@@ -87,6 +87,13 @@ test_start "special-vars"
   unset DIRENV_CONFIG
 test_stop
 
+test_start "dump"
+  direnv_eval
+  test "$LS_COLORS" = "*.ogg=38;5;45:*.wav=38;5;45"
+  test "$THREE_BACKSLASHES" = '\\\'
+  test "$LESSOPEN" = "||/usr/bin/lesspipe.sh %s"
+test_stop
+
 test_start "empty-var"
   direnv_eval
   test "${FOO-unset}" != "unset"
