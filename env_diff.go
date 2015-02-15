@@ -114,6 +114,9 @@ func IgnoredEnv(key string) bool {
 	if strings.HasPrefix(key, "__fish") {
 		return true
 	}
+	if strings.HasPrefix(key, "BASH_FUNC_") {
+		return true
+	}
 	_, found := IGNORED_KEYS[key]
 	return found
 }
