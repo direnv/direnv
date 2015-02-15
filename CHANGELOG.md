@@ -1,4 +1,15 @@
 
+2.6.0 / 2015-02-15
+==================
+
+  * NEW: tcsh is now supported ! Thanks @bbense
+  * CHANGE: `direnv dump` now ignores `BASH_FUNC_` exports. Thanks @gfxmonk
+  * CHANGE: Interactive input during load is now possible. Thanks @toao
+  * FIX: allow workaround for tmux users: `alias tmux='direnv exec / tmux'`
+  * FIX: hardened fish shell escaping thanks to @gfxmonk
+
+Thanks @bbense @vially and @dadooda for corrections in the docs
+
 2.5.0 / 2014-11-04
 ==================
 
