@@ -18,16 +18,13 @@ end
 }
 
 func (f fish) Escape(str string) string {
-	if str == "" {
-		return "''"
-	}
 	in := []byte(str)
-	out := ""
+	out := "'"
 	i := 0
 	l := len(in)
 
 	hex := func(char byte) {
-		out += fmt.Sprintf("\\x%02x", char)
+		out += fmt.Sprintf("'\\x%02x'", char)
 	}
 
 	backslash := func(char byte) {
@@ -35,11 +32,7 @@ func (f fish) Escape(str string) string {
 	}
 
 	escaped := func(str string) {
-		out += str
-	}
-
-	quoted := func(char byte) {
-		out += string([]byte{char})
+		out += "'" + str + "'"
 	}
 
 	literal := func(char byte) {
@@ -57,32 +50,12 @@ func (f fish) Escape(str string) string {
 			escaped(`\r`)
 		case char <= US:
 			hex(char)
-		case char <= AMPERSTAND:
-			quoted(char)
 		case char == SINGLE_QUOTE:
 			backslash(char)
-		case char <= PLUS:
-			quoted(char)
-		case char <= NINE:
-			literal(char)
-		case char <= QUESTION:
-			quoted(char)
-		case char <= LOWERCASE_Z:
-			literal(char)
-		case char == OPEN_BRACKET:
-			quoted(char)
 		case char == BACKSLASH:
 			backslash(char)
-		case char <= CLOSE_BRACKET:
-			quoted(char)
-		case char == UNDERSCORE:
-			literal(char)
-		case char <= BACKTICK:
-			quoted(char)
-		case char <= LOWERCASE_Z:
-			literal(char)
 		case char <= TILDA:
-			quoted(char)
+			literal(char)
 		case char == DEL:
 			hex(char)
 		default:
@@ -90,6 +63,8 @@ func (f fish) Escape(str string) string {
 		}
 		i += 1
 	}
+
+	out += "'"
 
 	return out
 }
