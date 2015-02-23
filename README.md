@@ -60,7 +60,9 @@ Links to binary builds are also available on
 ## Setup
 
 For direnv to work properly it needs to be hooked into the shell. Each shell
-has it's own extension mechanism:
+has it's own extension mechanism, which you can copy and paste from the 
+console after running the `direnv hook SHELL` command (where shell is the 
+name of shell you are using.) For example:
 
 ### BASH
 
@@ -69,7 +71,8 @@ Add the following line at the end of your "~/.bashrc" file:
 `eval "$(direnv hook bash)"`
 
 Make sure it appears even after rvm, git-prompt and other shell extensions
-that manipulate your prompt.
+that manipulate your prompt. You may need to add `source ~/.bashrc` to your 
+"~/.bash_profile" file.
 
 ### ZSH
 
