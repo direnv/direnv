@@ -1,15 +1,15 @@
 direnv -- Unclutter your .profile
 =================================
 
-`direnv` is an environment variable manager for your shell. It knows how to
-hook into bash, zsh and fish shell to load or unload environment variables
-depending on your current directory. This allows to have project-specific
+`direnv` is an environment switcher for the shell. It knows how to hook into
+bash, zsh, tcsh and fish shell to load or unload environment variables
+depending on the current directory. This allows to have project-specific
 environment variables and not clutter the "~/.profile" file.
 
 Before each prompt it checks for the existence of an ".envrc" file in the
-current and parent directories. If the file exists, it is loaded into a bash
-sub-shell and all exported variables are then captured by direnv and then made
-available to your shell.
+current and parent directories. If the file exists (and authorized), it is
+loaded into a bash sub-shell and all exported variables are then captured by
+direnv and then made available the current shell.
 
 Because direnv is compiled into a single static executable it is fast enough
 to be unnoticeable on each prompt. It is also language agnostic and can be
@@ -47,7 +47,7 @@ Dependencies: make, golang
 git clone https://github.com/zimbatm/direnv
 cd direnv
 make install
-# or symlink ./direnv into your $PATH
+# or symlink ./direnv into the $PATH
 ```
 
 ### Packaged
@@ -64,30 +64,38 @@ has it's own extension mechanism:
 
 ### BASH
 
-Add the following line at the end of your "~/.bashrc" file:
+Add the following line at the end of the "~/.bashrc" file:
 
-`eval "$(direnv hook bash)"`
+```sh
+eval "$(direnv hook bash)"
+```
 
 Make sure it appears even after rvm, git-prompt and other shell extensions
-that manipulate your prompt.
+that manipulate the prompt.
 
 ### ZSH
 
-Add the following line at the end of your "~/.zshrc" file:
+Add the following line at the end of the "~/.zshrc" file:
 
-`eval "$(direnv hook zsh)"`
+```sh
+eval "$(direnv hook zsh)"
+```
 
 ### FISH
 
-Add the following line at the end of your "~/.config/fish/config.fish" file:
+Add the following line at the end of the "~/.config/fish/config.fish" file:
 
-`eval (direnv hook fish)`
+```fish
+eval (direnv hook fish)
+```
 
 ### TCSH
 
-Add the following line at the end of your "~/.cshrc" file:
+Add the following line at the end of the "~/.cshrc" file:
 
-    eval `direnv hook tcsh`
+```sh
+eval `direnv hook tcsh`
+```
 
 
 ## Usage
@@ -131,15 +139,19 @@ It's also possible to create your own extensions by creating a bash file at
 
 Lets say you have the following structure:
 
-- `/a/.envrc`
-- `/a/b/.envrc`
+- "/a/.envrc"
+- "/a/b/.envrc"
 
-If you add the following line in `/a/b/.envrc`, you can load both of the
-`.envrc` when you are in `/a/b`:
+If you add the following line in "/a/b/.envrc", you can load both of the
+".envrc" when you are in `/a/b`:
 
-```
+```sh
 source_env ..
 ```
+
+## Similar projects
+
+* [autoenv](https://github.com/kennethreitz/autoenv) - lightweight, doesn't support unloads
 
 ## Contribute
 
