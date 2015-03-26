@@ -30,5 +30,5 @@ func (x vim) Export(key, value string) string {
 }
 
 func (x vim) Unset(key string) string {
-	return "unlet $" + x.EscapeKey(key) + "\n"
+	return "let $" + x.EscapeKey(key) + " = ''\n"
 }
