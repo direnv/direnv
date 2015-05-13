@@ -151,6 +151,7 @@ source_env ..
 
 ## Similar projects
 
+* [Environment Modules](http://modules.sourceforge.net/) - one of the oldest (in a good way) environment loading system
 * [autoenv](https://github.com/kennethreitz/autoenv) - lightweight, doesn't support unloads
 
 ## Contribute
