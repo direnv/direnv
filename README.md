@@ -164,8 +164,9 @@ All bugs or other forms of discussion happen on
 There is also a wiki available where you can share your usage patterns or
 other tips and tricks <https://github.com/zimbatm/direnv/wiki>
 
-Or drop by on the [#direnv channel on FreeNode](irc://#direnv@FreeNode) to
-have a chat.
+Or drop by on
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/zimbatm/direnv?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+to have a chat.
 
 [![Build Status](https://api.travis-ci.org/zimbatm/direnv.png?branch=master)](http://travis-ci.org/zimbatm/direnv)
 
