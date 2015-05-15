@@ -1,6 +1,8 @@
 direnv -- Unclutter your .profile
 =================================
 
+[![Join the chat at https://gitter.im/zimbatm/direnv](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/zimbatm/direnv?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 `direnv` is an environment switcher for the shell. It knows how to hook into
 bash, zsh, tcsh and fish shell to load or unload environment variables
 depending on the current directory. This allows to have project-specific
