@@ -135,6 +135,8 @@ source_env() {
     then
       log_status "loading $rcfile"
       . "./$(basename "$rcpath")"
+    else
+      log_status "referenced $rcfile does not exist"
     fi
     popd > /dev/null
   popd > /dev/null

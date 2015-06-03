@@ -137,6 +137,8 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"    then\n" +
 	"      log_status \"loading $rcfile\"\n" +
 	"      . \"./$(basename \"$rcpath\")\"\n" +
+	"    else\n" +
+	"      log_status \"referenced $rcfile does not exist\"\n" +
 	"    fi\n" +
 	"    popd > /dev/null\n" +
 	"  popd > /dev/null\n" +
