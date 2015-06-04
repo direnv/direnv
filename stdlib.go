@@ -131,10 +131,15 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"    rcfile=\"$rcfile/.envrc\"\n" +
 	"    rcpath=\"$rcpath/.envrc\"\n" +
 	"  fi\n" +
-	"  log_status \"loading $rcfile\"\n" +
 	"  pushd \"$(pwd -P 2>/dev/null)\" > /dev/null\n" +
 	"    pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
-	"    . \"./$(basename \"$rcpath\")\"\n" +
+	"    if [ -f \"./$(basename \"$rcpath\")\" ]\n" +
+	"    then\n" +
+	"      log_status \"loading $rcfile\"\n" +
+	"      . \"./$(basename \"$rcpath\")\"\n" +
+	"    else\n" +
+	"      log_status \"referenced $rcfile does not exist\"\n" +
+	"    fi\n" +
 	"    popd > /dev/null\n" +
 	"  popd > /dev/null\n" +
 	"}\n" +

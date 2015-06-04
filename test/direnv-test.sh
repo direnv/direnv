@@ -107,6 +107,10 @@ test_start "empty-var-unset"
   unset FOO
 test_stop
 
+test_start "missing-file-source-env"
+  direnv_eval
+test_stop
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.
