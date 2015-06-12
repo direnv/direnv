@@ -9,16 +9,21 @@
   <script src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 
   <!-- marked -->
-  <script src="//chutsu.github.io/ditto/ver/0.1/marked.js"></script>
+  <script src="//chutsu.github.io/ditto/ver/0.12/marked.js"></script>
+
+  <!-- highlight -->
+  <link rel="stylesheet" href="//chutsu.github.io/ditto/ver/0.12/github.css"> 
+  <script src="//chutsu.github.io/ditto/ver/0.12/highlight.js"></script>
 
   <!-- ditto -->
-  <script src="//chutsu.github.io/ditto/ver/0.1/ditto.js"></script>
-  <link rel="stylesheet" href="//chutsu.github.io/ditto/ver/0.1/ditto.css">
+  <link rel="stylesheet" href="//chutsu.github.io/ditto/ver/0.12/ditto.css">
+  <script src="//chutsu.github.io/ditto/ver/0.12/ditto.js"></script>
 </head>
 <body>
   <!-- essential -->
   <div id="sidebar"></div>
   <div id="content"></div>
+  <div id="hide"></div>
 
   <!-- optional -->
   <div id="back_to_top">back to top</div>
@@ -27,19 +32,22 @@
   <div id="error"></div>
 
   <script>
-    // essential settings
-  ditto.index = "README.md";
-  ditto.sidebar_file = "docs/sidebar.md";
+    $(function($) {
+      // essential settings
+      ditto.index = "README.md";
+      ditto.sidebar_file = "docs/sidebar.md";
 
-  // optional settings if you want github search
-  ditto.github_username = "zimbatm";
-  ditto.github_repo = "direnv";
+      // optional settings if you want github search
+      ditto.github_username = "zimbatm";
+      ditto.github_repo = "direnv";
+      ditto.highlight_code = true;
 
-  // where the docs are actually stored on github - so you can edit
-  ditto.base_url = "https://github.com/zimbatm/direnv/edit/master";
+      // where the docs are actually stored on github - so you can edit
+      ditto.base_url = "https://github.com/zimbatm/direnv/edit/master";
 
-  // run
-  ditto.run();
+      // run
+      ditto.run();
+    });
   </script>
 </body>
 </html>
