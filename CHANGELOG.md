@@ -1,4 +1,11 @@
 
+2.6.1 / 2015-06-23
+==================
+
+  * FIX: source_env handles missing .envrc gracefully. Thanks @gerhard
+  * FIX: Empty variable as unloading in Vim. Thanks @p0deje
+  * FIX: Corrected spelling mistake in deny command. Thanks @neanias
+
 2.6.0 / 2015-02-15
 ==================
 
