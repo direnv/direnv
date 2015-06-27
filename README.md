@@ -44,7 +44,7 @@ nope
 Dependencies: make, golang
 
 ```bash
-git clone https://github.com/zimbatm/direnv
+git clone https://github.com/direnv/direnv
 cd direnv
 make install
 # or symlink ./direnv into the $PATH
@@ -55,7 +55,7 @@ make install
 There's package definitions on Homebrew, Arch's AUR and NixOS's nixpkgs.
 
 Links to binary builds are also available on
-[each release](https://github.com/zimbatm/direnv/releases).
+[each release](https://github.com/direnv/direnv/releases).
 
 ## Setup
 
@@ -159,19 +159,19 @@ source_env ..
 Bug reports, contributions and forks are welcome.
 
 All bugs or other forms of discussion happen on
-<http://github.com/zimbatm/direnv/issues>
+<http://github.com/direnv/direnv/issues>
 
 There is also a wiki available where you can share your usage patterns or
-other tips and tricks <https://github.com/zimbatm/direnv/wiki>
+other tips and tricks <https://github.com/direnv/direnv/wiki>
 
 Or drop by on
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/zimbatm/direnv?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/direnv/direnv?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 to have a chat.
 
-[![Build Status](https://api.travis-ci.org/zimbatm/direnv.png?branch=master)](http://travis-ci.org/zimbatm/direnv)
+[![Build Status](https://api.travis-ci.org/direnv/direnv.png?branch=master)](http://travis-ci.org/direnv/direnv)
 
 ## COPYRIGHT
 
 Copyright (C) 2014 shared by all
-[contributors](https://github.com/zimbatm/direnv/graphs/contributors) under
+[contributors](https://github.com/direnv/direnv/graphs/contributors) under
 the MIT licence.

@@ -56,7 +56,7 @@ Make sure it appears even after rvm, git\-prompt and other shell extensions
 that manipulate your prompt.
 .SS ZSH
 .PP
-Add the following line at the end of you "~/.zshrc" file:
+Add the following line at the end of your "~/.zshrc" file:
 .PP
 \fB\fCeval "$(direnv hook zsh)"\fR
 .SS FISH
@@ -68,7 +68,11 @@ Add the following line at the end of your "~/.config/fish/config.fish" file:
 .PP
 Add the following line at the end of your "~/.cshrc" file:
 .PP
-\fB\fCeval `direnv hook tcsh`\f
+.RS
+.nf
+eval `direnv hook tcsh`
+.fi
+.RE
 .SH USAGE
 .PP
 In some target folder, create an ".envrc" file and add some 
@@ -103,18 +107,14 @@ Hopefully this is enough to get you started.
 Bug reports, contributions and forks are welcome.
 .PP
 All bugs or other forms of discussion happen on
-.UR http://github.com/zimbatm/direnv/issues
-.UE
+\[la]http://github.com/direnv/direnv/issues\[ra]
 .PP
 There is also a wiki available where you can share your usage patterns or
 other tips and tricks 
-.UR https://github.com/zimbatm/direnv/wiki
-.UE
+\[la]https://github.com/direnv/direnv/wiki\[ra]
 .PP
 Or drop by on the #direnv channel on FreeNode
-.UR irc://#direnv@FreeNode
-.UE
-to
+\[la]irc://#direnv@FreeNode\[ra] to
 have a chat.
 .SH COPYRIGHT
 .PP

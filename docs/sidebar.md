@@ -7,16 +7,16 @@
 
 ## Github
 
-- [Repo](https://github.com/zimbatm/direnv)
-- [Issues](https://github.com/zimbatm/direnv/issues)
-- [Releases](https://github.com/zimbatm/direnv/releases)
-- [Wiki](https://github.com/zimbatm/direnv/wiki)
+- [Repo](https://github.com/direnv/direnv)
+- [Issues](https://github.com/direnv/direnv/issues)
+- [Releases](https://github.com/direnv/direnv/releases)
+- [Wiki](https://github.com/direnv/direnv/wiki)
 
 ## Guides
 
 - [Screencasts](#/docs/screencasts)
 - [Ruby](#/docs/ruby)
-- [Vim integration](https://github.com/zimbatm/direnv.vim)
+- [Vim integration](https://github.com/direnv/direnv.vim)
 
 ## Man pages
 - [man 1 direnv](#man/direnv.1)
