@@ -26,12 +26,14 @@ func DetectShell(target string) Shell {
 		return BASH
 	case "zsh":
 		return ZSH
+	case "tcsh":
+		return TCSH
 	case "fish":
 		return FISH
 	case "vim":
 		return VIM
-	case "tcsh":
-		return TCSH
+	case "emacs":
+		return EMACS
 	}
 
 	return nil
