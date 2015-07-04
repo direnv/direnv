@@ -45,7 +45,7 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"# Usage: expand_path <rel_path> [<relative_to>]\n" +
 	"#\n" +
-	"# Outputs the absolute path of <rel_path> relaitve to <relative_to> or the\n" +
+	"# Outputs the absolute path of <rel_path> relative to <relative_to> or the\n" +
 	"# current directory.\n" +
 	"#\n" +
 	"# Example:\n" +

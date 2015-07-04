@@ -43,7 +43,7 @@ has() {
 
 # Usage: expand_path <rel_path> [<relative_to>]
 #
-# Outputs the absolute path of <rel_path> relaitve to <relative_to> or the
+# Outputs the absolute path of <rel_path> relative to <relative_to> or the
 # current directory.
 #
 # Example:
