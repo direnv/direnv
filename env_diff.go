@@ -17,6 +17,7 @@ var IGNORED_KEYS = map[string]bool{
 	"OLDPWD": true,
 	"PWD":    true,
 	"SHELL":  true,
+	"SHELLOPTS": true,
 	"SHLVL":  true,
 	"_":      true,
 }
