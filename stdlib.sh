@@ -390,6 +390,8 @@ use_nix() {
 }
 
 ## Load the global ~/.direnvrc if present
-if [ -f "$HOME/.direnvrc" ]; then
+if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" ]; then
+  source_env "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" >&2
+elif [ -f "$HOME/.direnvrc" ]; then
   source_env "~/.direnvrc" >&2
 fi
