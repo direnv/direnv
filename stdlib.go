@@ -380,6 +380,17 @@ const STDLIB = "# These are the commands available in an .envrc context\n" +
 	"  rvm \"$@\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use_nix [...]\n" +
+	"#\n" +
+	"# Load environment variables from `nix-shell`.\n" +
+	"# If you have a `default.nix` or `shell.nix` these will be\n" +
+	"# used by default, but you can also specify packages directly\n" +
+	"# (e.g `use nix -p ocaml`).\n" +
+	"#\n" +
+	"use_nix() {\n" +
+	"  direnv_load nix-shell --show-trace \"$@\" --run 'direnv dump'\n" +
+	"}\n" +
+	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [ -f \"$HOME/.direnvrc\" ]; then\n" +
 	"  source_env \"~/.direnvrc\" >&2\n" +

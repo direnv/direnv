@@ -378,6 +378,17 @@ rvm() {
   rvm "$@"
 }
 
+# Usage: use_nix [...]
+#
+# Load environment variables from `nix-shell`.
+# If you have a `default.nix` or `shell.nix` these will be
+# used by default, but you can also specify packages directly
+# (e.g `use nix -p ocaml`).
+#
+use_nix() {
+  direnv_load nix-shell --show-trace "$@" --run 'direnv dump'
+}
+
 ## Load the global ~/.direnvrc if present
 if [ -f "$HOME/.direnvrc" ]; then
   source_env "~/.direnvrc" >&2
