@@ -20,7 +20,7 @@ DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
 #
 log_status() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg="$*"
+    local msg=$*
     # shellcheck disable=SC2059
     printf "${DIRENV_LOG_FORMAT}\n" "$msg" >&2
   fi
@@ -79,14 +79,14 @@ dotenv() {
 #    # output: /usr/local/lib
 #
 user_rel_path() {
-  local abs_path="${1#-}"
+  local abs_path=${1#-}
 
-  if [ -z "$abs_path" ]; then return; fi
+  if [[ -z $abs_path ]]; then return; fi
 
-  if [ -n "$HOME" ]; then
-    local rel_path="${abs_path#$HOME}"
-    if [ "$rel_path" != "$abs_path" ]; then
-      abs_path="~${rel_path}"
+  if [[ -n $HOME ]]; then
+    local rel_path=${abs_path#$HOME}
+    if [[ $rel_path != "$abs_path" ]]; then
+      abs_path=~$rel_path
     fi
   fi
 
@@ -111,11 +111,11 @@ find_up() {
   (
     cd "$(pwd -P 2>/dev/null)"
     while true; do
-      if [ -f "$1" ]; then
+      if [[ -f $1 ]]; then
         echo "$PWD/$1"
         return 0
       fi
-      if [ "$PWD" = "/" ] || [ "$PWD" = "//" ]; then
+      if [[ $PWD = / ]] || [[ $PWD = // ]]; then
         return 1
       fi
       cd ..
@@ -127,16 +127,15 @@ find_up() {
 #
 # Loads another ".envrc" either by specifying its path or filename.
 source_env() {
-  local rcpath="${1/#\~/$HOME}"
+  local rcpath=${1/#\~/$HOME}
   local rcfile
-  if ! [ -f "$rcpath" ]; then
-    rcpath="$rcpath/.envrc"
+  if ! [[ -f $rcpath ]]; then
+    rcpath=$rcpath/.envrc
   fi
   rcfile=$(user_rel_path "$rcpath")
   pushd "$(pwd -P 2>/dev/null)" > /dev/null
     pushd "$(dirname "$rcpath")" > /dev/null
-    if [ -f "./$(basename "$rcpath")" ]
-    then
+    if [[ -f ./$(basename "$rcpath") ]]; then
       log_status "loading $rcfile"
       . "./$(basename "$rcpath")"
     else
@@ -151,13 +150,13 @@ source_env() {
 # Loads another ".envrc" if found with the find_up command.
 #
 source_up() {
-  local file="$1"
+  local file=$1
   local dir
-  if [ -z "$file" ]; then
-    file=".envrc"
+  if [[ -z $file ]]; then
+    file=.envrc
   fi
-  dir="$(cd .. && find_up "$file")"
-  if [ -n "$dir" ]; then
+  dir=$(cd .. && find_up "$file")
+  if [[ -n $dir ]]; then
     source_env "$(user_rel_path "$dir")"
   fi
 }
@@ -171,9 +170,11 @@ source_up() {
 # the results with direnv_load.
 #
 direnv_load() {
-  exports="$("$direnv" apply_dump <("$@"))"
-  if test "$?" -ne 0; then
-    exit 1
+  local exports
+  exports=$("$direnv" apply_dump <("$@"))
+  local es=$?
+  if [[ $es -ne 0 ]]; then
+    return $es
   fi
   eval "$exports"
 }
@@ -192,7 +193,7 @@ direnv_load() {
 #    # output: /home/user/my/project/bin:/usr/bin:/bin
 #
 PATH_add() {
-  PATH="$(expand_path "$1"):$PATH"
+  PATH=$(expand_path "$1"):$PATH
   export PATH
 }
 
@@ -200,17 +201,17 @@ PATH_add() {
 #
 # Works like PATH_add except that it's for an arbitrary <varname>.
 path_add() {
-  local old_paths="${!1}"
+  local old_paths=${!1}
   local dir
-  dir="$(expand_path "$2")"
+  dir=$(expand_path "$2")
 
-  if [ -z "$old_paths" ]; then
-    old_paths="$dir"
+  if [[ -z $old_paths ]]; then
+    old_paths=$dir
   else
-    old_paths="$dir:$old_paths"
+    old_paths=$dir:$old_paths
   fi
 
-  export $1="$old_paths"
+  export $1=$old_paths
 }
 
 # Usage: load_prefix <prefix_path>
@@ -238,7 +239,7 @@ path_add() {
 #
 load_prefix() {
   local dir
-  dir="$(expand_path "$1")"
+  dir=$(expand_path "$1")
   path_add CPATH "$dir/include"
   path_add LD_LIBRARY_PATH "$dir/lib"
   path_add LIBRARY_PATH "$dir/lib"
@@ -280,8 +281,8 @@ layout_node() {
 # See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details
 #
 layout_perl() {
-  local libdir="$PWD/.direnv/perl5"
-  export LOCAL_LIB_DIR="$libdir"
+  local libdir=$PWD/.direnv/perl5
+  export LOCAL_LIB_DIR=$libdir
   export PERL_MB_OPT="--install_base '$libdir'"
   export PERL_MM_OPT="INSTALL_BASE=$libdir"
   path_add PERL5LIB "$libdir/lib/perl5"
@@ -299,15 +300,15 @@ layout_perl() {
 # versions of python.
 #
 layout_python() {
-  local python="${1:-python}"
-  local old_env="$PWD/.direnv/virtualenv"
+  local python=${1:-python}
+  local old_env=$PWD/.direnv/virtualenv
   unset PYTHONHOME
-  if [[ -d $old_env && $python = "python" ]]; then
-    export VIRTUAL_ENV="$old_env"
+  if [[ -d $old_env && $python = python ]]; then
+    export VIRTUAL_ENV=$old_env
   else
     local python_version
     python_version=$("$python" -c "import platform as p;print(p.python_version())")
-    export VIRTUAL_ENV="$PWD/.direnv/python-$python_version"
+    export VIRTUAL_ENV=$PWD/.direnv/python-$python_version
     if [[ ! -d $VIRTUAL_ENV ]]; then
       virtualenv "--python=$python" "$VIRTUAL_ENV"
     fi
@@ -332,13 +333,13 @@ layout_python3() {
 #
 layout_ruby() {
   if ruby -e "exit Gem::VERSION > '2.2.0'" 2>/dev/null; then
-    export GEM_HOME="$PWD/.direnv/ruby"
+    export GEM_HOME=$PWD/.direnv/ruby
   else
     local ruby_version
-    ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
-    export GEM_HOME="$PWD/.direnv/ruby-${ruby_version}"
+    ruby_version=$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")
+    export GEM_HOME=$PWD/.direnv/ruby-${ruby_version}
   fi
-  export BUNDLE_BIN="$PWD/.direnv/bin"
+  export BUNDLE_BIN=$PWD/.direnv/bin
 
   PATH_add "$GEM_HOME/bin"
   PATH_add "$BUNDLE_BIN"
@@ -358,7 +359,7 @@ layout_ruby() {
 #    # output: Ruby 1.9.3
 #
 use() {
-  local cmd="$1"
+  local cmd=$1
   log_status "using $*"
   shift
   "use_$cmd" "$@"
@@ -378,9 +379,9 @@ use_rbenv() {
 #
 rvm() {
   unset rvm
-  if [ -n "${rvm_scripts_path:-}" ]; then
+  if [[ -n ${rvm_scripts_path:-} ]]; then
     source "${rvm_scripts_path}/rvm"
-  elif [ -n "${rvm_path:-}" ]; then
+  elif [[ -n ${rvm_path:-} ]]; then
     source "${rvm_path}/scripts/rvm"
   else
     source "$HOME/.rvm/scripts/rvm"
@@ -400,8 +401,8 @@ use_nix() {
 }
 
 ## Load the global ~/.direnvrc if present
-if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" ]; then
+if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
   source_env "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" >&2
-elif [ -f "$HOME/.direnvrc" ]; then
+elif [[ -f $HOME/.direnvrc ]]; then
   source_env "$HOME/.direnvrc" >&2
 fi
