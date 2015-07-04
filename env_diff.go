@@ -14,12 +14,12 @@ var IGNORED_KEYS = map[string]bool{
 	"PS1":             true, // PS1 should not be exported, fixes problem in bash
 
 	// variables that should change freely
-	"OLDPWD": true,
-	"PWD":    true,
-	"SHELL":  true,
+	"OLDPWD":    true,
+	"PWD":       true,
+	"SHELL":     true,
 	"SHELLOPTS": true,
-	"SHLVL":  true,
-	"_":      true,
+	"SHLVL":     true,
+	"_":         true,
 }
 
 type EnvDiff struct {
