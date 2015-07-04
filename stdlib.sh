@@ -1,4 +1,7 @@
+#!bash
+#
 # These are the commands available in an .envrc context
+#
 set -e
 direnv="%s"
 
@@ -18,6 +21,7 @@ DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
 log_status() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
     local msg="$*"
+    # shellcheck disable=SC2059
     printf "${DIRENV_LOG_FORMAT}\n" "$msg" >&2
   fi
 }
@@ -39,7 +43,7 @@ has() {
 
 # Usage: expand_path <rel_path> [<relative_to>]
 #
-# Outputs the absolute path of <rel_path> relaitve to <relative_to> or the 
+# Outputs the absolute path of <rel_path> relaitve to <relative_to> or the
 # current directory.
 #
 # Example:
@@ -75,23 +79,23 @@ dotenv() {
 #    # output: /usr/local/lib
 #
 user_rel_path() {
-  local path="${1#-}"
+  local abs_path="${1#-}"
 
-  if [ -z "$path" ]; then return; fi
+  if [ -z "$abs_path" ]; then return; fi
 
   if [ -n "$HOME" ]; then
-    local rel_path="${path#$HOME}"
-    if [ "$rel_path" != "$path" ]; then
-      path="~${rel_path}"
+    local rel_path="${abs_path#$HOME}"
+    if [ "$rel_path" != "$abs_path" ]; then
+      abs_path="~${rel_path}"
     fi
   fi
 
-  echo "$path"
+  echo "$abs_path"
 }
 
 # Usage: find_up <filename>
 #
-# Outputs the path of <filename> when searched from the current directory up to 
+# Outputs the path of <filename> when searched from the current directory up to
 # /. Returns 1 if the file has not been found.
 #
 # Example:
@@ -123,12 +127,12 @@ find_up() {
 #
 # Loads another ".envrc" either by specifying its path or filename.
 source_env() {
-  local rcfile="$1"
   local rcpath="${1/#\~/$HOME}"
+  local rcfile
   if ! [ -f "$rcpath" ]; then
-    rcfile="$rcfile/.envrc"
     rcpath="$rcpath/.envrc"
   fi
+  rcfile=$(user_rel_path "$rcpath")
   pushd "$(pwd -P 2>/dev/null)" > /dev/null
     pushd "$(dirname "$rcpath")" > /dev/null
     if [ -f "./$(basename "$rcpath")" ]
@@ -148,12 +152,13 @@ source_env() {
 #
 source_up() {
   local file="$1"
+  local dir
   if [ -z "$file" ]; then
     file=".envrc"
   fi
-  local path="$(cd .. && find_up "$file")"
-  if [ -n "$path" ]; then
-    source_env "$(user_rel_path "$path")"
+  dir="$(cd .. && find_up "$file")"
+  if [ -n "$dir" ]; then
+    source_env "$(user_rel_path "$dir")"
   fi
 }
 
@@ -187,7 +192,8 @@ direnv_load() {
 #    # output: /home/user/my/project/bin:/usr/bin:/bin
 #
 PATH_add() {
-  export PATH="$(expand_path "$1"):$PATH"
+  PATH="$(expand_path "$1"):$PATH"
+  export PATH
 }
 
 # Usage: path_add <varname> <path>
@@ -195,12 +201,13 @@ PATH_add() {
 # Works like PATH_add except that it's for an arbitrary <varname>.
 path_add() {
   local old_paths="${!1}"
-  local path="$(expand_path "$2")"
+  local dir
+  dir="$(expand_path "$2")"
 
   if [ -z "$old_paths" ]; then
-    old_paths="$path"
+    old_paths="$dir"
   else
-    old_paths="$path:$old_paths"
+    old_paths="$dir:$old_paths"
   fi
 
   export $1="$old_paths"
@@ -230,14 +237,15 @@ path_add() {
 #    load_prefix ~/rubies/ruby-1.9.3
 #
 load_prefix() {
-  local path="$(expand_path "$1")"
-  path_add CPATH "$path/include"
-  path_add LD_LIBRARY_PATH "$path/lib"
-  path_add LIBRARY_PATH "$path/lib"
-  path_add MANPATH "$path/man"
-  path_add MANPATH "$path/share/man"
-  path_add PATH "$path/bin"
-  path_add PKG_CONFIG_PATH "$path/lib/pkgconfig"
+  local dir
+  dir="$(expand_path "$1")"
+  path_add CPATH "$dir/include"
+  path_add LD_LIBRARY_PATH "$dir/lib"
+  path_add LIBRARY_PATH "$dir/lib"
+  path_add MANPATH "$dir/man"
+  path_add MANPATH "$dir/share/man"
+  path_add PATH "$dir/bin"
+  path_add PKG_CONFIG_PATH "$dir/lib/pkgconfig"
 }
 
 # Usage: layout <type>
@@ -295,9 +303,10 @@ layout_python() {
   local old_env="$PWD/.direnv/virtualenv"
   unset PYTHONHOME
   if [[ -d $old_env && $python = "python" ]]; then
-    export VIRTUAL_ENV="$old_virtualenv"
+    export VIRTUAL_ENV="$old_env"
   else
-    local python_version=$("$python" -c "import platform as p;print(p.python_version())")
+    local python_version
+    python_version=$("$python" -c "import platform as p;print(p.python_version())")
     export VIRTUAL_ENV="$PWD/.direnv/python-$python_version"
     if [[ ! -d $VIRTUAL_ENV ]]; then
       virtualenv "--python=$python" "$VIRTUAL_ENV"
@@ -325,7 +334,8 @@ layout_ruby() {
   if ruby -e "exit Gem::VERSION > '2.2.0'" 2>/dev/null; then
     export GEM_HOME="$PWD/.direnv/ruby"
   else
-    local ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
+    local ruby_version
+    ruby_version="$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")"
     export GEM_HOME="$PWD/.direnv/ruby-${ruby_version}"
   fi
   export BUNDLE_BIN="$PWD/.direnv/bin"
@@ -393,5 +403,5 @@ use_nix() {
 if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" ]; then
   source_env "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" >&2
 elif [ -f "$HOME/.direnvrc" ]; then
-  source_env "~/.direnvrc" >&2
+  source_env "$HOME/.direnvrc" >&2
 fi
