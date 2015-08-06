@@ -14,7 +14,7 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-Outputs a bash script called the *stdlib*. The following commands are included in that script and loaded in the context of an ".envrc". Additionnaly to that, it also loads the file in "~/.direnvrc" if it exists.
+Outputs a bash script called the *stdlib*. The following commands are included in that script and loaded in the context of an ".envrc". In addition, it also loads the file in "~/.direnvrc" if it exists.
 
 STDLIB
 ------
