@@ -202,6 +202,16 @@ use ruby 1.9.3
 \fB\fCuse rbenv\fR:
 Loads rbenv which add the ruby wrappers available on the PATH.
 .IP \(bu 2
+\fB\fCuse nix [...]\fR:
+Load environment variables from \fB\fCnix\-shell\fR\&.
+.PP
+If you have a \fB\fCdefault.nix\fR or \fB\fCshell.nix\fR these will be
+used by default, but you can also specify packages directly
+(e.g \fB\fCuse nix \-p ocaml\fR).
+.PP
+See 
+\[la]http://nixos.org/nix/manual/#sec-nix-shell\[ra]
+.IP \(bu 2
 \fB\fCrvm\fR ...:
 Should work just like in the shell if you have rvm installed.
 .RE

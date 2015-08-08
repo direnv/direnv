@@ -156,6 +156,14 @@ Example:
 
 * `use rbenv`:
     Loads rbenv which add the ruby wrappers available on the PATH.
+* `use nix [...]`:
+    Load environment variables from `nix-shell`.
+
+    If you have a `default.nix` or `shell.nix` these will be
+    used by default, but you can also specify packages directly
+    (e.g `use nix -p ocaml`).
+
+    See http://nixos.org/nix/manual/#sec-nix-shell
 * `rvm` ...:
     Should work just like in the shell if you have rvm installed.
 
