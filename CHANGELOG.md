@@ -1,4 +1,12 @@
 
+2.7.0 / 2015-08-08
+==================
+
+  * NEW: use_nix() helper to stdlib. Thanks @gfxmonk
+  * FIX: Added SHELLOPTS to ignored vars. Thanks @fernandomora
+  * FIX: Removed shellcheck offenses in the stdlib, better escaping
+  * FIX: typos. Thanks @camelpunch, @oppegard
+
 2.6.1 / 2015-06-23
 ==================
 
