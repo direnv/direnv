@@ -60,7 +60,7 @@ Links to binary builds are also available on
 ## Setup
 
 For direnv to work properly it needs to be hooked into the shell. Each shell
-has it's own extension mechanism:
+has its own extension mechanism:
 
 ### BASH
 
