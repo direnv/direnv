@@ -16,7 +16,7 @@ DESCRIPTION
 
 `direnv` is an environment variable manager for your shell. It knows how to
 hook into bash, zsh and fish shell to load or unload environment variables
-depending on your current directory. This allows to have project-specific
+depending on your current directory. This allows you to have project-specific
 environment variables and not clutter the "~/.profile" file.
 
 Before each prompt it checks for the existence of an ".envrc" file in the
