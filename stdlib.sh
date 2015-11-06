@@ -389,6 +389,65 @@ rvm() {
   rvm "$@"
 }
 
+# Usage: use node
+# Loads NodeJS version from a `.node-version` or `.nvmrc` file.
+#
+# Usage: use node <version>
+# Loads specified NodeJS version.
+#
+# Environment Variables:
+#
+# - $NODE_VERSIONS (required)
+#   You must specify a path to your installed NodeJS versions via the `$NODE_VERSIONS` variable.
+#
+# - $NODE_VERSION_PREFIX (optional) [default="node-v"]
+#   Overrides the default version prefix.
+
+use_node() {
+  local VERSION=$1
+  local VIA=""
+  local COLOR_NORMAL=`tput sgr0`
+  local COLOR_ERROR="\e[0;31m"
+
+  if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then
+    printf "${COLOR_ERROR}You must specify a \$NODE_VERSIONS environment variable and the directory specified must exist!${COLOR_NORMAL}" >&2
+    sleep 4
+    exit 1
+  fi
+
+  if [[ -z $VERSION ]] && [[ -f .nvmrc ]]; then
+    VERSION=$(cat .nvmrc)
+    VIA=".nvmrc"
+  fi
+
+  if [[ -z $VERSION ]] && [[ -f .node-version ]]; then
+    VERSION=$(cat .node-version)
+    VIA=".node-version"
+  fi
+
+  if [[ -z $VERSION ]]; then
+    printf "${COLOR_ERROR}I do not know which NodeJS version to load because one has not been specified!${COLOR_NORMAL}" >&2
+    sleep 4
+    exit 1
+  fi
+
+  local NODE_PREFIX=$NODE_VERSIONS/${NODE_VERSION_PREFIX:-"node-v"}$VERSION
+
+  if [[ ! -d $NODE_PREFIX ]]; then
+    printf "${COLOR_ERROR}Unable to find NodeJS version (%s) in (%s)!${COLOR_NORMAL}" $VERSION $NODE_VERSIONS >&2
+    sleep 4
+    exit 1
+  fi
+
+  if [[ -z $VIA ]]; then
+    echo "Loading NodeJS $VERSION from $NODE_PREFIX" >&1
+  else
+    echo "Loading NodeJS $VERSION via $VIA from $NODE_PREFIX" >&1
+  fi
+
+  load_prefix $NODE_PREFIX
+}
+
 # Usage: use_nix [...]
 #
 # Load environment variables from `nix-shell`.
