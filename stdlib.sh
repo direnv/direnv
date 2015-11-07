@@ -26,6 +26,27 @@ log_status() {
   fi
 }
 
+# Usage: log_error [<message> ...]
+#
+# Logs an error message. Acts like echo,
+# but wraps output in the standard direnv log format
+# (controlled by $DIRENV_LOG_FORMAT), and directs it
+# to stderr rather than stdout.
+#
+# Example:
+#
+#    log_error "Unable to find specified directory!"
+
+log_error() {
+  local color_normal=`tput sgr0`
+  local color_error="\e[0;31m"
+  if [[ -n $DIRENV_LOG_FORMAT ]]; then
+    local msg=$*
+    # shellcheck disable=SC2059
+    printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
+  fi
+}
+
 # Usage: has <command>
 #
 # Returns 0 if the <command> is available. Returns 1 otherwise. It can be a
@@ -404,48 +425,48 @@ rvm() {
 #   Overrides the default version prefix.
 
 use_node() {
-  local VERSION=$1
-  local VIA=""
-  local COLOR_NORMAL=`tput sgr0`
-  local COLOR_ERROR="\e[0;31m"
+  local version=$1
+  local via=""
 
   if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then
-    printf "${COLOR_ERROR}You must specify a \$NODE_VERSIONS environment variable and the directory specified must exist!${COLOR_NORMAL}" >&2
-    sleep 4
+    log_error "You must specify a \$NODE_VERSIONS environment variable and the directory specified must exist!"
     exit 1
   fi
 
-  if [[ -z $VERSION ]] && [[ -f .nvmrc ]]; then
-    VERSION=$(cat .nvmrc)
-    VIA=".nvmrc"
+  if [[ -z $version ]] && [[ -f .nvmrc ]]; then
+    version=$(< .nvmrc)
+    via=".nvmrc"
   fi
 
-  if [[ -z $VERSION ]] && [[ -f .node-version ]]; then
-    VERSION=$(cat .node-version)
-    VIA=".node-version"
+  if [[ -z $version ]] && [[ -f .node-version ]]; then
+    version=$(< .node-version)
+    via=".node-version"
   fi
 
-  if [[ -z $VERSION ]]; then
-    printf "${COLOR_ERROR}I do not know which NodeJS version to load because one has not been specified!${COLOR_NORMAL}" >&2
-    sleep 4
+  if [[ -z $version ]]; then
+    log_error "I do not know which NodeJS version to load because one has not been specified!"
     exit 1
   fi
 
-  local NODE_PREFIX=$NODE_VERSIONS/${NODE_VERSION_PREFIX:-"node-v"}$VERSION
+  local node_prefix=$NODE_VERSIONS/${NODE_VERSION_PREFIX:-"node-v"}$version
 
-  if [[ ! -d $NODE_PREFIX ]]; then
-    printf "${COLOR_ERROR}Unable to find NodeJS version (%s) in (%s)!${COLOR_NORMAL}" $VERSION $NODE_VERSIONS >&2
-    sleep 4
+  if [[ ! -d $node_prefix ]]; then
+    log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"
     exit 1
   fi
 
-  if [[ -z $VIA ]]; then
-    echo "Loading NodeJS $VERSION from $NODE_PREFIX" >&1
+  load_prefix $node_prefix
+
+  if [[ -z $(command -v node) ]]; then
+    log_error "Unable to load NodeJS version ($version)!"
+    exit 1
+  fi
+
+  if [[ -z $via ]]; then
+    log_status "Successfully loaded NodeJS $(node --version), from prefix ($node_prefix)"
   else
-    echo "Loading NodeJS $VERSION via $VIA from $NODE_PREFIX" >&1
+    log_status "Successfully loaded NodeJS $(node --version) (via $via), from prefix ($node_prefix)"
   fi
-
-  load_prefix $NODE_PREFIX
 }
 
 # Usage: use_nix [...]
