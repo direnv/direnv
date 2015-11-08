@@ -167,6 +167,26 @@ Example:
 * `rvm` ...:
     Should work just like in the shell if you have rvm installed.
 
+* `use node`:
+    Loads NodeJS version from a `.node-version` or `.nvmrc` file.
+
+Example (.envrc):
+
+    set -e
+    use node
+
+Example (.node-version):
+
+    4.2.2
+
+* `use node` version:
+    Loads specified NodeJS version.
+
+Example (.envrc):
+
+    set -e
+    use node 4.2.2
+
 COPYRIGHT
 ---------
 
