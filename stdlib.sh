@@ -430,7 +430,7 @@ use_node() {
 
   if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then
     log_error "You must specify a \$NODE_VERSIONS environment variable and the directory specified must exist!"
-    exit 1
+    return 1
   fi
 
   if [[ -z $version ]] && [[ -f .nvmrc ]]; then
@@ -445,19 +445,19 @@ use_node() {
 
   if [[ -z $version ]]; then
     log_error "I do not know which NodeJS version to load because one has not been specified!"
-    exit 1
+    return 1
   fi
 
   local node_prefix=$NODE_VERSIONS/${NODE_VERSION_PREFIX:-"node-v"}$version
 
   if [[ ! -d $node_prefix ]]; then
     log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"
-    exit 1
+    return 1
   fi
 
   if [[ ! -x $node_prefix/bin/node ]]; then
     log_error "Unable to load NodeJS binary (node) for version ($version) in ($NODE_VERSIONS)!"
-    exit 1
+    return 1
   fi
 
   load_prefix $node_prefix
