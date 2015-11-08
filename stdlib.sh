@@ -457,8 +457,8 @@ use_node() {
 
   load_prefix $node_prefix
 
-  if [[ -z $(command -v node) ]]; then
-    log_error "Unable to load NodeJS version ($version)!"
+  if ! has node; then
+    log_error "Unable to load NodeJS binary (node) for version ($version) in ($NODE_VERSIONS)!"
     exit 1
   fi
 
