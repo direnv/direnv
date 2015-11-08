@@ -26,6 +26,27 @@ log_status() {
   fi
 }
 
+# Usage: log_error [<message> ...]
+#
+# Logs an error message. Acts like echo,
+# but wraps output in the standard direnv log format
+# (controlled by $DIRENV_LOG_FORMAT), and directs it
+# to stderr rather than stdout.
+#
+# Example:
+#
+#    log_error "Unable to find specified directory!"
+
+log_error() {
+  local color_normal=`tput sgr0`
+  local color_error="\e[0;31m"
+  if [[ -n $DIRENV_LOG_FORMAT ]]; then
+    local msg=$*
+    # shellcheck disable=SC2059
+    printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
+  fi
+}
+
 # Usage: has <command>
 #
 # Returns 0 if the <command> is available. Returns 1 otherwise. It can be a
@@ -387,6 +408,65 @@ rvm() {
     source "$HOME/.rvm/scripts/rvm"
   fi
   rvm "$@"
+}
+
+# Usage: use node
+# Loads NodeJS version from a `.node-version` or `.nvmrc` file.
+#
+# Usage: use node <version>
+# Loads specified NodeJS version.
+#
+# Environment Variables:
+#
+# - $NODE_VERSIONS (required)
+#   You must specify a path to your installed NodeJS versions via the `$NODE_VERSIONS` variable.
+#
+# - $NODE_VERSION_PREFIX (optional) [default="node-v"]
+#   Overrides the default version prefix.
+
+use_node() {
+  local version=$1
+  local via=""
+
+  if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then
+    log_error "You must specify a \$NODE_VERSIONS environment variable and the directory specified must exist!"
+    return 1
+  fi
+
+  if [[ -z $version ]] && [[ -f .nvmrc ]]; then
+    version=$(< .nvmrc)
+    via=".nvmrc"
+  fi
+
+  if [[ -z $version ]] && [[ -f .node-version ]]; then
+    version=$(< .node-version)
+    via=".node-version"
+  fi
+
+  if [[ -z $version ]]; then
+    log_error "I do not know which NodeJS version to load because one has not been specified!"
+    return 1
+  fi
+
+  local node_prefix=$NODE_VERSIONS/${NODE_VERSION_PREFIX:-"node-v"}$version
+
+  if [[ ! -d $node_prefix ]]; then
+    log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"
+    return 1
+  fi
+
+  if [[ ! -x $node_prefix/bin/node ]]; then
+    log_error "Unable to load NodeJS binary (node) for version ($version) in ($NODE_VERSIONS)!"
+    return 1
+  fi
+
+  load_prefix $node_prefix
+
+  if [[ -z $via ]]; then
+    log_status "Successfully loaded NodeJS $(node --version), from prefix ($node_prefix)"
+  else
+    log_status "Successfully loaded NodeJS $(node --version) (via $via), from prefix ($node_prefix)"
+  fi
 }
 
 # Usage: use_nix [...]
