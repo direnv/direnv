@@ -455,12 +455,12 @@ use_node() {
     exit 1
   fi
 
-  load_prefix $node_prefix
-
-  if ! has node; then
+  if [[ ! -x $node_prefix/bin/node ]]; then
     log_error "Unable to load NodeJS binary (node) for version ($version) in ($NODE_VERSIONS)!"
     exit 1
   fi
+
+  load_prefix $node_prefix
 
   if [[ -z $via ]]; then
     log_status "Successfully loaded NodeJS $(node --version), from prefix ($node_prefix)"
