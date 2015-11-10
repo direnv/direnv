@@ -214,6 +214,40 @@ See
 .IP \(bu 2
 \fB\fCrvm\fR ...:
 Should work just like in the shell if you have rvm installed.
+.IP \(bu 2
+\fB\fCuse node\fR:
+Loads NodeJS version from a \fB\fC\&.node\-version\fR or \fB\fC\&.nvmrc\fR file.
+.RE
+.PP
+Example (.envrc):
+.PP
+.RS
+.nf
+set \-e
+use node
+.fi
+.RE
+.PP
+Example (.node\-version):
+.PP
+.RS
+.nf
+4.2.2
+.fi
+.RE
+.RS
+.IP \(bu 2
+\fB\fCuse node\fR version:
+Loads specified NodeJS version.
+.RE
+.PP
+Example (.envrc):
+.PP
+.RS
+.nf
+set \-e
+use node 4.2.2
+.fi
 .RE
 .SH COPYRIGHT
 .PP

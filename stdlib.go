@@ -28,6 +28,27 @@ const STDLIB = "#!bash\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: log_error [<message> ...]\n" +
+	"#\n" +
+	"# Logs an error message. Acts like echo,\n" +
+	"# but wraps output in the standard direnv log format\n" +
+	"# (controlled by $DIRENV_LOG_FORMAT), and directs it\n" +
+	"# to stderr rather than stdout.\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    log_error \"Unable to find specified directory!\"\n" +
+	"\n" +
+	"log_error() {\n" +
+	"  local color_normal=`tput sgr0`\n" +
+	"  local color_error=\"\\e[0;31m\"\n" +
+	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
+	"    local msg=$*\n" +
+	"    # shellcheck disable=SC2059\n" +
+	"    printf \"${color_error}${DIRENV_LOG_FORMAT}${color_normal}\\n\" \"$msg\" >&2\n" +
+	"  fi\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: has <command>\n" +
 	"#\n" +
 	"# Returns 0 if the <command> is available. Returns 1 otherwise. It can be a\n" +
@@ -389,6 +410,65 @@ const STDLIB = "#!bash\n" +
 	"    source \"$HOME/.rvm/scripts/rvm\"\n" +
 	"  fi\n" +
 	"  rvm \"$@\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: use node\n" +
+	"# Loads NodeJS version from a `.node-version` or `.nvmrc` file.\n" +
+	"#\n" +
+	"# Usage: use node <version>\n" +
+	"# Loads specified NodeJS version.\n" +
+	"#\n" +
+	"# Environment Variables:\n" +
+	"#\n" +
+	"# - $NODE_VERSIONS (required)\n" +
+	"#   You must specify a path to your installed NodeJS versions via the `$NODE_VERSIONS` variable.\n" +
+	"#\n" +
+	"# - $NODE_VERSION_PREFIX (optional) [default=\"node-v\"]\n" +
+	"#   Overrides the default version prefix.\n" +
+	"\n" +
+	"use_node() {\n" +
+	"  local version=$1\n" +
+	"  local via=\"\"\n" +
+	"\n" +
+	"  if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then\n" +
+	"    log_error \"You must specify a \\$NODE_VERSIONS environment variable and the directory specified must exist!\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  if [[ -z $version ]] && [[ -f .nvmrc ]]; then\n" +
+	"    version=$(< .nvmrc)\n" +
+	"    via=\".nvmrc\"\n" +
+	"  fi\n" +
+	"\n" +
+	"  if [[ -z $version ]] && [[ -f .node-version ]]; then\n" +
+	"    version=$(< .node-version)\n" +
+	"    via=\".node-version\"\n" +
+	"  fi\n" +
+	"\n" +
+	"  if [[ -z $version ]]; then\n" +
+	"    log_error \"I do not know which NodeJS version to load because one has not been specified!\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  local node_prefix=$NODE_VERSIONS/${NODE_VERSION_PREFIX:-\"node-v\"}$version\n" +
+	"\n" +
+	"  if [[ ! -d $node_prefix ]]; then\n" +
+	"    log_error \"Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  if [[ ! -x $node_prefix/bin/node ]]; then\n" +
+	"    log_error \"Unable to load NodeJS binary (node) for version ($version) in ($NODE_VERSIONS)!\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  load_prefix $node_prefix\n" +
+	"\n" +
+	"  if [[ -z $via ]]; then\n" +
+	"    log_status \"Successfully loaded NodeJS $(node --version), from prefix ($node_prefix)\"\n" +
+	"  else\n" +
+	"    log_status \"Successfully loaded NodeJS $(node --version) (via $via), from prefix ($node_prefix)\"\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: use_nix [...]\n" +

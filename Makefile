@@ -12,7 +12,7 @@ build: direnv
 stdlib.go: stdlib.sh
 	cat $< | ./script/str2go main STDLIB $< > $@
 
-direnv: *.go
+direnv: stdlib.go *.go
 	go fmt
 	go build -o direnv
 
