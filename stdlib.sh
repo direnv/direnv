@@ -416,6 +416,9 @@ rvm() {
 # Usage: use node <version>
 # Loads specified NodeJS version.
 #
+# If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match
+# is performed and the highest matching version installed is selected.
+#
 # Environment Variables:
 #
 # - $NODE_VERSIONS (required)
@@ -448,7 +451,8 @@ use_node() {
     return 1
   fi
 
-  local node_prefix=$NODE_VERSIONS/${NODE_VERSION_PREFIX:-"node-v"}$version
+  local node_wanted=${NODE_VERSION_PREFIX:-"node-v"}$version
+  local node_prefix=$(find $NODE_VERSIONS -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)
 
   if [[ ! -d $node_prefix ]]; then
     log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"

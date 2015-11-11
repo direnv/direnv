@@ -217,6 +217,10 @@ Should work just like in the shell if you have rvm installed.
 .IP \(bu 2
 \fB\fCuse node\fR:
 Loads NodeJS version from a \fB\fC\&.node\-version\fR or \fB\fC\&.nvmrc\fR file.
+.PP
+If you specify a partial NodeJS version (i.e. \fB\fC4.2\fR), a fuzzy
+match is performed and the highest matching version installed
+is selected.
 .RE
 .PP
 Example (.envrc):
@@ -232,7 +236,7 @@ Example (.node\-version):
 .PP
 .RS
 .nf
-4.2.2
+4.2
 .fi
 .RE
 .RS

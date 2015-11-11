@@ -418,6 +418,9 @@ const STDLIB = "#!bash\n" +
 	"# Usage: use node <version>\n" +
 	"# Loads specified NodeJS version.\n" +
 	"#\n" +
+	"# If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match\n" +
+	"# is performed and the highest matching version installed is selected.\n" +
+	"#\n" +
 	"# Environment Variables:\n" +
 	"#\n" +
 	"# - $NODE_VERSIONS (required)\n" +
@@ -450,7 +453,8 @@ const STDLIB = "#!bash\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
-	"  local node_prefix=$NODE_VERSIONS/${NODE_VERSION_PREFIX:-\"node-v\"}$version\n" +
+	"  local node_wanted=${NODE_VERSION_PREFIX:-\"node-v\"}$version\n" +
+	"  local node_prefix=$(find $NODE_VERSIONS -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)\n" +
 	"\n" +
 	"  if [[ ! -d $node_prefix ]]; then\n" +
 	"    log_error \"Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!\"\n" +
