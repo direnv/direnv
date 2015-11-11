@@ -170,6 +170,10 @@ Example:
 * `use node`:
     Loads NodeJS version from a `.node-version` or `.nvmrc` file.
 
+    If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy
+    match is performed and the highest matching version installed
+    is selected.
+
 Example (.envrc):
 
     set -e
@@ -177,7 +181,7 @@ Example (.envrc):
 
 Example (.node-version):
 
-    4.2.2
+    4.2
 
 * `use node` version:
     Loads specified NodeJS version.
