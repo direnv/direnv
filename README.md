@@ -153,6 +153,7 @@ source_env ..
 
 * [Environment Modules](http://modules.sourceforge.net/) - one of the oldest (in a good way) environment loading system
 * [autoenv](https://github.com/kennethreitz/autoenv) - lightweight, doesn't support unloads
+* [zsh-autoenv](https://github.com/Tarrasch/zsh-autoenv) - a feature-rich mixture of autoenv and [smartcd](https://github.com/cxreg/smartcd): enter/leave events, nesting, stashing (Zsh-only).
 
 ## Contribute
 
