@@ -52,7 +52,8 @@ make install
 
 ### Packaged
 
-There's package definitions on Homebrew, Arch's AUR and NixOS's nixpkgs.
+There's package definitions on Homebrew, Arch's AUR, Gentoo go-overlay overlay
+and NixOS's nixpkgs.
 
 Links to binary builds are also available on
 [each release](https://github.com/direnv/direnv/releases).
