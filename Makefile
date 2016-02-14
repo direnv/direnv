@@ -1,8 +1,5 @@
 DESTDIR ?= /usr/local
 
-MAN_MD = $(wildcard man/*.md)
-ROFFS = $(MAN_MD:.md=)
-
 ifeq ($(shell uname), Darwin)
 	# Fixes DYLD_INSERT_LIBRARIES issues
 	# See https://github.com/direnv/direnv/issues/194
@@ -25,11 +22,9 @@ direnv: stdlib.go *.go
 clean:
 	rm -f direnv
 
-%.1: %.1.md
-	@which md2man-roff >/dev/null || (echo "Could not generate man page because md2man is missing, gem install md2man"; false)
-	md2man-roff $< > $@
-
-man: $(ROFFS)
+man:
+	@which md2man-rake >/dev/null || (echo "Could not generate man page because md2man is missing, gem install md2man"; false)
+	md2man-rake md2man:man
 
 test: build
 	go test
