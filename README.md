@@ -8,7 +8,7 @@ environment variables and not clutter the "~/.profile" file.
 
 Before each prompt it checks for the existence of an ".envrc" file in the
 current and parent directories. If the file exists (and authorized), it is
-loaded into a bash sub-shell and all exported variables are then captured by
+loaded into a **bash** sub-shell and all exported variables are then captured by
 direnv and then made available the current shell.
 
 Because direnv is compiled into a single static executable it is fast enough
@@ -103,6 +103,14 @@ eval `direnv hook tcsh`
 
 In some target folder, create an ".envrc" file and add some export(1)
 directives in it.
+
+Note that the contents of the `.envrc` file must be valid bash syntax,
+despite what shell you may be using.
+This is because direnv always executes the `.envrc` with bash (a sort of
+lowest common denominator of UNIX shells) so that direnv can work across shells.
+If you try to use some syntax that doesn't work in bash (like zsh's
+nested expansions), you will [run into
+trouble](https://github.com/direnv/direnv/issues/199).
 
 On the next prompt you will notice that direnv complains about the ".envrc"
 being blocked. This is the security mechanism to avoid loading new files
