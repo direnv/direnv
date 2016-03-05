@@ -5,3 +5,4 @@
 /site
 /test/allow
 man/*.html
+*.sw?

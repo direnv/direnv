@@ -13,6 +13,10 @@ unset DIRENV_DIR
 unset DIRENV_MTIME
 unset DIRENV_DIFF
 
+export XDG_CONFIG_HOME=${TEST_DIR}/config
+mkdir -p ${XDG_CONFIG_HOME}/direnv
+touch ${XDG_CONFIG_HOME}/direnv/direnvrc
+
 direnv_eval() {
   eval `direnv export bash`
 }

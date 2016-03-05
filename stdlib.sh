@@ -239,7 +239,7 @@ path_add() {
 #
 # Expands some common path variables for the given <prefix_path> prefix. This is
 # useful if you installed something in the <prefix_path> using
-# $(./configure --prefix=<prefix_path> && make install) and want to use it in 
+# $(./configure --prefix=<prefix_path> && make install) and want to use it in
 # the project.
 #
 # Variables set:

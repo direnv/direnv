@@ -241,7 +241,7 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"# Expands some common path variables for the given <prefix_path> prefix. This is\n" +
 	"# useful if you installed something in the <prefix_path> using\n" +
-	"# $(./configure --prefix=<prefix_path> && make install) and want to use it in \n" +
+	"# $(./configure --prefix=<prefix_path> && make install) and want to use it in\n" +
 	"# the project.\n" +
 	"#\n" +
 	"# Variables set:\n" +

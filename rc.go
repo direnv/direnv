@@ -122,12 +122,15 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		return
 	}
 
-	// Save state
+	self.RecordState(env, newEnv)
+
+	return
+}
+
+func (self *RC) RecordState(env Env, newEnv Env) {
 	newEnv[DIRENV_DIR] = "-" + filepath.Dir(self.path)
 	newEnv[DIRENV_MTIME] = fmt.Sprintf("%d", self.mtime)
 	newEnv[DIRENV_DIFF] = env.Diff(newEnv).Serialize()
-
-	return
 }
 
 /// Utils

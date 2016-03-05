@@ -2,10 +2,153 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
+	"os"
 	"sort"
 	"strings"
 )
+
+type ExportContext struct {
+	config   *Config
+	foundRC  *RC
+	loadedRC *RC
+	env      Env
+	oldEnv   Env
+	newEnv   Env
+}
+
+func (self *ExportContext) loadConfig() (err error) {
+	self.config, err = LoadConfig(self.env)
+	return
+}
+
+func (self *ExportContext) getRCs() {
+	self.loadedRC = self.config.LoadedRC()
+	self.foundRC = self.config.FindRC()
+}
+
+func (self *ExportContext) loadRC() (err error) {
+	self.newEnv, err = self.foundRC.Load(self.config, self.oldEnv)
+
+	return
+}
+
+func (self *ExportContext) hasRC() bool {
+	return self.foundRC != nil || self.loadedRC != nil
+}
+
+func (self *ExportContext) updateRC() (err error) {
+	self.oldEnv = self.env.Copy()
+	var backupDiff *EnvDiff
+
+	if backupDiff, err = self.config.EnvDiff(); err != nil {
+		err = fmt.Errorf("EnvDiff() failed: %q", err)
+		return
+	}
+	self.oldEnv = backupDiff.Reverse().Patch(self.env)
+
+	switch {
+	case self.foundRC == nil:
+		err = self.unloadEnv()
+	case self.loadedRC.path != self.foundRC.path:
+		err = self.loadRC()
+	case self.loadedRC.mtime != self.foundRC.mtime:
+		err = self.loadRC()
+	}
+	return
+}
+
+func (self *ExportContext) unloadEnv() (err error) {
+	log_status(self.env, "unloading")
+	self.newEnv = self.oldEnv.Copy()
+	delete(self.newEnv, DIRENV_DIR)
+	delete(self.newEnv, DIRENV_MTIME)
+	delete(self.newEnv, DIRENV_DIFF)
+	return nil
+}
+
+func (self *ExportContext) resetEnv() {
+	self.newEnv = self.oldEnv.Copy()
+	delete(self.oldEnv, DIRENV_DIR)
+	delete(self.oldEnv, DIRENV_MTIME)
+	delete(self.oldEnv, DIRENV_DIFF)
+	if self.foundRC != nil {
+		delete(self.newEnv, DIRENV_DIFF)
+		self.foundRC.RecordState(self.oldEnv, self.newEnv)
+	}
+}
+
+func (self *ExportContext) diffString(shell Shell) string {
+	oldDiff := self.oldEnv.Diff(self.newEnv)
+	if oldDiff.Any() {
+		var out []string
+		for key, _ := range oldDiff.Prev {
+			_, ok := oldDiff.Next[key]
+			if !ok && !direnvKey(key) {
+				out = append(out, "-"+key)
+			}
+		}
+
+		for key := range oldDiff.Next {
+			_, ok := oldDiff.Prev[key]
+			if direnvKey(key) {
+				continue
+			}
+			if ok {
+				out = append(out, "~"+key)
+			} else {
+				out = append(out, "+"+key)
+			}
+		}
+
+		sort.Strings(out)
+		if len(out) > 0 {
+			log_status(self.env, "export %s", strings.Join(out, " "))
+		}
+	}
+
+	diff := self.env.Diff(self.newEnv)
+	return diff.ToShell(shell)
+}
+
+func exportCommand(env Env, args []string) (err error) {
+	context := ExportContext{env: env}
+
+	var target string
+
+	if len(args) > 1 {
+		target = args[1]
+	}
+
+	shell := DetectShell(target)
+	if shell == nil {
+		return fmt.Errorf("Unknown target shell '%s'", target)
+	}
+
+	if err = context.loadConfig(); err != nil {
+		return
+	}
+
+	context.getRCs()
+
+	if !context.hasRC() {
+		return nil
+	}
+
+	err = context.updateRC()
+
+	if err != nil {
+		context.resetEnv()
+	}
+
+	if context.newEnv == nil {
+		fmt.Fprintf(os.Stderr, "New env is blank\n\n")
+		return nil
+	}
+
+	fmt.Print(context.diffString(shell))
+
+	return
+}
 
 // `direnv export $0`
 var CmdExport = &Cmd{
@@ -13,113 +156,7 @@ var CmdExport = &Cmd{
 	Desc:    "loads an .envrc and prints the diff in terms of exports",
 	Args:    []string{"SHELL"},
 	Private: true,
-	Fn: func(env Env, args []string) (err error) {
-		var oldEnv Env = env.Copy()
-		var newEnv Env
-		var loadedRC *RC
-		var foundRC *RC
-		var config *Config
-		var target string
-
-		if len(args) > 1 {
-			target = args[1]
-		}
-
-		shell := DetectShell(target)
-		if shell == nil {
-			return fmt.Errorf("Unknown target shell '%s'", target)
-		}
-
-		if config, err = LoadConfig(env); err != nil {
-			return
-		}
-
-		loadedRC = config.LoadedRC()
-		foundRC = config.FindRC()
-
-		loadRC := func() {
-			newEnv, err = foundRC.Load(config, oldEnv)
-		}
-
-		//fmt.Fprintf(os.Stderr, "%v %v\n", loadedRC, foundRC)
-
-		if loadedRC == nil {
-			if foundRC == nil {
-				// We're done here.
-				return nil
-			}
-
-			loadRC()
-		} else {
-			var backupDiff *EnvDiff
-			if backupDiff, err = config.EnvDiff(); err != nil {
-				err = fmt.Errorf("EnvDiff() failed: %q", err)
-				goto error
-			}
-			oldEnv = backupDiff.Reverse().Patch(env)
-			if foundRC == nil {
-				log_status(env, "unloading")
-				newEnv = oldEnv.Copy()
-				delete(newEnv, DIRENV_DIR)
-				delete(newEnv, DIRENV_MTIME)
-				delete(newEnv, DIRENV_DIFF)
-			} else if loadedRC.path != foundRC.path {
-				loadRC()
-			} else if loadedRC.mtime != foundRC.mtime {
-				loadRC()
-			} else {
-				// Nothing to do. Env is loaded and hasn't changed
-				return nil
-			}
-		}
-
-	error:
-		if err != nil {
-			newEnv = oldEnv.Copy()
-			delete(oldEnv, DIRENV_DIR)
-			delete(oldEnv, DIRENV_MTIME)
-			delete(oldEnv, DIRENV_DIFF)
-			if foundRC != nil {
-				delete(newEnv, DIRENV_DIFF)
-				// This should be nearby rc.Load()'s similar statement
-				newEnv[DIRENV_DIR] = "-" + filepath.Dir(foundRC.path)
-				newEnv[DIRENV_MTIME] = fmt.Sprintf("%d", foundRC.mtime)
-				newEnv[DIRENV_DIFF] = oldEnv.Diff(newEnv).Serialize()
-			}
-		}
-
-		oldDiff := oldEnv.Diff(newEnv)
-		if oldDiff.Any() {
-			var out []string
-			for key, _ := range oldDiff.Prev {
-				_, ok := oldDiff.Next[key]
-				if !ok && !direnvKey(key) {
-					out = append(out, "-"+key)
-				}
-			}
-			for key := range oldDiff.Next {
-				_, ok := oldDiff.Prev[key]
-				if direnvKey(key) {
-					continue
-				}
-				if ok {
-					out = append(out, "~"+key)
-				} else {
-					out = append(out, "+"+key)
-				}
-			}
-			sort.Strings(out)
-			if len(out) > 0 {
-				log_status(env, "export %s", strings.Join(out, " "))
-			}
-		}
-
-		diff := env.Diff(newEnv)
-		str := diff.ToShell(shell)
-		fmt.Print(str)
-
-		return
-	},
+	Fn:      exportCommand,
 }
 
 func direnvKey(key string) bool {
