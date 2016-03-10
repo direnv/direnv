@@ -79,8 +79,9 @@ func (self *Config) LoadedRC() *RC {
 	if err != nil {
 		return nil
 	}
+	times_string := self.Env[DIRENV_WATCHES]
 
-	return RCFromEnv(rcPath, mtime)
+	return RCFromEnv(rcPath, times_string, mtime)
 }
 
 func (self *Config) FindRC() *RC {

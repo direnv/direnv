@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 )
@@ -26,12 +25,6 @@ func (self *ExportContext) getRCs() {
 	self.foundRC = self.config.FindRC()
 }
 
-func (self *ExportContext) loadRC() (err error) {
-	self.newEnv, err = self.foundRC.Load(self.config, self.oldEnv)
-
-	return
-}
-
 func (self *ExportContext) hasRC() bool {
 	return self.foundRC != nil || self.loadedRC != nil
 }
@@ -51,9 +44,14 @@ func (self *ExportContext) updateRC() (err error) {
 		err = self.unloadEnv()
 	case self.loadedRC.path != self.foundRC.path:
 		err = self.loadRC()
-	case self.loadedRC.mtime != self.foundRC.mtime:
+	case self.loadedRC.times.Check() != nil:
 		err = self.loadRC()
 	}
+	return
+}
+
+func (self *ExportContext) loadRC() (err error) {
+	self.newEnv, err = self.foundRC.Load(self.config, self.oldEnv)
 	return
 }
 
@@ -63,7 +61,7 @@ func (self *ExportContext) unloadEnv() (err error) {
 	delete(self.newEnv, DIRENV_DIR)
 	delete(self.newEnv, DIRENV_MTIME)
 	delete(self.newEnv, DIRENV_DIFF)
-	return nil
+	return
 }
 
 func (self *ExportContext) resetEnv() {
@@ -128,20 +126,15 @@ func exportCommand(env Env, args []string) (err error) {
 		return
 	}
 
-	context.getRCs()
-
-	if !context.hasRC() {
+	if context.getRCs(); !context.hasRC() {
 		return nil
 	}
 
-	err = context.updateRC()
-
-	if err != nil {
+	if err = context.updateRC(); err != nil {
 		context.resetEnv()
 	}
 
 	if context.newEnv == nil {
-		fmt.Fprintf(os.Stderr, "New env is blank\n\n")
 		return nil
 	}
 
