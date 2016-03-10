@@ -12,6 +12,7 @@ import (
 
 func marshal(obj interface{}) string {
 	jsonData, err := json.Marshal(obj)
+
 	if err != nil {
 		panic(fmt.Errorf("marshal(): %v", err))
 	}
