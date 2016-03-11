@@ -36,6 +36,7 @@ func init() {
 		CmdStdlib,
 		CmdVersion,
 		CmdWatch,
+		CmdCurrent,
 	}
 }
 

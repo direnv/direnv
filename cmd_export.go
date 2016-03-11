@@ -58,21 +58,24 @@ func (self *ExportContext) loadRC() (err error) {
 func (self *ExportContext) unloadEnv() (err error) {
 	log_status(self.env, "unloading")
 	self.newEnv = self.oldEnv.Copy()
-	delete(self.newEnv, DIRENV_DIR)
-	delete(self.newEnv, DIRENV_MTIME)
-	delete(self.newEnv, DIRENV_DIFF)
+	cleanEnv(self.newEnv)
 	return
 }
 
 func (self *ExportContext) resetEnv() {
 	self.newEnv = self.oldEnv.Copy()
-	delete(self.oldEnv, DIRENV_DIR)
-	delete(self.oldEnv, DIRENV_MTIME)
-	delete(self.oldEnv, DIRENV_DIFF)
+	cleanEnv(self.oldEnv)
 	if self.foundRC != nil {
 		delete(self.newEnv, DIRENV_DIFF)
 		self.foundRC.RecordState(self.oldEnv, self.newEnv)
 	}
+}
+
+func cleanEnv(env Env) {
+	delete(env, DIRENV_DIR)
+	delete(env, DIRENV_MTIME)
+	delete(env, DIRENV_WATCHES)
+	delete(env, DIRENV_DIFF)
 }
 
 func (self *ExportContext) diffString(shell Shell) string {

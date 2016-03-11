@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type FileTime struct {
@@ -88,6 +89,20 @@ func (times *FileTimes) Check() (err error) {
 	return
 }
 
+func (times *FileTimes) CheckOne(path string) (err error) {
+	path, err = filepath.Abs(path)
+	if err != nil {
+		return
+	}
+	for idx := range *times.list {
+		if time := (*times.list)[idx]; time.Path == path {
+			err = time.Check()
+			return
+		}
+	}
+	return checkFailed{fmt.Sprintf("File %q is unknown", path)}
+}
+
 func (time FileTime) Check() (err error) {
 	stat, err := os.Stat(time.Path)
 	switch {
@@ -103,6 +118,18 @@ func (time FileTime) Check() (err error) {
 		return checkFailed{fmt.Sprintf("File %q is stale", time.Path)}
 	}
 	return nil
+}
+
+func (self *FileTime) Formatted(relDir string) string {
+	timeBytes, err := time.Unix(self.Modtime, 0).MarshalText()
+	if err != nil {
+		timeBytes = []byte("<<???>>")
+	}
+	path, err := filepath.Rel(relDir, self.Path)
+	if err != nil {
+		path = self.Path
+	}
+	return fmt.Sprintf("%q - %s", path, timeBytes)
 }
 
 func (times *FileTimes) Marshal() string {
