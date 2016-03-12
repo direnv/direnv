@@ -91,14 +91,14 @@ Bash
 
 ::
 
-    $ echo 'eval "direnv hook bash"' >> ~/.bashrc
+    $ echo 'eval $("direnv hook bash)"' >> ~/.bashrc && source ~/.bashrc
 
 Zsh
 ^^^
 
 ::
 
-    $ echo 'eval "direnv hook zsh"' >> ~/.zshrc
+    $ echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc && source ~/.zshrc
 
 Fish shell
 ^^^^^^^^^^
