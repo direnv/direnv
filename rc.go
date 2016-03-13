@@ -105,6 +105,8 @@ const NOT_ALLOWED = "%s is blocked. Run `direnv allow` to approve its content."
 func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	wd := config.WorkDir
 	direnv := config.SelfPath
+	shellEnv := env.Copy()
+	shellEnv[DIRENV_WATCHES] = self.times.Marshal()
 
 	if !self.Allowed() {
 		return nil, fmt.Errorf(NOT_ALLOWED, self.RelTo(wd))
@@ -116,7 +118,7 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
-	cmd.Env = env.ToGoEnv()
+	cmd.Env = shellEnv.ToGoEnv()
 	cmd.Dir = wd
 
 	out, err := cmd.Output()
@@ -137,7 +139,6 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 func (self *RC) RecordState(env Env, newEnv Env) {
 	newEnv[DIRENV_DIR] = "-" + filepath.Dir(self.path)
 	newEnv[DIRENV_MTIME] = fmt.Sprintf("%d", self.mtime)
-	newEnv[DIRENV_WATCHES] = self.times.Marshal()
 	newEnv[DIRENV_DIFF] = env.Diff(newEnv).Serialize()
 }
 

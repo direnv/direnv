@@ -153,7 +153,10 @@ source_env() {
   if ! [[ -f $rcpath ]]; then
     rcpath=$rcpath/.envrc
   fi
+
   rcfile=$(user_rel_path "$rcpath")
+  eval $($direnv watch $rcpath)
+
   pushd "$(pwd -P 2>/dev/null)" > /dev/null
     pushd "$(dirname "$rcpath")" > /dev/null
     if [[ -f ./$(basename "$rcpath") ]]; then
@@ -486,7 +489,7 @@ use_nix() {
 
 ## Load the global ~/.direnvrc if present
 if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
-  source_env "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" >&2
+  source_env ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc >&2
 elif [[ -f $HOME/.direnvrc ]]; then
-  source_env "$HOME/.direnvrc" >&2
+  source_env $HOME/.direnvrc >&2
 fi

@@ -141,7 +141,8 @@ func exportCommand(env Env, args []string) (err error) {
 		return nil
 	}
 
-	fmt.Print(context.diffString(shell))
+	diffString := context.diffString(shell)
+	fmt.Print(diffString)
 
 	return
 }

@@ -58,8 +58,16 @@ test_start base
 test_stop
 
 test_start inherit
+  cp ../base/.envrc ../inherited/.envrc
   direnv_eval
+  echo "HELLO should be world:" $HELLO
   test "$HELLO" = "world"
+
+  sleep 1
+  echo "export HELLO=goodbye" > ../inherited/.envrc
+  direnv_eval
+  echo "HELLO should be goodbye:" $HELLO
+  test "$HELLO" = "goodbye"
 test_stop
 
 test_start "ruby-layout"
