@@ -155,7 +155,7 @@ source_env() {
   fi
 
   rcfile=$(user_rel_path "$rcpath")
-  eval $($direnv watch $rcpath)
+  watch_file $rcpath
 
   pushd "$(pwd -P 2>/dev/null)" > /dev/null
     pushd "$(dirname "$rcpath")" > /dev/null
@@ -168,6 +168,18 @@ source_env() {
     popd > /dev/null
   popd > /dev/null
 }
+
+# Usage: watch_file <filename>
+#
+# Adds <path> to the list of files that direnv will watch for changes - useful when the contents
+# of a file influence how variables are set - especially in direnvrc
+#
+watch_file() {
+  local file=${1/#\~/$HOME}
+
+  eval $($direnv watch $file)
+}
+
 
 # Usage: source_up [<filename>]
 #

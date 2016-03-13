@@ -157,7 +157,7 @@ const STDLIB = "#!bash\n" +
 	"  fi\n" +
 	"\n" +
 	"  rcfile=$(user_rel_path \"$rcpath\")\n" +
-	"  eval $($direnv watch $rcpath)\n" +
+	"  watch_file $rcpath\n" +
 	"\n" +
 	"  pushd \"$(pwd -P 2>/dev/null)\" > /dev/null\n" +
 	"    pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
@@ -170,6 +170,18 @@ const STDLIB = "#!bash\n" +
 	"    popd > /dev/null\n" +
 	"  popd > /dev/null\n" +
 	"}\n" +
+	"\n" +
+	"# Usage: watch_file <filename>\n" +
+	"#\n" +
+	"# Adds <path> to the list of files that direnv will watch for changes - useful when the contents\n" +
+	"# of a file influence how variables are set - especially in direnvrc\n" +
+	"#\n" +
+	"watch_file() {\n" +
+	"  local file=${1/#\\~/$HOME}\n" +
+	"\n" +
+	"  eval $($direnv watch $file)\n" +
+	"}\n" +
+	"\n" +
 	"\n" +
 	"# Usage: source_up [<filename>]\n" +
 	"#\n" +
