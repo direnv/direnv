@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -75,13 +74,9 @@ func (self *Config) LoadedRC() *RC {
 	}
 	rcPath := filepath.Join(self.RCDir, ".envrc")
 
-	mtime, err := strconv.ParseInt(self.Env[DIRENV_MTIME], 10, 64)
-	if err != nil {
-		return nil
-	}
 	times_string := self.Env[DIRENV_WATCHES]
 
-	return RCFromEnv(rcPath, times_string, mtime)
+	return RCFromEnv(rcPath, times_string)
 }
 
 func (self *Config) FindRC() *RC {

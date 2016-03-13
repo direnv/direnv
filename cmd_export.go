@@ -72,10 +72,7 @@ func (self *ExportContext) resetEnv() {
 }
 
 func cleanEnv(env Env) {
-	delete(env, DIRENV_DIR)
-	delete(env, DIRENV_MTIME)
-	delete(env, DIRENV_WATCHES)
-	delete(env, DIRENV_DIFF)
+	env.Clean()
 }
 
 func (self *ExportContext) diffString(shell Shell) string {

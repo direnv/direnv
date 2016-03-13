@@ -11,6 +11,7 @@ export DIRENV_CONFIG=$PWD
 unset DIRENV_BASH
 unset DIRENV_DIR
 unset DIRENV_MTIME
+unset DIRENV_WATCHES
 unset DIRENV_DIFF
 
 export XDG_CONFIG_HOME=${TEST_DIR}/config
@@ -41,15 +42,15 @@ test_start base
   direnv_eval
   test "$HELLO" = "world"
 
-  MTIME=$DIRENV_MTIME
+  WATCHES=$DIRENV_WATCHES
   direnv_eval
-  test "$MTIME" = "$DIRENV_MTIME"
+  test "$WATCHES" = "$DIRENV_WATCHES"
 
   sleep 1
 
   touch .envrc
   direnv_eval
-  test "$MTIME" != "$DIRENV_MTIME"
+  test "$WATCHES" != "$DIRENV_WATCHES"
 
   cd ..
   direnv_eval

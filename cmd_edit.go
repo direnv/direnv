@@ -18,7 +18,7 @@ var CmdEdit = &Cmd{
 	Fn: func(env Env, args []string) (err error) {
 		var config *Config
 		var rcPath string
-		var mtime int64
+		var times *FileTimes
 		var foundRC *RC
 
 		if config, err = LoadConfig(env); err != nil {
@@ -27,7 +27,7 @@ var CmdEdit = &Cmd{
 
 		foundRC = config.FindRC()
 		if foundRC != nil {
-			mtime = foundRC.mtime
+			times = &foundRC.times
 		}
 
 		if len(args) > 1 {
@@ -62,7 +62,7 @@ var CmdEdit = &Cmd{
 		}
 
 		foundRC = FindRC(rcPath, config.AllowDir())
-		if foundRC != nil && foundRC.mtime > mtime {
+		if foundRC != nil && times != nil && times.Check() != nil {
 			foundRC.Allow()
 		}
 

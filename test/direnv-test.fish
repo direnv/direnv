@@ -4,7 +4,7 @@ function eq --argument-names a b
 		echo "Error: " (count $argv) " arguments passed to `eq`: $argv"
 		exit 1
 	end
-		
+
 	if not test $a = $b
 		printf "Error:\n - expected: %s\n -      got: %s\n" "$a" "$b"
 		exit 1
@@ -19,6 +19,7 @@ set -gx PATH (dirname $TEST_DIR) $PATH
 set -x DIRENV_CONFIG $PWD
 set -e DIRENV_BASH
 set -e DIRENV_DIR
+set -e DIRENV_WATCHES
 set -e DIRENV_MTIME
 set -e DIRENV_DIFF
 

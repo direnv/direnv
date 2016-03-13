@@ -13,7 +13,6 @@ import (
 
 type RC struct {
 	path      string
-	mtime     int64
 	allowPath string
 	times     FileTimes
 }
@@ -28,33 +27,24 @@ func FindRC(wd string, allowDir string) *RC {
 }
 
 func RCFromPath(path string, allowDir string) *RC {
-	times := NewFileTimes()
-	times.Update(path)
-	mtime, err := fileMtime(path)
-	if err != nil {
-		return nil
-	}
-
 	hash, err := fileHash(path)
 	if err != nil {
 		return nil
 	}
 
 	allowPath := filepath.Join(allowDir, hash)
-	allowMtime, _ := fileMtime(allowPath)
 
-	if allowMtime > mtime {
-		mtime = allowMtime
-	}
+	times := NewFileTimes()
+	times.Update(path)
 	times.Update(allowPath)
 
-	return &RC{path, mtime, allowPath, times}
+	return &RC{path, allowPath, times}
 }
 
-func RCFromEnv(path, marshalled_times string, mtime int64) *RC {
+func RCFromEnv(path, marshalled_times string) *RC {
 	times := NewFileTimes()
 	times.Unmarshal(marshalled_times)
-	return &RC{path, mtime, "", times}
+	return &RC{path, "", times}
 }
 
 func (self *RC) Allow() (err error) {
@@ -67,7 +57,6 @@ func (self *RC) Allow() (err error) {
 	if err = touch(self.allowPath); err != nil {
 		return
 	}
-	self.mtime, err = fileMtime(self.allowPath)
 	self.times.Update(self.allowPath)
 	return
 }
@@ -138,7 +127,6 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 
 func (self *RC) RecordState(env Env, newEnv Env) {
 	newEnv[DIRENV_DIR] = "-" + filepath.Dir(self.path)
-	newEnv[DIRENV_MTIME] = fmt.Sprintf("%d", self.mtime)
 	newEnv[DIRENV_DIFF] = env.Diff(newEnv).Serialize()
 }
 
@@ -184,15 +172,6 @@ func eachDir(path string) (paths []string) {
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
-}
-
-func fileMtime(path string) (int64, error) {
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		return 0, err
-	}
-
-	return fileInfo.ModTime().Unix(), nil
 }
 
 func fileHash(path string) (hash string, err error) {

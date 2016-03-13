@@ -11,6 +11,7 @@ setenv DIRENV_CONFIG $PWD
 unsetenv DIRENV_BASH
 unsetenv DIRENV_DIR
 unsetenv DIRENV_MTIME
+unsetenv DIRENV_WATCHES
 unsetenv DIRENV_DIFF
 
 # direnv_eval() {
@@ -24,7 +25,7 @@ alias direnv_eval 'eval `direnv export tcsh`'
 #   echo "## Testing $1 ##"
 # }
 
- 
+
 # test_stop {
 #   cd $TEST_DIR
 #   direnv_eval
@@ -40,15 +41,15 @@ cd $TEST_DIR/scenarios/base
   direnv_eval
   test "$HELLO" = "world"
 
-  setenv MTIME $DIRENV_MTIME
+  setenv WATCHES $DIRENV_WATCHES
   direnv_eval
-  test "$MTIME" = "$DIRENV_MTIME"
+  test "$WATCHES" = "$DIRENV_WATCHES"
 
   sleep 1
 
   touch .envrc
   direnv_eval
-  test "$MTIME" != "$DIRENV_MTIME"
+  test "$WATCHES" != "$DIRENV_WATCHES"
 
   cd ..
   direnv_eval
@@ -72,7 +73,7 @@ cd $TEST_DIR ; direnv_eval
 
 # Make sure directories with spaces are fine
 cd $TEST_DIR/scenarios/"space dir"
-  direnv allow 
+  direnv allow
   echo "Testing space dir"
   direnv_eval
   test "$SPACE_DIR" = "true"
@@ -101,10 +102,10 @@ cd $TEST_DIR ; direnv_eval
 # cd $TEST_DIR ; direnv_eval
 
 cd $TEST_DIR/scenarios/"empty-var"
-  direnv allow 
+  direnv allow
   echo "Testing empty-var"
   direnv_eval
-  test "$?FOO" -eq 1 
+  test "$?FOO" -eq 1
   test "$FOO" = ""
 cd $TEST_DIR ; direnv_eval
 
