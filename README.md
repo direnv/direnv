@@ -174,9 +174,10 @@ All bugs or other forms of discussion happen on
 There is also a wiki available where you can share your usage patterns or
 other tips and tricks <https://github.com/direnv/direnv/wiki>
 
-Or drop by on
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/direnv/direnv?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-to have a chat.
+Or drop by on [IRC (#direnv on freenode)](irc://irc.freenode.net/#direnv) to
+have a chat.
+<iframe src="http://webchat.freenode.net?randomnick=1&channels=%23direnv&uio=MTE9MTk117"
+width="647" height="400"></iframe>
 
 [![Build Status](https://api.travis-ci.org/direnv/direnv.png?branch=master)](http://travis-ci.org/direnv/direnv)
 
