@@ -80,6 +80,9 @@ func (err checkFailed) Error() string {
 }
 
 func (times *FileTimes) Check() (err error) {
+	if len(*times.list) == 0 {
+		return checkFailed{"Times list is empty"}
+	}
 	for idx := range *times.list {
 		err = (*times.list)[idx].Check()
 		if err != nil {
@@ -108,15 +111,20 @@ func (time FileTime) Check() (err error) {
 	switch {
 	case os.IsNotExist(err):
 		if time.Exists {
+			log_debug("Check: %s: gone", time.Path)
 			return checkFailed{fmt.Sprintf("File %q is missing", time.Path)}
 		}
 	case err != nil:
+		log_debug("Check: %s: ERR: %v", time.Path, err)
 		return err
 	case !time.Exists:
+		log_debug("Check: %s: appeared", time.Path)
 		return checkFailed{fmt.Sprintf("File %q newly created", time.Path)}
 	case stat.ModTime().Unix() > time.Modtime:
+		log_debug("Check: %s: stale", time.Path)
 		return checkFailed{fmt.Sprintf("File %q is stale", time.Path)}
 	}
+	log_debug("Check: %s: up to date", time.Path)
 	return nil
 }
 

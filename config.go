@@ -70,6 +70,7 @@ func (self *Config) AllowDir() string {
 
 func (self *Config) LoadedRC() *RC {
 	if self.RCDir == "" {
+		log_debug("RCDir is blank - loadedRC is nil")
 		return nil
 	}
 	rcPath := filepath.Join(self.RCDir, ".envrc")
@@ -85,7 +86,11 @@ func (self *Config) FindRC() *RC {
 
 func (self *Config) EnvDiff() (*EnvDiff, error) {
 	if self.Env[DIRENV_DIFF] == "" {
-		return nil, fmt.Errorf("DIRENV_DIFF is empty")
+		if self.Env[DIRENV_WATCHES] == "" {
+			return self.Env.Diff(self.Env), nil
+		} else {
+			return nil, fmt.Errorf("DIRENV_DIFF is empty")
+		}
 	}
 	return LoadEnvDiff(self.Env[DIRENV_DIFF])
 }

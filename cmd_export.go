@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 )
@@ -30,6 +31,9 @@ func (self *ExportContext) hasRC() bool {
 }
 
 func (self *ExportContext) updateRC() (err error) {
+	defer log.SetPrefix(log.Prefix())
+	log.SetPrefix(log.Prefix() + "update:")
+
 	self.oldEnv = self.env.Copy()
 	var backupDiff *EnvDiff
 
@@ -37,16 +41,30 @@ func (self *ExportContext) updateRC() (err error) {
 		err = fmt.Errorf("EnvDiff() failed: %q", err)
 		return
 	}
+
 	self.oldEnv = backupDiff.Reverse().Patch(self.env)
+
+	log_debug("Determining action:")
+	log_debug("foundRC: %#v", self.foundRC)
+	log_debug("loadedRC: %#v", self.loadedRC)
 
 	switch {
 	case self.foundRC == nil:
+		log_debug("no RC found, unloading")
 		err = self.unloadEnv()
+	case self.loadedRC == nil:
+		log_debug("no RC (implies no DIRENV_DIFF),loading")
+		err = self.loadRC()
 	case self.loadedRC.path != self.foundRC.path:
+		log_debug("new RC, loading")
 		err = self.loadRC()
 	case self.loadedRC.times.Check() != nil:
+		log_debug("file changed, reloading")
 		err = self.loadRC()
+	default:
+		log_debug("no update needed")
 	}
+
 	return
 }
 
@@ -109,6 +127,9 @@ func (self *ExportContext) diffString(shell Shell) string {
 }
 
 func exportCommand(env Env, args []string) (err error) {
+	defer log.SetPrefix(log.Prefix())
+	log.SetPrefix(log.Prefix() + "export:")
+	log_debug("start")
 	context := ExportContext{env: env}
 
 	var target string
@@ -122,23 +143,29 @@ func exportCommand(env Env, args []string) (err error) {
 		return fmt.Errorf("Unknown target shell '%s'", target)
 	}
 
+	log_debug("load config")
 	if err = context.loadConfig(); err != nil {
 		return
 	}
 
+	log_debug("loading RCs")
 	if context.getRCs(); !context.hasRC() {
 		return nil
 	}
 
+	log_debug("updating RC")
 	if err = context.updateRC(); err != nil {
+		log_debug("err: %v", err)
 		context.resetEnv()
 	}
 
 	if context.newEnv == nil {
+		log_debug("newEnv nil, exiting")
 		return nil
 	}
 
 	diffString := context.diffString(shell)
+	log_debug("env diff %s", diffString)
 	fmt.Print(diffString)
 
 	return
