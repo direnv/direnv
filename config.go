@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -71,16 +70,14 @@ func (self *Config) AllowDir() string {
 
 func (self *Config) LoadedRC() *RC {
 	if self.RCDir == "" {
+		log_debug("RCDir is blank - loadedRC is nil")
 		return nil
 	}
 	rcPath := filepath.Join(self.RCDir, ".envrc")
 
-	mtime, err := strconv.ParseInt(self.Env[DIRENV_MTIME], 10, 64)
-	if err != nil {
-		return nil
-	}
+	times_string := self.Env[DIRENV_WATCHES]
 
-	return RCFromEnv(rcPath, mtime)
+	return RCFromEnv(rcPath, times_string)
 }
 
 func (self *Config) FindRC() *RC {
@@ -89,7 +86,11 @@ func (self *Config) FindRC() *RC {
 
 func (self *Config) EnvDiff() (*EnvDiff, error) {
 	if self.Env[DIRENV_DIFF] == "" {
-		return nil, fmt.Errorf("DIRENV_DIFF is empty")
+		if self.Env[DIRENV_WATCHES] == "" {
+			return self.Env.Diff(self.Env), nil
+		} else {
+			return nil, fmt.Errorf("DIRENV_DIFF is empty")
+		}
 	}
 	return LoadEnvDiff(self.Env[DIRENV_DIFF])
 }

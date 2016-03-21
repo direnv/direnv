@@ -25,6 +25,12 @@ func GetEnv() Env {
 	return env
 }
 
+func (env Env) CleanContext() {
+	delete(env, DIRENV_DIR)
+	delete(env, DIRENV_WATCHES)
+	delete(env, DIRENV_DIFF)
+}
+
 func LoadEnv(base64env string) (env Env, err error) {
 	env = make(Env)
 	err = unmarshal(base64env, &env)

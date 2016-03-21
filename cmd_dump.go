@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // `direnv dump`
 var CmdDump = &Cmd{

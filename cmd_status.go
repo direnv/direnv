@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 )
 
 var CmdStatus = &Cmd{
@@ -21,23 +22,28 @@ var CmdStatus = &Cmd{
 		foundRC := config.FindRC()
 
 		if loadedRC != nil {
-			fmt.Println("Loaded RC path", loadedRC.path)
-			fmt.Println("Loaded RC mtime", loadedRC.mtime)
-			fmt.Println("Loaded RC allowed", loadedRC.Allowed())
-			fmt.Println("Loaded RC allowPath", loadedRC.allowPath)
+			formatRC("Loaded", loadedRC)
 		} else {
 			fmt.Println("No .envrc loaded")
 		}
 
 		if foundRC != nil {
-			fmt.Println("Found RC path", foundRC.path)
-			fmt.Println("Found RC mtime", foundRC.mtime)
-			fmt.Println("Found RC allowed", foundRC.Allowed())
-			fmt.Println("Found RC allowPath", foundRC.allowPath)
+			formatRC("Found", foundRC)
 		} else {
 			fmt.Println("No .envrc found")
 		}
 
 		return nil
 	},
+}
+
+func formatRC(desc string, rc *RC) {
+	workDir := filepath.Dir(rc.path)
+
+	fmt.Println(desc, "RC path", rc.path)
+	for idx, _ := range *(rc.times.list) {
+		fmt.Println(desc, "watch:", (*rc.times.list)[idx].Formatted(workDir))
+	}
+	fmt.Println(desc, "RC allowed", rc.Allowed())
+	fmt.Println(desc, "RC allowPath", rc.allowPath)
 }

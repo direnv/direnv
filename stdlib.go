@@ -40,8 +40,10 @@ const STDLIB = "#!bash\n" +
 	"#    log_error \"Unable to find specified directory!\"\n" +
 	"\n" +
 	"log_error() {\n" +
-	"  local color_normal=`tput sgr0`\n" +
-	"  local color_error=\"\\e[0;31m\"\n" +
+	"  local color_normal\n" +
+	"  local color_error\n" +
+	"  color_normal=$(tput sgr0)\n" +
+	"  color_error=\"\\e[0;31m\"\n" +
 	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
 	"    local msg=$*\n" +
 	"    # shellcheck disable=SC2059\n" +
@@ -155,11 +157,15 @@ const STDLIB = "#!bash\n" +
 	"  if ! [[ -f $rcpath ]]; then\n" +
 	"    rcpath=$rcpath/.envrc\n" +
 	"  fi\n" +
+	"\n" +
 	"  rcfile=$(user_rel_path \"$rcpath\")\n" +
+	"  watch_file \"$rcpath\"\n" +
+	"\n" +
 	"  pushd \"$(pwd -P 2>/dev/null)\" > /dev/null\n" +
 	"    pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
 	"    if [[ -f ./$(basename \"$rcpath\") ]]; then\n" +
 	"      log_status \"loading $rcfile\"\n" +
+	"      # shellcheck source=/dev/null\n" +
 	"      . \"./$(basename \"$rcpath\")\"\n" +
 	"    else\n" +
 	"      log_status \"referenced $rcfile does not exist\"\n" +
@@ -167,6 +173,18 @@ const STDLIB = "#!bash\n" +
 	"    popd > /dev/null\n" +
 	"  popd > /dev/null\n" +
 	"}\n" +
+	"\n" +
+	"# Usage: watch_file <filename>\n" +
+	"#\n" +
+	"# Adds <path> to the list of files that direnv will watch for changes - useful when the contents\n" +
+	"# of a file influence how variables are set - especially in direnvrc\n" +
+	"#\n" +
+	"watch_file() {\n" +
+	"  local file=${1/#\\~/$HOME}\n" +
+	"\n" +
+	"  eval \"$($direnv watch \"$file\")\"\n" +
+	"}\n" +
+	"\n" +
 	"\n" +
 	"# Usage: source_up [<filename>]\n" +
 	"#\n" +
@@ -241,7 +259,7 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"# Expands some common path variables for the given <prefix_path> prefix. This is\n" +
 	"# useful if you installed something in the <prefix_path> using\n" +
-	"# $(./configure --prefix=<prefix_path> && make install) and want to use it in \n" +
+	"# $(./configure --prefix=<prefix_path> && make install) and want to use it in\n" +
 	"# the project.\n" +
 	"#\n" +
 	"# Variables set:\n" +
@@ -403,10 +421,13 @@ const STDLIB = "#!bash\n" +
 	"rvm() {\n" +
 	"  unset rvm\n" +
 	"  if [[ -n ${rvm_scripts_path:-} ]]; then\n" +
+	"    # shellcheck source=/dev/null\n" +
 	"    source \"${rvm_scripts_path}/rvm\"\n" +
 	"  elif [[ -n ${rvm_path:-} ]]; then\n" +
+	"    # shellcheck source=/dev/null\n" +
 	"    source \"${rvm_path}/scripts/rvm\"\n" +
 	"  else\n" +
+	"    # shellcheck source=/dev/null\n" +
 	"    source \"$HOME/.rvm/scripts/rvm\"\n" +
 	"  fi\n" +
 	"  rvm \"$@\"\n" +
@@ -432,6 +453,8 @@ const STDLIB = "#!bash\n" +
 	"use_node() {\n" +
 	"  local version=$1\n" +
 	"  local via=\"\"\n" +
+	"  local node_wanted\n" +
+	"  local node_prefix\n" +
 	"\n" +
 	"  if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then\n" +
 	"    log_error \"You must specify a \\$NODE_VERSIONS environment variable and the directory specified must exist!\"\n" +
@@ -453,8 +476,8 @@ const STDLIB = "#!bash\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
-	"  local node_wanted=${NODE_VERSION_PREFIX:-\"node-v\"}$version\n" +
-	"  local node_prefix=$(find $NODE_VERSIONS -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)\n" +
+	"  node_wanted=${NODE_VERSION_PREFIX:-\"node-v\"}$version\n" +
+	"  node_prefix=$(find \"$NODE_VERSIONS\" -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)\n" +
 	"\n" +
 	"  if [[ ! -d $node_prefix ]]; then\n" +
 	"    log_error \"Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!\"\n" +
@@ -466,7 +489,7 @@ const STDLIB = "#!bash\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
-	"  load_prefix $node_prefix\n" +
+	"  load_prefix \"$node_prefix\"\n" +
 	"\n" +
 	"  if [[ -z $via ]]; then\n" +
 	"    log_status \"Successfully loaded NodeJS $(node --version), from prefix ($node_prefix)\"\n" +

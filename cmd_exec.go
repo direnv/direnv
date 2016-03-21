@@ -53,9 +53,7 @@ var CmdExec = &Cmd{
 		if backupDiff, err = config.EnvDiff(); err == nil {
 			backupDiff.Reverse().Patch(env)
 		}
-		delete(env, DIRENV_DIR)
-		delete(env, DIRENV_MTIME)
-		delete(env, DIRENV_DIFF)
+		env.CleanContext()
 
 		// Load the rc
 		if rc != nil {

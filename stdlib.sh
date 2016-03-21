@@ -38,8 +38,10 @@ log_status() {
 #    log_error "Unable to find specified directory!"
 
 log_error() {
-  local color_normal=`tput sgr0`
-  local color_error="\e[0;31m"
+  local color_normal
+  local color_error
+  color_normal=$(tput sgr0)
+  color_error="\e[0;31m"
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
     local msg=$*
     # shellcheck disable=SC2059
@@ -153,11 +155,15 @@ source_env() {
   if ! [[ -f $rcpath ]]; then
     rcpath=$rcpath/.envrc
   fi
+
   rcfile=$(user_rel_path "$rcpath")
+  watch_file "$rcpath"
+
   pushd "$(pwd -P 2>/dev/null)" > /dev/null
     pushd "$(dirname "$rcpath")" > /dev/null
     if [[ -f ./$(basename "$rcpath") ]]; then
       log_status "loading $rcfile"
+      # shellcheck source=/dev/null
       . "./$(basename "$rcpath")"
     else
       log_status "referenced $rcfile does not exist"
@@ -165,6 +171,18 @@ source_env() {
     popd > /dev/null
   popd > /dev/null
 }
+
+# Usage: watch_file <filename>
+#
+# Adds <path> to the list of files that direnv will watch for changes - useful when the contents
+# of a file influence how variables are set - especially in direnvrc
+#
+watch_file() {
+  local file=${1/#\~/$HOME}
+
+  eval "$($direnv watch "$file")"
+}
+
 
 # Usage: source_up [<filename>]
 #
@@ -239,7 +257,7 @@ path_add() {
 #
 # Expands some common path variables for the given <prefix_path> prefix. This is
 # useful if you installed something in the <prefix_path> using
-# $(./configure --prefix=<prefix_path> && make install) and want to use it in 
+# $(./configure --prefix=<prefix_path> && make install) and want to use it in
 # the project.
 #
 # Variables set:
@@ -401,10 +419,13 @@ use_rbenv() {
 rvm() {
   unset rvm
   if [[ -n ${rvm_scripts_path:-} ]]; then
+    # shellcheck source=/dev/null
     source "${rvm_scripts_path}/rvm"
   elif [[ -n ${rvm_path:-} ]]; then
+    # shellcheck source=/dev/null
     source "${rvm_path}/scripts/rvm"
   else
+    # shellcheck source=/dev/null
     source "$HOME/.rvm/scripts/rvm"
   fi
   rvm "$@"
@@ -430,6 +451,8 @@ rvm() {
 use_node() {
   local version=$1
   local via=""
+  local node_wanted
+  local node_prefix
 
   if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then
     log_error "You must specify a \$NODE_VERSIONS environment variable and the directory specified must exist!"
@@ -451,8 +474,8 @@ use_node() {
     return 1
   fi
 
-  local node_wanted=${NODE_VERSION_PREFIX:-"node-v"}$version
-  local node_prefix=$(find $NODE_VERSIONS -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)
+  node_wanted=${NODE_VERSION_PREFIX:-"node-v"}$version
+  node_prefix=$(find "$NODE_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)
 
   if [[ ! -d $node_prefix ]]; then
     log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"
@@ -464,7 +487,7 @@ use_node() {
     return 1
   fi
 
-  load_prefix $node_prefix
+  load_prefix "$node_prefix"
 
   if [[ -z $via ]]; then
     log_status "Successfully loaded NodeJS $(node --version), from prefix ($node_prefix)"
