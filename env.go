@@ -25,7 +25,7 @@ func GetEnv() Env {
 	return env
 }
 
-func (env Env) Clean() {
+func (env Env) CleanContext() {
 	delete(env, DIRENV_DIR)
 	delete(env, DIRENV_WATCHES)
 	delete(env, DIRENV_DIFF)

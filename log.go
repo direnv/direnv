@@ -48,6 +48,11 @@ func log_debug(msg string, a ...interface{}) {
 }
 
 func logMsg(format, msg string, a ...interface{}) {
+	defer log.SetFlags(log.Flags())
+	defer log.SetPrefix(log.Prefix())
+	log.SetFlags(0)
+	log.SetPrefix("")
+
 	msg = fmt.Sprintf(format+"\n", msg)
 	log.Printf(msg, a...)
 }

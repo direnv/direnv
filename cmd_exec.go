@@ -53,7 +53,7 @@ var CmdExec = &Cmd{
 		if backupDiff, err = config.EnvDiff(); err == nil {
 			backupDiff.Reverse().Patch(env)
 		}
-		env.Clean()
+		env.CleanContext()
 
 		// Load the rc
 		if rc != nil {

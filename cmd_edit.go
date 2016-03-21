@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,6 +21,9 @@ var CmdEdit = &Cmd{
 		var rcPath string
 		var times *FileTimes
 		var foundRC *RC
+
+		defer log.SetPrefix(log.Prefix())
+		log.SetPrefix(log.Prefix() + "cmd_edit: ")
 
 		if config, err = LoadConfig(env); err != nil {
 			return
@@ -62,7 +66,12 @@ var CmdEdit = &Cmd{
 		}
 
 		foundRC = FindRC(rcPath, config.AllowDir())
-		if foundRC != nil && times != nil && times.Check() != nil {
+		log_debug("foundRC: %#v", foundRC)
+		log_debug("times: %#v", times)
+		if times != nil {
+			log_debug("times.Check(): %#v", times.Check())
+		}
+		if foundRC != nil && (times == nil || times.Check() != nil) {
 			foundRC.Allow()
 		}
 

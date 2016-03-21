@@ -90,7 +90,7 @@ func (self *ExportContext) resetEnv() {
 }
 
 func cleanEnv(env Env) {
-	env.Clean()
+	env.CleanContext()
 }
 
 func (self *ExportContext) diffString(shell Shell) string {
