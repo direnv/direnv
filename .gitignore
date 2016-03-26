@@ -4,5 +4,6 @@
 /dist
 /site
 /test/allow
+/test/config/direnv/allow
 man/*.html
 *.sw?
