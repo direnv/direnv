@@ -84,7 +84,18 @@ expand_path() {
 # Loads a ".env" file into the current environment
 #
 dotenv() {
+  local path=$1
+  if [[ -z $path ]]; then
+    path=$PWD/.env
+  elif [[ -d $path ]]; then
+    path=$path/.env
+  fi
+  if ! [[ -f $path ]]; then
+    log_error ".env at $path not found"
+    return 1
+  fi
   eval "$("$direnv" dotenv bash "$@")"
+  watch_file "$path"
 }
 
 # Usage: user_rel_path <abs_path>
