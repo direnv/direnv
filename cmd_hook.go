@@ -21,7 +21,12 @@ var CmdHook = &Cmd{
 			return fmt.Errorf("Unknown target shell '%s'", target)
 		}
 
-		fmt.Println(shell.Hook())
+		h, err := shell.Hook()
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(h)
 
 		return
 	},

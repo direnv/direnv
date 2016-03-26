@@ -15,18 +15,29 @@ if [[ -z ${precmd_functions[(r)_direnv_hook]} ]]; then
 fi
 `
 
-func (z zsh) Hook() string {
-	return ZSH_HOOK
+func (z zsh) Hook() (string, error) {
+	return ZSH_HOOK, nil
 }
 
-func (z zsh) Escape(str string) string {
-	return ShellEscape(str)
+func (z zsh) Export(e ShellExport) (out string) {
+	for key, value := range e {
+		if value == nil {
+			out += z.unset(key)
+		} else {
+			out += z.export(key, *value)
+		}
+	}
+	return out
 }
 
-func (z zsh) Export(key, value string) string {
-	return "export " + z.Escape(key) + "=" + z.Escape(value) + ";"
+func (z zsh) export(key, value string) string {
+	return "export " + z.escape(key) + "=" + z.escape(value) + ";"
 }
 
-func (z zsh) Unset(key string) string {
-	return "unset " + z.Escape(key) + ";"
+func (z zsh) unset(key string) string {
+	return "unset " + z.escape(key) + ";"
+}
+
+func (z zsh) escape(str string) string {
+	return BashEscape(str)
 }

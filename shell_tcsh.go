@@ -9,11 +9,37 @@ type tcsh int
 
 var TCSH tcsh
 
-func (f tcsh) Hook() string {
-	return "alias precmd 'eval `direnv export tcsh`' "
+func (f tcsh) Hook() (string, error) {
+	return "alias precmd 'eval `direnv export tcsh`' ", nil
 }
 
-func (f tcsh) Escape(str string) string {
+func (f tcsh) Export(e ShellExport) (out string) {
+	for key, value := range e {
+		if value == nil {
+			out += f.unset(key)
+		} else {
+			out += f.export(key, *value)
+		}
+	}
+	return out
+}
+
+func (f tcsh) export(key, value string) string {
+	if key == "PATH" {
+		command := "set path = ("
+		for _, path := range strings.Split(value, ":") {
+			command += " " + f.escape(path)
+		}
+		return command + " );"
+	}
+	return "setenv " + f.escape(key) + " " + f.escape(value) + ";"
+}
+
+func (f tcsh) unset(key string) string {
+	return "unsetenv " + f.escape(key) + ";"
+}
+
+func (f tcsh) escape(str string) string {
 	if str == "" {
 		return "''"
 	}
@@ -90,19 +116,4 @@ func (f tcsh) Escape(str string) string {
 	}
 
 	return out
-}
-
-func (f tcsh) Export(key, value string) string {
-	if key == "PATH" {
-		command := "set path = ("
-		for _, path := range strings.Split(value, ":") {
-			command += " " + f.Escape(path)
-		}
-		return command + " );"
-	}
-	return "setenv " + f.Escape(key) + " " + f.Escape(value) + ";"
-}
-
-func (f tcsh) Unset(key string) string {
-	return "unsetenv " + f.Escape(key) + ";"
 }

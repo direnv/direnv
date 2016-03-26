@@ -58,13 +58,13 @@ func (env Env) ToGoEnv() []string {
 }
 
 func (env Env) ToShell(shell Shell) string {
-	str := ""
+	e := make(ShellExport)
 
 	for key, value := range env {
-		str += shell.Export(key, value)
+		e.Add(key, value)
 	}
 
-	return str
+	return shell.Export(e)
 }
 
 func (env Env) Serialize() string {

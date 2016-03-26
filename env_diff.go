@@ -71,20 +71,20 @@ func (self *EnvDiff) Any() bool {
 }
 
 func (self *EnvDiff) ToShell(shell Shell) string {
-	str := ""
+	e := make(ShellExport)
 
 	for key := range self.Prev {
 		_, ok := self.Next[key]
 		if !ok {
-			str += shell.Unset(key)
+			e.Remove(key)
 		}
 	}
 
 	for key, value := range self.Next {
-		str += shell.Export(key, value)
+		e.Add(key, value)
 	}
 
-	return str
+	return shell.Export(e)
 }
 
 func (self *EnvDiff) Patch(env Env) (newEnv Env) {

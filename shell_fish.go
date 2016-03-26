@@ -9,15 +9,43 @@ type fish int
 
 var FISH fish
 
-func (f fish) Hook() string {
-	return `
+const FISH_HOOK = `
 function __direnv_export_eval --on-event fish_prompt;
 	eval (direnv export fish);
 end
 `
+
+func (f fish) Hook() (string, error) {
+	return FISH_HOOK, nil
 }
 
-func (f fish) Escape(str string) string {
+func (f fish) Export(e ShellExport) (out string) {
+	for key, value := range e {
+		if value == nil {
+			out += f.unset(key)
+		} else {
+			out += f.export(key, *value)
+		}
+	}
+	return out
+}
+
+func (f fish) export(key, value string) string {
+	if key == "PATH" {
+		command := "set -x -g PATH"
+		for _, path := range strings.Split(value, ":") {
+			command += " " + f.escape(path)
+		}
+		return command + ";"
+	}
+	return "set -x -g " + f.escape(key) + " " + f.escape(value) + ";"
+}
+
+func (f fish) unset(key string) string {
+	return "set -e -g " + f.escape(key) + ";"
+}
+
+func (f fish) escape(str string) string {
 	in := []byte(str)
 	out := "'"
 	i := 0
@@ -67,19 +95,4 @@ func (f fish) Escape(str string) string {
 	out += "'"
 
 	return out
-}
-
-func (f fish) Export(key, value string) string {
-	if key == "PATH" {
-		command := "set -x -g PATH"
-		for _, path := range strings.Split(value, ":") {
-			command += " " + f.Escape(path)
-		}
-		return command + ";"
-	}
-	return "set -x -g " + f.Escape(key) + " " + f.Escape(value) + ";"
-}
-
-func (f fish) Unset(key string) string {
-	return "set -e -g " + f.Escape(key) + ";"
 }
