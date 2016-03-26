@@ -41,6 +41,8 @@ func DetectShell(target string) Shell {
 		return VIM
 	case "tcsh":
 		return TCSH
+	case "json":
+		return JSON
 	}
 
 	return nil
