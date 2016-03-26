@@ -9,7 +9,7 @@ import (
 
 var CmdPrune = &Cmd{
 	Name: "prune",
-	Desc: "prune allowed .envrc's which no more exists",
+	Desc: "removes old allowed files",
 	Fn: func(env Env, args []string) (err error) {
 		var config *Config
 		var dir *os.File
