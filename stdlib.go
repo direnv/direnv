@@ -86,7 +86,18 @@ const STDLIB = "#!bash\n" +
 	"# Loads a \".env\" file into the current environment\n" +
 	"#\n" +
 	"dotenv() {\n" +
+	"  local path=$1\n" +
+	"  if [[ -z $path ]]; then\n" +
+	"    path=$PWD/.env\n" +
+	"  elif [[ -d $path ]]; then\n" +
+	"    path=$path/.env\n" +
+	"  fi\n" +
+	"  if ! [[ -f $path ]]; then\n" +
+	"    log_error \".env at $path not found\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
 	"  eval \"$(\"$direnv\" dotenv bash \"$@\")\"\n" +
+	"  watch_file \"$path\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: user_rel_path <abs_path>\n" +
