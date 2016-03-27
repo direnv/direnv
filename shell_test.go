@@ -4,12 +4,12 @@ import (
 	"testing"
 )
 
-func TestShellEscape(t *testing.T) {
-	assertEqual(t, `''`, ShellEscape(""))
-	assertEqual(t, `$'escape\'quote'`, ShellEscape("escape'quote"))
-	assertEqual(t, `$'foo\r\n\tbar'`, ShellEscape("foo\r\n\tbar"))
-	assertEqual(t, `$'foo bar'`, ShellEscape("foo bar"))
-	assertEqual(t, `$'\xc3\xa9'`, ShellEscape("é"))
+func TestBashEscape(t *testing.T) {
+	assertEqual(t, `''`, BashEscape(""))
+	assertEqual(t, `$'escape\'quote'`, BashEscape("escape'quote"))
+	assertEqual(t, `$'foo\r\n\tbar'`, BashEscape("foo\r\n\tbar"))
+	assertEqual(t, `$'foo bar'`, BashEscape("foo bar"))
+	assertEqual(t, `$'\xc3\xa9'`, BashEscape("é"))
 }
 
 func TestShellDetection(t *testing.T) {

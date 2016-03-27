@@ -1,7 +1,7 @@
 package main
 
 import (
-	"os"
+	"errors"
 	"strings"
 )
 
@@ -9,26 +9,35 @@ type vim int
 
 var VIM vim
 
-func (x vim) Hook() string {
-	log_error("this feature is not supported. Install the direnv.vim plugin instead.")
-	os.Exit(1)
-	return ""
+func (x vim) Hook() (string, error) {
+	return "", errors.New("this feature is not supported. Install the direnv.vim plugin instead.")
+}
+
+func (x vim) Export(e ShellExport) (out string) {
+	for key, value := range e {
+		if value == nil {
+			out += x.unset(key)
+		} else {
+			out += x.export(key, *value)
+		}
+	}
+	return out
+}
+
+func (x vim) export(key, value string) string {
+	return "let $" + x.escapeKey(key) + " = " + x.escapeValue(value) + "\n"
+}
+
+func (x vim) unset(key string) string {
+	return "let $" + x.escapeKey(key) + " = ''\n"
 }
 
 // TODO: support keys with special chars or fail
-func (x vim) EscapeKey(str string) string {
+func (x vim) escapeKey(str string) string {
 	return str
 }
 
 // TODO: Make sure this escaping is valid
-func (x vim) EscapeValue(str string) string {
+func (x vim) escapeValue(str string) string {
 	return "'" + strings.Replace(str, "'", "''", -1) + "'"
-}
-
-func (x vim) Export(key, value string) string {
-	return "let $" + x.EscapeKey(key) + " = " + x.EscapeValue(value) + "\n"
-}
-
-func (x vim) Unset(key string) string {
-	return "let $" + x.EscapeKey(key) + " = ''\n"
 }

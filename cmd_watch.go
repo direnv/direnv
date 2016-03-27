@@ -40,7 +40,10 @@ func watchCommand(env Env, args []string) (err error) {
 
 	watches.Update(path)
 
-	fmt.Printf(shell.Export(DIRENV_WATCHES, watches.Marshal()))
+	e := make(ShellExport)
+	e.Add(DIRENV_WATCHES, watches.Marshal())
+
+	fmt.Printf(shell.Export(e))
 
 	return
 }
