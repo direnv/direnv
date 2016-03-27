@@ -1,4 +1,17 @@
 
+2.8.0 / 2016-03-27
+==================
+
+  * NEW: `direnv export json` to facilitate IDE integration
+  * NEW: watch functionality thanks to @avnik
+    Now direnv also reload on associate .env and .envrc changes.
+  * NEW: stdlib `watch_file` function thanks to @avnik
+    Allows to monitor more files for change.
+  * NEW: stdlib `use node` function thanks to @wilmoore
+  * NEW: `direnv prune` to remove old allowed files thanks to @punitagrawal
+    Only works with newly-generated files since we're not storing the path
+    inside of them.
+
 2.7.0 / 2015-08-08
 ==================
 
