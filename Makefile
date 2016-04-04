@@ -43,6 +43,5 @@ install: all
 
 dist:
 	go get github.com/mitchellh/gox
-	gox -build-toolchain
-	gox -output "dist/{{.Dir}}.{{.OS}}-{{.Arch}}"
+	gox -output "dist/direnv.{{.OS}}-{{.Arch}}"
 
