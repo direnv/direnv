@@ -50,13 +50,25 @@ make install
 # or symlink ./direnv into the $PATH
 ```
 
-### Packaged
+### From system packages
 
-There's package definitions on Homebrew, Arch's AUR, Gentoo go-overlay overlay
-and NixOS's nixpkgs.
+direnv is packaged for a variety of systems:
 
-Links to binary builds are also available on
+* Fedora - missing, please contact me !
+* [Arch AUR](https://aur.archlinux.org/packages/direnv/)
+* [Debian](https://packages.debian.org/search?keywords=direnv&searchon=names&suite=all&section=all)
+* [Gentoo go-overlay](https://github.com/Dr-Terrible/go-overlay)
+* [NetBSD pkgsrc-wip](http://www.pkgsrc.org/wip/)
+* [NixOS](https://nixos.org/nixos/packages.html)
+* [OSX Homebrew](http://brew.sh/)
+* [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
+
+### From binary builds
+
+Binary builds for a variety of architectures are also available for
 [each release](https://github.com/direnv/direnv/releases).
+
+Fetch the binary, `chmod +x direnv` and put it somewhere in your PATH.
 
 ## Setup
 
