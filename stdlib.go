@@ -360,6 +360,11 @@ const STDLIB = "#!bash\n" +
 	"  else\n" +
 	"    local python_version\n" +
 	"    python_version=$(\"$python\" -c \"import platform as p;print(p.python_version())\")\n" +
+	"    if [[ -z $python_version ]]; then\n" +
+	"      log_error \"Could not find python's version\"\n" +
+	"      return 1\n" +
+	"    fi\n" +
+	"\n" +
 	"    export VIRTUAL_ENV=$PWD/.direnv/python-$python_version\n" +
 	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
 	"      virtualenv \"--python=$python\" \"$VIRTUAL_ENV\"\n" +

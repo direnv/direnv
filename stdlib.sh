@@ -358,6 +358,11 @@ layout_python() {
   else
     local python_version
     python_version=$("$python" -c "import platform as p;print(p.python_version())")
+    if [[ -z $python_version ]]; then
+      log_error "Could not find python's version"
+      return 1
+    fi
+
     export VIRTUAL_ENV=$PWD/.direnv/python-$python_version
     if [[ ! -d $VIRTUAL_ENV ]]; then
       virtualenv "--python=$python" "$VIRTUAL_ENV"
