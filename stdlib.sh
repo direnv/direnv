@@ -506,7 +506,7 @@ rvm() {
 use_node() {
   local version=$1
   local via=""
-  local node_version_prefix=${NODE_VERSION_PREFIX:-node-v}
+  local node_version_prefix=${NODE_VERSION_PREFIX-node-v}
   local node_wanted
   local node_prefix
 

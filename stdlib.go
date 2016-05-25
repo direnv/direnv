@@ -508,7 +508,7 @@ const STDLIB = "#!bash\n" +
 	"use_node() {\n" +
 	"  local version=$1\n" +
 	"  local via=\"\"\n" +
-	"  local node_version_prefix=${NODE_VERSION_PREFIX:-node-v}\n" +
+	"  local node_version_prefix=${NODE_VERSION_PREFIX-node-v}\n" +
 	"  local node_wanted\n" +
 	"  local node_prefix\n" +
 	"\n" +
