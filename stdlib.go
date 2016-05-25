@@ -492,7 +492,7 @@ const STDLIB = "#!bash\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
-	"  node_wanted=${NODE_VERSION_PREFIX:-\"node-v\"}$version\n" +
+	"  node_wanted=${NODE_VERSION_PREFIX-\"node-v\"}$version\n" +
 	"  node_prefix=$(find \"$NODE_VERSIONS\" -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)\n" +
 	"\n" +
 	"  if [[ ! -d $node_prefix ]]; then\n" +

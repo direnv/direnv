@@ -490,7 +490,7 @@ use_node() {
     return 1
   fi
 
-  node_wanted=${NODE_VERSION_PREFIX:-"node-v"}$version
+  node_wanted=${NODE_VERSION_PREFIX-"node-v"}$version
   node_prefix=$(find "$NODE_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)
 
   if [[ ! -d $node_prefix ]]; then
