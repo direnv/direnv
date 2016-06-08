@@ -45,7 +45,9 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 	config.BashPath = env[DIRENV_BASH]
 	if config.BashPath == "" {
-		if config.BashPath, err = exec.LookPath("bash"); err != nil {
+		if bashPath != "" {
+			config.BashPath = bashPath
+		} else if config.BashPath, err = exec.LookPath("bash"); err != nil {
 			err = fmt.Errorf("Can't find bash: %q", err)
 			return
 		}

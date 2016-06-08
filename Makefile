@@ -3,10 +3,20 @@ DESTDIR ?= /usr/local
 MAN_MD = $(wildcard man/*.md)
 ROFFS = $(MAN_MD:.md=)
 
+GO_LDFLAGS =
+
 ifeq ($(shell uname), Darwin)
 	# Fixes DYLD_INSERT_LIBRARIES issues
 	# See https://github.com/direnv/direnv/issues/194
-	GO_FLAGS += -ldflags -linkmode=external
+	GO_LDFLAGS += -linkmode=external
+endif
+
+ifdef BASH_PATH
+	GO_LDFLAGS += -X main.bashPath=$(BASH_PATH)
+endif
+
+ifdef GO_LDFLAGS
+	GO_FLAGS += -ldflags '$(GO_LDFLAGS)'
 endif
 
 .PHONY: all man html test install dist
