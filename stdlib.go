@@ -523,6 +523,10 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"use_nix() {\n" +
 	"  direnv_load nix-shell --show-trace \"$@\" --run 'direnv dump'\n" +
+	"  if [ $# -gt 0 ]; then\n" +
+	"    watch_file default.nix\n" +
+	"    watch_file shell.nix\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
