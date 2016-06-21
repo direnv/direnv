@@ -14,12 +14,10 @@ var CmdReload = &Cmd{
 		}
 
 		foundRC := config.FindRC()
-		if foundRC != nil {
-			return foundRC.Touch()
-		} else {
+		if foundRC == nil {
 			return fmt.Errorf(".envrc not found")
 		}
 
-		return nil
+		return foundRC.Touch()
 	},
 }

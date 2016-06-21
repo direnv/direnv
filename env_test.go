@@ -11,14 +11,14 @@ func TestEnv(t *testing.T) {
 
 	env2, err := LoadEnv(out)
 	if err != nil {
-		t.Errorf("parse error", err)
+		t.Error("parse error", err)
 	}
 
 	if env2["FOO"] != "bar" {
-		t.Errorf("FOO != bar", env2["FOO"])
+		t.Error("FOO != bar", env2["FOO"])
 	}
 
 	if len(env2) != 1 {
-		t.Errorf("len != 1", len(env2))
+		t.Error("len != 1", len(env2))
 	}
 }

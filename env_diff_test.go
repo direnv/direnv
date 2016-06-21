@@ -12,15 +12,15 @@ func TestEnvDiff(t *testing.T) {
 
 	diff2, err := LoadEnvDiff(out)
 	if err != nil {
-		t.Errorf("parse error", err)
+		t.Error("parse error", err)
 	}
 
 	if len(diff2.Prev) != 1 {
-		t.Errorf("len(diff2.prev) != 1", len(diff2.Prev))
+		t.Error("len(diff2.prev) != 1", len(diff2.Prev))
 	}
 
 	if len(diff2.Next) != 1 {
-		t.Errorf("len(diff2.next) != 0", len(diff2.Next))
+		t.Error("len(diff2.next) != 0", len(diff2.Next))
 	}
 }
 
