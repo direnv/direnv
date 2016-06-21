@@ -41,7 +41,7 @@ func formatRC(desc string, rc *RC) {
 	workDir := filepath.Dir(rc.path)
 
 	fmt.Println(desc, "RC path", rc.path)
-	for idx, _ := range *(rc.times.list) {
+	for idx := range *(rc.times.list) {
 		fmt.Println(desc, "watch:", (*rc.times.list)[idx].Formatted(workDir))
 	}
 	fmt.Println(desc, "RC allowed", rc.Allowed())

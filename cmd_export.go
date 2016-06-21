@@ -97,7 +97,7 @@ func (self *ExportContext) diffString(shell Shell) string {
 	oldDiff := self.oldEnv.Diff(self.newEnv)
 	if oldDiff.Any() {
 		var out []string
-		for key, _ := range oldDiff.Prev {
+		for key := range oldDiff.Prev {
 			_, ok := oldDiff.Next[key]
 			if !ok && !direnvKey(key) {
 				out = append(out, "-"+key)
