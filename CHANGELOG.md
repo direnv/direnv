@@ -1,4 +1,13 @@
 
+2.9.0 / 2016-07-03
+==================
+
+  * NEW: use_nix() is now watching default.nix and shell.nix
+  * NEW: Allow to fix the bash path at built time
+  * FIX: Panic on `direnv current` with no argument
+  * FIX: Permit empty NODE_VERSION_PREFIX variable
+  * FIX: layout_python: fail properly when python is not found
+
 2.8.1 / 2016-04-04
 ==================
 
