@@ -521,7 +521,7 @@ use_node() {
 #
 use_nix() {
   direnv_load nix-shell --show-trace "$@" --run 'direnv dump'
-  if [[ $# -gt 0 ]]; then
+  if [[ $# = 0 ]]; then
     watch_file default.nix
     watch_file shell.nix
   fi
