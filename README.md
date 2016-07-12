@@ -3,17 +3,17 @@ direnv -- Unclutter your .profile
 
 `direnv` is an environment switcher for the shell. It knows how to hook into
 bash, zsh, tcsh and fish shell to load or unload environment variables
-depending on the current directory. This allows to have project-specific
-environment variables and not clutter the "~/.profile" file.
+depending on the current directory. This allows project-specific
+environment variables without cluttering the "~/.profile" file.
 
-Before each prompt it checks for the existence of an ".envrc" file in the
-current and parent directories. If the file exists (and authorized), it is
+Before each prompt, direnv checks for the existence of a ".envrc" file in the
+current and parent directories. If the file exists (and is authorized), it is
 loaded into a **bash** sub-shell and all exported variables are then captured by
-direnv and then made available the current shell.
+direnv and then made available to the current shell.
 
-Because direnv is compiled into a single static executable it is fast enough
-to be unnoticeable on each prompt. It is also language agnostic and can be
-used to build solutions similar to rbenv, pyenv, phpenv, ...
+Because direnv is compiled into a single static executable, it is fast enough
+to be unnoticeable on each prompt. It is also language-agnostic and can be
+used to build solutions similar to rbenv, pyenv and phpenv.
 
 
 ## Example
@@ -113,11 +113,11 @@ eval `direnv hook tcsh`
 
 ## Usage
 
-In some target folder, create an ".envrc" file and add some export(1)
+In some target folder, create a ".envrc" file and add some export(1)
 directives in it.
 
 Note that the contents of the `.envrc` file must be valid bash syntax,
-despite what shell you may be using.
+regardless of the shell you are using.
 This is because direnv always executes the `.envrc` with bash (a sort of
 lowest common denominator of UNIX shells) so that direnv can work across shells.
 If you try to use some syntax that doesn't work in bash (like zsh's
@@ -134,9 +134,9 @@ and watch direnv loading your new environment. Note that `direnv edit .` is a
 handy shortcut that opens the file in your $EDITOR and automatically allows it
 if the file's modification time has changed.
 
-Now that the environment is loaded you can notice that once you `cd` out
-of the directory it automatically gets unloaded. If you `cd` back into it it's
-loaded again. That's the base of the mechanism that allows you to build cool
+Now that the environment is loaded, you will notice that once you `cd` out
+of the directory it automatically gets unloaded. If you `cd` back into it, it's
+loaded again. That's the basis of the mechanism that allows you to build cool
 things.
 
 ### The stdlib
@@ -146,7 +146,7 @@ utility functions that are made available in the context of the ".envrc" file.
 
 As an example, the `PATH_add` function is used to expand and prepend a path to
 the $PATH environment variable. Instead of `export $PATH=$PWD/bin:$PATH` you
-can write `PATH_add bin`. It's shorter and avoid a common mistake where
+can write `PATH_add bin`. It's shorter and avoids a common mistake where
 `$PATH=bin`.
 
 To find the documentation for all available functions check the
@@ -158,13 +158,13 @@ It's also possible to create your own extensions by creating a bash file at
 
 #### Loading layered .envrc
 
-Lets say you have the following structure:
+Let's say you have the following structure:
 
 - "/a/.envrc"
 - "/a/b/.envrc"
 
 If you add the following line in "/a/b/.envrc", you can load both of the
-".envrc" when you are in `/a/b`:
+".envrc" files when you are in `/a/b`:
 
 ```sh
 source_env ..
@@ -172,8 +172,8 @@ source_env ..
 
 ## Similar projects
 
-* [Environment Modules](http://modules.sourceforge.net/) - one of the oldest (in a good way) environment loading system
-* [autoenv](https://github.com/kennethreitz/autoenv) - lightweight, doesn't support unloads
+* [Environment Modules](http://modules.sourceforge.net/) - one of the oldest (in a good way) environment-loading systems
+* [autoenv](https://github.com/kennethreitz/autoenv) - lightweight; doesn't support unloads
 * [zsh-autoenv](https://github.com/Tarrasch/zsh-autoenv) - a feature-rich mixture of autoenv and [smartcd](https://github.com/cxreg/smartcd): enter/leave events, nesting, stashing (Zsh-only).
 
 ## Contribute
