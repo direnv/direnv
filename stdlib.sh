@@ -251,17 +251,17 @@ PATH_add() {
 #
 # Works like PATH_add except that it's for an arbitrary <varname>.
 path_add() {
-  local old_paths=${!1}
+  local old_paths="${!1}"
   local dir
   dir=$(expand_path "$2")
 
   if [[ -z $old_paths ]]; then
-    old_paths=$dir
+    old_paths="$dir"
   else
-    old_paths=$dir:$old_paths
+    old_paths="$dir:$old_paths"
   fi
 
-  export $1=$old_paths
+  export "$1=$old_paths"
 }
 
 # Usage: load_prefix <prefix_path>

@@ -253,17 +253,17 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"# Works like PATH_add except that it's for an arbitrary <varname>.\n" +
 	"path_add() {\n" +
-	"  local old_paths=${!1}\n" +
+	"  local old_paths=\"${!1}\"\n" +
 	"  local dir\n" +
 	"  dir=$(expand_path \"$2\")\n" +
 	"\n" +
 	"  if [[ -z $old_paths ]]; then\n" +
-	"    old_paths=$dir\n" +
+	"    old_paths=\"$dir\"\n" +
 	"  else\n" +
-	"    old_paths=$dir:$old_paths\n" +
+	"    old_paths=\"$dir:$old_paths\"\n" +
 	"  fi\n" +
 	"\n" +
-	"  export $1=$old_paths\n" +
+	"  export \"$1=$old_paths\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: load_prefix <prefix_path>\n" +
