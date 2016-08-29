@@ -181,15 +181,16 @@ source_env ..
 Bug reports, contributions and forks are welcome.
 
 All bugs or other forms of discussion happen on
-<http://github.com/direnv/direnv/issues>
+<http://github.com/direnv/direnv/issues>.
 
-There is also a wiki available where you can share your usage patterns or
+There is a wiki available where you can share your usage patterns or
 other tips and tricks <https://github.com/direnv/direnv/wiki>
 
+For longer form discussions you can also write to <mailto:direnv-discuss@googlegroups.com>
+
 Or drop by on [IRC (#direnv on freenode)](irc://irc.freenode.net/#direnv) to
-have a chat.
-<iframe src="http://webchat.freenode.net?randomnick=1&channels=%23direnv&uio=MTE9MTk117"
-width="647" height="400"></iframe>
+have a chat. If you ask a question make sure to stay around as not everyone is
+active all day.
 
 [![Build Status](https://api.travis-ci.org/direnv/direnv.png?branch=master)](http://travis-ci.org/direnv/direnv)
 
