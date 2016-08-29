@@ -40,8 +40,8 @@ clean:
 	rm -f direnv
 
 %.1: %.1.md
-	@which md2man-roff >/dev/null || (echo "Could not generate man page because md2man is missing, gem install md2man"; false)
-	md2man-roff $< > $@
+	@which go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing, `go get -u https://github.com/cpuguy83/go-md2man`"; false)
+	go-md2man -in $< -out $@
 
 man: $(ROFFS)
 
