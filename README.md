@@ -54,7 +54,7 @@ make install
 
 direnv is packaged for a variety of systems:
 
-* Fedora - missing, please contact me !
+* [Fedora](https://apps.fedoraproject.org/packages/direnv)
 * [Arch AUR](https://aur.archlinux.org/packages/direnv/)
 * [Debian](https://packages.debian.org/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [Gentoo go-overlay](https://github.com/Dr-Terrible/go-overlay)
