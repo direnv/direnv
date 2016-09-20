@@ -1,6 +1,6 @@
 language: go
 go:
-- 1.6
+- 1.7
 sudo: false
 script: make test
 branches:
@@ -15,19 +15,19 @@ deploy:
   file:
   - dist/direnv.darwin-386
   - dist/direnv.darwin-amd64
+  - dist/direnv.freebsd-386
+  - dist/direnv.freebsd-amd64
+  - dist/direnv.freebsd-arm
   - dist/direnv.linux-386
   - dist/direnv.linux-amd64
   - dist/direnv.linux-arm
-  - dist/direnv.freebsd-386
-  - dist/direnv.freebsd-amd64
+  - dist/direnv.netbsd-386
+  - dist/direnv.netbsd-amd64
+  - dist/direnv.netbsd-arm
   - dist/direnv.openbsd-386
   - dist/direnv.openbsd-amd64
   - dist/direnv.windows-386.exe
   - dist/direnv.windows-amd64.exe
-  - dist/direnv.freebsd-arm
-  - dist/direnv.netbsd-386
-  - dist/direnv.netbsd-amd64
-  - dist/direnv.netbsd-arm
   skip_cleanup: true
   on:
     tags: true
