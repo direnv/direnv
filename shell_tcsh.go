@@ -32,11 +32,11 @@ func (f tcsh) export(key, value string) string {
 		}
 		return command + " );"
 	}
-	return "setenv " + f.escape(key) + " " + f.escape(value) + ";"
+	return "setenv " + f.escape(key) + " " + f.escape(value) + " ;"
 }
 
 func (f tcsh) unset(key string) string {
-	return "unsetenv " + f.escape(key) + ";"
+	return "unsetenv " + f.escape(key) + " ;"
 }
 
 func (f tcsh) escape(str string) string {
