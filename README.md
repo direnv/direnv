@@ -62,6 +62,7 @@ direnv is packaged for a variety of systems:
 * [NixOS](https://nixos.org/nixos/packages.html)
 * [OSX Homebrew](http://brew.sh/)
 * [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
+* [GNU Guix](https://www.gnu.org/software/guix/)
 
 ### From binary builds
 
