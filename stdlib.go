@@ -529,6 +529,20 @@ const STDLIB = "#!bash\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use_guix [...]\n" +
+	"#\n" +
+	"# Load environment variables from `guix environment`.\n" +
+	"# Any arguments given will be passed to guix environment. For example,\n" +
+	"# `use guix hello` would setup an environment with the dependencies of\n" +
+	"# the hello package. To create an environment including hello, the\n" +
+	"# `--ad-hoc` flag is used `use guix --ad-hoc hello`. Other options\n" +
+	"# include `--load` which allows loading an environment from a\n" +
+	"# file. For a full list of options, consult the documentation for the\n" +
+	"# `guix environment` command.\n" +
+	"use_guix() {\n" +
+	"  eval \"$(guix environment \"$@\" --search-paths)\"\n" +
+	"}\n" +
+	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then\n" +
 	"  source_env \"${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc\" >&2\n" +

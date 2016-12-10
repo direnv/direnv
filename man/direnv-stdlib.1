@@ -269,6 +269,22 @@ See
 .IP \(bu 2
 
 .PP
+\fB\fCuse guix [...]\fR:
+Load environment variables from \fB\fCguix environment\fR\&.
+.PP
+Any arguments given will be passed to guix environment. For example,
+\fB\fCuse guix hello\fR would setup an environment with the dependencies of
+the hello package. To create an environment including hello, the
+\fB\fC\-\-ad\-hoc\fR flag is used \fB\fCuse guix \-\-ad\-hoc hello\fR\&. Other options
+include \fB\fC\-\-load\fR which allows loading an environment from a
+file.
+
+.PP
+See 
+\[la]https://www.gnu.org/software/guix/manual/html_node/Invoking-guix-environment.html\[ra]
+.IP \(bu 2
+
+.PP
 \fB\fCrvm\fR ...:
 Should work just like in the shell if you have rvm installed.
 .IP \(bu 2
