@@ -164,6 +164,17 @@ Example:
     (e.g `use nix -p ocaml`).
 
     See http://nixos.org/nix/manual/#sec-nix-shell
+* `use guix [...]`:
+	Load environment variables from `guix environment`.
+
+	Any arguments given will be passed to guix environment. For example,
+	`use guix hello` would setup an environment with the dependencies of
+	the hello package. To create an environment including hello, the
+	`--ad-hoc` flag is used `use guix --ad-hoc hello`. Other options
+	include `--load` which allows loading an environment from a
+	file.
+
+    See https://www.gnu.org/software/guix/manual/html_node/Invoking-guix-environment.html
 * `rvm` ...:
     Should work just like in the shell if you have rvm installed.
 

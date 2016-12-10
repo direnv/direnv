@@ -527,6 +527,20 @@ use_nix() {
   fi
 }
 
+# Usage: use_guix [...]
+#
+# Load environment variables from `guix environment`.
+# Any arguments given will be passed to guix environment. For example,
+# `use guix hello` would setup an environment with the dependencies of
+# the hello package. To create an environment including hello, the
+# `--ad-hoc` flag is used `use guix --ad-hoc hello`. Other options
+# include `--load` which allows loading an environment from a
+# file. For a full list of options, consult the documentation for the
+# `guix environment` command.
+use_guix() {
+  eval "$(guix environment "$@" --search-paths)"
+}
+
 ## Load the global ~/.direnvrc if present
 if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
   source_env "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" >&2
