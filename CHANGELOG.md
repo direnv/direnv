@@ -1,4 +1,12 @@
 
+2.10.0 / 2016-12-10
+==================
+
+  * NEW: `use guix` (#242)
+  * CHANGE: use go-md2man to generate the man pages
+  * FIX: tcsh escaping (#241)
+  * FIX: doc typos and rewords (#226)
+
 2.9.0 / 2016-07-03
 ==================
 
