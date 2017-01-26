@@ -256,7 +256,12 @@ path_add() {
   dir=$(expand_path "$2")
 
   if [[ -z $old_paths ]]; then
-    old_paths="$dir"
+    if [[ $1 = MANPATH ]]; then
+      # If empty, prepend $dir to the default
+      old_paths="$dir:$(man -w)"
+    else
+      old_paths="$dir"
+    fi
   else
     old_paths="$dir:$old_paths"
   fi
