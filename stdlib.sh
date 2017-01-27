@@ -257,7 +257,10 @@ path_add() {
 
   if [[ -z $old_paths ]]; then
     if [[ $1 = MANPATH ]]; then
-      # If empty, prepend $dir to the default
+      # If MANPATH is empty, man still knows where to look.
+      # If MANPATH is not empty, man will only look in MANPATH.
+      # So if we set MANPATH=$dir, man will only look in $dir.
+      # Instead, prepend to `man -w` (which outputs man's default paths).
       old_paths="$dir:$(man -w)"
     else
       old_paths="$dir"
