@@ -256,20 +256,28 @@ path_add() {
   dir=$(expand_path "$2")
 
   if [[ -z $old_paths ]]; then
-    if [[ $1 = MANPATH ]]; then
-      # If MANPATH is empty, man still knows where to look.
-      # If MANPATH is not empty, man will only look in MANPATH.
-      # So if we set MANPATH=$dir, man will only look in $dir.
-      # Instead, prepend to `man -w` (which outputs man's default paths).
-      old_paths="$dir:$(man -w)"
-    else
-      old_paths="$dir"
-    fi
+    old_paths="$dir"
   else
     old_paths="$dir:$old_paths"
   fi
 
   export "$1=$old_paths"
+}
+
+# Usage: MANPATH_add <path>
+#
+# Prepends a path to the MANPATH environment variable while making sure that
+# `man` can still lookup the system manual pages.
+#
+# If MANPATH is not empty, man will only look in MANPATH.
+# So if we set MANPATH=$path, man will only look in $path.
+# Instead, prepend to `man -w` (which outputs man's default paths).
+#
+MANPATH_add() {
+  local old_paths="${!1}"
+  local dir
+  dir=$(expand_path "$2")
+  export "$1=$dir:${old_paths:-$(man -w)}"
 }
 
 # Usage: load_prefix <prefix_path>
@@ -298,11 +306,11 @@ path_add() {
 load_prefix() {
   local dir
   dir=$(expand_path "$1")
+  MANPATH_add "$dir/man"
+  MANPATH_add "$dir/share/man"
   path_add CPATH "$dir/include"
   path_add LD_LIBRARY_PATH "$dir/lib"
   path_add LIBRARY_PATH "$dir/lib"
-  path_add MANPATH "$dir/man"
-  path_add MANPATH "$dir/share/man"
   path_add PATH "$dir/bin"
   path_add PKG_CONFIG_PATH "$dir/lib/pkgconfig"
 }
