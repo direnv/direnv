@@ -266,6 +266,22 @@ const STDLIB = "#!bash\n" +
 	"  export \"$1=$old_paths\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: MANPATH_add <path>\n" +
+	"#\n" +
+	"# Prepends a path to the MANPATH environment variable while making sure that\n" +
+	"# `man` can still lookup the system manual pages.\n" +
+	"#\n" +
+	"# If MANPATH is not empty, man will only look in MANPATH.\n" +
+	"# So if we set MANPATH=$path, man will only look in $path.\n" +
+	"# Instead, prepend to `man -w` (which outputs man's default paths).\n" +
+	"#\n" +
+	"MANPATH_add() {\n" +
+	"  local old_paths=\"${!1}\"\n" +
+	"  local dir\n" +
+	"  dir=$(expand_path \"$2\")\n" +
+	"  export \"$1=$dir:${old_paths:-$(man -w)}\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: load_prefix <prefix_path>\n" +
 	"#\n" +
 	"# Expands some common path variables for the given <prefix_path> prefix. This is\n" +
@@ -292,11 +308,11 @@ const STDLIB = "#!bash\n" +
 	"load_prefix() {\n" +
 	"  local dir\n" +
 	"  dir=$(expand_path \"$1\")\n" +
+	"  MANPATH_add \"$dir/man\"\n" +
+	"  MANPATH_add \"$dir/share/man\"\n" +
 	"  path_add CPATH \"$dir/include\"\n" +
 	"  path_add LD_LIBRARY_PATH \"$dir/lib\"\n" +
 	"  path_add LIBRARY_PATH \"$dir/lib\"\n" +
-	"  path_add MANPATH \"$dir/man\"\n" +
-	"  path_add MANPATH \"$dir/share/man\"\n" +
 	"  path_add PATH \"$dir/bin\"\n" +
 	"  path_add PKG_CONFIG_PATH \"$dir/lib/pkgconfig\"\n" +
 	"}\n" +

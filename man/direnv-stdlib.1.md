@@ -91,6 +91,9 @@ Example:
     echo $PATH
     # output: /home/user/my/project/bin:/usr/bin:/bin
 
+* `MANPATH_add` *path*:
+    Prepends the expanded *path* to the MANPATH environment variable. It takes care of man-specific heuritic.
+
 * `path_add` *varname* *path*:
     Works like `PATH_add` except that it's for an arbitrary *varname*.
 
