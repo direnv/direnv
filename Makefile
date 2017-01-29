@@ -40,7 +40,7 @@ clean:
 	rm -f direnv
 
 %.1: %.1.md
-	@which go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing, `go get -u https://github.com/cpuguy83/go-md2man`"; false)
+	@which go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing. Run: go get -u github.com/cpuguy83/go-md2man"; false)
 	go-md2man -in $< -out $@
 
 man: $(ROFFS)
