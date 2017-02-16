@@ -160,6 +160,8 @@ find_up() {
 # Usage: source_env <file_or_dir_path>
 #
 # Loads another ".envrc" either by specifying its path or filename.
+#
+# NOTE: the other ".envrc" is not checked by the security framework.
 source_env() {
   local rcpath=${1/#\~/$HOME}
   local rcfile
@@ -199,6 +201,7 @@ watch_file() {
 #
 # Loads another ".envrc" if found with the find_up command.
 #
+# NOTE: the other ".envrc" is not checked by the security framework.
 source_up() {
   local file=$1
   local dir

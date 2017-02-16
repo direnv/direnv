@@ -162,6 +162,8 @@ const STDLIB = "#!bash\n" +
 	"# Usage: source_env <file_or_dir_path>\n" +
 	"#\n" +
 	"# Loads another \".envrc\" either by specifying its path or filename.\n" +
+	"#\n" +
+	"# NOTE: the other \".envrc\" is not checked by the security framework.\n" +
 	"source_env() {\n" +
 	"  local rcpath=${1/#\\~/$HOME}\n" +
 	"  local rcfile\n" +
@@ -201,6 +203,7 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"# Loads another \".envrc\" if found with the find_up command.\n" +
 	"#\n" +
+	"# NOTE: the other \".envrc\" is not checked by the security framework.\n" +
 	"source_up() {\n" +
 	"  local file=$1\n" +
 	"  local dir\n" +
