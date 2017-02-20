@@ -1,8 +1,9 @@
 language: go
 go:
-- 1.6
-- 1.7
-- 1.8
+- 1.5.x
+- 1.6.x
+- 1.7.x
+- 1.8.x
 sudo: false
 script: make test
 branches:
@@ -33,3 +34,4 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
+    condition: $TRAVIS_GO_VERSION =~ ^1\.8(\.*)?$
