@@ -1,4 +1,13 @@
 
+2.11.0 / 2017-02-20
+==================
+
+  * NEW: stdlib.sh: introduce MANPATH_add <path> (#248)
+  * NEW: provide packages using the equinox service
+  * CHANGE: test direnv with go 1.8 (#254)
+  * FIX: Add warning about source_env/up
+  * FIX: go-md2man install instruction
+
 2.10.0 / 2016-12-10
 ==================
 
