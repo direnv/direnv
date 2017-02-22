@@ -279,10 +279,10 @@ const STDLIB = "#!bash\n" +
 	"# Instead, prepend to `man -w` (which outputs man's default paths).\n" +
 	"#\n" +
 	"MANPATH_add() {\n" +
-	"  local old_paths=\"${!1}\"\n" +
+	"  local old_paths=\"${MANPATH:-$(man -w)}\"\n" +
 	"  local dir\n" +
-	"  dir=$(expand_path \"$2\")\n" +
-	"  export \"$1=$dir:${old_paths:-$(man -w)}\"\n" +
+	"  dir=$(expand_path \"$1\")\n" +
+	"  export \"MANPATH=$dir:$old_paths\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: load_prefix <prefix_path>\n" +

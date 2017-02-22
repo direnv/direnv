@@ -277,10 +277,10 @@ path_add() {
 # Instead, prepend to `man -w` (which outputs man's default paths).
 #
 MANPATH_add() {
-  local old_paths="${!1}"
+  local old_paths="${MANPATH:-$(man -w)}"
   local dir
-  dir=$(expand_path "$2")
-  export "$1=$dir:${old_paths:-$(man -w)}"
+  dir=$(expand_path "$1")
+  export "MANPATH=$dir:$old_paths"
 }
 
 # Usage: load_prefix <prefix_path>
