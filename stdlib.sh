@@ -510,7 +510,16 @@ use_node() {
   fi
 
   node_wanted=${NODE_VERSION_PREFIX-"node-v"}$version
-  node_prefix=$(find "$NODE_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)
+  node_prefix=$(
+    # Look for matching node versions in $NODE_VERSIONS path
+    find "$NODE_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" |
+
+    # Sort by version: split by "." then reverse numeric sort for each piece of the version string
+    sort -r -t . -k 1,1n -k 2,2n -k 3,3n |
+
+    # The first one is the highest
+    head -1
+  )
 
   if [[ ! -d $node_prefix ]]; then
     log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"
