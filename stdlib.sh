@@ -279,8 +279,8 @@ path_add() {
 MANPATH_add() {
   local old_paths="${!1}"
   local dir
-  dir=$(expand_path "$2")
-  export "$1=$dir:${old_paths:-$(man -w)}"
+  dir=$(expand_path "$1")
+  export "MANPATH=$dir:${old_paths:-$(man -w)}"
 }
 
 # Usage: load_prefix <prefix_path>
