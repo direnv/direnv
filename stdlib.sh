@@ -525,6 +525,8 @@ use_node() {
     head -1
   )
 
+  node_prefix="$NODE_VERSIONS/${NODE_VERSION_PREFIX-"node-v"}$node_prefix"
+
   if [[ ! -d $node_prefix ]]; then
     log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"
     return 1
