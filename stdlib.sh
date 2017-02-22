@@ -514,6 +514,10 @@ use_node() {
     # Look for matching node versions in $NODE_VERSIONS path
     find "$NODE_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" |
 
+    # Strip possible "/" suffix from $NODE_VERSIONS, then use that to
+    # Strip $NODE_VERSIONS/$NODE_VERSION_PREFIX prefix from line.
+    while IFS= read -r line; do echo "${line#${NODE_VERSIONS%/}/${NODE_VERSION_PREFIX-"node-v"}}"; done |
+
     # Sort by version: split by "." then reverse numeric sort for each piece of the version string
     sort -r -t . -k 1,1n -k 2,2n -k 3,3n |
 
