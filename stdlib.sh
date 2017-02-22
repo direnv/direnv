@@ -519,7 +519,7 @@ use_node() {
     while IFS= read -r line; do echo "${line#${NODE_VERSIONS%/}/${NODE_VERSION_PREFIX-"node-v"}}"; done |
 
     # Sort by version: split by "." then reverse numeric sort for each piece of the version string
-    sort -r -t . -k 1,1n -k 2,2n -k 3,3n |
+    sort -t . -k 1,1rn -k 2,2rn -k 3,3rn |
 
     # The first one is the highest
     head -1
