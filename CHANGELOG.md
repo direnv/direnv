@@ -1,4 +1,9 @@
 
+2.11.2 / 2017-03-01
+==================
+
+  * FIX: Typo in MANPATH_add always generates "PATH missing" error. (#256)
+
 2.11.1 / 2017-02-20
 ==================
 
