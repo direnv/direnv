@@ -488,6 +488,7 @@ const STDLIB = "#!bash\n" +
 	"use_node() {\n" +
 	"  local version=$1\n" +
 	"  local via=\"\"\n" +
+	"  local node_version_prefix=${NODE_VERSION_PREFIX:-node-v}\n" +
 	"  local node_wanted\n" +
 	"  local node_prefix\n" +
 	"\n" +
@@ -511,8 +512,23 @@ const STDLIB = "#!bash\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
-	"  node_wanted=${NODE_VERSION_PREFIX-\"node-v\"}$version\n" +
-	"  node_prefix=$(find \"$NODE_VERSIONS\" -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)\n" +
+	"  node_wanted=${node_version_prefix}${version}\n" +
+	"  node_prefix=$(\n" +
+	"    # Look for matching node versions in $NODE_VERSIONS path\n" +
+	"    find \"$NODE_VERSIONS\" -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" |\n" +
+	"\n" +
+	"    # Strip possible \"/\" suffix from $NODE_VERSIONS, then use that to\n" +
+	"    # Strip $NODE_VERSIONS/$NODE_VERSION_PREFIX prefix from line.\n" +
+	"    while IFS= read -r line; do echo \"${line#${NODE_VERSIONS%/}/${node_version_prefix}}\"; done |\n" +
+	"\n" +
+	"    # Sort by version: split by \".\" then reverse numeric sort for each piece of the version string\n" +
+	"    sort -t . -k 1,1rn -k 2,2rn -k 3,3rn |\n" +
+	"\n" +
+	"    # The first one is the highest\n" +
+	"    head -1\n" +
+	"  )\n" +
+	"\n" +
+	"  node_prefix=\"${NODE_VERSIONS}/${node_version_prefix}${node_prefix}\"\n" +
 	"\n" +
 	"  if [[ ! -d $node_prefix ]]; then\n" +
 	"    log_error \"Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!\"\n" +
