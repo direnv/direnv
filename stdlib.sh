@@ -486,6 +486,7 @@ rvm() {
 use_node() {
   local version=$1
   local via=""
+  local node_version_prefix=${NODE_VERSION_PREFIX:-node-v}
   local node_wanted
   local node_prefix
 
@@ -509,8 +510,23 @@ use_node() {
     return 1
   fi
 
-  node_wanted=${NODE_VERSION_PREFIX-"node-v"}$version
-  node_prefix=$(find "$NODE_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | head -1)
+  node_wanted=${node_version_prefix}${version}
+  node_prefix=$(
+    # Look for matching node versions in $NODE_VERSIONS path
+    find "$NODE_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" |
+
+    # Strip possible "/" suffix from $NODE_VERSIONS, then use that to
+    # Strip $NODE_VERSIONS/$NODE_VERSION_PREFIX prefix from line.
+    while IFS= read -r line; do echo "${line#${NODE_VERSIONS%/}/${node_version_prefix}}"; done |
+
+    # Sort by version: split by "." then reverse numeric sort for each piece of the version string
+    sort -t . -k 1,1rn -k 2,2rn -k 3,3rn |
+
+    # The first one is the highest
+    head -1
+  )
+
+  node_prefix="${NODE_VERSIONS}/${node_version_prefix}${node_prefix}"
 
   if [[ ! -d $node_prefix ]]; then
     log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"
