@@ -370,6 +370,7 @@ layout_perl() {
 #
 layout_python() {
   local python=${1:-python}
+  shift
   local old_env=$PWD/.direnv/virtualenv
   unset PYTHONHOME
   if [[ -d $old_env && $python = python ]]; then
@@ -384,10 +385,18 @@ layout_python() {
 
     export VIRTUAL_ENV=$PWD/.direnv/python-$python_version
     if [[ ! -d $VIRTUAL_ENV ]]; then
-      virtualenv "--python=$python" "$VIRTUAL_ENV"
+      virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
     fi
   fi
   PATH_add "$VIRTUAL_ENV/bin"
+}
+
+# Usage: layout python2
+#
+# A shortcut for $(layout python python2)
+#
+layout_python2() {
+  layout_python python2 "$@"
 }
 
 # Usage: layout python3
@@ -395,7 +404,7 @@ layout_python() {
 # A shortcut for $(layout python python3)
 #
 layout_python3() {
-  layout_python python3
+  layout_python python3 "$@"
 }
 
 # Usage: layout ruby
