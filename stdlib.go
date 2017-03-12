@@ -372,6 +372,7 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"layout_python() {\n" +
 	"  local python=${1:-python}\n" +
+	"  shift\n" +
 	"  local old_env=$PWD/.direnv/virtualenv\n" +
 	"  unset PYTHONHOME\n" +
 	"  if [[ -d $old_env && $python = python ]]; then\n" +
@@ -386,10 +387,18 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"    export VIRTUAL_ENV=$PWD/.direnv/python-$python_version\n" +
 	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"      virtualenv \"--python=$python\" \"$VIRTUAL_ENV\"\n" +
+	"      virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
 	"    fi\n" +
 	"  fi\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: layout python2\n" +
+	"#\n" +
+	"# A shortcut for $(layout python python2)\n" +
+	"#\n" +
+	"layout_python2() {\n" +
+	"  layout_python python2 \"$@\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout python3\n" +
@@ -397,7 +406,7 @@ const STDLIB = "#!bash\n" +
 	"# A shortcut for $(layout python python3)\n" +
 	"#\n" +
 	"layout_python3() {\n" +
-	"  layout_python python3\n" +
+	"  layout_python python3 \"$@\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout ruby\n" +
