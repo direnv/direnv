@@ -3,15 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 )
 
 const (
-	debugLogFormat   = "DBG-direnv: %s"
-	defaultLogFormat = "direnv: %s"
-	errorLogFormat   = "\033[31mdirenv: %s\033[0m"
+	debugLogFormat          = "DBG-direnv: %s"
+	defaultLogFormat        = "direnv: %s"
+	errorLogFormat          = defaultLogFormat
+	errorLogFormatWithColor = "\033[31mdirenv: %s\033[0m"
 )
 
 var debugging bool
+var noColor = os.Getenv("TERM") == "dumb"
 
 func setupLogging(env Env) {
 	log.SetFlags(0)
@@ -24,7 +27,11 @@ func setupLogging(env Env) {
 }
 
 func log_error(msg string, a ...interface{}) {
-	logMsg(errorLogFormat, msg, a...)
+	if noColor {
+		logMsg(errorLogFormat, msg, a...)
+	} else {
+		logMsg(errorLogFormatWithColor, msg, a...)
+	}
 }
 
 func log_status(env Env, msg string, a ...interface{}) {
