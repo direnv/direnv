@@ -41,7 +41,7 @@ log_error() {
   local color_normal
   local color_error
   color_normal=$(tput sgr0)
-  color_error="\e[0;31m"
+  color_error=$(tput setaf 1)
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
     local msg=$*
     # shellcheck disable=SC2059

@@ -43,7 +43,7 @@ const STDLIB = "#!bash\n" +
 	"  local color_normal\n" +
 	"  local color_error\n" +
 	"  color_normal=$(tput sgr0)\n" +
-	"  color_error=\"\\e[0;31m\"\n" +
+	"  color_error=$(tput setaf 1)\n" +
 	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
 	"    local msg=$*\n" +
 	"    # shellcheck disable=SC2059\n" +
