@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/mattn/go-isatty"
 	"log"
 	"os"
 )
@@ -15,7 +14,7 @@ const (
 )
 
 var debugging bool
-var noColor = !isatty.IsTerminal(os.Stdout.Fd()) || os.Getenv("TERM") == "dumb"
+var noColor = os.Getenv("TERM") == "dumb"
 
 func setupLogging(env Env) {
 	log.SetFlags(0)
