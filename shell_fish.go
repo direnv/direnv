@@ -76,6 +76,8 @@ func (f fish) escape(str string) string {
 			escaped(`\n`)
 		case char == CR:
 			escaped(`\r`)
+		case char == SPACE:
+			backslash(char)
 		case char <= US:
 			hex(char)
 		case char == SINGLE_QUOTE:
