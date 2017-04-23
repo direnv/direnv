@@ -195,7 +195,7 @@ const STDLIB = "#!bash\n" +
 	"watch_file() {\n" +
 	"  local file=${1/#\\~/$HOME}\n" +
 	"\n" +
-	"  eval \"$($direnv watch \"$file\")\"\n" +
+	"  eval \"$(\"$direnv\" watch \"$file\")\"\n" +
 	"}\n" +
 	"\n" +
 	"\n" +

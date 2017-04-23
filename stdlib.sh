@@ -193,7 +193,7 @@ source_env() {
 watch_file() {
   local file=${1/#\~/$HOME}
 
-  eval "$($direnv watch "$file")"
+  eval "$("$direnv" watch "$file")"
 }
 
 
