@@ -1,21 +1,33 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"regexp"
 	"strings"
 )
 
-var DOTENV_REG = regexp.MustCompile("(?:export\\s+)?([\\w\\.]+)(?:\\s*=\\s*|:\\s+?)(.*)")
+var DOTENV_REG = regexp.MustCompile("^(?:export\\s+)?([\\w\\.]+)(?:\\s*=\\s*|:\\s+?)(.*)")
 var DOTENV_LF_REG = regexp.MustCompile("\\\\n")
 var DOTENV_ESC_REG = regexp.MustCompile("\\\\.")
 
 func ParseDotEnv(data string) Env {
 	var dotenv = make(Env)
 
-	result := DOTENV_REG.FindAllStringSubmatch(data, -1)
-	for _, match := range result {
+	buf := bufio.NewReader(strings.NewReader(data))
+	for {
+		line, err := buf.ReadString('\n')
+		if err != nil {
+			break
+		}
+
+		match := DOTENV_REG.FindStringSubmatch(line)
+		// commented line or invalid line
+		if len(match) == 0 {
+			continue
+		}
+
 		key := match[1]
 		value := strings.TrimSpace(match[2])
 
