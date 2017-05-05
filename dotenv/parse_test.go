@@ -1,7 +1,9 @@
-package main
+package dotenv_test
 
 import (
 	"testing"
+
+	"github.com/direnv/direnv/dotenv"
 )
 
 // See the reference implementation:
@@ -10,12 +12,12 @@ import (
 // TODO: support comments at the end of a line
 
 const TEST_EXPORTED = `export OPTION_A=2
-export OPTION_B='\n'
+export OPTION_B='\n' # foo
 #export OPTION_C=3
 `
 
 func TestDotEnvExported(t *testing.T) {
-	env := ParseDotEnv(TEST_EXPORTED)
+	env := dotenv.MustParse(TEST_EXPORTED)
 
 	if env["OPTION_A"] != "2" {
 		t.Error("OPTION_A")
@@ -36,7 +38,7 @@ OPTION_E = 5
 `
 
 func TestDotEnvPlain(t *testing.T) {
-	env := ParseDotEnv(TEST_PLAIN)
+	env := dotenv.MustParse(TEST_PLAIN)
 
 	if env["OPTION_A"] != "1" {
 		t.Error("OPTION_A")
@@ -67,7 +69,7 @@ OPTION_H="\n"
 `
 
 func TestDotEnvQuoted(t *testing.T) {
-	env := ParseDotEnv(TEST_QUOTED)
+	env := dotenv.MustParse(TEST_QUOTED)
 
 	if env["OPTION_A"] != "1" {
 		t.Error("OPTION_A")
@@ -106,7 +108,7 @@ OPTION_D: '\n'
 `
 
 func TestDotEnvYAML(t *testing.T) {
-	env := ParseDotEnv(TEST_YAML)
+	env := dotenv.MustParse(TEST_YAML)
 
 	if env["OPTION_A"] != "1" {
 		t.Error("OPTION_A")
