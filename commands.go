@@ -77,11 +77,16 @@ func CommandsDispatch(env Env, args []string) error {
 
 	done := make(chan bool, 1)
 	if !command.NoWait {
+		timeout, err := time.ParseDuration(env.Fetch("DIRENV_WARN_TIMEOUT", "5s"))
+		if err != nil {
+			log_error("invalid DIRENV_WARN_TIMEOUT: " + err.Error())
+			timeout = 5 * time.Second
+		}
 		go func() {
 			select {
 			case <-done:
 				return
-			case <-time.After(5 * time.Second):
+			case <-time.After(timeout):
 				log_error("(%v) is taking a while to execute. Use CTRL-C to give up.", args)
 			}
 		}()
