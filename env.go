@@ -74,3 +74,11 @@ func (env Env) Serialize() string {
 func (e1 Env) Diff(e2 Env) *EnvDiff {
 	return BuildEnvDiff(e1, e2)
 }
+
+func (e Env) Fetch(key, def string) string {
+	v, ok := e[key]
+	if !ok {
+		v = def
+	}
+	return v
+}
