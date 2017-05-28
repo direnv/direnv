@@ -335,7 +335,11 @@ const STDLIB = "#!bash\n" +
 	"# Sets the GOPATH environment variable to the current directory.\n" +
 	"#\n" +
 	"layout_go() {\n" +
-	"  path_add GOPATH \"$PWD\"\n" +
+	"  if [ \"$(expr substr $(uname -s) 1 6)\" = \"CYGWIN\" ]; then\n" +
+	"    path_add GOPATH \"$(cygpath -m $(pwd))\"\n" +
+	"  else\n" +
+	"    path_add GOPATH \"$PWD\"\n" +
+	"  fi\n" +
 	"  PATH_add bin\n" +
 	"}\n" +
 	"\n" +

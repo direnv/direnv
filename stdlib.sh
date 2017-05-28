@@ -333,7 +333,11 @@ layout() {
 # Sets the GOPATH environment variable to the current directory.
 #
 layout_go() {
-  path_add GOPATH "$PWD"
+  if [ "$(expr substr $(uname -s) 1 6)" = "CYGWIN" ]; then
+    path_add GOPATH "$(cygpath -m $(pwd))"
+  else
+    path_add GOPATH "$PWD"
+  fi
   PATH_add bin
 }
 
