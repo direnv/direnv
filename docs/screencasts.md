@@ -7,14 +7,14 @@ time to share until now. Enjoy !
 
 Showing how to install direnv and checking that it works afterwards.
 
-<script type="text/javascript" src="http://asciinema.org/a/4413.js"
+<script type="text/javascript" src="https://asciinema.org/a/4413.js"
 id="asciicast-4413" async></script>
 
 ## The direnv security model
 
 Explains how the .envrc files are protected from unwanted loading.
 
-<script type="text/javascript" src="http://asciinema.org/a/4416.js"
+<script type="text/javascript" src="https://asciinema.org/a/4416.js"
 id="asciicast-4416" async></script>
 
 ## Handling ruby versions with direnv
@@ -22,6 +22,6 @@ id="asciicast-4416" async></script>
 This shows how direnv can be used to build something akin to rvm, rbenv and
 friends.
 
-<script type="text/javascript" src="http://asciinema.org/a/4415.js"
+<script type="text/javascript" src="https://asciinema.org/a/4415.js"
 id="asciicast-4415" async></script>
 
