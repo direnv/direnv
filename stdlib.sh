@@ -246,8 +246,7 @@ direnv_load() {
 #    # output: /home/user/my/project/bin:/usr/bin:/bin
 #
 PATH_add() {
-  PATH=$(expand_path "$1"):$PATH
-  export PATH
+  path_add PATH "$@"
 }
 
 # Usage: path_add <varname> <path>
