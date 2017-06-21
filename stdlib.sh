@@ -249,21 +249,29 @@ PATH_add() {
   path_add PATH "$@"
 }
 
-# Usage: path_add <varname> <path>
+# Usage: path_add <varname> <path> [<path> ...]
 #
 # Works like PATH_add except that it's for an arbitrary <varname>.
 path_add() {
+  local var_name="$1"
   local old_paths="${!1}"
+  shift
+
+  local dirs="$(expand_path "$2")"
+  shift
+
   local dir
-  dir=$(expand_path "$2")
+  for dir in "$@"; do
+    dirs="${dirs}:$(expand_path "$dir")"
+  done
 
   if [[ -z $old_paths ]]; then
-    old_paths="$dir"
+    old_paths="$dirs"
   else
-    old_paths="$dir:$old_paths"
+    old_paths="$dirs:$old_paths"
   fi
 
-  export "$1=$old_paths"
+  export "$var_name=$old_paths"
 }
 
 # Usage: MANPATH_add <path>
