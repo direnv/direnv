@@ -232,18 +232,22 @@ direnv_load() {
   eval "$exports"
 }
 
-# Usage: PATH_add <path>
+# Usage: PATH_add <path> [<path> ...]
 #
-# Prepends the expanded <path> to the PATH environment variable. It prevents a
-# common mistake where PATH is replaced by only the new <path>.
+# Prepends the expanded <path> to the PATH environment variable, in order.
+# It prevents a common mistake where PATH is replaced by only the new <path>.
+# Supports adding multiple directories at once.
 #
 # Example:
 #
 #    pwd
-#    # output: /home/user/my/project
+#    # output: /my/project
 #    PATH_add bin
 #    echo $PATH
-#    # output: /home/user/my/project/bin:/usr/bin:/bin
+#    # output: /my/project/bin:/usr/bin:/bin
+#    PATH_add bam boum
+#    echo $PATH
+#    # output: /my/project/bam:/my/project/boum:/my/project/bin:/usr/bin:/bin
 #
 PATH_add() {
   path_add PATH "$@"
