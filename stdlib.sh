@@ -235,8 +235,9 @@ direnv_load() {
 # Usage: PATH_add <path> [<path> ...]
 #
 # Prepends the expanded <path> to the PATH environment variable, in order.
-# It prevents a common mistake where PATH is replaced by only the new <path>.
-# Supports adding multiple directories at once.
+# It prevents a common mistake where PATH is replaced by only the new <path>,
+# or where a trailing colon is left in PATH, resulting in the current directory
+# being considered in the PATH.  Supports adding multiple directories at once.
 #
 # Example:
 #
