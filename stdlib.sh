@@ -232,39 +232,51 @@ direnv_load() {
   eval "$exports"
 }
 
-# Usage: PATH_add <path>
+# Usage: PATH_add <path> [<path> ...]
 #
-# Prepends the expanded <path> to the PATH environment variable. It prevents a
-# common mistake where PATH is replaced by only the new <path>.
+# Prepends the expanded <path> to the PATH environment variable, in order.
+# It prevents a common mistake where PATH is replaced by only the new <path>,
+# or where a trailing colon is left in PATH, resulting in the current directory
+# being considered in the PATH.  Supports adding multiple directories at once.
 #
 # Example:
 #
 #    pwd
-#    # output: /home/user/my/project
+#    # output: /my/project
 #    PATH_add bin
 #    echo $PATH
-#    # output: /home/user/my/project/bin:/usr/bin:/bin
+#    # output: /my/project/bin:/usr/bin:/bin
+#    PATH_add bam boum
+#    echo $PATH
+#    # output: /my/project/bam:/my/project/boum:/my/project/bin:/usr/bin:/bin
 #
 PATH_add() {
-  PATH=$(expand_path "$1"):$PATH
-  export PATH
+  path_add PATH "$@"
 }
 
-# Usage: path_add <varname> <path>
+# Usage: path_add <varname> <path> [<path> ...]
 #
 # Works like PATH_add except that it's for an arbitrary <varname>.
 path_add() {
+  local var_name="$1"
   local old_paths="${!1}"
+  shift
+
+  local dirs="$(expand_path "$2")"
+  shift
+
   local dir
-  dir=$(expand_path "$2")
+  for dir in "$@"; do
+    dirs="${dirs}:$(expand_path "$dir")"
+  done
 
   if [[ -z $old_paths ]]; then
-    old_paths="$dir"
+    old_paths="$dirs"
   else
-    old_paths="$dir:$old_paths"
+    old_paths="$dirs:$old_paths"
   fi
 
-  export "$1=$old_paths"
+  export "$var_name=$old_paths"
 }
 
 # Usage: MANPATH_add <path>
