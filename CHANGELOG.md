@@ -1,4 +1,15 @@
 
+2.12.0 / 2017-06-30
+==================
+
+  * NEW: support multiple items in path_add and PATH_add (#276)
+  * NEW: add a configurable DIRENV_WARN_TIMEOUT option (#273)
+  * CHANGE: rewrite the dotenv parsing, now supports commented lines
+  * CHANGE: pass additional args to virtualenv (#261)
+  * FIX: stdlib watch_file(): escaping fix
+  * FIX: only output color if $TERM is not dumb (#264)
+  * FIX: the watch_file documentation
+
 2.11.3 / 2017-03-02
 ==================
 

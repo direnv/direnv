@@ -234,39 +234,51 @@ const STDLIB = "#!bash\n" +
 	"  eval \"$exports\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: PATH_add <path>\n" +
+	"# Usage: PATH_add <path> [<path> ...]\n" +
 	"#\n" +
-	"# Prepends the expanded <path> to the PATH environment variable. It prevents a\n" +
-	"# common mistake where PATH is replaced by only the new <path>.\n" +
+	"# Prepends the expanded <path> to the PATH environment variable, in order.\n" +
+	"# It prevents a common mistake where PATH is replaced by only the new <path>,\n" +
+	"# or where a trailing colon is left in PATH, resulting in the current directory\n" +
+	"# being considered in the PATH.  Supports adding multiple directories at once.\n" +
 	"#\n" +
 	"# Example:\n" +
 	"#\n" +
 	"#    pwd\n" +
-	"#    # output: /home/user/my/project\n" +
+	"#    # output: /my/project\n" +
 	"#    PATH_add bin\n" +
 	"#    echo $PATH\n" +
-	"#    # output: /home/user/my/project/bin:/usr/bin:/bin\n" +
+	"#    # output: /my/project/bin:/usr/bin:/bin\n" +
+	"#    PATH_add bam boum\n" +
+	"#    echo $PATH\n" +
+	"#    # output: /my/project/bam:/my/project/boum:/my/project/bin:/usr/bin:/bin\n" +
 	"#\n" +
 	"PATH_add() {\n" +
-	"  PATH=$(expand_path \"$1\"):$PATH\n" +
-	"  export PATH\n" +
+	"  path_add PATH \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: path_add <varname> <path>\n" +
+	"# Usage: path_add <varname> <path> [<path> ...]\n" +
 	"#\n" +
 	"# Works like PATH_add except that it's for an arbitrary <varname>.\n" +
 	"path_add() {\n" +
+	"  local var_name=\"$1\"\n" +
 	"  local old_paths=\"${!1}\"\n" +
+	"  shift\n" +
+	"\n" +
+	"  local dirs=\"$(expand_path \"$2\")\"\n" +
+	"  shift\n" +
+	"\n" +
 	"  local dir\n" +
-	"  dir=$(expand_path \"$2\")\n" +
+	"  for dir in \"$@\"; do\n" +
+	"    dirs=\"${dirs}:$(expand_path \"$dir\")\"\n" +
+	"  done\n" +
 	"\n" +
 	"  if [[ -z $old_paths ]]; then\n" +
-	"    old_paths=\"$dir\"\n" +
+	"    old_paths=\"$dirs\"\n" +
 	"  else\n" +
-	"    old_paths=\"$dir:$old_paths\"\n" +
+	"    old_paths=\"$dirs:$old_paths\"\n" +
 	"  fi\n" +
 	"\n" +
-	"  export \"$1=$old_paths\"\n" +
+	"  export \"$var_name=$old_paths\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: MANPATH_add <path>\n" +

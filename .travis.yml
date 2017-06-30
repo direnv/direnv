@@ -34,4 +34,4 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    condition: $TRAVIS_GO_VERSION =~ ^1\.8(\.*)?$
+    condition: $TRAVIS_GO_VERSION =~ ^1\.8\..*$
