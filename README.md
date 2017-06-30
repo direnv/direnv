@@ -43,9 +43,12 @@ nope
 
 Dependencies: make, golang
 
+Make sure that `$GOPATH` is set in your environment. Example: `export GOPATH=$HOME/go`
+
 ```bash
-git clone https://github.com/direnv/direnv
-cd direnv
+mkdir -p $GOPATH/src/github.com/direnv
+git clone git@github.com:direnv/direnv.git $GOPATH/src/github.com/direnv/direnv
+cd $GOPATH/src/github.com/direnv/direnv
 make install
 # or symlink ./direnv into the $PATH
 ```
