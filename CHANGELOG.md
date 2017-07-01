@@ -1,4 +1,10 @@
 
+2.12.1 / 2017-07-01
+==================
+
+  * FIX: stdlib path_add(), see #278
+  * FIX: install from source instructions
+
 2.12.0 / 2017-06-30
 ==================
 
