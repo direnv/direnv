@@ -47,7 +47,7 @@ Make sure that `$GOPATH` is set in your environment. Example: `export GOPATH=$HO
 
 ```bash
 mkdir -p $GOPATH/src/github.com/direnv
-git clone git@github.com:direnv/direnv.git $GOPATH/src/github.com/direnv/direnv
+git clone https://github.com/direnv/direnv.git $GOPATH/src/github.com/direnv/direnv
 cd $GOPATH/src/github.com/direnv/direnv
 make install
 # or symlink ./direnv into the $PATH
