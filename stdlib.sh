@@ -259,24 +259,21 @@ PATH_add() {
 # Works like PATH_add except that it's for an arbitrary <varname>.
 path_add() {
   local var_name="$1"
-  local old_paths="${!1}"
+  # split existing paths into an array
+  declare -a path_array
+  IFS=: read -ra path_array <<< "${!1}"
   shift
 
-  local dirs="$(expand_path "$2")"
-  shift
-
-  local dir
-  for dir in "$@"; do
-    dirs="${dirs}:$(expand_path "$dir")"
+  # prepend the passed paths in the right order
+  for (( i=$# ; i>0 ; i-- )); do
+    path_array=( "$(expand_path "${!i}")" "${path_array[@]}" )
   done
 
-  if [[ -z $old_paths ]]; then
-    old_paths="$dirs"
-  else
-    old_paths="$dirs:$old_paths"
-  fi
+  # join back all the paths
+  local path=$(IFS=:; echo "${path_array[*]}")
 
-  export "$var_name=$old_paths"
+  # and finally export back the result to the original variable
+  export "$var_name=$path"
 }
 
 # Usage: MANPATH_add <path>

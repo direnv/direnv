@@ -261,24 +261,21 @@ const STDLIB = "#!bash\n" +
 	"# Works like PATH_add except that it's for an arbitrary <varname>.\n" +
 	"path_add() {\n" +
 	"  local var_name=\"$1\"\n" +
-	"  local old_paths=\"${!1}\"\n" +
+	"  # split existing paths into an array\n" +
+	"  declare -a path_array\n" +
+	"  IFS=: read -ra path_array <<< \"${!1}\"\n" +
 	"  shift\n" +
 	"\n" +
-	"  local dirs=\"$(expand_path \"$2\")\"\n" +
-	"  shift\n" +
-	"\n" +
-	"  local dir\n" +
-	"  for dir in \"$@\"; do\n" +
-	"    dirs=\"${dirs}:$(expand_path \"$dir\")\"\n" +
+	"  # prepend the passed paths in the right order\n" +
+	"  for (( i=$# ; i>0 ; i-- )); do\n" +
+	"    path_array=( \"$(expand_path \"${!i}\")\" \"${path_array[@]}\" )\n" +
 	"  done\n" +
 	"\n" +
-	"  if [[ -z $old_paths ]]; then\n" +
-	"    old_paths=\"$dirs\"\n" +
-	"  else\n" +
-	"    old_paths=\"$dirs:$old_paths\"\n" +
-	"  fi\n" +
+	"  # join back all the paths\n" +
+	"  local path=$(IFS=:; echo \"${path_array[*]}\")\n" +
 	"\n" +
-	"  export \"$var_name=$old_paths\"\n" +
+	"  # and finally export back the result to the original variable\n" +
+	"  export \"$var_name=$path\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: MANPATH_add <path>\n" +
