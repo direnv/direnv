@@ -379,7 +379,7 @@ layout_perl() {
 #
 layout_python() {
   local python=${1:-python}
-  shift
+  [[ $# -gt 0 ]] && shift
   local old_env=$PWD/.direnv/virtualenv
   unset PYTHONHOME
   if [[ -d $old_env && $python = python ]]; then

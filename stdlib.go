@@ -381,7 +381,7 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"layout_python() {\n" +
 	"  local python=${1:-python}\n" +
-	"  shift\n" +
+	"  [[ $# -gt 0 ]] && shift\n" +
 	"  local old_env=$PWD/.direnv/virtualenv\n" +
 	"  unset PYTHONHOME\n" +
 	"  if [[ -d $old_env && $python = python ]]; then\n" +
