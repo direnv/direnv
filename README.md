@@ -4,7 +4,7 @@ direnv -- Unclutter your .profile
 `direnv` is an environment switcher for the shell. It knows how to hook into
 bash, zsh, tcsh and fish shell to load or unload environment variables
 depending on the current directory. This allows project-specific
-environment variables without cluttering the "~/.profile" file.
+environment variables without cluttering the `~/.profile` file.
 
 Before each prompt, direnv checks for the existence of a ".envrc" file in the
 current and parent directories. If the file exists (and is authorized), it is
@@ -84,7 +84,7 @@ has its own extension mechanism:
 
 ### BASH
 
-Add the following line at the end of the "~/.bashrc" file:
+Add the following line at the end of the `~/.bashrc` file:
 
 ```sh
 eval "$(direnv hook bash)"
@@ -95,7 +95,7 @@ that manipulate the prompt.
 
 ### ZSH
 
-Add the following line at the end of the "~/.zshrc" file:
+Add the following line at the end of the `~/.zshrc` file:
 
 ```sh
 eval "$(direnv hook zsh)"
@@ -103,7 +103,7 @@ eval "$(direnv hook zsh)"
 
 ### FISH
 
-Add the following line at the end of the "~/.config/fish/config.fish" file:
+Add the following line at the end of the `~/.config/fish/config.fish` file:
 
 ```fish
 eval (direnv hook fish)
@@ -111,7 +111,7 @@ eval (direnv hook fish)
 
 ### TCSH
 
-Add the following line at the end of the "~/.cshrc" file:
+Add the following line at the end of the `~/.cshrc` file:
 
 ```sh
 eval `direnv hook tcsh`
@@ -160,7 +160,7 @@ To find the documentation for all available functions check the
 direnv-stdlib(1) man page.
 
 It's also possible to create your own extensions by creating a bash file at
-"~/.config/direnv/direnvrc" or "~/.direnvrc". This file is loaded before your
+`~/.config/direnv/direnvrc` or `~/.direnvrc`. This file is loaded before your
 ".envrc" and thus allows you to make your own extensions to direnv.
 
 #### Loading layered .envrc
