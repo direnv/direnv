@@ -120,9 +120,9 @@ func (time FileTime) Check() (err error) {
 	case !time.Exists:
 		log_debug("Check: %s: appeared", time.Path)
 		return checkFailed{fmt.Sprintf("File %q newly created", time.Path)}
-	case stat.ModTime().Unix() > time.Modtime:
+	case stat.ModTime().Unix() != time.Modtime:
 		log_debug("Check: %s: stale", time.Path)
-		return checkFailed{fmt.Sprintf("File %q is stale", time.Path)}
+		return checkFailed{fmt.Sprintf("File %q has changed", time.Path)}
 	}
 	log_debug("Check: %s: up to date", time.Path)
 	return nil
