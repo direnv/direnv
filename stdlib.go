@@ -598,7 +598,7 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then\n" +
-	"  source_env \"${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc\" >&2\n" +
+	"  source \"${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc\" >&2\n" +
 	"elif [[ -f $HOME/.direnvrc ]]; then\n" +
-	"  source_env \"$HOME/.direnvrc\" >&2\n" +
+	"  source \"$HOME/.direnvrc\" >&2\n" +
 	"fi\n"

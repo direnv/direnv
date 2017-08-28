@@ -596,7 +596,7 @@ use_guix() {
 
 ## Load the global ~/.direnvrc if present
 if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
-  source_env "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" >&2
+  source "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" >&2
 elif [[ -f $HOME/.direnvrc ]]; then
-  source_env "$HOME/.direnvrc" >&2
+  source "$HOME/.direnvrc" >&2
 fi
