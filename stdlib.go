@@ -7,7 +7,9 @@ const STDLIB = "#!bash\n" +
 	"set -e\n" +
 	"direnv=\"%s\"\n" +
 	"\n" +
+	"# Config, change in the direnvrc\n" +
 	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %%s}\"\n" +
+	"direnv_layout_dir=$PWD/.direnv\n" +
 	"\n" +
 	"# Usage: log_status [<message> ...]\n" +
 	"#\n" +
@@ -361,7 +363,7 @@ const STDLIB = "#!bash\n" +
 	"# See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details\n" +
 	"#\n" +
 	"layout_perl() {\n" +
-	"  local libdir=$PWD/.direnv/perl5\n" +
+	"  local libdir=$direnv_layout_dir/perl5\n" +
 	"  export LOCAL_LIB_DIR=$libdir\n" +
 	"  export PERL_MB_OPT=\"--install_base '$libdir'\"\n" +
 	"  export PERL_MM_OPT=\"INSTALL_BASE=$libdir\"\n" +
@@ -373,7 +375,7 @@ const STDLIB = "#!bash\n" +
 	"# Usage: layout python <python_exe>\n" +
 	"#\n" +
 	"# Creates and loads a virtualenv environment under\n" +
-	"# \"$PWD/.direnv/python-$python_version\".\n" +
+	"# \"$direnv_layout_dir/python-$python_version\".\n" +
 	"# This forces the installation of any egg into the project's sub-folder.\n" +
 	"#\n" +
 	"# It's possible to specify the python executable if you want to use different\n" +
@@ -382,7 +384,7 @@ const STDLIB = "#!bash\n" +
 	"layout_python() {\n" +
 	"  local python=${1:-python}\n" +
 	"  [[ $# -gt 0 ]] && shift\n" +
-	"  local old_env=$PWD/.direnv/virtualenv\n" +
+	"  local old_env=$direnv_layout_dir/virtualenv\n" +
 	"  unset PYTHONHOME\n" +
 	"  if [[ -d $old_env && $python = python ]]; then\n" +
 	"    export VIRTUAL_ENV=$old_env\n" +
@@ -394,7 +396,7 @@ const STDLIB = "#!bash\n" +
 	"      return 1\n" +
 	"    fi\n" +
 	"\n" +
-	"    export VIRTUAL_ENV=$PWD/.direnv/python-$python_version\n" +
+	"    export VIRTUAL_ENV=$direnv_layout_dir/python-$python_version\n" +
 	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
 	"      virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
 	"    fi\n" +
@@ -420,20 +422,20 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"# Usage: layout ruby\n" +
 	"#\n" +
-	"# Sets the GEM_HOME environment variable to \"$PWD/.direnv/ruby/RUBY_VERSION\".\n" +
+	"# Sets the GEM_HOME environment variable to \"$direnv_layout_dir/ruby/RUBY_VERSION\".\n" +
 	"# This forces the installation of any gems into the project's sub-folder.\n" +
 	"# If you're using bundler it will create wrapper programs that can be invoked\n" +
 	"# directly instead of using the $(bundle exec) prefix.\n" +
 	"#\n" +
 	"layout_ruby() {\n" +
 	"  if ruby -e \"exit Gem::VERSION > '2.2.0'\" 2>/dev/null; then\n" +
-	"    export GEM_HOME=$PWD/.direnv/ruby\n" +
+	"    export GEM_HOME=$direnv_layout_dir/ruby\n" +
 	"  else\n" +
 	"    local ruby_version\n" +
 	"    ruby_version=$(ruby -e\"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION\")\n" +
-	"    export GEM_HOME=$PWD/.direnv/ruby-${ruby_version}\n" +
+	"    export GEM_HOME=$direnv_layout_dir/ruby-${ruby_version}\n" +
 	"  fi\n" +
-	"  export BUNDLE_BIN=$PWD/.direnv/bin\n" +
+	"  export BUNDLE_BIN=$direnv_layout_dir/bin\n" +
 	"\n" +
 	"  PATH_add \"$GEM_HOME/bin\"\n" +
 	"  PATH_add \"$BUNDLE_BIN\"\n" +
@@ -598,7 +600,7 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then\n" +
-	"  source_env \"${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc\" >&2\n" +
+	"  source \"${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc\" >&2\n" +
 	"elif [[ -f $HOME/.direnvrc ]]; then\n" +
-	"  source_env \"$HOME/.direnvrc\" >&2\n" +
+	"  source \"$HOME/.direnvrc\" >&2\n" +
 	"fi\n"
