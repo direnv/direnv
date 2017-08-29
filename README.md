@@ -177,6 +177,16 @@ If you add the following line in "/a/b/.envrc", you can load both of the
 source_env ..
 ```
 
+## Common things people don't know
+
+Based on GitHub issues interractions, here are the top things that have been confusing for users:
+
+1. direnv has a standard library of functions, a collection of utilities that I found useful to have and accumulated over the years. If you know how to read bash, you can find it here: https://github.com/direnv/direnv/blob/master/stdlib.sh
+
+2. It's possible to override the stdlib with your own set of function by adding a bash file to either `~/.config/direnv/direnvrc` or `~/.direnvrc`. These will become available to all your `.envrc` files.
+
+3. direnv is actually creating a new bash process to load the stdlib, direnvrc and `.envrc`, and only exports the environment diff back to the original shell. This allows direnv to record the environemnt changes accurately and also work with all sorts of shells. It also means that aliases and functions are not exportable right now.
+
 ## Similar projects
 
 * [Environment Modules](http://modules.sourceforge.net/) - one of the oldest (in a good way) environment-loading systems
