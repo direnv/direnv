@@ -186,7 +186,7 @@ Based on GitHub issues interractions, here are the top things that have been con
 
 2. It's possible to override the stdlib with your own set of function by adding a bash file to either `~/.config/direnv/direnvrc` or `~/.direnvrc`. These will become available to all your `.envrc` files.
 
-3. direnv is actually creating a new bash process to load the stdlib, direnvrc and `.envrc`, and only exports the environment diff back to the original shell. This allows direnv to record the environemnt changes accurately and also work with all sorts of shells. It also means that aliases and functions are not exportable right now.
+3. direnv is actually creating a new bash process to load the stdlib, direnvrc and `.envrc`, and only exports the environment diff back to the original shell. This allows direnv to record the environment changes accurately and also work with all sorts of shells. It also means that aliases and functions are not exportable right now.
 
 ## Similar projects
 
