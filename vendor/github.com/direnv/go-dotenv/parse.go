@@ -36,9 +36,6 @@ var lineRe = regexp.MustCompile(
 // Parse reads a string in the .env format and returns a map of the extracted key=values.
 //
 // Ported from https://github.com/bkeepers/dotenv/blob/84f33f48107c492c3a99bd41c1059e7b4c1bb67a/lib/dotenv/parser.rb
-//
-// TODO:
-// * add support for variable expansion, probably needs API breakage
 func Parse(data string) (map[string]string, error) {
 	var dotenv = make(map[string]string)
 

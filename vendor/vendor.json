@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "cWBHNtfP9zArkCTScBpUa2B5z/o=",
+			"path": "github.com/direnv/go-dotenv",
+			"revision": "528f1560748ad3a959abe03743f537f3c0be6c34",
+			"revisionTime": "2017-09-03T21:58:57Z"
+		}
+	],
+	"rootPath": "github.com/direnv/direnv"
+}

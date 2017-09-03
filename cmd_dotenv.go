@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/direnv/direnv/dotenv"
+	"github.com/direnv/go-dotenv"
 )
 
 // `direnv private dotenv [SHELL [PATH_TO_DOTENV]]`
