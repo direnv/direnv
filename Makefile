@@ -5,6 +5,8 @@ ROFFS = $(MAN_MD:.md=)
 
 GO_LDFLAGS =
 
+export GO15VENDOREXPERIMENT=1
+
 ifeq ($(shell uname), Darwin)
 	# Fixes DYLD_INSERT_LIBRARIES issues
 	# See https://github.com/direnv/direnv/issues/194
