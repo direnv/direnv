@@ -147,7 +147,7 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"find_up() {\n" +
 	"  (\n" +
-	"    cd \"$(pwd -P 2>/dev/null)\"\n" +
+	"    cd \"$(pwd 2>/dev/null)\"\n" +
 	"    while true; do\n" +
 	"      if [[ -f $1 ]]; then\n" +
 	"        echo \"$PWD/$1\"\n" +
@@ -176,7 +176,7 @@ const STDLIB = "#!bash\n" +
 	"  rcfile=$(user_rel_path \"$rcpath\")\n" +
 	"  watch_file \"$rcpath\"\n" +
 	"\n" +
-	"  pushd \"$(pwd -P 2>/dev/null)\" > /dev/null\n" +
+	"  pushd \"$(pwd 2>/dev/null)\" > /dev/null\n" +
 	"    pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
 	"    if [[ -f ./$(basename \"$rcpath\") ]]; then\n" +
 	"      log_status \"loading $rcfile\"\n" +

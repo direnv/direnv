@@ -145,7 +145,7 @@ user_rel_path() {
 #
 find_up() {
   (
-    cd "$(pwd -P 2>/dev/null)"
+    cd "$(pwd 2>/dev/null)"
     while true; do
       if [[ -f $1 ]]; then
         echo "$PWD/$1"
@@ -174,7 +174,7 @@ source_env() {
   rcfile=$(user_rel_path "$rcpath")
   watch_file "$rcpath"
 
-  pushd "$(pwd -P 2>/dev/null)" > /dev/null
+  pushd "$(pwd 2>/dev/null)" > /dev/null
     pushd "$(dirname "$rcpath")" > /dev/null
     if [[ -f ./$(basename "$rcpath") ]]; then
       log_status "loading $rcfile"
