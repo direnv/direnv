@@ -1,4 +1,16 @@
 
+2.13.0 / 2017-09-24
+==================
+
+  * NEW: stdlib: configurable direnv_layout_dir
+  * CHANGE: stdlib: source the direnvrc directly
+  * FIX: permit empty NODE_VERSION_PREFIX variable
+  * FIX: pwd: Don't use -P to remove symlinks (#295)
+  * FIX: also reload when mtime goes back in time
+  * FIX: Prevent `$HOME` path from being striked (#287)
+  * BUILD: use the new `dep` tool to manage dependencies
+  * BUILD: dotenv: move to vendor folder
+
 2.12.2 / 2017-07-05
 ==================
 
