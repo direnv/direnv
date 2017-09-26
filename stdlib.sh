@@ -7,7 +7,17 @@ direnv="%s"
 
 # Config, change in the direnvrc
 DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
-direnv_layout_dir=$PWD/.direnv
+
+# Usage: direnv_layout_dir
+#
+# Prints the folder path that direnv should use to store layout content.
+# This needs to be a function as $PWD might change during source_env/up.
+#
+# The output defaults to $PWD/.direnv.
+
+direnv_layout_dir() {
+  echo "${direnv_layout_dir:-$PWD/.direnv}"
+}
 
 # Usage: log_status [<message> ...]
 #
@@ -361,7 +371,7 @@ layout_node() {
 # See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details
 #
 layout_perl() {
-  local libdir=$direnv_layout_dir/perl5
+  local libdir=$(direnv_layout_dir)/perl5
   export LOCAL_LIB_DIR=$libdir
   export PERL_MB_OPT="--install_base '$libdir'"
   export PERL_MM_OPT="INSTALL_BASE=$libdir"
@@ -382,7 +392,7 @@ layout_perl() {
 layout_python() {
   local python=${1:-python}
   [[ $# -gt 0 ]] && shift
-  local old_env=$direnv_layout_dir/virtualenv
+  local old_env=$(direnv_layout_dir)/virtualenv
   unset PYTHONHOME
   if [[ -d $old_env && $python = python ]]; then
     export VIRTUAL_ENV=$old_env
@@ -394,7 +404,7 @@ layout_python() {
       return 1
     fi
 
-    export VIRTUAL_ENV=$direnv_layout_dir/python-$python_version
+    export VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
     if [[ ! -d $VIRTUAL_ENV ]]; then
       virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
     fi
@@ -420,20 +430,20 @@ layout_python3() {
 
 # Usage: layout ruby
 #
-# Sets the GEM_HOME environment variable to "$direnv_layout_dir/ruby/RUBY_VERSION".
+# Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".
 # This forces the installation of any gems into the project's sub-folder.
 # If you're using bundler it will create wrapper programs that can be invoked
 # directly instead of using the $(bundle exec) prefix.
 #
 layout_ruby() {
   if ruby -e "exit Gem::VERSION > '2.2.0'" 2>/dev/null; then
-    export GEM_HOME=$direnv_layout_dir/ruby
+    export GEM_HOME=$(direnv_layout_dir)/ruby
   else
     local ruby_version
     ruby_version=$(ruby -e"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION")
-    export GEM_HOME=$direnv_layout_dir/ruby-${ruby_version}
+    export GEM_HOME=$(direnv_layout_dir)/ruby-${ruby_version}
   fi
-  export BUNDLE_BIN=$direnv_layout_dir/bin
+  export BUNDLE_BIN=$(direnv_layout_dir)/bin
 
   PATH_add "$GEM_HOME/bin"
   PATH_add "$BUNDLE_BIN"
