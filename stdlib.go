@@ -13,9 +13,9 @@ const STDLIB = "#!bash\n" +
 	"# Usage: direnv_layout_dir\n" +
 	"#\n" +
 	"# Prints the folder path that direnv should use to store layout content.\n" +
-	"# This defaults to $PWD/.direnv.\n" +
+	"# This needs to be a function as $PWD might change during source_env/up.\n" +
 	"#\n" +
-	"# The reason to use a function is to allow $PWD to change.\n" +
+	"# The output defaults to $PWD/.direnv.\n" +
 	"\n" +
 	"direnv_layout_dir() {\n" +
 	"  echo \"${direnv_layout_dir:-$PWD/.direnv}\"\n" +
