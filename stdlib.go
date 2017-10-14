@@ -613,4 +613,5 @@ const STDLIB = "#!bash\n" +
 	"  source \"${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc\" >&2\n" +
 	"elif [[ -f $HOME/.direnvrc ]]; then\n" +
 	"  source \"$HOME/.direnvrc\" >&2\n" +
-	"fi\n"
+	"fi\n" +
+	""
