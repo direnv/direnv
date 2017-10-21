@@ -5,6 +5,7 @@
 package dotenv
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -13,6 +14,7 @@ import (
 const LINE = `
 \A
 \s*
+(?:|#.*|          # comment line
 (?:export\s+)?    # optional export
 ([\w\.]+)         # key
 (?:\s*=\s*|:\s+?) # separator
@@ -25,6 +27,7 @@ const LINE = `
 )?                # value end
 \s*
 (?:\#.*)?         # optional comment
+)
 \z
 `
 
@@ -40,10 +43,12 @@ func Parse(data string) (map[string]string, error) {
 	var dotenv = make(map[string]string)
 
 	for _, line := range linesRe.Split(data, -1) {
+		if !lineRe.MatchString(line) {
+			return nil, fmt.Errorf("invalid line: %s", line)
+		}
 
 		match := lineRe.FindStringSubmatch(line)
-		// commented line or invalid line
-		// TODO: return error if invalid
+		// commented or empty line
 		if len(match) == 0 {
 			continue
 		}
@@ -67,6 +72,10 @@ func MustParse(data string) map[string]string {
 }
 
 func parseValue(value string) string {
+	if len(value) <= 1 {
+		return value
+	}
+
 	if value[0:1] == "'" && value[len(value)-1:] == "'" {
 		value = value[1 : len(value)-1]
 	} else if value[0:1] == `"` && value[len(value)-1:] == `"` {
