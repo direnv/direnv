@@ -157,7 +157,6 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"find_up() {\n" +
 	"  (\n" +
-	"    cd \"$(pwd 2>/dev/null)\"\n" +
 	"    while true; do\n" +
 	"      if [[ -f $1 ]]; then\n" +
 	"        echo \"$PWD/$1\"\n" +

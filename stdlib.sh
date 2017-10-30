@@ -155,7 +155,6 @@ user_rel_path() {
 #
 find_up() {
   (
-    cd "$(pwd 2>/dev/null)"
     while true; do
       if [[ -f $1 ]]; then
         echo "$PWD/$1"
