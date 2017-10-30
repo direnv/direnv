@@ -222,7 +222,7 @@ source_up() {
   fi
   dir=$(cd .. && find_up "$file")
   if [[ -n $dir ]]; then
-    source_env "$(user_rel_path "$dir")"
+    source_env "$dir"
   fi
 }
 

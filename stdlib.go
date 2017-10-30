@@ -224,7 +224,7 @@ const STDLIB = "#!bash\n" +
 	"  fi\n" +
 	"  dir=$(cd .. && find_up \"$file\")\n" +
 	"  if [[ -n $dir ]]; then\n" +
-	"    source_env \"$(user_rel_path \"$dir\")\"\n" +
+	"    source_env \"$dir\"\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
