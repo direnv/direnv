@@ -1,0 +1,19 @@
+[package]
+name = "direnv"
+version = "3.0.0"
+authors = ["zimbatm <zimbatm@zimbatm.com>"]
+
+[dependencies]
+getopts = "0.2"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+toml = "0.4.5"
+
+[lib]
+name = "direnv"
+path = "src/direnv/lib.rs"
+
+[[bin]]
+name = "direnv"
+path = "src/bin/main.rs"
