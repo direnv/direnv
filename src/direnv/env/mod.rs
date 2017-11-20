@@ -31,10 +31,19 @@ pub fn diff(a: Env, b: Env) -> Diff {
             match diff.get(key) {
                 None => Change::Remove(val.to_os_string()),
                 Some(&Change::Add(ref old_val)) =>
-                    Change::Replace(old_val.to_os_string(), val.to_os_string()),
+                    if old_val == val {
+                        // Hack, re-use Change::Add to remove from the diff if it's the same k=v
+                        Change::Add(old_val.to_os_string())
+                    } else {
+                        Change::Replace(old_val.to_os_string(), val.to_os_string())
+                    },
                 Some(_) => panic!("bug"),
             };
-        diff.insert(key.to_os_string(), change);
+        match change {
+            // Hack, see above
+            Change::Add(_) => diff.remove(key),
+            _ => diff.insert(key.to_os_string(), change),
+        };
     }
     diff
 }
