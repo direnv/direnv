@@ -385,10 +385,11 @@ layout_perl() {
 # "$direnv_layout_dir/python-$python_version".
 # This forces the installation of any egg into the project's sub-folder.
 #
-# It's possible to specify the python executable if you want to use different
-# versions of python.
+# It's possible to specify the python and virtualenv executables if
+# you want to use different versions of python.
 #
 layout_python() {
+  # get supplied python version
   local python=${1:-python}
   [[ $# -gt 0 ]] && shift
   local old_env=$(direnv_layout_dir)/virtualenv
@@ -403,9 +404,19 @@ layout_python() {
       return 1
     fi
 
+    # get supplied virtualenv version
+    local virtualenv=virtualenv
+    if [[ $# -gt 0 ]]; then
+        if [[ "${1}" == virtualenv* ]]; then
+            virtualenv=${1}
+            shift
+        fi
+    fi
+
     export VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
     if [[ ! -d $VIRTUAL_ENV ]]; then
-      virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
+      log_status "$virtualenv --python=$python $@ $VIRTUAL_ENV"
+      $virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
     fi
   fi
   PATH_add "$VIRTUAL_ENV/bin"
@@ -413,18 +424,26 @@ layout_python() {
 
 # Usage: layout python2
 #
-# A shortcut for $(layout python python2)
+# A shortcut for $(layout python python2 virtualenv-2)
 #
 layout_python2() {
-  layout_python python2 "$@"
+  if [[ $(command -v virtualenv-2) ]]; then
+      layout_python python2 virtualenv-2 "$@"
+  else
+      layout_python python2 "$@"
+  fi
 }
 
 # Usage: layout python3
 #
-# A shortcut for $(layout python python3)
+# A shortcut for $(layout python python3 virtualenv-3)
 #
 layout_python3() {
-  layout_python python3 "$@"
+  if [[ $(command -v virtualenv-3) ]]; then
+      layout_python python3 virtualenv-3 "$@"
+  else
+      layout_python python3 "$@"
+  fi
 }
 
 # Usage: layout ruby
