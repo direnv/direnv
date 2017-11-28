@@ -1,4 +1,13 @@
 
+2.13.2 / 2017-11-28
+==================
+
+  * FIX: direnv edit: fix path escaping
+  * FIX: stdlib: fix find_up
+  * FIX: stdlib: use absolute path in source_up
+  * FIX: remove ruby as a build dependency
+  * FIX: go-dotenv: update to latest master to fix a parsing error
+
 2.13.1 / 2017-09-27
 ==================
 
