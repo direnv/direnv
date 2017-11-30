@@ -427,6 +427,26 @@ layout_python3() {
   layout_python python3 "$@"
 }
 
+# Usage: layout pipenv
+#
+# Similar to layout_python, but uses Pipenv to build a
+# virtualenv from the Pipfile located in the same directory.
+#
+layout_pipenv() {
+  if [[ ! -f Pipfile ]]; then
+    echo 'No Pipfile found.  Use `pipenv` to create a Pipfile first.' >&2
+    exit 2
+  fi
+
+  local VENV=$(pipenv --bare --venv 2>/dev/null)
+  if [[ -z $VENV || ! -d $VENV ]]; then
+    pipenv install
+  fi
+
+  export VIRTUAL_ENV=$(pipenv --venv)
+  PATH_add "$VIRTUAL_ENV/bin"
+}
+
 # Usage: layout ruby
 #
 # Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".
