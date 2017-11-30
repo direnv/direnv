@@ -52,6 +52,9 @@ func Parse(data string) (map[string]string, error) {
 		if len(match) == 0 {
 			continue
 		}
+		if len(match[1]) == 0 {
+			continue
+		}
 
 		key := match[1]
 		value := parseValue(match[2])
