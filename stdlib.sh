@@ -440,7 +440,7 @@ layout_pipenv() {
 
   local VENV=$(pipenv --bare --venv 2>/dev/null)
   if [[ -z $VENV || ! -d $VENV ]]; then
-    pipenv install
+    pipenv install --dev
   fi
 
   export VIRTUAL_ENV=$(pipenv --venv)
