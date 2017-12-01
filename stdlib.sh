@@ -427,7 +427,7 @@ layout_python3() {
   layout_python python3 "$@"
 }
 
-# Usage: layout anaconda <enviroment_name> <conda_exe>
+# Usage: layout anaconda <enviroment_name> [<conda_exe>]
 #
 # Activates anaconda for the named environment. If the environment
 # hasn't been created, it will be using the environment.yml file in
@@ -435,24 +435,26 @@ layout_python3() {
 # the one found in the system environment.
 #
 layout_anaconda() {
-  local env_name="$1"
-  local conda=$(command -v conda)
+  local env_name=$1
+  local conda
   if [[ $# -gt 1 ]]; then
-      conda=${2}
+    conda=${2}
+  else
+    conda=$(command -v conda)
   fi
-  PATH_add $(dirname $conda)
-  local env_loc=$($conda env list | grep $env_name)
+  PATH_add $(dirname "$conda")
+  local env_loc=$("$conda" env list | grep -- "$env_name")
   if [[ ! "$env_loc" == $env_name*$env_name ]]; then
-      if [[ -e environment.yml ]]; then
-         log_status "creating conda enviroment"
-         $conda env create
-      else
-          log_error "Could not find environment.yml"
-          return 1
-      fi
+    if [[ -e environment.yml ]]; then
+      log_status "creating conda enviroment"
+      "$conda" env create
+    else
+      log_error "Could not find environment.yml"
+      return 1
+    fi
   fi
 
-  source activate ${env_name}
+  source activate "$env_name"
 }
 
 # Usage: layout ruby
