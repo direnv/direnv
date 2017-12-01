@@ -445,6 +445,7 @@ layout_pipenv() {
 
   export VIRTUAL_ENV=$(pipenv --venv)
   PATH_add "$VIRTUAL_ENV/bin"
+  export PIPENV_ACTIVE=1
 }
 
 # Usage: layout ruby
