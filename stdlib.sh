@@ -434,7 +434,7 @@ layout_python3() {
 #
 layout_pipenv() {
   if [[ ! -f Pipfile ]]; then
-    echo 'No Pipfile found.  Use `pipenv` to create a Pipfile first.' >&2
+    log_error 'No Pipfile found.  Use `pipenv` to create a Pipfile first.'
     exit 2
   fi
 
