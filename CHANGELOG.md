@@ -1,4 +1,12 @@
 
+2.14.0 / 2017-12-13
+==================
+
+  * NEW: Add support for Pipenv layout (#314)
+  * CHANGE: direnv version: make public
+  * FIX: direnv edit: run the command through bash
+  * FIX: website: update ditto to v0.15
+
 2.13.3 / 2017-11-30
 ==================
 
