@@ -457,6 +457,27 @@ layout_anaconda() {
   source activate "$env_name"
 }
 
+# Usage: layout pipenv
+#
+# Similar to layout_python, but uses Pipenv to build a
+# virtualenv from the Pipfile located in the same directory.
+#
+layout_pipenv() {
+  if [[ ! -f Pipfile ]]; then
+    log_error 'No Pipfile found.  Use `pipenv` to create a Pipfile first.'
+    exit 2
+  fi
+
+  local VENV=$(pipenv --bare --venv 2>/dev/null)
+  if [[ -z $VENV || ! -d $VENV ]]; then
+    pipenv install --dev
+  fi
+
+  export VIRTUAL_ENV=$(pipenv --venv)
+  PATH_add "$VIRTUAL_ENV/bin"
+  export PIPENV_ACTIVE=1
+}
+
 # Usage: layout ruby
 #
 # Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".

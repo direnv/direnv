@@ -429,6 +429,26 @@ const STDLIB = "#!bash\n" +
 	"  layout_python python3 \"$@\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: layout pipenv\n" +
+	"#\n" +
+	"# Similar to layout_python, but uses Pipenv to build a\n" +
+	"# virtualenv from the Pipfile located in the same directory.\n" +
+	"#\n" +
+	"layout_pipenv() {\n" +
+	"  if [[ ! -f Pipfile ]]; then\n" +
+	"    log_error 'No Pipfile found.  Use `pipenv` to create a Pipfile first.'\n" +
+	"    exit 2\n" +
+	"  fi\n" +
+	"\n" +
+	"  local VENV=$(pipenv --bare --venv 2>/dev/null)\n" +
+	"  if [[ -z $VENV || ! -d $VENV ]]; then\n" +
+	"    pipenv install --dev\n" +
+	"  fi\n" +
+	"\n" +
+	"  export VIRTUAL_ENV=$(pipenv --venv)\n" +
+	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: layout ruby\n" +
 	"#\n" +
 	"# Sets the GEM_HOME environment variable to \"$(direnv_layout_dir)/ruby/RUBY_VERSION\".\n" +

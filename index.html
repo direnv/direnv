@@ -1,53 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>direnv - unclutter your .profile</title>
+    <title>direnv - unclutter your .profile</title>
 
-  <!-- jQuery -->
-  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+    <!-- JQUERY -->
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 
-  <!-- marked -->
-  <script src="//chutsu.github.io/ditto/ver/0.12/marked.js"></script>
+    <!-- MARKED -->
+    <script src="//chutsu.github.io/ditto/ver/0.15/marked.js"></script>
 
-  <!-- highlight -->
-  <link rel="stylesheet" href="//chutsu.github.io/ditto/ver/0.12/github.css">
-  <script src="//chutsu.github.io/ditto/ver/0.12/highlight.js"></script>
+    <!-- HIGHLIGHT.JS -->
+    <link rel="stylesheet" href="//chutsu.github.io/ditto/ver/0.15/github.css">
+    <script src="//chutsu.github.io/ditto/ver/0.15/highlight.js"></script>
 
-  <!-- ditto -->
-  <link rel="stylesheet" href="//chutsu.github.io/ditto/ver/0.12/ditto.css">
-  <script src="//chutsu.github.io/ditto/ver/0.12/ditto.js"></script>
+    <!-- MATHJAX -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$','$']],
+          processRefs: true
+        },
+        TeX: {
+          equationNumbers: {
+            autoNumber: "all",
+            formatID: function(id) { return null },
+            formatURL: function(id) { return null }
+          }
+        }
+      });
+    </script>
+    <script type="text/javascript"
+      src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+
+    <!-- DITTO CSS -->
+    <link rel="stylesheet" href="//chutsu.github.io/ditto/ver/0.15/ditto.css">
+    <script src="//chutsu.github.io/ditto/ver/0.15/ditto.js"></script>
 </head>
 <body>
-  <!-- essential -->
-  <div id="sidebar"></div>
-  <div id="content"></div>
-  <div id="hide"></div>
+    <!-- ESSENTIAL -->
+    <div id="sidebar"></div>
+    <div id="content"></div>
+    <div id="hide"></div>
 
-  <!-- optional -->
-  <div id="back_to_top">back to top</div>
-  <div id="edit">edit</div>
-  <div id="loading">Loading ...</div>
-  <div id="error"></div>
+    <!-- OPTIONAL -->
+    <div id="back_to_top">top</div>
+    <div id="edit">edit</div>
+    <div id="loading">Loading ...</div>
+    <div id="error"></div>
 
-  <script>
-    $(function($) {
-      // essential settings
-      ditto.index = "README.md";
-      ditto.sidebar_file = "docs/sidebar.md";
+    <!-- DITTO -->
+    <script>
+        $(function($) {
+          // essential settings
+          ditto.index = "README.md",
+          ditto.sidebar_file = "docs/sidebar.md",
 
-      // optional settings if you want github search
-      ditto.github_username = "direnv";
-      ditto.github_repo = "direnv";
-      ditto.highlight_code = true;
+          // optional settings if you want github search
+          ditto.github_username = "direnv";
+          ditto.github_repo = "direnv";
+          ditto.highlight_code = true;
 
-      // where the docs are actually stored on github - so you can edit
-      ditto.base_url = "https://github.com/direnv/direnv/edit/master";
+          // where the docs are actually stored on github - so you can edit
+          // e.g. https://github.com/chutsu/ditto/edit/gh-pages
+          ditto.base_url = "https://github.com/direnv/direnv/edit/master";
 
-      // run
-      ditto.run();
-    });
-  </script>
+          // run
+          ditto.run();
+        });
+    </script>
 </body>
 </html>
