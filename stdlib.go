@@ -429,6 +429,36 @@ const STDLIB = "#!bash\n" +
 	"  layout_python python3 \"$@\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: layout anaconda <enviroment_name> [<conda_exe>]\n" +
+	"#\n" +
+	"# Activates anaconda for the named environment. If the environment\n" +
+	"# hasn't been created, it will be using the environment.yml file in\n" +
+	"# the current directory. <conda_exe> is optional and will default to\n" +
+	"# the one found in the system environment.\n" +
+	"#\n" +
+	"layout_anaconda() {\n" +
+	"  local env_name=$1\n" +
+	"  local conda\n" +
+	"  if [[ $# -gt 1 ]]; then\n" +
+	"    conda=${2}\n" +
+	"  else\n" +
+	"    conda=$(command -v conda)\n" +
+	"  fi\n" +
+	"  PATH_add $(dirname \"$conda\")\n" +
+	"  local env_loc=$(\"$conda\" env list | grep -- \"$env_name\")\n" +
+	"  if [[ ! \"$env_loc\" == $env_name*$env_name ]]; then\n" +
+	"    if [[ -e environment.yml ]]; then\n" +
+	"      log_status \"creating conda enviroment\"\n" +
+	"      \"$conda\" env create\n" +
+	"    else\n" +
+	"      log_error \"Could not find environment.yml\"\n" +
+	"      return 1\n" +
+	"    fi\n" +
+	"  fi\n" +
+	"\n" +
+	"  source activate \"$env_name\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: layout pipenv\n" +
 	"#\n" +
 	"# Similar to layout_python, but uses Pipenv to build a\n" +
@@ -447,6 +477,7 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"  export VIRTUAL_ENV=$(pipenv --venv)\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
+	"  export PIPENV_ACTIVE=1\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout ruby\n" +
@@ -606,10 +637,19 @@ const STDLIB = "#!bash\n" +
 	"# (e.g `use nix -p ocaml`).\n" +
 	"#\n" +
 	"use_nix() {\n" +
+	"  local orig_IN_NIX_SHELL=\"$IN_NIX_SHELL\"\n" +
+	"\n" +
 	"  direnv_load nix-shell --show-trace \"$@\" --run 'direnv dump'\n" +
 	"  if [[ $# = 0 ]]; then\n" +
 	"    watch_file default.nix\n" +
 	"    watch_file shell.nix\n" +
+	"  fi\n" +
+	"\n" +
+	"  # Don't change the IN_NIX_SHELL env var\n" +
+	"  if [[ -z $orig_IN_NIX_SHELL ]]; then\n" +
+	"    unset IN_NIX_SHELL\n" +
+	"  else\n" +
+	"    export IN_NIX_SHELL=\"$orig_IN_NIX_SHELL\"\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +

@@ -635,10 +635,19 @@ use_node() {
 # (e.g `use nix -p ocaml`).
 #
 use_nix() {
+  local orig_IN_NIX_SHELL="$IN_NIX_SHELL"
+
   direnv_load nix-shell --show-trace "$@" --run 'direnv dump'
   if [[ $# = 0 ]]; then
     watch_file default.nix
     watch_file shell.nix
+  fi
+
+  # Don't change the IN_NIX_SHELL env var
+  if [[ -z $orig_IN_NIX_SHELL ]]; then
+    unset IN_NIX_SHELL
+  else
+    export IN_NIX_SHELL="$orig_IN_NIX_SHELL"
   fi
 }
 
