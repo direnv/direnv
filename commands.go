@@ -35,8 +35,10 @@ func init() {
 		CmdReload,
 		CmdStatus,
 		CmdStdlib,
+		CmdUnWhitelist,
 		CmdVersion,
 		CmdWatch,
+		CmdWhitelist,
 		CmdCurrent,
 	}
 }

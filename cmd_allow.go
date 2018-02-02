@@ -25,7 +25,7 @@ var CmdAllow = &Cmd{
 			return
 		}
 
-		rc := FindRC(rcPath, config.AllowDir())
+		rc := FindRC(rcPath, config.AllowDir(), config.WhitelistDir())
 		if rc == nil {
 			return fmt.Errorf(".envrc file not found")
 		}

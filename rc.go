@@ -13,21 +13,22 @@ import (
 )
 
 type RC struct {
-	path      string
-	allowPath string
-	times     FileTimes
+	path          string
+	allowPath     string
+	whitelistPath string
+	times         FileTimes
 }
 
-func FindRC(wd string, allowDir string) *RC {
+func FindRC(wd string, allowDir string, whitelistDir string) *RC {
 	rcPath := findUp(wd, ".envrc")
 	if rcPath == "" {
 		return nil
 	}
 
-	return RCFromPath(rcPath, allowDir)
+	return RCFromPath(rcPath, allowDir, whitelistDir)
 }
 
-func RCFromPath(path string, allowDir string) *RC {
+func RCFromPath(path string, allowDir string, whitelistDir string) *RC {
 	hash, err := fileHash(path)
 	if err != nil {
 		return nil
@@ -35,17 +36,24 @@ func RCFromPath(path string, allowDir string) *RC {
 
 	allowPath := filepath.Join(allowDir, hash)
 
+	hash, err = pathHash(path)
+	if err != nil {
+		return nil
+	}
+
+	whitelistPath := filepath.Join(whitelistDir, hash)
+
 	times := NewFileTimes()
 	times.Update(path)
 	times.Update(allowPath)
 
-	return &RC{path, allowPath, times}
+	return &RC{path, allowPath, whitelistPath, times}
 }
 
 func RCFromEnv(path, marshalled_times string) *RC {
 	times := NewFileTimes()
 	times.Unmarshal(marshalled_times)
-	return &RC{path, "", times}
+	return &RC{path, "", "", times}
 }
 
 func (self *RC) Allow() (err error) {
@@ -66,8 +74,31 @@ func (self *RC) Deny() error {
 	return os.Remove(self.allowPath)
 }
 
+func (self *RC) Whitelist() (err error) {
+	if self.allowPath == "" {
+		return fmt.Errorf("Cannot whitelist empty path")
+	}
+	if err = os.MkdirAll(filepath.Dir(self.whitelistPath), 0755); err != nil {
+		return
+	}
+	if err = whitelist(self.path, self.whitelistPath); err != nil {
+		return
+	}
+	self.times.Update(self.whitelistPath)
+	return
+}
+
+func (self *RC) UnWhitelist() error {
+	return os.Remove(self.whitelistPath)
+}
+
 func (self *RC) Allowed() bool {
 	_, err := os.Stat(self.allowPath)
+	if err == nil {
+		return true
+	}
+
+	_, err = os.Stat(self.whitelistPath)
 	return err == nil
 }
 
@@ -194,6 +225,15 @@ func fileHash(path string) (hash string, err error) {
 	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
 }
 
+func pathHash(path string) (hash string, err error) {
+	fullPath, err := filepath.Abs(path)
+	if err != nil {
+		return
+	}
+
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(fullPath))), nil
+}
+
 // Creates a file
 
 func touch(path string) (err error) {
@@ -203,6 +243,10 @@ func touch(path string) (err error) {
 
 func allow(path string, allowPath string) (err error) {
 	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
+}
+
+func whitelist(path string, whitelistPath string) (err error) {
+	return ioutil.WriteFile(whitelistPath, []byte(path+"\n"), 0644)
 }
 
 func findUp(searchDir string, fileName string) (path string) {
