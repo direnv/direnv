@@ -70,6 +70,10 @@ func (self *Config) AllowDir() string {
 	return filepath.Join(self.ConfDir, "allow")
 }
 
+func (self *Config) WhitelistDir() string {
+	return filepath.Join(self.ConfDir, "whitelist")
+}
+
 func (self *Config) LoadedRC() *RC {
 	if self.RCDir == "" {
 		log_debug("RCDir is blank - loadedRC is nil")
@@ -83,7 +87,7 @@ func (self *Config) LoadedRC() *RC {
 }
 
 func (self *Config) FindRC() *RC {
-	return FindRC(self.WorkDir, self.AllowDir())
+	return FindRC(self.WorkDir, self.AllowDir(), self.WhitelistDir())
 }
 
 func (self *Config) EnvDiff() (*EnvDiff, error) {

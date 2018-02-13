@@ -5,15 +5,14 @@ import (
 	"os"
 )
 
-// `direnv deny [PATH_TO_RC]`
-var CmdDeny = &Cmd{
-	Name: "deny",
-	Desc: "Revokes the authorization of a given .envrc",
+// `direnv whitelist [PATH_TO_RC]`
+var CmdWhitelist = &Cmd{
+	Name: "whitelist",
+	Desc: "Permanently allows any .envrc that resides at the given path",
 	Args: []string{"[PATH_TO_RC]"},
 	Fn: func(env Env, args []string) (err error) {
 		var rcPath string
 		var config *Config
-
 		if len(args) > 1 {
 			rcPath = args[1]
 		} else {
@@ -30,6 +29,6 @@ var CmdDeny = &Cmd{
 		if rc == nil {
 			return fmt.Errorf(".envrc file not found")
 		}
-		return rc.Deny()
+		return rc.Whitelist()
 	},
 }
