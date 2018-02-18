@@ -180,3 +180,17 @@ func TestFailingMustParse(t *testing.T) {
 	}()
 	dotenv.MustParse("...")
 }
+
+const TEST_COMMENT_OVERRIDE = `
+VARIABLE=value
+#VARIABLE=disabled_value
+`
+
+func TestCommentOverride(t *testing.T) {
+	env := dotenv.MustParse(TEST_COMMENT_OVERRIDE)
+	shouldNotHaveEmptyKey(t, env)
+
+	if env["VARIABLE"] != "value" {
+		t.Error("VARIABLE should == value, not", env["VARIABLE"])
+	}
+}
