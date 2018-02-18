@@ -6,15 +6,29 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	toml "github.com/BurntSushi/toml"
 )
 
 type Config struct {
-	Env      Env
-	WorkDir  string // Current directory
-	ConfDir  string
-	SelfPath string
-	BashPath string
-	RCDir    string
+	Env             Env
+	WorkDir         string // Current directory
+	ConfDir         string
+	SelfPath        string
+	BashPath        string
+	RCDir           string
+	TomlPath        string
+	WhitelistPrefix []string
+	WhitelistExact  map[string]bool
+}
+
+type tomlConfig struct {
+	Whitelist whitelist
+}
+
+type whitelist struct {
+	Prefix []string
+	Exact  []string
 }
 
 func LoadConfig(env Env) (config *Config, err error) {
@@ -63,6 +77,30 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.RCDir = config.RCDir[1:]
 	}
 
+	config.TomlPath = filepath.Join(config.ConfDir, "config.toml")
+	config.WhitelistPrefix = make([]string, 0)
+	config.WhitelistExact = make(map[string]bool)
+
+	if _, err = os.Stat(config.TomlPath); err == nil {
+		var tomlConf tomlConfig
+		if _, err = toml.DecodeFile(config.TomlPath, &tomlConf); err != nil {
+			err = fmt.Errorf("LoadConfig() failed to parse config.toml: %q", err)
+			return
+		}
+
+		for _, prefix := range tomlConf.Whitelist.Prefix {
+			config.WhitelistPrefix = append(config.WhitelistPrefix, prefix)
+		}
+
+		for _, path := range tomlConf.Whitelist.Exact {
+			if !strings.HasSuffix(path, "/.envrc") {
+				path = filepath.Join(path, ".envrc")
+			}
+
+			config.WhitelistExact[path] = true
+		}
+	}
+
 	return
 }
 
@@ -79,11 +117,11 @@ func (self *Config) LoadedRC() *RC {
 
 	times_string := self.Env[DIRENV_WATCHES]
 
-	return RCFromEnv(rcPath, times_string)
+	return RCFromEnv(rcPath, times_string, self)
 }
 
 func (self *Config) FindRC() *RC {
-	return FindRC(self.WorkDir, self.AllowDir())
+	return FindRC(self.WorkDir, self)
 }
 
 func (self *Config) EnvDiff() (*EnvDiff, error) {

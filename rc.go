@@ -16,36 +16,37 @@ type RC struct {
 	path      string
 	allowPath string
 	times     FileTimes
+	config    *Config
 }
 
-func FindRC(wd string, allowDir string) *RC {
+func FindRC(wd string, config *Config) *RC {
 	rcPath := findUp(wd, ".envrc")
 	if rcPath == "" {
 		return nil
 	}
 
-	return RCFromPath(rcPath, allowDir)
+	return RCFromPath(rcPath, config)
 }
 
-func RCFromPath(path string, allowDir string) *RC {
+func RCFromPath(path string, config *Config) *RC {
 	hash, err := fileHash(path)
 	if err != nil {
 		return nil
 	}
 
-	allowPath := filepath.Join(allowDir, hash)
+	allowPath := filepath.Join(config.AllowDir(), hash)
 
 	times := NewFileTimes()
 	times.Update(path)
 	times.Update(allowPath)
 
-	return &RC{path, allowPath, times}
+	return &RC{path, allowPath, times, config}
 }
 
-func RCFromEnv(path, marshalled_times string) *RC {
+func RCFromEnv(path, marshalled_times string, config *Config) *RC {
 	times := NewFileTimes()
 	times.Unmarshal(marshalled_times)
-	return &RC{path, "", times}
+	return &RC{path, "", times, config}
 }
 
 func (self *RC) Allow() (err error) {
@@ -67,8 +68,33 @@ func (self *RC) Deny() error {
 }
 
 func (self *RC) Allowed() bool {
+	// happy path is if this envrc has been explicitly allowed, O(1)ish common case
 	_, err := os.Stat(self.allowPath)
-	return err == nil
+
+	if err == nil {
+		return true
+	}
+
+	// when whitelisting we want to be (path) absolutely sure we've not been duped with a symlink
+	path, err := filepath.Abs(self.path)
+	// seems unlikely that we'd hit this, but have to handle it
+	if err != nil {
+		return false
+	}
+
+	// exact whitelists are O(1)ish to check, so look there first
+	if self.config.WhitelistExact[path] {
+		return true
+	}
+
+	// finally we check if any of our whitelist prefixes match
+	for _, prefix := range self.config.WhitelistPrefix {
+		if strings.HasPrefix(path, prefix) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Makes the path relative to the current directory. Except when both paths
