@@ -81,7 +81,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
 
-	if _, err = os.Stat(config.TomlPath); err == nil {
+	if _, statErr := os.Stat(config.TomlPath); statErr == nil {
 		var tomlConf tomlConfig
 		if _, err = toml.DecodeFile(config.TomlPath, &tomlConf); err != nil {
 			err = fmt.Errorf("LoadConfig() failed to parse config.toml: %q", err)
