@@ -22,4 +22,4 @@
 ## Man pages
 - [man 1 direnv](#man/direnv.1)
 - [man 1 direnv-stdlib](#man/direnv-stdlib.1)
-
+- [man 1 direnv.toml](#man/direnv.toml.1)
