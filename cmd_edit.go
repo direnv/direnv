@@ -67,7 +67,7 @@ var CmdEdit = &Cmd{
 			return
 		}
 
-		foundRC = FindRC(rcPath, config.AllowDir())
+		foundRC = FindRC(rcPath, config)
 		log_debug("foundRC: %#v", foundRC)
 		log_debug("times: %#v", times)
 		if times != nil {
