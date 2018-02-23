@@ -1,4 +1,3 @@
-.nh
 .TH DIRENV.TOML "FEBRUARY 2018" direnv "User Manuals"
 .SH NAME
 .PP
@@ -61,8 +60,6 @@ prefix = [ "/home/user/code/project\-a" ]
 
 .PP
 In this example, the following .envrc files will be implicitly allowed:
-
-.RS
 .IP \(bu 2
 \fB\fC/home/user/code/project\-a/.envrc\fR
 .IP \(bu 2
@@ -70,18 +67,12 @@ In this example, the following .envrc files will be implicitly allowed:
 .IP \(bu 2
 and so on
 
-.RE
-
 .PP
 In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fB\fCdirenv allow\fR):
-
-.RS
 .IP \(bu 2
 \fB\fC/home/user/project\-b/.envrc\fR
 .IP \(bu 2
 \fB\fC/opt/random/.envrc\fR
-
-.RE
 
 .SS \fB\fCexact\fR
 .PP
@@ -102,29 +93,25 @@ exact = [ "/home/user/project\-b/.envrc", "/home/user/project\-b/subdir\-a" ]
 
 .PP
 In this example, the following .envrc files will be implicitly allowed, and no others:
-
-.RS
 .IP \(bu 2
 \fB\fC/home/user/code/project\-b/.envrc\fR
 .IP \(bu 2
 \fB\fC/home/user/code/project\-b/subdir\-a\fR
 
-.RE
-
 .PP
 In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fB\fCdirenv allow\fR):
-
-.RS
 .IP \(bu 2
 \fB\fC/home/user/code/project\-b/subproject\-c/.envrc\fR
 .IP \(bu 2
 \fB\fC/home/user/code/.envrc\fR
 
-.RE
+.SH \fB\fCbash\_path\fR
+.PP
+This allows to hard\-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
 
 .SH COPYRIGHT
 .PP
-Copyright (C) 2018 zimbatm http://zimbatm.com
+Copyright (C) 2018 zimbatm 
 \[la]http://zimbatm.com\[ra] and contributors under the MIT licence.
 
 .SH SEE ALSO

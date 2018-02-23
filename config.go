@@ -23,7 +23,8 @@ type Config struct {
 }
 
 type tomlConfig struct {
-	Whitelist whitelist
+	Whitelist whitelist `toml:"whitelist"`
+	BashPath  string    `toml:"bash_path"`
 }
 
 type whitelist struct {
@@ -57,16 +58,6 @@ func LoadConfig(env Env) (config *Config, err error) {
 	exePath = strings.Replace(exePath, "\\", "/", -1)
 	config.SelfPath = exePath
 
-	config.BashPath = env[DIRENV_BASH]
-	if config.BashPath == "" {
-		if bashPath != "" {
-			config.BashPath = bashPath
-		} else if config.BashPath, err = exec.LookPath("bash"); err != nil {
-			err = fmt.Errorf("Can't find bash: %q", err)
-			return
-		}
-	}
-
 	if config.WorkDir, err = os.Getwd(); err != nil {
 		err = fmt.Errorf("LoadConfig() Getwd failed: %q", err)
 		return
@@ -77,10 +68,11 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.RCDir = config.RCDir[1:]
 	}
 
-	config.TomlPath = filepath.Join(config.ConfDir, "config.toml")
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
 
+	// Load the config.toml
+	config.TomlPath = filepath.Join(config.ConfDir, "config.toml")
 	if _, statErr := os.Stat(config.TomlPath); statErr == nil {
 		var tomlConf tomlConfig
 		if _, err = toml.DecodeFile(config.TomlPath, &tomlConf); err != nil {
@@ -98,6 +90,19 @@ func LoadConfig(env Env) (config *Config, err error) {
 			}
 
 			config.WhitelistExact[path] = true
+		}
+
+		config.BashPath = tomlConf.BashPath
+	}
+
+	if config.BashPath == "" {
+		if env[DIRENV_BASH] != "" {
+			config.BashPath = env[DIRENV_BASH]
+		} else if bashPath != "" {
+			config.BashPath = bashPath
+		} else if config.BashPath, err = exec.LookPath("bash"); err != nil {
+			err = fmt.Errorf("Can't find bash: %q", err)
+			return
 		}
 	}
 

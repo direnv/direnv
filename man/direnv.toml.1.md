@@ -78,6 +78,10 @@ In this example, the following .envrc files will not be implicitly allowed (alth
 * `/home/user/code/project-b/subproject-c/.envrc`
 * `/home/user/code/.envrc`
 
+## `bash_path`
+
+This allows to hard-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
+
 COPYRIGHT
 ---------
 
