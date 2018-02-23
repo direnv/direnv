@@ -1,4 +1,12 @@
 
+2.15.0 / 2018-02-23
+==================
+
+  * NEW: TOML configuration file! (#332, #337)
+  * NEW: support for allow folder whitelist (#332)
+  * NEW: add anaconda support (#312)
+  * CHANGE: use_nix: unset IN_NIX_SHELL
+
 2.14.0 / 2017-12-13
 ==================
 
