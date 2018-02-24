@@ -599,7 +599,7 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"    # Strip possible \"/\" suffix from $NODE_VERSIONS, then use that to\n" +
 	"    # Strip $NODE_VERSIONS/$NODE_VERSION_PREFIX prefix from line.\n" +
-	"    while IFS= read -r line; do echo \"${line#${NODE_VERSIONS%/}/${node_version_prefix}}\"; done |\n" +
+	"    while IFS= read -r line; do echo \"${line#${NODE_VERSIONS%%/}/${node_version_prefix}}\"; done |\n" +
 	"\n" +
 	"    # Sort by version: split by \".\" then reverse numeric sort for each piece of the version string\n" +
 	"    sort -t . -k 1,1rn -k 2,2rn -k 3,3rn |\n" +
