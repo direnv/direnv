@@ -5,10 +5,11 @@ const STDLIB = "#!bash\n" +
 	"# These are the commands available in an .envrc context\n" +
 	"#\n" +
 	"set -e\n" +
-	"direnv=\"%s\"\n" +
+	"# NOTE: don't touch the RHS, it gets replaced at runtime\n" +
+	"direnv=\"$(which direnv)\"\n" +
 	"\n" +
 	"# Config, change in the direnvrc\n" +
-	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %%s}\"\n" +
+	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %s}\"\n" +
 	"\n" +
 	"# Usage: direnv_layout_dir\n" +
 	"#\n" +
