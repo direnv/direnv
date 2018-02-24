@@ -3,10 +3,11 @@
 # These are the commands available in an .envrc context
 #
 set -e
-direnv="%s"
+# NOTE: don't touch the RHS, it gets replaced at runtime
+direnv="$(which direnv)"
 
 # Config, change in the direnvrc
-DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
+DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
 
 # Usage: direnv_layout_dir
 #

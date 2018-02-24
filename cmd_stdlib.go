@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 // `direnv stdlib`
@@ -14,7 +15,7 @@ var CmdStdlib = &Cmd{
 			return
 		}
 
-		fmt.Printf(STDLIB, config.SelfPath)
+		fmt.Println(strings.Replace(STDLIB, "$(which direnv)", config.SelfPath, 1))
 		return
 	},
 }
