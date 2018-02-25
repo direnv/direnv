@@ -1,4 +1,4 @@
-DIRENV.TOML "FEBRUARY 2018" direnv "User Manuals"
+DIRENV.TOML 1 "FEBRUARY 2018" direnv "User Manuals"
 ==================================================
 
 NAME
@@ -80,7 +80,7 @@ In this example, the following .envrc files will not be implicitly allowed (alth
 
 ## `bash_path`
 
-This allows to hard-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
+This allows one to hard-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
 
 COPYRIGHT
 ---------
