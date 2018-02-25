@@ -5,9 +5,6 @@ go:
 - 1.10.x
 sudo: false
 script: make test
-branches:
-  except:
-  - gh-pages
 before_deploy:
 - PATH="$HOME/gopath/bin:$PATH" make dist
 deploy:
@@ -33,4 +30,4 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    condition: $TRAVIS_GO_VERSION =~ ^1\.10\..*$
+    condition: $TRAVIS_GO_VERSION =~ ^1\.10
