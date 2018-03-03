@@ -1,32 +1,28 @@
-with import <nixpkgs> {};
-let
-  rstrip = s:
-    let
-      inherit (builtins) substring;
-      len = builtins.stringLength s;
-      suffix = substring (len - 1) 1 s;
-      ws = [ " " "\r" "\n" "\t" ];
-    in
-      if len > 0 && builtins.any (char: char == suffix) ws then
-        rstrip (substring 0 (len - 1) s)
-      else
-        s;
-  readVersion = f:
-    rstrip (builtins.readFile f);
-in
+{ pkgs ? import <nixpkgs> {} }:
+with pkgs;
 buildGoPackage rec {
-  version = readVersion ./version.txt;
+  version = lib.fileContents ./version.txt;
   name = "direnv-${version}";
   goPackagePath = "github.com/zimbatm/direnv";
 
-  src = ./.;
+  src = lib.cleanSource ./.;
+
+  postConfigure = "cd $NIX_BUILD_TOP/go/src/$goPackagePath";
+
+  buildPhase = "make BASH_PATH=${bash}/bin/bash";
+
+  installPhase = ''
+    mkdir -p $out
+    make install DESTDIR=$bin
+    mkdir -p $bin/share/fish/vendor_conf.d
+    echo "eval ($bin/bin/direnv hook fish)" > $bin/share/fish/vendor_conf.d/direnv.fish
+  '';
 
   meta = with stdenv.lib; {
     homepage = http://direnv.net;
-    description = "path-dependent environments";
+    description = "A shell extension that manages your environment";
     maintainers = with maintainers; [ zimbatm ];
     license = licenses.mit;
     platforms = go.meta.platforms;
   };
 }
-
