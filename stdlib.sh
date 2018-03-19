@@ -380,6 +380,13 @@ layout_perl() {
   PATH_add "$libdir/bin"
 }
 
+# Usage: layout php
+#
+# Adds "$PWD/vendor/bin" to the PATH environment variable
+layout_php() {
+  PATH_add vendor/bin
+}
+
 # Usage: layout python <python_exe>
 #
 # Creates and loads a virtualenv environment under
