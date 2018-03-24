@@ -132,7 +132,15 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	arg := fmt.Sprintf(argtmpl, direnv, self.RelTo(wd), direnv)
 	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
 
-	cmd.Stdin = os.Stdin
+	if config.DisableStdin {
+		cmd.Stdin, err = os.Open(os.DevNull)
+		if err != nil {
+			return
+		}
+	} else {
+		cmd.Stdin = os.Stdin
+	}
+
 	cmd.Stderr = os.Stderr
 	cmd.Env = shellEnv.ToGoEnv()
 	cmd.Dir = wd

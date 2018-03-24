@@ -82,6 +82,10 @@ In this example, the following .envrc files will not be implicitly allowed (alth
 
 This allows one to hard-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
 
+## `disable_stdin`
+
+If set to true, stdin is disabled (redirected to /dev/null) during the `.envrc` evaluation.
+
 COPYRIGHT
 ---------
 

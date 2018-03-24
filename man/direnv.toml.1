@@ -109,6 +109,10 @@ In this example, the following .envrc files will not be implicitly allowed (alth
 .PP
 This allows one to hard\-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
 
+.SH \fB\fCdisable\_stdin\fR
+.PP
+If set to true, stdin is disabled (redirected to /dev/null) during the \fB\fC\&.envrc\fR evaluation.
+
 .SH COPYRIGHT
 .PP
 Copyright (C) 2018 zimbatm 

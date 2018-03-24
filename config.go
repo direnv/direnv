@@ -18,13 +18,15 @@ type Config struct {
 	BashPath        string
 	RCDir           string
 	TomlPath        string
+	DisableStdin    bool
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
 }
 
 type tomlConfig struct {
-	Whitelist whitelist `toml:"whitelist"`
-	BashPath  string    `toml:"bash_path"`
+	Whitelist    whitelist `toml:"whitelist"`
+	BashPath     string    `toml:"bash_path"`
+	DisableStdin bool      `toml:"disable_stdin"`
 }
 
 type whitelist struct {
@@ -92,6 +94,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 			config.WhitelistExact[path] = true
 		}
 
+		config.DisableStdin = tomlConf.DisableStdin
 		config.BashPath = tomlConf.BashPath
 	}
 
