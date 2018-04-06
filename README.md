@@ -44,9 +44,10 @@ nope
 Dependencies: make, golang
 
 ```bash
-git clone https://github.com/direnv/direnv
-cd direnv
-make install
+go get github.com/direnv/direnv
+cd $GOPATH/src/github.com/direnv/direnv
+make
+sudo make install
 # or symlink ./direnv into the $PATH
 ```
 
