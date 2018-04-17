@@ -118,17 +118,11 @@ cd $TEST_DIR/scenarios/"empty-var-unset"
   unsetenv FOO
 cd $TEST_DIR ; direnv_eval
 
-# Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
-# BUG: foo/bar is resolved in the .envrc execution context and so can't find
-#      the .envrc file.
-#
-# Apparently, the CHDIR syscall does that so I don't know how to work around
-# the issue.
-#
-# cd $TEST_DIR/scenarios/"symlink-bug"
-#   cd foo/bar
-#   direnv_eval
-# cd $TEST_DIR ; direnv_eval
+cd $TEST_DIR/scenarios/"symlink-bug"
+  direnv allow foo
+  cd foo/bar
+  direnv_eval
+cd $TEST_DIR ; direnv_eval
 
 # Pending: test that the mtime is looked on the original file
 # cd $TEST_DIR/scenarios/"utils"
