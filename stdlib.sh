@@ -178,7 +178,11 @@ source_env() {
   local rcpath=${1/#\~/$HOME}
   local rcfile
   if ! [[ -f $rcpath ]]; then
-    rcpath=$rcpath/.envrc
+    if [[ -L "$(pwd)" ]]; then
+      rcpath="$(cd "$(dirname "$(pwd)/$rcpath")" && pwd)/.envrc"
+    else
+      rcpath=$rcpath/.envrc
+    fi
   fi
 
   rcfile=$(user_rel_path "$rcpath")

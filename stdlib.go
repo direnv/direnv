@@ -180,7 +180,11 @@ const STDLIB = "#!bash\n" +
 	"  local rcpath=${1/#\\~/$HOME}\n" +
 	"  local rcfile\n" +
 	"  if ! [[ -f $rcpath ]]; then\n" +
-	"    rcpath=$rcpath/.envrc\n" +
+	"    if [[ -L \"$(pwd)\" ]]; then\n" +
+	"      rcpath=\"$(cd \"$(dirname \"$(pwd)/$rcpath\")\" && pwd)/.envrc\"\n" +
+	"    else\n" +
+	"      rcpath=$rcpath/.envrc\n" +
+	"    fi\n" +
 	"  fi\n" +
 	"\n" +
 	"  rcfile=$(user_rel_path \"$rcpath\")\n" +
