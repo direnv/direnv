@@ -115,6 +115,19 @@ Add the following line at the end of the `~/.cshrc` file:
 eval `direnv hook tcsh`
 ```
 
+### Elvish
+
+Run:
+
+```
+$> direnv hook elvish > ~/.elvish/lib/direnv.elv
+```
+
+and add the following line to your `~/.elvish/rc.elv` file:
+
+```
+use direnv
+```
 
 ## Usage
 
