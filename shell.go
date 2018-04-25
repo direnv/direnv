@@ -43,6 +43,8 @@ func DetectShell(target string) Shell {
 		return TCSH
 	case "json":
 		return JSON
+	case "elvish":
+		return ELVISH
 	}
 
 	return nil

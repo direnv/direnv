@@ -50,6 +50,8 @@ man: $(ROFFS)
 test: build
 	go test
 	./test/direnv-test.sh
+	go get github.com/elves/elvish
+	elvish ./test/direnv-test.elv
 
 install: all
 	install -d $(DESTDIR)/bin

@@ -57,38 +57,81 @@ has it's own extension mechanism:
 
 .SS BASH
 .PP
-Add the following line at the end of your "\~/.bashrc" file:
+Add the following line at the end of the \fB\fC\~/.bashrc\fR file:
 
 .PP
-\fB\fCeval "$(direnv hook bash)"\fR
+.RS
+
+.nf
+eval "$(direnv hook bash)"
+
+.fi
+.RE
 
 .PP
 Make sure it appears even after rvm, git\-prompt and other shell extensions
-that manipulate your prompt.
+that manipulate the prompt.
 
 .SS ZSH
 .PP
-Add the following line at the end of your "\~/.zshrc" file:
+Add the following line at the end of the \fB\fC\~/.zshrc\fR file:
 
 .PP
-\fB\fCeval "$(direnv hook zsh)"\fR
+.RS
+
+.nf
+eval "$(direnv hook zsh)"
+
+.fi
+.RE
 
 .SS FISH
 .PP
-Add the following line at the end of your "\~/.config/fish/config.fish" file:
+Add the following line at the end of the \fB\fC\~/.config/fish/config.fish\fR file:
 
 .PP
-\fB\fCeval (direnv hook fish)\fR
+.RS
+
+.nf
+eval (direnv hook fish)
+
+.fi
+.RE
 
 .SS TCSH
 .PP
-Add the following line at the end of your "\~/.cshrc" file:
+Add the following line at the end of the \fB\fC\~/.cshrc\fR file:
 
 .PP
 .RS
 
 .nf
 eval `direnv hook tcsh`
+
+.fi
+.RE
+
+.SS Elvish
+.PP
+Run:
+
+.PP
+.RS
+
+.nf
+$> direnv hook elvish > \~/.elvish/lib/direnv.elv
+
+.fi
+.RE
+
+.PP
+and add the following line to your \fB\fC\~/.elvish/rc.elv\fR file:
+
+.PP
+.RS
+
+.nf
+use direnv
 
 .fi
 .RE
@@ -140,7 +183,7 @@ other tips and tricks
 \[la]https://github.com/direnv/direnv/wiki\[ra]
 
 .PP
-Or drop by on the 
+Or drop by on the #direnv channel on FreeNode
 \[la]irc://#direnv@FreeNode\[ra] to
 have a chat.
 
