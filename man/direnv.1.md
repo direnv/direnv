@@ -58,32 +58,52 @@ has it's own extension mechanism:
 
 ### BASH
 
-Add the following line at the end of your "~/.bashrc" file:
+Add the following line at the end of the `~/.bashrc` file:
 
-`eval "$(direnv hook bash)"`
+```sh
+eval "$(direnv hook bash)"
+```
 
 Make sure it appears even after rvm, git-prompt and other shell extensions
-that manipulate your prompt.
+that manipulate the prompt.
 
 ### ZSH
 
-Add the following line at the end of your "~/.zshrc" file:
+Add the following line at the end of the `~/.zshrc` file:
 
-`eval "$(direnv hook zsh)"`
+```sh
+eval "$(direnv hook zsh)"
+```
 
 ### FISH
 
-Add the following line at the end of your "~/.config/fish/config.fish" file:
+Add the following line at the end of the `~/.config/fish/config.fish` file:
 
-`eval (direnv hook fish)`
+```fish
+eval (direnv hook fish)
+```
 
 ### TCSH
 
-Add the following line at the end of your "~/.cshrc" file:
+Add the following line at the end of the `~/.cshrc` file:
 
-    eval `direnv hook tcsh`
+```sh
+eval `direnv hook tcsh`
+```
 
+### Elvish
 
+Run:
+
+```
+$> direnv hook elvish > ~/.elvish/lib/direnv.elv
+```
+
+and add the following line to your `~/.elvish/rc.elv` file:
+
+```
+use direnv
+```
 
 USAGE
 -----
