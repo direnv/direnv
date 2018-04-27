@@ -44,6 +44,7 @@ nope
 Dependencies: make, golang
 
 ```bash
+cd ~/go/src
 git clone https://github.com/direnv/direnv
 cd direnv
 make install
