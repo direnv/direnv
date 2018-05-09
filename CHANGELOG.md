@@ -1,4 +1,12 @@
 
+2.16.0 / 2018-05-09
+==================
+
+  * NEW: add support for elvish (#356)
+  * NEW: config: allow to disable stdin on eval (#351)
+  * DOC: Add the usage of source_up to the README (#347)
+  * FIX: default.nix: fix compilation
+
 2.15.2 / 2018-02-25
 ==================
 
