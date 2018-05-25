@@ -638,19 +638,10 @@ const STDLIB = "#!bash\n" +
 	"# (e.g `use nix -p ocaml`).\n" +
 	"#\n" +
 	"use_nix() {\n" +
-	"  local orig_IN_NIX_SHELL=\"$IN_NIX_SHELL\"\n" +
-	"\n" +
 	"  direnv_load nix-shell --show-trace \"$@\" --run 'direnv dump'\n" +
 	"  if [[ $# = 0 ]]; then\n" +
 	"    watch_file default.nix\n" +
 	"    watch_file shell.nix\n" +
-	"  fi\n" +
-	"\n" +
-	"  # Don't change the IN_NIX_SHELL env var\n" +
-	"  if [[ -z $orig_IN_NIX_SHELL ]]; then\n" +
-	"    unset IN_NIX_SHELL\n" +
-	"  else\n" +
-	"    export IN_NIX_SHELL=\"$orig_IN_NIX_SHELL\"\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
