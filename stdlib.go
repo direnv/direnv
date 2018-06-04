@@ -645,7 +645,7 @@ const STDLIB = "#!bash\n" +
 	"    # Strip $NODE_VERSIONS/$NODE_VERSION_PREFIX prefix from line.\n" +
 	"    # Sort by version: split by \".\" then reverse numeric sort for each piece of the version string\n" +
 	"    # The first one is the highest\n" +
-	"    find \"$NODE_VERSIONS\" -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" \\\n" +
+	"    find \"$NODE_VERSIONS\" -L -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" \\\n" +
 	"      | while IFS= read -r line; do echo \"${line#${NODE_VERSIONS%/}/${node_version_prefix}}\"; done \\\n" +
 	"      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \\\n" +
 	"      | head -1\n" +
