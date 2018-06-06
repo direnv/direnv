@@ -61,6 +61,7 @@ direnv is packaged for a variety of systems:
 * [NetBSD pkgsrc-wip](http://www.pkgsrc.org/wip/)
 * [NixOS](https://nixos.org/nixos/packages.html)
 * [OSX Homebrew](http://brew.sh/)
+* [OpenSuSe](https://build.opensuse.org/package/show/openSUSE%3AFactory/direnv)
 * [MacPorts](https://www.macports.org/)
 * [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [GNU Guix](https://www.gnu.org/software/guix/)
