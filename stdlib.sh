@@ -77,6 +77,15 @@ has() {
   type "$1" &>/dev/null
 }
 
+# Usage: join_args [args...]
+#
+# Joins all the passed arguments into a single string that can be evaluated by bash
+#
+# This is useful when one has to serialize an array of arguments back into a string
+join_args() {
+  printf '%q ' "$@"
+}
+
 # Usage: expand_path <rel_path> [<relative_to>]
 #
 # Outputs the absolute path of <rel_path> relative to <relative_to> or the
@@ -636,7 +645,7 @@ use_node() {
 # (e.g `use nix -p ocaml`).
 #
 use_nix() {
-  direnv_load nix-shell --show-trace "$@" --run 'direnv dump'
+  direnv_load nix-shell --show-trace "$@" --run "$(join_args "$direnv" dump)"
   if [[ $# = 0 ]]; then
     watch_file default.nix
     watch_file shell.nix

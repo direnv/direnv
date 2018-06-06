@@ -79,6 +79,15 @@ const STDLIB = "#!bash\n" +
 	"  type \"$1\" &>/dev/null\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: join_args [args...]\n" +
+	"#\n" +
+	"# Joins all the passed arguments into a single string that can be evaluated by bash\n" +
+	"#\n" +
+	"# This is useful when one has to serialize an array of arguments back into a string\n" +
+	"join_args() {\n" +
+	"  printf '%q ' \"$@\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: expand_path <rel_path> [<relative_to>]\n" +
 	"#\n" +
 	"# Outputs the absolute path of <rel_path> relative to <relative_to> or the\n" +
@@ -638,7 +647,7 @@ const STDLIB = "#!bash\n" +
 	"# (e.g `use nix -p ocaml`).\n" +
 	"#\n" +
 	"use_nix() {\n" +
-	"  direnv_load nix-shell --show-trace \"$@\" --run 'direnv dump'\n" +
+	"  direnv_load nix-shell --show-trace \"$@\" --run \"$(join_args \"$direnv\" dump)\"\n" +
 	"  if [[ $# = 0 ]]; then\n" +
 	"    watch_file default.nix\n" +
 	"    watch_file shell.nix\n" +

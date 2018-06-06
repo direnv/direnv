@@ -18,10 +18,6 @@ buildGoPackage rec {
     echo "eval ($bin/bin/direnv hook fish)" > $bin/share/fish/vendor_conf.d/direnv.fish
   '';
 
-  shellHooks = ''
-    unset GOPATH
-  '';
-
   meta = with stdenv.lib; {
     homepage = http://direnv.net;
     description = "A shell extension that manages your environment";
