@@ -13,7 +13,7 @@ func (elvish) Hook() (string, error) {
 	return `## hook for direnv
 @edit:before-readline = $@edit:before-readline {
 	try {
-		m = (direnv export elvish | from-json)
+		m = ("{{.SelfPath}}" export elvish | from-json)
 		keys $m | each [k]{
 			if (==s $k 'null') {
 				unset-env $k
@@ -22,7 +22,7 @@ func (elvish) Hook() (string, error) {
 			}
 		}
 	} except e {
-		nop
+		echo $e
 	}
 }
 `, nil

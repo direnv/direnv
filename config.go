@@ -49,14 +49,11 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 
 	var exePath string
-	if exePath, err = exec.LookPath(os.Args[0]); err != nil {
-		err = fmt.Errorf("LoadConfig() Lookpath failed: %q", err)
+	if exePath, err = os.Executable(); err != nil {
+		err = fmt.Errorf("LoadConfig() os.Executable() failed: %q", err)
 		return
 	}
-	if exePath, err = filepath.EvalSymlinks(exePath); err != nil {
-		err = fmt.Errorf("LoadConfig() symlink resolution: %q", err)
-		return
-	}
+	// Fix for mingsys
 	exePath = strings.Replace(exePath, "\\", "/", -1)
 	config.SelfPath = exePath
 

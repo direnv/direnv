@@ -11,7 +11,7 @@ var FISH fish
 
 const FISH_HOOK = `
 function __direnv_export_eval --on-event fish_prompt;
-	eval (direnv export fish);
+	eval ("{{.SelfPath}}" export fish);
 end
 `
 

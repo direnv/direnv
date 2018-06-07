@@ -7,7 +7,7 @@ var ZSH zsh
 
 const ZSH_HOOK = `
 _direnv_hook() {
-  eval "$(direnv export zsh)";
+  eval "$("{{.SelfPath}}" export zsh)";
 }
 typeset -ag precmd_functions;
 if [[ -z ${precmd_functions[(r)_direnv_hook]} ]]; then

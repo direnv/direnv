@@ -10,7 +10,7 @@ type tcsh int
 var TCSH tcsh
 
 func (f tcsh) Hook() (string, error) {
-	return "alias precmd 'eval `direnv export tcsh`' ", nil
+	return "alias precmd 'eval `{{.SelfPath}} export tcsh`'", nil
 }
 
 func (f tcsh) Export(e ShellExport) (out string) {

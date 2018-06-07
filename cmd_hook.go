@@ -2,7 +2,15 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"text/template"
 )
+
+// HookContext are the variables available during hook template evaluation
+type HookContext struct {
+	// SelfPath is the unescaped absolute path to direnv
+	SelfPath string
+}
 
 // `direnv hook $0`
 var CmdHook = &Cmd{
@@ -16,17 +24,32 @@ var CmdHook = &Cmd{
 			target = args[1]
 		}
 
+		selfPath, err := os.Executable()
+		if err != nil {
+			return err
+		}
+
+		ctx := HookContext{selfPath}
+
 		shell := DetectShell(target)
 		if shell == nil {
 			return fmt.Errorf("Unknown target shell '%s'", target)
 		}
 
-		h, err := shell.Hook()
+		hookStr, err := shell.Hook()
 		if err != nil {
 			return err
 		}
 
-		fmt.Println(h)
+		hookTemplate, err := template.New("hook").Parse(hookStr)
+		if err != nil {
+			return err
+		}
+
+		err = hookTemplate.Execute(os.Stdout, ctx)
+		if err != nil {
+			return err
+		}
 
 		return
 	},
