@@ -1,4 +1,13 @@
 
+2.17.0 / 2018-06-17
+==================
+
+  * CHANGE: hook expands the direnv path. Ensures that direnv can be executed even if the PATH is changed #369.
+  * CHANGE: stdlib: direnv_load: disallow watching in child
+    Allows the `use nix --pure` scenario in #368
+  * README: add OpenSuSE to the list of distros
+  * Revert "use_nix: unset IN_NIX_SHELL"
+
 2.16.0 / 2018-05-09
 ==================
 
