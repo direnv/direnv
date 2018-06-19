@@ -3,10 +3,11 @@
 # These are the commands available in an .envrc context
 #
 set -e
-direnv="%s"
+# NOTE: don't touch the RHS, it gets replaced at runtime
+direnv="$(which direnv)"
 
 # Config, change in the direnvrc
-DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %%s}"
+DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
 
 # Usage: direnv_layout_dir
 #
@@ -446,6 +447,57 @@ layout_python3() {
   fi
 }
 
+# Usage: layout anaconda <enviroment_name> [<conda_exe>]
+#
+# Activates anaconda for the named environment. If the environment
+# hasn't been created, it will be using the environment.yml file in
+# the current directory. <conda_exe> is optional and will default to
+# the one found in the system environment.
+#
+layout_anaconda() {
+  local env_name=$1
+  local conda
+  if [[ $# -gt 1 ]]; then
+    conda=${2}
+  else
+    conda=$(command -v conda)
+  fi
+  PATH_add $(dirname "$conda")
+  local env_loc=$("$conda" env list | grep -- "$env_name")
+  if [[ ! "$env_loc" == $env_name*$env_name ]]; then
+    if [[ -e environment.yml ]]; then
+      log_status "creating conda enviroment"
+      "$conda" env create
+    else
+      log_error "Could not find environment.yml"
+      return 1
+    fi
+  fi
+
+  source activate "$env_name"
+}
+
+# Usage: layout pipenv
+#
+# Similar to layout_python, but uses Pipenv to build a
+# virtualenv from the Pipfile located in the same directory.
+#
+layout_pipenv() {
+  if [[ ! -f Pipfile ]]; then
+    log_error 'No Pipfile found.  Use `pipenv` to create a Pipfile first.'
+    exit 2
+  fi
+
+  local VENV=$(pipenv --bare --venv 2>/dev/null)
+  if [[ -z $VENV || ! -d $VENV ]]; then
+    pipenv install --dev
+  fi
+
+  export VIRTUAL_ENV=$(pipenv --venv)
+  PATH_add "$VIRTUAL_ENV/bin"
+  export PIPENV_ACTIVE=1
+}
+
 # Usage: layout ruby
 #
 # Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".
@@ -603,10 +655,19 @@ use_node() {
 # (e.g `use nix -p ocaml`).
 #
 use_nix() {
+  local orig_IN_NIX_SHELL="$IN_NIX_SHELL"
+
   direnv_load nix-shell --show-trace "$@" --run 'direnv dump'
   if [[ $# = 0 ]]; then
     watch_file default.nix
     watch_file shell.nix
+  fi
+
+  # Don't change the IN_NIX_SHELL env var
+  if [[ -z $orig_IN_NIX_SHELL ]]; then
+    unset IN_NIX_SHELL
+  else
+    export IN_NIX_SHELL="$orig_IN_NIX_SHELL"
   fi
 }
 

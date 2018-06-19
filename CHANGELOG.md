@@ -1,4 +1,44 @@
 
+2.16.0 / 2018-05-09
+==================
+
+  * NEW: add support for elvish (#356)
+  * NEW: config: allow to disable stdin on eval (#351)
+  * DOC: Add the usage of source_up to the README (#347)
+  * FIX: default.nix: fix compilation
+
+2.15.2 / 2018-02-25
+==================
+
+  * FIX: lintian warnings (#340)
+  * FIX: release process (#342)
+
+2.15.1 / 2018-02-24
+==================
+
+  * FIX: support for go 1.10 (#339)
+
+2.15.0 / 2018-02-23
+==================
+
+  * NEW: TOML configuration file! (#332, #337)
+  * NEW: support for allow folder whitelist (#332)
+  * NEW: add anaconda support (#312)
+  * CHANGE: use_nix: unset IN_NIX_SHELL
+
+2.14.0 / 2017-12-13
+==================
+
+  * NEW: Add support for Pipenv layout (#314)
+  * CHANGE: direnv version: make public
+  * FIX: direnv edit: run the command through bash
+  * FIX: website: update ditto to v0.15
+
+2.13.3 / 2017-11-30
+==================
+
+  * FIX: fixes dotenv loading issue on macOS `''=''`
+
 2.13.2 / 2017-11-28
 ==================
 

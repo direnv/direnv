@@ -1,0 +1,123 @@
+.TH DIRENV.TOML 1 "FEBRUARY 2018" direnv "User Manuals"
+.SH NAME
+.PP
+direnv.toml \- the direnv configuration file
+
+.SH DESCRIPTION
+.PP
+A configuration file in TOML
+\[la]https://github.com/toml-lang/toml\[ra] format to specify a variety of configuration options for direnv. Resides at CONFIGURATION\_DIR/config.toml. For many users, this will be located at $HOME/.config/direnv/config.toml.
+
+.SH FORMAT
+.PP
+See the TOML GitHub Repository
+\[la]https://github.com/toml-lang/toml\[ra] for details about the syntax of the configuration file.
+
+.SH CONFIG
+.PP
+The configuration is specified in sections which each have their own top\-level tables
+\[la]https://github.com/toml-lang/toml#table\[ra], with key/value pairs specified in each section.
+
+.PP
+Example:
+
+.PP
+.RS
+
+.nf
+[section]
+key = "value"
+
+.fi
+.RE
+
+.PP
+The following sections are supported:
+
+.SH \fB\fCwhitelist\fR
+.PP
+Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" \-\- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. \fBThis feature should be used with great care\fP, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.
+
+.PP
+There are two types of whitelist directives supported:
+
+.SS \fB\fCprefix\fR
+.PP
+Accepts an array of strings. If any of the strings in this list are a prefix of an .envrc file's absolute path, that file will be implicitly allowed, regardless of contents or past usage of \fB\fCdirenv allow\fR or \fB\fCdirenv deny\fR\&.
+
+.PP
+Example:
+
+.PP
+.RS
+
+.nf
+[whitelist]
+prefix = [ "/home/user/code/project\-a" ]
+
+.fi
+.RE
+
+.PP
+In this example, the following .envrc files will be implicitly allowed:
+.IP \(bu 2
+\fB\fC/home/user/code/project\-a/.envrc\fR
+.IP \(bu 2
+\fB\fC/home/user/code/project\-a/subdir/.envrc\fR
+.IP \(bu 2
+and so on
+
+.PP
+In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fB\fCdirenv allow\fR):
+.IP \(bu 2
+\fB\fC/home/user/project\-b/.envrc\fR
+.IP \(bu 2
+\fB\fC/opt/random/.envrc\fR
+
+.SS \fB\fCexact\fR
+.PP
+Accepts an array of strings. Each string can be a directory name or the full path to an .envrc file. If a directory name is passed, it will be treated as if it had been passed as itself with \fB\fC/.envrc\fR appended. After resolving the filename, each string will be checked for being an exact match with an .envrc file's absolute path. If they match exactly, that .envrc file will be implicitly allowed, regardless of contents or past usage of \fB\fCdirenv allow\fR or \fB\fCdirenv deny\fR\&.
+
+.PP
+Example:
+
+.PP
+.RS
+
+.nf
+[whitelist]
+exact = [ "/home/user/project\-b/.envrc", "/home/user/project\-b/subdir\-a" ]
+
+.fi
+.RE
+
+.PP
+In this example, the following .envrc files will be implicitly allowed, and no others:
+.IP \(bu 2
+\fB\fC/home/user/code/project\-b/.envrc\fR
+.IP \(bu 2
+\fB\fC/home/user/code/project\-b/subdir\-a\fR
+
+.PP
+In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fB\fCdirenv allow\fR):
+.IP \(bu 2
+\fB\fC/home/user/code/project\-b/subproject\-c/.envrc\fR
+.IP \(bu 2
+\fB\fC/home/user/code/.envrc\fR
+
+.SH \fB\fCbash\_path\fR
+.PP
+This allows one to hard\-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
+
+.SH \fB\fCdisable\_stdin\fR
+.PP
+If set to true, stdin is disabled (redirected to /dev/null) during the \fB\fC\&.envrc\fR evaluation.
+
+.SH COPYRIGHT
+.PP
+Copyright (C) 2018 zimbatm 
+\[la]http://zimbatm.com\[ra] and contributors under the MIT licence.
+
+.SH SEE ALSO
+.PP
+direnv(1)

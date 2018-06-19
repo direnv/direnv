@@ -47,7 +47,7 @@ var CmdExec = &Cmd{
 			return
 		}
 
-		rc := FindRC(rcPath, config.AllowDir())
+		rc := FindRC(rcPath, config)
 
 		// Restore pristine environment if needed
 		if backupDiff, err = config.EnvDiff(); err == nil {

@@ -57,7 +57,9 @@ var CmdEdit = &Cmd{
 			}
 		}
 
-		cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", editor, BashEscape(rcPath)))
+		run := fmt.Sprintf("%s %s", editor, BashEscape(rcPath))
+
+		cmd := exec.Command(config.BashPath, "-c", run)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -65,7 +67,7 @@ var CmdEdit = &Cmd{
 			return
 		}
 
-		foundRC = FindRC(rcPath, config.AllowDir())
+		foundRC = FindRC(rcPath, config)
 		log_debug("foundRC: %#v", foundRC)
 		log_debug("times: %#v", times)
 		if times != nil {
