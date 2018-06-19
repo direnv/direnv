@@ -386,13 +386,14 @@ layout_perl() {
 # "$direnv_layout_dir/python-$python_version".
 # This forces the installation of any egg into the project's sub-folder.
 #
-# It's possible to specify the python and virtualenv executables if
-# you want to use different versions of python.
+# It's possible to specify the python executable if you want to use different
+# versions of python.
 #
 layout_python() {
   # get supplied python version
   local python=${1:-python}
   [[ $# -gt 0 ]] && shift
+
   local old_env=$(direnv_layout_dir)/virtualenv
   unset PYTHONHOME
   if [[ -d $old_env && $python = python ]]; then
@@ -405,19 +406,28 @@ layout_python() {
       return 1
     fi
 
-    # get supplied virtualenv version
-    local virtualenv=virtualenv
-    if [[ $# -gt 0 ]]; then
-        if [[ "${1}" == virtualenv* ]]; then
-            virtualenv=${1}
-            shift
-        fi
-    fi
-
     export VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
     if [[ ! -d $VIRTUAL_ENV ]]; then
-      log_status "$virtualenv --python=$python $@ $VIRTUAL_ENV"
-      $virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
+      # find virtualenv which matches the $python_version if possible
+      # start with virtualenv-major.minor.patch
+      local virtualenv="virtualenv-$python_version"
+      if [[ ! $(command -v $virtualenv) ]]; then
+        # then try virtualenv-major.minor
+        virtualenv="virtualenv-${python_version%.*}"
+        if [[ ! $(command -v $virtualenv) ]]; then
+          # then try virtualenv-major
+          virtualenv="virtualenv-${python_version%.*.*}"
+          if [[ ! $(command -v $virtualenv) ]]; then
+            # give up and use default name
+            virtualenv="virtualenv"
+          fi
+        fi
+      fi
+      if [[ ! $(command -v $virtualenv) ]]; then
+        log_error "Could not find virtualenv"
+        return 1
+      fi
+      "$virtualenv" "--python=$python" "$@" "$VIRTUAL_ENV"
     fi
   fi
   PATH_add "$VIRTUAL_ENV/bin"
@@ -425,26 +435,18 @@ layout_python() {
 
 # Usage: layout python2
 #
-# A shortcut for $(layout python python2 virtualenv-2)
+# A shortcut for $(layout python python2)
 #
 layout_python2() {
-  if [[ $(command -v virtualenv-2) ]]; then
-      layout_python python2 virtualenv-2 "$@"
-  else
-      layout_python python2 "$@"
-  fi
+  layout_python python2 "$@"
 }
 
 # Usage: layout python3
 #
-# A shortcut for $(layout python python3 virtualenv-3)
+# A shortcut for $(layout python python3)
 #
 layout_python3() {
-  if [[ $(command -v virtualenv-3) ]]; then
-      layout_python python3 virtualenv-3 "$@"
-  else
-      layout_python python3 "$@"
-  fi
+  layout_python python3 "$@"
 }
 
 # Usage: layout anaconda <enviroment_name> [<conda_exe>]
