@@ -39,17 +39,6 @@ nope
 
 ## Install
 
-### From source
-
-Dependencies: make, golang
-
-```bash
-git clone https://github.com/direnv/direnv
-cd direnv
-make install
-# or symlink ./direnv into the $PATH
-```
-
 ### From system packages
 
 direnv is packaged for a variety of systems:
@@ -75,6 +64,38 @@ Binary builds for a variety of architectures are also available for
 [each release](https://github.com/direnv/direnv/releases).
 
 Fetch the binary, `chmod +x direnv` and put it somewhere in your PATH.
+
+### Compile from source
+
+Setup go environment https://golang.org/doc/install
+
+> go >= 1.9 is required
+
+For example using $HOME/go for your workspace
+
+    $ export GOPATH=$HOME/go
+
+Create the directory:
+
+    $ mkdir -p $HOME/go/src/github.com/direnv
+
+Clone project into that directory:
+
+    $ git clone git@github.com:direnv/direnv.git $HOME/go/src/github.com/direnv/direnv
+
+Build by just typing make:
+
+    $ cd $HOME/go/src/github.com/direnv/direnv
+    $ make
+
+To install to /usr/local:
+
+    $ make install
+
+Or to a different location like `~/.local`:
+
+    $ make install DESTDIR=~/.local
+
 
 ## Setup
 
