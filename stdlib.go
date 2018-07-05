@@ -480,8 +480,9 @@ const STDLIB = "#!bash\n" +
 	"# virtualenv from the Pipfile located in the same directory.\n" +
 	"#\n" +
 	"layout_pipenv() {\n" +
-	"  if [[ ! -f Pipfile ]]; then\n" +
-	"    log_error 'No Pipfile found.  Use `pipenv` to create a Pipfile first.'\n" +
+	"  PIPENV_PIPFILE=\"${PIPENV_PIPFILE:-Pipfile}\"\n" +
+	"  if [[ ! -f \"$PIPENV_PIPFILE\" ]]; then\n" +
+	"    log_error \"No Pipfile found.  Use `pipenv` to create a `$PIPENV_PIPFILE` first.\"\n" +
 	"    exit 2\n" +
 	"  fi\n" +
 	"\n" +
