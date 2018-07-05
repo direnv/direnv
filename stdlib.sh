@@ -478,8 +478,9 @@ layout_anaconda() {
 # virtualenv from the Pipfile located in the same directory.
 #
 layout_pipenv() {
-  if [[ ! -f Pipfile ]]; then
-    log_error 'No Pipfile found.  Use `pipenv` to create a Pipfile first.'
+  PIPENV_PIPFILE="${PIPENV_PIPFILE:-Pipfile}"
+  if [[ ! -f "$PIPENV_PIPFILE" ]]; then
+    log_error "No Pipfile found.  Use `pipenv` to create a `$PIPENV_PIPFILE` first."
     exit 2
   fi
 
