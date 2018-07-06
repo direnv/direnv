@@ -403,9 +403,16 @@ layout_perl() {
 # It's possible to specify the python executable if you want to use different
 # versions of python.
 #
+# Environment Variables:
+#
+# - $VIRTUALENV_BIN (optional) [default="virtualenv"]
+#   Override the default executable for virtualenv (e.g. virtualenv-3)
+#
 layout_python() {
+  # get supplied python version
   local python=${1:-python}
   [[ $# -gt 0 ]] && shift
+
   local old_env=$(direnv_layout_dir)/virtualenv
   unset PYTHONHOME
   if [[ -d $old_env && $python = python ]]; then
@@ -420,7 +427,17 @@ layout_python() {
 
     export VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
     if [[ ! -d $VIRTUAL_ENV ]]; then
-      virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
+      # see if VIRTUALENV has been injected
+      local virtualenv=$VIRTUALENV_BIN
+      if [[ -z $virtualenv ]]; then
+          virtualenv=virtualenv
+      fi
+      if [[ ! $(command -v $virtualenv) ]]; then
+        log_error "Could not find virtualenv executable \"$virtualenv\""
+        return 1
+      fi
+      # create the new environment
+      "$virtualenv" "--python=$python" "$@" "$VIRTUAL_ENV"
     fi
   fi
   PATH_add "$VIRTUAL_ENV/bin"
