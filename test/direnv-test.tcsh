@@ -1,6 +1,4 @@
-#!/usr/bin/env tcsh -e -x
-
-# set -e
+#!/usr/bin/env tcsh -e
 
 cd `dirname $0`
 setenv TEST_DIR $PWD

@@ -1,12 +1,14 @@
-language: go
-go:
-- 1.8.x
-- 1.9.x
-- 1.10.x
-sudo: false
-script: make test
+sudo: required
+os:
+  - osx
+  - linux
+language: nix
+
+script: nix-shell --pure --run "make test"
+
+# Deploy
 before_deploy:
-- PATH="$HOME/gopath/bin:$PATH" make dist
+- nix shell --pure --run "make dist"
 deploy:
   provider: releases
   api_key:
@@ -30,4 +32,3 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    condition: $TRAVIS_GO_VERSION =~ ^1\.10

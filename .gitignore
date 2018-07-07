@@ -1,9 +1,8 @@
+*.sw?
 .direnv
+.gopath
 /direnv
 /direnv.test
 /dist
-/site
 /test/allow
 /test/config/direnv/allow
-*.sw?
-/.idea

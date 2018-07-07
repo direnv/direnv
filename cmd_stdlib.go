@@ -15,7 +15,7 @@ var CmdStdlib = &Cmd{
 			return
 		}
 
-		fmt.Println(strings.Replace(STDLIB, "$(which direnv)", config.SelfPath, 1))
+		fmt.Println(strings.Replace(STDLIB, "$(command -v direnv)", config.SelfPath, 1))
 		return
 	},
 }

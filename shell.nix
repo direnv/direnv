@@ -2,15 +2,19 @@
 with pkgs;
 mkShell {
   buildInputs = [
+    gnumake
+    go
+    go-md2man
+    gox
+    shellcheck
+    shfmt
+    which
+
+    # Shells
     bashInteractive
     elvish
     fish
-    go
     tcsh
     zsh
   ];
-
-  shellHook = ''
-    unset GOPATH
-  '';
 }
