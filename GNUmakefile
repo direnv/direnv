@@ -63,7 +63,6 @@ ifdef GO_LDFLAGS
 endif
 
 direnv: stdlib.go *.go | $(base)
-	$(GO) fmt
 	cd "$(base)" && $(GO) build $(GO_FLAGS) -o direnv
 
 stdlib.go: stdlib.sh
@@ -80,7 +79,7 @@ version.go: version.txt
 fmt: fmt-go fmt-sh
 
 fmt-go:
-	go fmt
+	$(GO) fmt
 
 fmt-sh:
 	shfmt -i 2 -w stdlib.sh
@@ -122,7 +121,7 @@ test-go: | $(base)
 	cd "$(base)" && $(GO) test -v ./...
 
 test-go-fmt:
-	[ $$(go fmt | tee /dev/stderr | wc -l) = 0 ]
+	[ $$($(GO) fmt | tee /dev/stderr | wc -l) = 0 ]
 
 test-shellcheck:
 	shellcheck stdlib.sh
