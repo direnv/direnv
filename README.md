@@ -1,6 +1,8 @@
 direnv -- Unclutter your .profile
 =================================
 
+[![Built with Nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
+
 `direnv` is an environment switcher for the shell. It knows how to hook into
 bash, zsh, tcsh, fish shell and elvish to load or unload environment variables
 depending on the current directory. This allows project-specific
@@ -71,21 +73,13 @@ Setup go environment https://golang.org/doc/install
 
 > go >= 1.9 is required
 
-For example using $HOME/go for your workspace
+Clone project:
 
-    $ export GOPATH=$HOME/go
-
-Create the directory:
-
-    $ mkdir -p $HOME/go/src/github.com/direnv
-
-Clone project into that directory:
-
-    $ git clone git@github.com:direnv/direnv.git $HOME/go/src/github.com/direnv/direnv
+    $ git clone git@github.com:direnv/direnv.git
 
 Build by just typing make:
 
-    $ cd $HOME/go/src/github.com/direnv/direnv
+    $ cd direnv
     $ make
 
 To install to /usr/local:
@@ -137,7 +131,7 @@ Add the following line at the end of the `~/.cshrc` file:
 eval `direnv hook tcsh`
 ```
 
-### Elvish
+### Elvish (0.12+)
 
 Run:
 

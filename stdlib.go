@@ -4,9 +4,16 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"# These are the commands available in an .envrc context\n" +
 	"#\n" +
+	"# ShellCheck exceptions:\n" +
+	"#\n" +
+	"# SC1090: Can't follow non-constant source. Use a directive to specify location.\n" +
+	"# SC1091: Not following: (file missing)\n" +
+	"# SC1117: Backslash is literal in \"\\n\". Prefer explicit escaping: \"\\\\n\".\n" +
+	"# SC2059: Don't use variables in the printf format string. Use printf \"..%s..\" \"$foo\".\n" +
 	"set -e\n" +
+	"\n" +
 	"# NOTE: don't touch the RHS, it gets replaced at runtime\n" +
-	"direnv=\"$(which direnv)\"\n" +
+	"direnv=\"$(command -v direnv)\"\n" +
 	"\n" +
 	"# Config, change in the direnvrc\n" +
 	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %s}\"\n" +
@@ -36,7 +43,7 @@ const STDLIB = "#!bash\n" +
 	"log_status() {\n" +
 	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
 	"    local msg=$*\n" +
-	"    # shellcheck disable=SC2059\n" +
+	"    # shellcheck disable=SC2059,SC1117\n" +
 	"    printf \"${DIRENV_LOG_FORMAT}\\n\" \"$msg\" >&2\n" +
 	"  fi\n" +
 	"}\n" +
@@ -59,7 +66,7 @@ const STDLIB = "#!bash\n" +
 	"  color_error=$(tput setaf 1)\n" +
 	"  if [[ -n $DIRENV_LOG_FORMAT ]]; then\n" +
 	"    local msg=$*\n" +
-	"    # shellcheck disable=SC2059\n" +
+	"    # shellcheck disable=SC2059,SC1117\n" +
 	"    printf \"${color_error}${DIRENV_LOG_FORMAT}${color_normal}\\n\" \"$msg\" >&2\n" +
 	"  fi\n" +
 	"}\n" +
@@ -172,7 +179,7 @@ const STDLIB = "#!bash\n" +
 	"        echo \"$PWD/$1\"\n" +
 	"        return 0\n" +
 	"      fi\n" +
-	"      if [[ $PWD = / ]] || [[ $PWD = // ]]; then\n" +
+	"      if [[ $PWD == / ]] || [[ $PWD == // ]]; then\n" +
 	"        return 1\n" +
 	"      fi\n" +
 	"      cd ..\n" +
@@ -195,17 +202,17 @@ const STDLIB = "#!bash\n" +
 	"  rcfile=$(user_rel_path \"$rcpath\")\n" +
 	"  watch_file \"$rcpath\"\n" +
 	"\n" +
-	"  pushd \"$(pwd 2>/dev/null)\" > /dev/null\n" +
-	"    pushd \"$(dirname \"$rcpath\")\" > /dev/null\n" +
-	"    if [[ -f ./$(basename \"$rcpath\") ]]; then\n" +
-	"      log_status \"loading $rcfile\"\n" +
-	"      # shellcheck source=/dev/null\n" +
-	"      . \"./$(basename \"$rcpath\")\"\n" +
-	"    else\n" +
-	"      log_status \"referenced $rcfile does not exist\"\n" +
-	"    fi\n" +
-	"    popd > /dev/null\n" +
-	"  popd > /dev/null\n" +
+	"  pushd \"$(pwd 2>/dev/null)\" >/dev/null\n" +
+	"  pushd \"$(dirname \"$rcpath\")\" >/dev/null\n" +
+	"  if [[ -f ./$(basename \"$rcpath\") ]]; then\n" +
+	"    log_status \"loading $rcfile\"\n" +
+	"    # shellcheck source=/dev/null\n" +
+	"    . \"./$(basename \"$rcpath\")\"\n" +
+	"  else\n" +
+	"    log_status \"referenced $rcfile does not exist\"\n" +
+	"  fi\n" +
+	"  popd >/dev/null\n" +
+	"  popd >/dev/null\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: watch_file <filename>\n" +
@@ -218,7 +225,6 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"  eval \"$(\"$direnv\" watch \"$file\")\"\n" +
 	"}\n" +
-	"\n" +
 	"\n" +
 	"# Usage: source_up [<filename>]\n" +
 	"#\n" +
@@ -286,19 +292,23 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"# Works like PATH_add except that it's for an arbitrary <varname>.\n" +
 	"path_add() {\n" +
+	"  local path\n" +
 	"  local var_name=\"$1\"\n" +
 	"  # split existing paths into an array\n" +
 	"  declare -a path_array\n" +
-	"  IFS=: read -ra path_array <<< \"${!1}\"\n" +
+	"  IFS=: read -ra path_array <<<\"${!1}\"\n" +
 	"  shift\n" +
 	"\n" +
 	"  # prepend the passed paths in the right order\n" +
-	"  for (( i=$# ; i>0 ; i-- )); do\n" +
-	"    path_array=( \"$(expand_path \"${!i}\")\" \"${path_array[@]}\" )\n" +
+	"  for ((i = $#; i > 0; i--)); do\n" +
+	"    path_array=(\"$(expand_path \"${!i}\")\" \"${path_array[@]}\")\n" +
 	"  done\n" +
 	"\n" +
 	"  # join back all the paths\n" +
-	"  local path=$(IFS=:; echo \"${path_array[*]}\")\n" +
+	"  path=$(\n" +
+	"    IFS=:\n" +
+	"    echo \"${path_array[*]}\"\n" +
+	"  )\n" +
 	"\n" +
 	"  # and finally export back the result to the original variable\n" +
 	"  export \"$var_name=$path\"\n" +
@@ -387,7 +397,8 @@ const STDLIB = "#!bash\n" +
 	"# See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details\n" +
 	"#\n" +
 	"layout_perl() {\n" +
-	"  local libdir=$(direnv_layout_dir)/perl5\n" +
+	"  local libdir\n" +
+	"  libdir=$(direnv_layout_dir)/perl5\n" +
 	"  export LOCAL_LIB_DIR=$libdir\n" +
 	"  export PERL_MB_OPT=\"--install_base '$libdir'\"\n" +
 	"  export PERL_MM_OPT=\"INSTALL_BASE=$libdir\"\n" +
@@ -406,11 +417,12 @@ const STDLIB = "#!bash\n" +
 	"# versions of python.\n" +
 	"#\n" +
 	"layout_python() {\n" +
+	"  local old_env\n" +
 	"  local python=${1:-python}\n" +
 	"  [[ $# -gt 0 ]] && shift\n" +
-	"  local old_env=$(direnv_layout_dir)/virtualenv\n" +
+	"  old_env=$(direnv_layout_dir)/virtualenv\n" +
 	"  unset PYTHONHOME\n" +
-	"  if [[ -d $old_env && $python = python ]]; then\n" +
+	"  if [[ -d $old_env && $python == python ]]; then\n" +
 	"    export VIRTUAL_ENV=$old_env\n" +
 	"  else\n" +
 	"    local python_version\n" +
@@ -420,7 +432,8 @@ const STDLIB = "#!bash\n" +
 	"      return 1\n" +
 	"    fi\n" +
 	"\n" +
-	"    export VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
+	"    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
+	"    export VIRTUAL_ENV\n" +
 	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
 	"      virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
 	"    fi\n" +
@@ -453,14 +466,15 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"layout_anaconda() {\n" +
 	"  local env_name=$1\n" +
+	"  local env_loc\n" +
 	"  local conda\n" +
 	"  if [[ $# -gt 1 ]]; then\n" +
 	"    conda=${2}\n" +
 	"  else\n" +
 	"    conda=$(command -v conda)\n" +
 	"  fi\n" +
-	"  PATH_add $(dirname \"$conda\")\n" +
-	"  local env_loc=$(\"$conda\" env list | grep -- \"$env_name\")\n" +
+	"  PATH_add \"$(dirname \"$conda\")\"\n" +
+	"  env_loc=$(\"$conda\" env list | grep -- \"$env_name\")\n" +
 	"  if [[ ! \"$env_loc\" == $env_name*$env_name ]]; then\n" +
 	"    if [[ -e environment.yml ]]; then\n" +
 	"      log_status \"creating conda enviroment\"\n" +
@@ -471,6 +485,7 @@ const STDLIB = "#!bash\n" +
 	"    fi\n" +
 	"  fi\n" +
 	"\n" +
+	"  # shellcheck disable=SC1091\n" +
 	"  source activate \"$env_name\"\n" +
 	"}\n" +
 	"\n" +
@@ -480,20 +495,24 @@ const STDLIB = "#!bash\n" +
 	"# virtualenv from the Pipfile located in the same directory.\n" +
 	"#\n" +
 	"layout_pipenv() {\n" +
+	"  local venv\n" +
 	"  PIPENV_PIPFILE=\"${PIPENV_PIPFILE:-Pipfile}\"\n" +
 	"  if [[ ! -f \"$PIPENV_PIPFILE\" ]]; then\n" +
-	"    log_error \"No Pipfile found.  Use `pipenv` to create a `$PIPENV_PIPFILE` first.\"\n" +
+	"    log_error \"No Pipfile found.  Use \\`pipenv\\` to create a \\`$PIPENV_PIPFILE\\` first.\"\n" +
 	"    exit 2\n" +
 	"  fi\n" +
 	"\n" +
-	"  local VENV=$(pipenv --bare --venv 2>/dev/null)\n" +
-	"  if [[ -z $VENV || ! -d $VENV ]]; then\n" +
+	"  venv=$(pipenv --bare --venv 2>/dev/null)\n" +
+	"\n" +
+	"  if [[ -z $venv || ! -d $venv ]]; then\n" +
 	"    pipenv install --dev\n" +
 	"  fi\n" +
 	"\n" +
-	"  export VIRTUAL_ENV=$(pipenv --venv)\n" +
+	"  VIRTUAL_ENV=$(pipenv --venv)\n" +
+	"\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
 	"  export PIPENV_ACTIVE=1\n" +
+	"  export VIRTUAL_ENV\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout ruby\n" +
@@ -504,14 +523,18 @@ const STDLIB = "#!bash\n" +
 	"# directly instead of using the $(bundle exec) prefix.\n" +
 	"#\n" +
 	"layout_ruby() {\n" +
+	"  BUNDLE_BIN=$(direnv_layout_dir)/bin\n" +
+	"\n" +
 	"  if ruby -e \"exit Gem::VERSION > '2.2.0'\" 2>/dev/null; then\n" +
-	"    export GEM_HOME=$(direnv_layout_dir)/ruby\n" +
+	"    GEM_HOME=$(direnv_layout_dir)/ruby\n" +
 	"  else\n" +
 	"    local ruby_version\n" +
 	"    ruby_version=$(ruby -e\"puts (defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby') + '-' + RUBY_VERSION\")\n" +
-	"    export GEM_HOME=$(direnv_layout_dir)/ruby-${ruby_version}\n" +
+	"    GEM_HOME=$(direnv_layout_dir)/ruby-${ruby_version}\n" +
 	"  fi\n" +
-	"  export BUNDLE_BIN=$(direnv_layout_dir)/bin\n" +
+	"\n" +
+	"  export BUNDLE_BIN\n" +
+	"  export GEM_HOME\n" +
 	"\n" +
 	"  PATH_add \"$GEM_HOME/bin\"\n" +
 	"  PATH_add \"$BUNDLE_BIN\"\n" +
@@ -594,12 +617,12 @@ const STDLIB = "#!bash\n" +
 	"  fi\n" +
 	"\n" +
 	"  if [[ -z $version ]] && [[ -f .nvmrc ]]; then\n" +
-	"    version=$(< .nvmrc)\n" +
+	"    version=$(<.nvmrc)\n" +
 	"    via=\".nvmrc\"\n" +
 	"  fi\n" +
 	"\n" +
 	"  if [[ -z $version ]] && [[ -f .node-version ]]; then\n" +
-	"    version=$(< .node-version)\n" +
+	"    version=$(<.node-version)\n" +
 	"    via=\".node-version\"\n" +
 	"  fi\n" +
 	"\n" +
@@ -611,17 +634,14 @@ const STDLIB = "#!bash\n" +
 	"  node_wanted=${node_version_prefix}${version}\n" +
 	"  node_prefix=$(\n" +
 	"    # Look for matching node versions in $NODE_VERSIONS path\n" +
-	"    find \"$NODE_VERSIONS\" -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" |\n" +
-	"\n" +
 	"    # Strip possible \"/\" suffix from $NODE_VERSIONS, then use that to\n" +
 	"    # Strip $NODE_VERSIONS/$NODE_VERSION_PREFIX prefix from line.\n" +
-	"    while IFS= read -r line; do echo \"${line#${NODE_VERSIONS%/}/${node_version_prefix}}\"; done |\n" +
-	"\n" +
 	"    # Sort by version: split by \".\" then reverse numeric sort for each piece of the version string\n" +
-	"    sort -t . -k 1,1rn -k 2,2rn -k 3,3rn |\n" +
-	"\n" +
 	"    # The first one is the highest\n" +
-	"    head -1\n" +
+	"    find \"$NODE_VERSIONS\" -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" \\\n" +
+	"      | while IFS= read -r line; do echo \"${line#${NODE_VERSIONS%/}/${node_version_prefix}}\"; done \\\n" +
+	"      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \\\n" +
+	"      | head -1\n" +
 	"  )\n" +
 	"\n" +
 	"  node_prefix=\"${NODE_VERSIONS}/${node_version_prefix}${node_prefix}\"\n" +
@@ -654,7 +674,7 @@ const STDLIB = "#!bash\n" +
 	"#\n" +
 	"use_nix() {\n" +
 	"  direnv_load nix-shell --show-trace \"$@\" --run \"$(join_args \"$direnv\" dump)\"\n" +
-	"  if [[ $# = 0 ]]; then\n" +
+	"  if [[ $# == 0 ]]; then\n" +
 	"    watch_file default.nix\n" +
 	"    watch_file shell.nix\n" +
 	"  fi\n" +
@@ -676,8 +696,10 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then\n" +
+	"  # shellcheck disable=SC1090\n" +
 	"  source \"${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc\" >&2\n" +
 	"elif [[ -f $HOME/.direnvrc ]]; then\n" +
+	"  # shellcheck disable=SC1090\n" +
 	"  source \"$HOME/.direnvrc\" >&2\n" +
 	"fi\n" +
 	""
