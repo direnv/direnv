@@ -5,4 +5,5 @@
 /direnv.test
 /dist
 /test/allow
+/test/direnv
 /test/config/direnv/allow

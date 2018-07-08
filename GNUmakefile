@@ -130,9 +130,9 @@ test-shellcheck:
 test-bash:
 	bash ./test/direnv-test.bash
 
+# Needs elvish 0.12+
 test-elvish:
-	# Currently broken
-	#elvish ./test/direnv-test.elv
+	elvish ./test/direnv-test.elv
 
 test-fish:
 	fish ./test/direnv-test.fish
