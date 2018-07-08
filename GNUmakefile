@@ -4,12 +4,14 @@
 
 # Set this to change the target installation path
 DESTDIR ?= /usr/local
+BINDIR   = ${DESTDIR}/bin
+MANDIR   = ${DESTDIR}/share/man
 
 # Override the go executable
 GO = go
 
 # Change if you want to fork direnv
-PACKAGE  = github.com/direnv/direnv
+PACKAGE = github.com/direnv/direnv
 
 # BASH_PATH can also be passed to hard-code the path to bash at build time
 
@@ -149,10 +151,10 @@ test-zsh:
 
 .PHONY: install
 install: all
-	install -d $(DESTDIR)/bin
-	install -d $(DESTDIR)/share/man/man1
-	install direnv $(DESTDIR)/bin
-	cp -R man/*.1 $(DESTDIR)/share/man/man1
+	install -d $(BINDIR)
+	install direnv $(BINDIR)
+	install -d $(MANDIR)/man1
+	cp -R man/*.1 $(MANDIR)/man1
 
 .PHONY: dist
 dist: | $(base)
