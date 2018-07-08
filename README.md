@@ -2,6 +2,7 @@ direnv -- Unclutter your .profile
 =================================
 
 [![Built with Nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
+[![Build Status](https://travis-ci.org/direnv/direnv.svg?branch=master)](https://travis-ci.org/direnv/direnv)
 
 `direnv` is an environment switcher for the shell. It knows how to hook into
 bash, zsh, tcsh, fish shell and elvish to load or unload environment variables
