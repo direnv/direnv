@@ -407,6 +407,13 @@ const STDLIB = "#!bash\n" +
 	"  PATH_add \"$libdir/bin\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: layout php\n" +
+	"#\n" +
+	"# Adds \"$PWD/vendor/bin\" to the PATH environment variable\n" +
+	"layout_php() {\n" +
+	"  PATH_add vendor/bin\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: layout python <python_exe>\n" +
 	"#\n" +
 	"# Creates and loads a virtualenv environment under\n" +
