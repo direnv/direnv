@@ -42,6 +42,12 @@ nope
 
 ## Install
 
+If you are brave enough to try the experimental curl based installer run:
+
+```
+curl -s https://github.com/direnv/direnv/get-direnv | bash
+```
+
 ### From system packages
 
 direnv is packaged for a variety of systems:

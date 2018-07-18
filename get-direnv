@@ -1,0 +1,47 @@
+#!/bin/bash
+set -eou pipefail
+
+# Determine OS platform
+UNAME=$(uname | tr "[:upper:]" "[:lower:]")
+# If Linux, try to determine specific distribution
+if [ "$UNAME" == "linux" ]; then
+    # If available, use LSB to identify distribution
+    if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
+        export DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
+    # Otherwise, use release info file
+    else
+        export DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
+    fi
+fi
+# For everything else (or if above failed), just use generic identifier
+[ "${DISTRO:-}" == "" ] && export DISTRO=$UNAME
+unset UNAME
+
+echo $DISTRO
+
+which go >/dev/null || {
+    if [ "${DISTRO}" == "darwin" ]; then
+        brew install go
+    elif [ "${DISTRO}" == "CentOS" ]; then
+        sudo yum install -q -y golang
+    fi
+}
+
+if [ ! -d ~/go/src/github.com/direnv ]; then
+    LANG=C git clone https://github.com/direnv/direnv ~/go/src/github.com/direnv
+fi
+pushd ~/go/src/github.com/direnv >/dev/null
+    git pull
+    GOPATH=$HOME/go PATH=$PATH:$GOPATH/bin
+    GOBIN=~/.local/bin go install
+popd >/dev/null
+
+which -a direnv >/dev/null
+
+# install zsh hook if not already present
+if [ -f ~/.zshrc ]; then
+  grep -qF 'eval "$(direnv hook zsh)"' ~/.zshrc || \
+    sed -i '$a eval "$(direnv hook zsh)"' ~/.zshrc
+fi
+
+echo "--- done ---"
