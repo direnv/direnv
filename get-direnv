@@ -44,4 +44,31 @@ if [ -f ~/.zshrc ]; then
     sed -i '$a eval "$(direnv hook zsh)"' ~/.zshrc
 fi
 
+# install bash hook if not already present
+if [ -f ~/.bashrc ]; then
+  grep -qF 'eval "$(direnv hook bash)"' ~/.bashrc || \
+    sed -i '$a eval "$(direnv hook bash)"' ~/.bashrc
+fi
+
+# install fish hook if not already present
+if [ -f ~/.config/fish/config.fish ]; then
+  grep -qF 'eval "$(direnv hook fish)"' ~/.config/fish/config.fish || \
+    sed -i '$a eval "$(direnv hook fish)"' ~/.config/fish/config.fish
+fi
+
+# install tcsh hook if not already present
+if [ -f ~/.cshrc ]; then
+  grep -qF 'eval "$(direnv hook tcsh)"' ~/.cshrc || \
+    sed -i '$a eval "$(direnv hook tcsh)"' ~/.cshrc
+fi
+
+# install elvish hook if not already present
+if [ -d ~/.elvish/lib ]; then
+  direnv hook elvish > ~/.elvish/lib/direnv.elv
+fi
+if [ -f ~/.elvish/rc.elv ]; then
+  grep -qF 'use direnv' ~/.elvish/rc.elv || \
+    sed -i '$a use direnv' ~/.elvish/rc.elv
+fi
+
 echo "--- done ---"
