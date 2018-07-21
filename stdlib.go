@@ -414,7 +414,7 @@ const STDLIB = "#!bash\n" +
 	"  PATH_add vendor/bin\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: layout python <python_exe>\n" +
+	"# Usage: layout python <python_exe> [-v <virtualenv_exe>] [-- [virtualenv-options]]\n" +
 	"#\n" +
 	"# Creates and loads a virtualenv environment under\n" +
 	"# \"$direnv_layout_dir/python-$python_version\".\n" +
@@ -424,44 +424,79 @@ const STDLIB = "#!bash\n" +
 	"# versions of python.\n" +
 	"#\n" +
 	"layout_python() {\n" +
-	"  local old_env\n" +
 	"  local python=${1:-python}\n" +
 	"  [[ $# -gt 0 ]] && shift\n" +
-	"  old_env=$(direnv_layout_dir)/virtualenv\n" +
-	"  unset PYTHONHOME\n" +
-	"  if [[ -d $old_env && $python == python ]]; then\n" +
-	"    export VIRTUAL_ENV=$old_env\n" +
-	"  else\n" +
-	"    local python_version\n" +
-	"    python_version=$(\"$python\" -c \"import platform as p;print(p.python_version())\")\n" +
-	"    if [[ -z $python_version ]]; then\n" +
-	"      log_error \"Could not find python's version\"\n" +
-	"      return 1\n" +
-	"    fi\n" +
-	"\n" +
-	"    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
-	"    export VIRTUAL_ENV\n" +
-	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"      virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
-	"    fi\n" +
-	"  fi\n" +
-	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
+	"  layout_virtualenv -p $python \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: layout python2\n" +
+	"# Usage: layout python2 [-v <virtualenv_exe>] [-- [virtualenv-options]]\n" +
 	"#\n" +
-	"# A shortcut for $(layout python python2)\n" +
+	"# A shortcut for $(layout virtualenv -p python2)\n" +
 	"#\n" +
 	"layout_python2() {\n" +
-	"  layout_python python2 \"$@\"\n" +
+	"  layout_virtualenv -p python2 \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: layout python3\n" +
+	"# Usage: layout python3 [-v <virtualenv_exe>] [-- [virtualenv-options]]\n" +
 	"#\n" +
-	"# A shortcut for $(layout python python3)\n" +
+	"# A shortcut for $(layout virtualenv -p python3)\n" +
 	"#\n" +
 	"layout_python3() {\n" +
-	"  layout_python python3 \"$@\"\n" +
+	"  layout_virtualenv -p python3 \"$@\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: layout virtualenv [-p <python_exe>] [-v <virtualenv_exe>] [-- [virtualenv-options]]\n" +
+	"# opts]\n" +
+	"#\n" +
+	"# Creates and loads a virtualenv environment under\n" +
+	"# \"$direnv_layout_dir/python-$python_version\".\n" +
+	"# This forces the installation of any egg into the project's sub-folder.\n" +
+	"#\n" +
+	"# Options:\n" +
+	"# -v <virtualenv_exe>: specifies the name of the virtualenv executable (default: virtualenv)\n" +
+	"# -p <python_exe>: specifies the name of the python executable (default: python)\n" +
+	"\n" +
+	"layout_virtualenv() {\n" +
+	"  local opt\n" +
+	"  local python_exe=python\n" +
+	"  local python_version\n" +
+	"  local virtualenv_exe=virtualenv\n" +
+	"\n" +
+	"  while getopts \":p:v:\" opt; do\n" +
+	"    case \"${opt}\" in\n" +
+	"      p)\n" +
+	"        python_exe=${OPTARG}\n" +
+	"        ;;\n" +
+	"      v)\n" +
+	"        virtualenv_exe=${OPTARG}\n" +
+	"        ;;\n" +
+	"      *)\n" +
+	"        log_error \"unknown option ${opt}\"\n" +
+	"        echo\n" +
+	"        echo \"Usage: layout virtualenv [-p <python_exe>] [-v <virtualenv_exe>] [-- [virtualenv-options]]\"\n" +
+	"        return 1\n" +
+	"        ;;\n" +
+	"    esac\n" +
+	"  done\n" +
+	"  shift $((OPTIND - 1))\n" +
+	"\n" +
+	"  ##\n" +
+	"\n" +
+	"  unset PYTHONHOME # like the virtualenv activation script\n" +
+	"\n" +
+	"  python_version=$(\"$python_exe\" -c \"import platform as p;print(p.python_version())\")\n" +
+	"  if [[ -z $python_version ]]; then\n" +
+	"    log_error \"Could not find python's version\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"  export VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
+	"\n" +
+	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
+	"\n" +
+	"  # auto-create\n" +
+	"  if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
+	"    \"$virtualenv_exe\" \"--python=$python_exe\" \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout anaconda <enviroment_name> [<conda_exe>]\n" +

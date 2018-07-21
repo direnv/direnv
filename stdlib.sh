@@ -412,7 +412,7 @@ layout_php() {
   PATH_add vendor/bin
 }
 
-# Usage: layout python <python_exe>
+# Usage: layout python <python_exe> [-v <virtualenv_exe>] [-- [virtualenv-options]]
 #
 # Creates and loads a virtualenv environment under
 # "$direnv_layout_dir/python-$python_version".
@@ -422,44 +422,79 @@ layout_php() {
 # versions of python.
 #
 layout_python() {
-  local old_env
   local python=${1:-python}
   [[ $# -gt 0 ]] && shift
-  old_env=$(direnv_layout_dir)/virtualenv
-  unset PYTHONHOME
-  if [[ -d $old_env && $python == python ]]; then
-    export VIRTUAL_ENV=$old_env
-  else
-    local python_version
-    python_version=$("$python" -c "import platform as p;print(p.python_version())")
-    if [[ -z $python_version ]]; then
-      log_error "Could not find python's version"
-      return 1
-    fi
-
-    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
-    export VIRTUAL_ENV
-    if [[ ! -d $VIRTUAL_ENV ]]; then
-      virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
-    fi
-  fi
-  PATH_add "$VIRTUAL_ENV/bin"
+  layout_virtualenv -p $python "$@"
 }
 
-# Usage: layout python2
+# Usage: layout python2 [-v <virtualenv_exe>] [-- [virtualenv-options]]
 #
-# A shortcut for $(layout python python2)
+# A shortcut for $(layout virtualenv -p python2)
 #
 layout_python2() {
-  layout_python python2 "$@"
+  layout_virtualenv -p python2 "$@"
 }
 
-# Usage: layout python3
+# Usage: layout python3 [-v <virtualenv_exe>] [-- [virtualenv-options]]
 #
-# A shortcut for $(layout python python3)
+# A shortcut for $(layout virtualenv -p python3)
 #
 layout_python3() {
-  layout_python python3 "$@"
+  layout_virtualenv -p python3 "$@"
+}
+
+# Usage: layout virtualenv [-p <python_exe>] [-v <virtualenv_exe>] [-- [virtualenv-options]]
+# opts]
+#
+# Creates and loads a virtualenv environment under
+# "$direnv_layout_dir/python-$python_version".
+# This forces the installation of any egg into the project's sub-folder.
+#
+# Options:
+# -v <virtualenv_exe>: specifies the name of the virtualenv executable (default: virtualenv)
+# -p <python_exe>: specifies the name of the python executable (default: python)
+
+layout_virtualenv() {
+  local opt
+  local python_exe=python
+  local python_version
+  local virtualenv_exe=virtualenv
+
+  while getopts ":p:v:" opt; do
+    case "${opt}" in
+      p)
+        python_exe=${OPTARG}
+        ;;
+      v)
+        virtualenv_exe=${OPTARG}
+        ;;
+      *)
+        log_error "unknown option ${opt}"
+        echo
+        echo "Usage: layout virtualenv [-p <python_exe>] [-v <virtualenv_exe>] [-- [virtualenv-options]]"
+        return 1
+        ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  ##
+
+  unset PYTHONHOME # like the virtualenv activation script
+
+  python_version=$("$python_exe" -c "import platform as p;print(p.python_version())")
+  if [[ -z $python_version ]]; then
+    log_error "Could not find python's version"
+    return 1
+  fi
+  export VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
+
+  PATH_add "$VIRTUAL_ENV/bin"
+
+  # auto-create
+  if [[ ! -d $VIRTUAL_ENV ]]; then
+    "$virtualenv_exe" "--python=$python_exe" "$@" "$VIRTUAL_ENV"
+  fi
 }
 
 # Usage: layout anaconda <enviroment_name> [<conda_exe>]
