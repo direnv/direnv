@@ -13,7 +13,7 @@ _direnv_hook() {
   return $previous_exit_status;
 };
 if ! [[ "$PROMPT_COMMAND" =~ _direnv_hook ]]; then
-  PROMPT_COMMAND="_direnv_hook;$PROMPT_COMMAND";
+  PROMPT_COMMAND="_direnv_hook;$PROMPT_COMMAND"
 fi
 `
 
