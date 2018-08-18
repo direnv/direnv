@@ -600,6 +600,13 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  PATH_add \"$BUNDLE_BIN\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: layout julia\n" +
+	"#\n" +
+	"# Sets the JULIA_PROJECT environment variable to the current directory.\n" +
+	"layout_julia() {\n" +
+	"  export JULIA_PROJECT=$PWD\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: use <program_name> [<version>]\n" +
 	"#\n" +
 	"# A semantic command dispatch intended for loading external dependencies into\n" +

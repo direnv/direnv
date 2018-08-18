@@ -598,6 +598,13 @@ layout_ruby() {
   PATH_add "$BUNDLE_BIN"
 }
 
+# Usage: layout julia
+#
+# Sets the JULIA_PROJECT environment variable to the current directory.
+layout_julia() {
+  export JULIA_PROJECT=$PWD
+}
+
 # Usage: use <program_name> [<version>]
 #
 # A semantic command dispatch intended for loading external dependencies into
