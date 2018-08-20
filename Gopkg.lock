@@ -2,20 +2,27 @@
 
 
 [[projects]]
+  digest = "1:289dd4d7abfb3ad2b5f728fbe9b1d5c1bf7d265a3eb9ef92869af1f7baba4c7a"
   name = "github.com/BurntSushi/toml"
   packages = ["."]
+  pruneopts = ""
   revision = "b26d9c308763d68093482582cea63d69be07a0f0"
   version = "v0.3.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:81095ba56fd43f25ebe9824b9cd637365aa1e8cbe4b41dabad2a3dd738777977"
   name = "github.com/direnv/go-dotenv"
   packages = ["."]
+  pruneopts = ""
   revision = "4738ec4932d7ea82d158b6900f0c7a12f116e5e5"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e82f451544754a32dfc841dc03a43f341b78356b29888b2a57385294ddf920e3"
+  input-imports = [
+    "github.com/BurntSushi/toml",
+    "github.com/direnv/go-dotenv",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
