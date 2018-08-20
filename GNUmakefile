@@ -22,7 +22,7 @@ SHELL = bash
 ############################################################################
 
 .PHONY: all
-all: fmt build man
+all: build man
 
 export GOPATH = $(CURDIR)/.gopath
 export GO15VENDOREXPERIMENT=1
@@ -82,6 +82,7 @@ fmt-go:
 	$(GO) fmt
 
 fmt-sh:
+	@command -v shfmt >/dev/null || (echo "Could not format stdlib.sh because shfmt is missing. Run: go get -u mvdan.cc/sh/cmd/shfmt"; false)
 	shfmt -i 2 -w stdlib.sh
 
 ############################################################################
