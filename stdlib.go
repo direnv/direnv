@@ -464,7 +464,7 @@ const STDLIB = "#!bash\n" +
 	"  layout_python python3 \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: layout anaconda <enviroment_name> [<conda_exe>]\n" +
+	"# Usage: layout anaconda <environment_name> [<conda_exe>]\n" +
 	"#\n" +
 	"# Activates anaconda for the named environment. If the environment\n" +
 	"# hasn't been created, it will be using the environment.yml file in\n" +
@@ -484,7 +484,7 @@ const STDLIB = "#!bash\n" +
 	"  env_loc=$(\"$conda\" env list | grep -- \"$env_name\")\n" +
 	"  if [[ ! \"$env_loc\" == $env_name*$env_name ]]; then\n" +
 	"    if [[ -e environment.yml ]]; then\n" +
-	"      log_status \"creating conda enviroment\"\n" +
+	"      log_status \"creating conda environment\"\n" +
 	"      \"$conda\" env create\n" +
 	"    else\n" +
 	"      log_error \"Could not find environment.yml\"\n" +
