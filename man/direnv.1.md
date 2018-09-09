@@ -22,7 +22,7 @@ environment variables and not clutter the "~/.profile" file.
 Before each prompt it checks for the existence of an ".envrc" file in the
 current and parent directories. If the file exists, it is loaded into a bash
 sub-shell and all exported variables are then captured by direnv and then made
-available to your current shell.
+available to your current shell, while unset variables are removed.
 
 Because direnv is compiled into a single static executable it is fast enough
 to be unnoticeable on each prompt. It is also language agnostic and can be
@@ -109,7 +109,7 @@ USAGE
 -----
 
 In some target folder, create an ".envrc" file and add some export(1)
-directives in it.
+and unset(1) directives in it.
 
 On the next prompt you will notice that direnv complains about the ".envrc"
 being blocked. This is the security mechanism to avoid loading new files
