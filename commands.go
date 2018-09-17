@@ -22,6 +22,7 @@ func init() {
 	CmdList = []*Cmd{
 		CmdAllow,
 		CmdApplyDump,
+		CmdShowDump,
 		CmdDeny,
 		CmdDotEnv,
 		CmdDump,
