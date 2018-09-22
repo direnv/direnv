@@ -58,6 +58,10 @@ direnv is packaged for a variety of systems:
 * [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [GNU Guix](https://www.gnu.org/software/guix/)
 
+See also:
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/direnv.svg)](https://repology.org/metapackage/direnv)
+
 ### From binary builds
 
 Binary builds for a variety of architectures are also available for
