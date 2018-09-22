@@ -58,8 +58,9 @@ direnv is packaged for a variety of systems:
 * [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [GNU Guix](https://www.gnu.org/software/guix/)
 
-Non-official builds for Debian and Fedora are also available at
-https://dl.equinox.io/zimbatm/direnv/stable
+See also:
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/direnv.svg)](https://repology.org/metapackage/direnv)
 
 ### From binary builds
 
