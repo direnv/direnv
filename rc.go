@@ -15,6 +15,7 @@ import (
 type RC struct {
 	path      string
 	allowPath string
+	denyPath  string
 	times     FileTimes
 	config    *Config
 }
@@ -35,23 +36,27 @@ func RCFromPath(path string, config *Config) *RC {
 	}
 
 	allowPath := filepath.Join(config.AllowDir(), hash)
+	denyPath := filepath.Join(config.DenyDir(), hash)
 
 	times := NewFileTimes()
 	times.Update(path)
 	times.Update(allowPath)
 
-	return &RC{path, allowPath, times, config}
+	return &RC{path, allowPath, denyPath, times, config}
 }
 
 func RCFromEnv(path, marshalled_times string, config *Config) *RC {
 	times := NewFileTimes()
 	times.Unmarshal(marshalled_times)
-	return &RC{path, "", times, config}
+	return &RC{path, "", "", times, config}
 }
 
 func (self *RC) Allow() (err error) {
 	if self.allowPath == "" {
 		return fmt.Errorf("Cannot allow empty path")
+	}
+	if self.denyPath != "" {
+		os.Remove(self.denyPath)
 	}
 	if err = os.MkdirAll(filepath.Dir(self.allowPath), 0755); err != nil {
 		return
@@ -63,8 +68,20 @@ func (self *RC) Allow() (err error) {
 	return
 }
 
-func (self *RC) Deny() error {
-	return os.Remove(self.allowPath)
+func (self *RC) Deny() (err error) {
+	if self.allowPath != "" {
+		os.Remove(self.allowPath)
+	}
+
+	if err = os.MkdirAll(filepath.Dir(self.denyPath), 0755); err != nil {
+		return
+	}
+	if err = deny(self.path, self.denyPath); err != nil {
+		return
+	}
+	self.times.Update(self.denyPath)
+
+	return err
 }
 
 func (self *RC) Allowed() bool {
@@ -97,6 +114,11 @@ func (self *RC) Allowed() bool {
 	return false
 }
 
+func (self *RC) Denied() bool {
+	_, err := os.Stat(self.denyPath)
+	return err == nil
+}
+
 // Makes the path relative to the current directory. Except when both paths
 // are completely different.
 // Eg:  /home/foo and /home/bar => ../foo
@@ -124,6 +146,9 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	shellEnv := env.Copy()
 	shellEnv[DIRENV_WATCHES] = self.times.Marshal()
 
+	if self.Denied() {
+		return nil, nil
+	}
 	if !self.Allowed() {
 		return nil, fmt.Errorf(NOT_ALLOWED, self.RelTo(wd))
 	}
@@ -237,6 +262,10 @@ func touch(path string) (err error) {
 
 func allow(path string, allowPath string) (err error) {
 	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
+}
+
+func deny(path string, denyPath string) (err error) {
+	return ioutil.WriteFile(denyPath, []byte(path+"\n"), 0644)
 }
 
 func findUp(searchDir string, fileName string) (path string) {

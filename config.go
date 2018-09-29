@@ -113,6 +113,11 @@ func (self *Config) AllowDir() string {
 	return filepath.Join(self.ConfDir, "allow")
 }
 
+// DenyDir returns the directory under which we store the denials
+func (self *Config) DenyDir() string {
+	return filepath.Join(self.ConfDir, "deny")
+}
+
 func (self *Config) LoadedRC() *RC {
 	if self.RCDir == "" {
 		log_debug("RCDir is blank - loadedRC is nil")
