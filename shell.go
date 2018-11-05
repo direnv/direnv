@@ -10,6 +10,7 @@ import (
 type Shell interface {
 	Hook() (string, error)
 	Export(e ShellExport) string
+	Dump(env Env) string
 }
 
 // Used to describe what to generate for the shell

@@ -22,3 +22,12 @@ func (sh jsonShell) Export(e ShellExport) string {
 	}
 	return string(out)
 }
+
+func (sh jsonShell) Dump(env Env) string {
+	out, err := json.MarshalIndent(env, "", "  ")
+	if err != nil {
+		// Should never happen
+		panic(err)
+	}
+	return string(out)
+}

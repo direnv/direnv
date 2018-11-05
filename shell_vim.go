@@ -24,6 +24,13 @@ func (sh vim) Export(e ShellExport) (out string) {
 	return out
 }
 
+func (sh vim) Dump(env Env) (out string) {
+	for key, value := range env {
+		out += sh.export(key, value)
+	}
+	return out
+}
+
 func (sh vim) export(key, value string) string {
 	return "let $" + sh.escapeKey(key) + " = " + sh.escapeValue(value) + "\n"
 }

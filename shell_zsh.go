@@ -30,6 +30,13 @@ func (sh zsh) Export(e ShellExport) (out string) {
 	return out
 }
 
+func (sh zsh) Dump(env Env) (out string) {
+	for key, value := range env {
+		out += sh.export(key, value)
+	}
+	return out
+}
+
 func (sh zsh) export(key, value string) string {
 	return "export " + sh.escape(key) + "=" + sh.escape(value) + ";"
 }

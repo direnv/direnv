@@ -37,6 +37,15 @@ func (sh elvish) Export(e ShellExport) string {
 	return buf.String()
 }
 
+func (sh elvish) Dump(env Env) (out string) {
+	buf := new(bytes.Buffer)
+	err := json.NewEncoder(buf).Encode(env)
+	if err != nil {
+		panic(err)
+	}
+	return buf.String()
+}
+
 var (
 	_ Shell = (*elvish)(nil)
 )
