@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/direnv/direnv/gzenv"
 )
 
 // `direnv show_dump`
@@ -18,7 +20,7 @@ var CmdShowDump = &Cmd{
 		}
 
 		var f interface{}
-		err = unmarshal(args[1], &f)
+		err = gzenv.Unmarshal(args[1], &f)
 		if err != nil {
 			return err
 		}

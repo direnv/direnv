@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"strings"
+
+	"github.com/direnv/direnv/gzenv"
 )
 
 type Env map[string]string
@@ -31,9 +33,9 @@ func (env Env) CleanContext() {
 	delete(env, DIRENV_DIFF)
 }
 
-func LoadEnv(base64env string) (env Env, err error) {
+func LoadEnv(gzenvStr string) (env Env, err error) {
 	env = make(Env)
-	err = unmarshal(base64env, &env)
+	err = gzenv.Unmarshal(gzenvStr, &env)
 	return
 }
 
@@ -68,7 +70,7 @@ func (env Env) ToShell(shell Shell) string {
 }
 
 func (env Env) Serialize() string {
-	return marshal(env)
+	return gzenv.Marshal(env)
 }
 
 func (e1 Env) Diff(e2 Env) *EnvDiff {

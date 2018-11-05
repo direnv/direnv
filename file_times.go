@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/direnv/direnv/gzenv"
 )
 
 type FileTime struct {
@@ -141,9 +143,9 @@ func (self *FileTime) Formatted(relDir string) string {
 }
 
 func (times *FileTimes) Marshal() string {
-	return marshal(*times.list)
+	return gzenv.Marshal(*times.list)
 }
 
 func (times *FileTimes) Unmarshal(from string) error {
-	return unmarshal(from, times.list)
+	return gzenv.Unmarshal(from, times.list)
 }
