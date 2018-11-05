@@ -2,9 +2,9 @@ package main
 
 import "fmt"
 
-type bash int
+type bash struct{}
 
-var BASH bash
+var BASH Shell = bash{}
 
 const BASH_HOOK = `
 _direnv_hook() {
@@ -17,30 +17,30 @@ if ! [[ "$PROMPT_COMMAND" =~ _direnv_hook ]]; then
 fi
 `
 
-func (b bash) Hook() (string, error) {
+func (sh bash) Hook() (string, error) {
 	return BASH_HOOK, nil
 }
 
-func (b bash) Export(e ShellExport) (out string) {
+func (sh bash) Export(e ShellExport) (out string) {
 	for key, value := range e {
 		if value == nil {
-			out += b.unset(key)
+			out += sh.unset(key)
 		} else {
-			out += b.export(key, *value)
+			out += sh.export(key, *value)
 		}
 	}
 	return out
 }
 
-func (b bash) export(key, value string) string {
-	return "export " + b.escape(key) + "=" + b.escape(value) + ";"
+func (sh bash) export(key, value string) string {
+	return "export " + sh.escape(key) + "=" + sh.escape(value) + ";"
 }
 
-func (b bash) unset(key string) string {
-	return "unset " + b.escape(key) + ";"
+func (sh bash) unset(key string) string {
+	return "unset " + sh.escape(key) + ";"
 }
 
-func (b bash) escape(str string) string {
+func (sh bash) escape(str string) string {
 	return BashEscape(str)
 }
 
