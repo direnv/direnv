@@ -38,6 +38,8 @@ func DetectShell(target string) Shell {
 		return ZSH
 	case "fish":
 		return FISH
+	case "gzenv":
+		return GZENV
 	case "vim":
 		return VIM
 	case "tcsh":
