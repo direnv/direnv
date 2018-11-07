@@ -16,6 +16,7 @@ type Config struct {
 	Env             Env
 	WorkDir         string // Current directory
 	ConfDir         string
+	DataDir         string
 	SelfPath        string
 	BashPath        string
 	RCDir           string
@@ -127,11 +128,19 @@ func LoadConfig(env Env) (config *Config, err error) {
 		}
 	}
 
+	if config.DataDir == "" {
+		config.DataDir = xdg.DataDir(env, "direnv")
+	}
+	if config.DataDir == "" {
+		err = fmt.Errorf("Couldn't find a data directory for direnv")
+		return
+	}
+
 	return
 }
 
 func (config *Config) AllowDir() string {
-	return filepath.Join(config.ConfDir, "allow")
+	return filepath.Join(config.DataDir, "allow")
 }
 
 func (config *Config) LoadedRC() *RC {

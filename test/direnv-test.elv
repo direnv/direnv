@@ -1,6 +1,8 @@
 #!/usr/bin/env elvish
 
 E:TEST_DIR = (path-dir (src)[path])
+set-env XDG_CONFIG_HOME $E:TEST_DIR/config
+set-env XDG_DATA_HOME $E:TEST_DIR/data
 E:PATH = (path-dir $E:TEST_DIR):$E:PATH
 
 cd $E:TEST_DIR
@@ -13,7 +15,6 @@ unset-env DIRENV_MTIME
 unset-env DIRENV_WATCHES
 unset-env DIRENV_DIFF
 
-set-env XDG_CONFIG_HOME $E:TEST_DIR
 mkdir -p $E:XDG_CONFIG_HOME/direnv
 touch $E:XDG_CONFIG_HOME/direnv/direnvrc
 
