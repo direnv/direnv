@@ -13,6 +13,8 @@ end
 
 cd (dirname (status -f))
 set TEST_DIR $PWD
+set XDG_CONFIG_HOME $TEST_DIR/config
+set XDG_DATA_HOME $TEST_DIR/data
 set -gx PATH (dirname $TEST_DIR) $PATH
 
 # Reset the direnv loading if any
