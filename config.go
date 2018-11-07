@@ -9,6 +9,7 @@ import (
 	"time"
 
 	toml "github.com/BurntSushi/toml"
+	"github.com/direnv/direnv/xdg"
 )
 
 type Config struct {
@@ -44,7 +45,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 	config.ConfDir = env[DIRENV_CONFIG]
 	if config.ConfDir == "" {
-		config.ConfDir = XdgConfigDir(env, "direnv")
+		config.ConfDir = xdg.ConfigDir(env, "direnv")
 	}
 	if config.ConfDir == "" {
 		err = fmt.Errorf("couldn't find a configuration directory for direnv")
