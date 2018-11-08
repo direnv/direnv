@@ -7,7 +7,7 @@ import (
 
 type elvish struct{}
 
-var ELVISH = elvish{}
+var ELVISH Shell = elvish{}
 
 func (elvish) Hook() (string, error) {
 	return `## hook for direnv
@@ -31,6 +31,15 @@ func (elvish) Hook() (string, error) {
 func (sh elvish) Export(e ShellExport) string {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(e)
+	if err != nil {
+		panic(err)
+	}
+	return buf.String()
+}
+
+func (sh elvish) Dump(env Env) (out string) {
+	buf := new(bytes.Buffer)
+	err := json.NewEncoder(buf).Encode(env)
 	if err != nil {
 		panic(err)
 	}

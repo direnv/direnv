@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-type fish int
+type fish struct{}
 
-var FISH fish
+var FISH Shell = fish{}
 
 const FISH_HOOK = `
 function __direnv_export_eval --on-event fish_prompt;
@@ -15,37 +15,44 @@ function __direnv_export_eval --on-event fish_prompt;
 end
 `
 
-func (f fish) Hook() (string, error) {
+func (sh fish) Hook() (string, error) {
 	return FISH_HOOK, nil
 }
 
-func (f fish) Export(e ShellExport) (out string) {
+func (sh fish) Export(e ShellExport) (out string) {
 	for key, value := range e {
 		if value == nil {
-			out += f.unset(key)
+			out += sh.unset(key)
 		} else {
-			out += f.export(key, *value)
+			out += sh.export(key, *value)
 		}
 	}
 	return out
 }
 
-func (f fish) export(key, value string) string {
+func (sh fish) Dump(env Env) (out string) {
+	for key, value := range env {
+		out += sh.export(key, value)
+	}
+	return out
+}
+
+func (sh fish) export(key, value string) string {
 	if key == "PATH" {
 		command := "set -x -g PATH"
 		for _, path := range strings.Split(value, ":") {
-			command += " " + f.escape(path)
+			command += " " + sh.escape(path)
 		}
 		return command + ";"
 	}
-	return "set -x -g " + f.escape(key) + " " + f.escape(value) + ";"
+	return "set -x -g " + sh.escape(key) + " " + sh.escape(value) + ";"
 }
 
-func (f fish) unset(key string) string {
-	return "set -e -g " + f.escape(key) + ";"
+func (sh fish) unset(key string) string {
+	return "set -e -g " + sh.escape(key) + ";"
 }
 
-func (f fish) escape(str string) string {
+func (sh fish) escape(str string) string {
 	in := []byte(str)
 	out := "'"
 	i := 0

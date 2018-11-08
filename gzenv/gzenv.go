@@ -1,4 +1,6 @@
-package main
+// the gzenv format: json+gzip+base64
+// a quickly designed format to export the whole environment back into itself
+package gzenv
 
 import (
 	"bytes"
@@ -10,7 +12,8 @@ import (
 	"strings"
 )
 
-func marshal(obj interface{}) string {
+// Marshal encodes the object into the gzenv format
+func Marshal(obj interface{}) string {
 	jsonData, err := json.Marshal(obj)
 
 	if err != nil {
@@ -27,10 +30,11 @@ func marshal(obj interface{}) string {
 	return base64Data
 }
 
-func unmarshal(base64env string, obj interface{}) error {
-	base64env = strings.TrimSpace(base64env)
+// Unmarshal restores the gzenv format back into a Go object
+func Unmarshal(gzenv string, obj interface{}) error {
+	gzenv = strings.TrimSpace(gzenv)
 
-	data, err := base64.URLEncoding.DecodeString(base64env)
+	data, err := base64.URLEncoding.DecodeString(gzenv)
 	if err != nil {
 		return fmt.Errorf("unmarshal() base64 decoding: %v", err)
 	}

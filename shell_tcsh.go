@@ -5,41 +5,48 @@ import (
 	"strings"
 )
 
-type tcsh int
+type tcsh struct{}
 
-var TCSH tcsh
+var TCSH Shell = tcsh{}
 
-func (f tcsh) Hook() (string, error) {
+func (sh tcsh) Hook() (string, error) {
 	return "alias precmd 'eval `{{.SelfPath}} export tcsh`'", nil
 }
 
-func (f tcsh) Export(e ShellExport) (out string) {
+func (sh tcsh) Export(e ShellExport) (out string) {
 	for key, value := range e {
 		if value == nil {
-			out += f.unset(key)
+			out += sh.unset(key)
 		} else {
-			out += f.export(key, *value)
+			out += sh.export(key, *value)
 		}
 	}
 	return out
 }
 
-func (f tcsh) export(key, value string) string {
+func (sh tcsh) Dump(env Env) (out string) {
+	for key, value := range env {
+		out += sh.export(key, value)
+	}
+	return out
+}
+
+func (sh tcsh) export(key, value string) string {
 	if key == "PATH" {
 		command := "set path = ("
 		for _, path := range strings.Split(value, ":") {
-			command += " " + f.escape(path)
+			command += " " + sh.escape(path)
 		}
 		return command + " );"
 	}
-	return "setenv " + f.escape(key) + " " + f.escape(value) + " ;"
+	return "setenv " + sh.escape(key) + " " + sh.escape(value) + " ;"
 }
 
-func (f tcsh) unset(key string) string {
-	return "unsetenv " + f.escape(key) + " ;"
+func (sh tcsh) unset(key string) string {
+	return "unsetenv " + sh.escape(key) + " ;"
 }
 
-func (f tcsh) escape(str string) string {
+func (sh tcsh) escape(str string) string {
 	if str == "" {
 		return "''"
 	}

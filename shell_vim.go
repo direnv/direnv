@@ -5,39 +5,46 @@ import (
 	"strings"
 )
 
-type vim int
+type vim struct{}
 
-var VIM vim
+var VIM Shell = vim{}
 
-func (x vim) Hook() (string, error) {
+func (sh vim) Hook() (string, error) {
 	return "", errors.New("this feature is not supported. Install the direnv.vim plugin instead.")
 }
 
-func (x vim) Export(e ShellExport) (out string) {
+func (sh vim) Export(e ShellExport) (out string) {
 	for key, value := range e {
 		if value == nil {
-			out += x.unset(key)
+			out += sh.unset(key)
 		} else {
-			out += x.export(key, *value)
+			out += sh.export(key, *value)
 		}
 	}
 	return out
 }
 
-func (x vim) export(key, value string) string {
-	return "let $" + x.escapeKey(key) + " = " + x.escapeValue(value) + "\n"
+func (sh vim) Dump(env Env) (out string) {
+	for key, value := range env {
+		out += sh.export(key, value)
+	}
+	return out
 }
 
-func (x vim) unset(key string) string {
-	return "let $" + x.escapeKey(key) + " = ''\n"
+func (sh vim) export(key, value string) string {
+	return "let $" + sh.escapeKey(key) + " = " + sh.escapeValue(value) + "\n"
+}
+
+func (sh vim) unset(key string) string {
+	return "let $" + sh.escapeKey(key) + " = ''\n"
 }
 
 // TODO: support keys with special chars or fail
-func (x vim) escapeKey(str string) string {
+func (sh vim) escapeKey(str string) string {
 	return str
 }
 
 // TODO: Make sure this escaping is valid
-func (x vim) escapeValue(str string) string {
+func (sh vim) escapeValue(str string) string {
 	return "'" + strings.Replace(str, "'", "''", -1) + "'"
 }

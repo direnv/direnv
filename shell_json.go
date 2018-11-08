@@ -5,16 +5,26 @@ import (
 	"errors"
 )
 
-type jsonShell int
+// jsonShell is not a real shell
+type jsonShell struct{}
 
-var JSON jsonShell
+var JSON Shell = jsonShell{}
 
-func (s jsonShell) Hook() (string, error) {
+func (sh jsonShell) Hook() (string, error) {
 	return "", errors.New("this feature is not supported")
 }
 
-func (s jsonShell) Export(e ShellExport) string {
+func (sh jsonShell) Export(e ShellExport) string {
 	out, err := json.MarshalIndent(e, "", "  ")
+	if err != nil {
+		// Should never happen
+		panic(err)
+	}
+	return string(out)
+}
+
+func (sh jsonShell) Dump(env Env) string {
+	out, err := json.MarshalIndent(env, "", "  ")
 	if err != nil {
 		// Should never happen
 		panic(err)

@@ -1,9 +1,9 @@
 package main
 
 // ZSH is a singleton instance of ZSH_T
-type zsh int
+type zsh struct{}
 
-var ZSH zsh
+var ZSH Shell = zsh{}
 
 const ZSH_HOOK = `
 _direnv_hook() {
@@ -15,29 +15,36 @@ if [[ -z ${precmd_functions[(r)_direnv_hook]} ]]; then
 fi
 `
 
-func (z zsh) Hook() (string, error) {
+func (sh zsh) Hook() (string, error) {
 	return ZSH_HOOK, nil
 }
 
-func (z zsh) Export(e ShellExport) (out string) {
+func (sh zsh) Export(e ShellExport) (out string) {
 	for key, value := range e {
 		if value == nil {
-			out += z.unset(key)
+			out += sh.unset(key)
 		} else {
-			out += z.export(key, *value)
+			out += sh.export(key, *value)
 		}
 	}
 	return out
 }
 
-func (z zsh) export(key, value string) string {
-	return "export " + z.escape(key) + "=" + z.escape(value) + ";"
+func (sh zsh) Dump(env Env) (out string) {
+	for key, value := range env {
+		out += sh.export(key, value)
+	}
+	return out
 }
 
-func (z zsh) unset(key string) string {
-	return "unset " + z.escape(key) + ";"
+func (sh zsh) export(key, value string) string {
+	return "export " + sh.escape(key) + "=" + sh.escape(value) + ";"
 }
 
-func (z zsh) escape(str string) string {
+func (sh zsh) unset(key string) string {
+	return "unset " + sh.escape(key) + ";"
+}
+
+func (sh zsh) escape(str string) string {
 	return BashEscape(str)
 }
