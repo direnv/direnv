@@ -21,6 +21,10 @@ var IGNORED_KEYS = map[string]bool{
 	"SHELL":     true,
 	"SHELLOPTS": true,
 	"SHLVL":     true,
+	"APPLICATIONS_AG_ASSETS_SUBDOMAIN": true,
+	"APPLICATIONS_AG_ASSET_PROTOCOL":   true,
+	"APPLICATIONS_AG_HOST":     true,
+	"APPLICATIONS_AG_PROTOCOL":     true,
 	"_":         true,
 }
 
