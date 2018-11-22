@@ -7,6 +7,9 @@ DESTDIR ?= /usr/local
 BINDIR   = ${DESTDIR}/bin
 MANDIR   = ${DESTDIR}/share/man
 
+# filename of the executable
+exe = direnv$(shell go env GOEXE)
+
 # Override the go executable
 GO = go
 
@@ -63,7 +66,7 @@ ifdef GO_LDFLAGS
 endif
 
 direnv: stdlib.go *.go | $(base)
-	cd "$(base)" && $(GO) build $(GO_FLAGS) -o direnv
+	cd "$(base)" && $(GO) build $(GO_FLAGS) -o $(exe)
 
 stdlib.go: stdlib.sh
 	cat $< | ./script/str2go main STDLIB $< > $@
@@ -153,7 +156,7 @@ test-zsh:
 .PHONY: install
 install: all
 	install -d $(BINDIR)
-	install direnv $(BINDIR)
+	install $(exe) $(BINDIR)
 	install -d $(MANDIR)/man1
 	cp -R man/*.1 $(MANDIR)/man1
 
