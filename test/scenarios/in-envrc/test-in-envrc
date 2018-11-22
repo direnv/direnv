@@ -1,0 +1,2 @@
+#!/bin/sh
+test -n "$DIRENV_IN_ENVRC" && echo "in envrc"

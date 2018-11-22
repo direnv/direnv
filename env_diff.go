@@ -12,6 +12,9 @@ var IGNORED_KEYS = map[string]bool{
 	"DIRENV_CONFIG": true,
 	"DIRENV_BASH":   true,
 
+	// should only be available inside of the .envrc
+	"DIRENV_IN_ENVRC": true,
+
 	"COMP_WORDBREAKS": true, // Avoids segfaults in bash
 	"PS1":             true, // PS1 should not be exported, fixes problem in bash
 

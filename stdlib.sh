@@ -16,6 +16,11 @@ direnv="$(command -v direnv)"
 # Config, change in the direnvrc
 DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
 
+# This variable can be used by programs to detect when they are running inside
+# of a .envrc evaluation context. It is ignored by the direnv diffing
+# algorithm and so it won't be re-exported.
+export DIRENV_IN_ENVRC=1
+
 # Usage: direnv_layout_dir
 #
 # Prints the folder path that direnv should use to store layout content.
