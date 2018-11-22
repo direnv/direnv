@@ -8,7 +8,7 @@ script: nix-shell --pure --run "make test"
 
 # Deploy
 before_deploy:
-- nix shell --pure --run "make dist"
+- nix-shell --pure --run "make dist"
 deploy:
   provider: releases
   api_key:
