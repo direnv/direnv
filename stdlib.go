@@ -18,6 +18,11 @@ const STDLIB = "#!bash\n" +
 	"# Config, change in the direnvrc\n" +
 	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %s}\"\n" +
 	"\n" +
+	"# This variable can be used by programs to detect when they are running inside\n" +
+	"# of a .envrc evaluation context. All variables starting with `DIRENV_` are\n" +
+	"# ignored by the direnv diffing algorithm and so it won't be re-exported.\n" +
+	"export DIRENV_IN_ENVRC=1\n" +
+	"\n" +
 	"# Usage: direnv_layout_dir\n" +
 	"#\n" +
 	"# Prints the folder path that direnv should use to store layout content.\n" +
