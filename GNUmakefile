@@ -70,6 +70,7 @@ stdlib.go: stdlib.sh
 
 version.go: version.txt
 	echo package main > $@
+	echo >> $@
 	echo 'const VERSION = "$(shell cat $<)"' >> $@
 
 ############################################################################
