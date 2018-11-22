@@ -1,4 +1,38 @@
 
+2.18.0 / 2018-11-22
+==================
+
+A lot of changes!
+
+  * stdlib: add DIRENV_IN_ENVRC (#414)
+  * Fix typo in readme. (#412)
+  * Merge pull request #407 from zimbatm/direnv-dump-shell
+  * direnv dump can now dump to arbitrary shells
+  * add a new "gzenv" shell
+  * move gzenv into new package
+  * shell: introduce a dump capability
+  * cleanup the shells
+  * Add alias '--version' to version command. Closes #377. (#404)
+  * Correctes spelling of openSUSE (#403)
+  * testing: elvish 0.12 is released now (#402)
+  * Merge pull request #397 from zimbatm/readme-packaging-status
+  * README: add packaging status badge
+  * README: remove equinox installation
+  * direnv show_dump: new command to debug encoded env (#395)
+  * Document possibility to unset vars (#392)
+  * stdlib: fix typo
+  * go dep: update Gopkg.lock
+  * make: don't make shfmt a dependency
+  * Avoid to add unnecessary trailing semicolon character (#384)
+  * add asdf to the list of known projects
+  * stdlib.go: re-generate
+  * Add PHP layout to stdlib (#346)
+  * make: fix formatting
+  * README: add build status badge
+  * Overhaul the build system (#375)
+  * stdlib, layout_pipenv: handle `$PIPENV_PIPFILE` (#371)
+  * README: improve the source build instructions
+
 2.17.0 / 2018-06-17
 ==================
 
