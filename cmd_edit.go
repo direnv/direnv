@@ -14,20 +14,14 @@ var CmdEdit = &Cmd{
 	Name: "edit",
 	Desc: `Opens PATH_TO_RC or the current .envrc into an $EDITOR and allow
   the file to be loaded afterwards.`,
-	Args:   []string{"[PATH_TO_RC]"},
-	NoWait: true,
-	Fn: func(env Env, args []string) (err error) {
-		var config *Config
+	Args: []string{"[PATH_TO_RC]"},
+	Action: actionWithConfig(func(env Env, args []string, config *Config) (err error) {
 		var rcPath string
 		var times *FileTimes
 		var foundRC *RC
 
 		defer log.SetPrefix(log.Prefix())
 		log.SetPrefix(log.Prefix() + "cmd_edit: ")
-
-		if config, err = LoadConfig(env); err != nil {
-			return
-		}
 
 		foundRC = config.FindRC()
 		if foundRC != nil {
@@ -78,7 +72,7 @@ var CmdEdit = &Cmd{
 		}
 
 		return
-	},
+	}),
 }
 
 // Utils

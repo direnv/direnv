@@ -8,7 +8,7 @@ var CmdDump = &Cmd{
 	Desc:    "Used to export the inner bash state at the end of execution",
 	Args:    []string{"[SHELL]"},
 	Private: true,
-	Fn: func(env Env, args []string) (err error) {
+	Action: actionSimple(func(env Env, args []string) (err error) {
 		target := "gzenv"
 
 		if len(args) > 1 {
@@ -23,5 +23,5 @@ var CmdDump = &Cmd{
 		fmt.Println(shell.Dump(env))
 
 		return
-	},
+	}),
 }

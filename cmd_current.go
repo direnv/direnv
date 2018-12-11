@@ -9,7 +9,7 @@ var CmdCurrent = &Cmd{
 	Desc:    "Reports whether direnv's view of a file is current (or stale)",
 	Args:    []string{"PATH"},
 	Private: true,
-	Fn:      currentCommandFn,
+	Action:  actionSimple(currentCommandFn),
 }
 
 func currentCommandFn(env Env, args []string) (err error) {

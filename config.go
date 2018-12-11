@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	toml "github.com/BurntSushi/toml"
 )
@@ -19,14 +20,16 @@ type Config struct {
 	RCDir           string
 	TomlPath        string
 	DisableStdin    bool
+	WarnTimeout     time.Duration
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
 }
 
 type tomlConfig struct {
-	Whitelist    whitelist `toml:"whitelist"`
-	BashPath     string    `toml:"bash_path"`
-	DisableStdin bool      `toml:"disable_stdin"`
+	BashPath     string        `toml:"bash_path"`
+	DisableStdin bool          `toml:"disable_stdin"`
+	WarnTimeout  time.Duration `toml:"warn_timeout"`
+	Whitelist    whitelist     `toml:"whitelist"`
 }
 
 type whitelist struct {
@@ -93,6 +96,16 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 		config.DisableStdin = tomlConf.DisableStdin
 		config.BashPath = tomlConf.BashPath
+		config.WarnTimeout = tomlConf.WarnTimeout
+	}
+
+	if config.WarnTimeout == 0 {
+		timeout, err := time.ParseDuration(env.Fetch("DIRENV_WARN_TIMEOUT", "5s"))
+		if err != nil {
+			log_error("invalid DIRENV_WARN_TIMEOUT: " + err.Error())
+			timeout = 5 * time.Second
+		}
+		config.WarnTimeout = timeout
 	}
 
 	if config.BashPath == "" {

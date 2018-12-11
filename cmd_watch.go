@@ -7,7 +7,7 @@ var CmdWatch = &Cmd{
 	Desc:    "Adds a path to the list that direnv watches for changes",
 	Args:    []string{"[SHELL]", "PATH"},
 	Private: false,
-	Fn:      watchCommand,
+	Action:  actionSimple(watchCommand),
 }
 
 func watchCommand(env Env, args []string) (err error) {
