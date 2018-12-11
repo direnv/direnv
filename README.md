@@ -57,6 +57,7 @@ direnv is packaged for a variety of systems:
 * [MacPorts](https://www.macports.org/)
 * [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [GNU Guix](https://www.gnu.org/software/guix/)
+* [Snap](https://snapcraft.io/direnv)
 
 See also:
 
