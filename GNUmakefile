@@ -129,7 +129,7 @@ test-go-fmt:
 	[ $$($(GO) fmt | tee /dev/stderr | wc -l) = 0 ]
 
 test-shellcheck:
-	shellcheck stdlib.sh
+	shellcheck -e SC2239 stdlib.sh
 
 test-bash:
 	bash ./test/direnv-test.bash
