@@ -19,8 +19,8 @@ const STDLIB = "#!bash\n" +
 	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %s}\"\n" +
 	"\n" +
 	"# This variable can be used by programs to detect when they are running inside\n" +
-	"# of a .envrc evaluation context. All variables starting with `DIRENV_` are\n" +
-	"# ignored by the direnv diffing algorithm and so it won't be re-exported.\n" +
+	"# of a .envrc evaluation context. It is ignored by the direnv diffing\n" +
+	"# algorithm and so it won't be re-exported.\n" +
 	"export DIRENV_IN_ENVRC=1\n" +
 	"\n" +
 	"# Usage: direnv_layout_dir\n" +
@@ -421,9 +421,10 @@ const STDLIB = "#!bash\n" +
 	"\n" +
 	"# Usage: layout python <python_exe>\n" +
 	"#\n" +
-	"# Creates and loads a virtualenv environment under\n" +
+	"# Creates and loads a virtual environment under\n" +
 	"# \"$direnv_layout_dir/python-$python_version\".\n" +
 	"# This forces the installation of any egg into the project's sub-folder.\n" +
+	"# For python older then 3.3 this requires virtualenv to be installed.\n" +
 	"#\n" +
 	"# It's possible to specify the python executable if you want to use different\n" +
 	"# versions of python.\n" +
@@ -447,7 +448,11 @@ const STDLIB = "#!bash\n" +
 	"    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
 	"    export VIRTUAL_ENV\n" +
 	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"      virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"      if $python -c \"import venv\"; then\n" +
+	"        $python -m venv \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"      else\n" +
+	"        virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"      fi\n" +
 	"    fi\n" +
 	"  fi\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
