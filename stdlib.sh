@@ -423,9 +423,10 @@ layout_php() {
 
 # Usage: layout python <python_exe>
 #
-# Creates and loads a virtualenv environment under
+# Creates and loads a virtual environment under
 # "$direnv_layout_dir/python-$python_version".
 # This forces the installation of any egg into the project's sub-folder.
+# For python older then 3.3 this requires virtualenv to be installed.
 #
 # It's possible to specify the python executable if you want to use different
 # versions of python.
@@ -449,7 +450,11 @@ layout_python() {
     VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
     export VIRTUAL_ENV
     if [[ ! -d $VIRTUAL_ENV ]]; then
-      virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
+      if $python -c "import venv"; then
+        $python -m venv "$@" "$VIRTUAL_ENV"
+      else
+        virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
+      fi
     fi
   fi
   PATH_add "$VIRTUAL_ENV/bin"

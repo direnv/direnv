@@ -425,9 +425,10 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"# Usage: layout python <python_exe>\n" +
 	"#\n" +
-	"# Creates and loads a virtualenv environment under\n" +
+	"# Creates and loads a virtual environment under\n" +
 	"# \"$direnv_layout_dir/python-$python_version\".\n" +
 	"# This forces the installation of any egg into the project's sub-folder.\n" +
+	"# For python older then 3.3 this requires virtualenv to be installed.\n" +
 	"#\n" +
 	"# It's possible to specify the python executable if you want to use different\n" +
 	"# versions of python.\n" +
@@ -451,7 +452,11 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
 	"    export VIRTUAL_ENV\n" +
 	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"      virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"      if $python -c \"import venv\"; then\n" +
+	"        $python -m venv \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"      else\n" +
+	"        virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"      fi\n" +
 	"    fi\n" +
 	"  fi\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
