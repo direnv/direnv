@@ -206,7 +206,7 @@ If you add the following line in "/a/b/.envrc", you can load both of the
 ```sh
 source_env ..
 ```
-In the general case `source_up` will load any .envrc higher up in the folder structure. This allows you to truly enable arbitrary heirarchical stuctures of `.envrc` usage.
+In the general case `source_up` will load any .envrc higher up in the folder structure. This allows you to truly enable arbitrary hierarchical stuctures of `.envrc` usage.
 
 ```sh
 source_up
