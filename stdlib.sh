@@ -1,4 +1,4 @@
-#!bash
+#!/usr/bin/env bash
 #
 # These are the commands available in an .envrc context
 #
