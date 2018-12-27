@@ -1,14 +1,21 @@
 package dotenv_test
 
 import (
+	"os"
 	"testing"
 
-	"github.com/direnv/go-dotenv"
+	dotenv "github.com/direnv/go-dotenv"
 )
 
 func shouldNotHaveEmptyKey(t *testing.T, env map[string]string) {
 	if _, ok := env[""]; ok {
 		t.Error("should not have empty key")
+	}
+}
+
+func envShouldContain(t *testing.T, env map[string]string, key string, value string) {
+	if env[key] != value {
+		t.Errorf("%s: %s, expected %s", key, env[key], value)
 	}
 }
 
@@ -193,4 +200,72 @@ func TestCommentOverride(t *testing.T) {
 	if env["VARIABLE"] != "value" {
 		t.Error("VARIABLE should == value, not", env["VARIABLE"])
 	}
+}
+
+const TEST_VARIABLE_EXPANSION = `
+OPTION_A=$FOO
+OPTION_B="$FOO"
+OPTION_C=${FOO}
+OPTION_D="${FOO}"
+OPTION_E='$FOO'
+OPTION_F=$FOO/bar
+OPTION_G="$FOO/bar"
+OPTION_H=${FOO}/bar
+OPTION_I="${FOO}/bar"
+OPTION_J='$FOO/bar'
+OPTION_K=$BAR
+OPTION_L="$BAR"
+OPTION_M=${BAR}
+OPTION_N="${BAR}"
+OPTION_O='$BAR'
+OPTION_P=$BAR/baz
+OPTION_Q="$BAR/baz"
+OPTION_R=${BAR}/baz
+OPTION_S="${BAR}/baz"
+OPTION_T='$BAR/baz'
+OPTION_U="$OPTION_A/bar"
+OPTION_V=$OPTION_A/bar
+OPTION_W="$OPTION_A/bar"
+OPTION_X=${OPTION_A}/bar
+OPTION_Y="${OPTION_A}/bar"
+OPTION_Z='$OPTION_A/bar'
+OPTION_A1="$OPTION_A/bar/${OPTION_H}/$FOO"
+`
+
+func TestVariableExpansion(t *testing.T) {
+	err := os.Setenv("FOO", "foo")
+	if err != nil {
+		t.Fatalf("unable to set environment variable for testing: %s", err)
+	}
+
+	env := dotenv.MustParse(TEST_VARIABLE_EXPANSION)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "OPTION_A", "foo")
+	envShouldContain(t, env, "OPTION_B", "foo")
+	envShouldContain(t, env, "OPTION_C", "foo")
+	envShouldContain(t, env, "OPTION_D", "foo")
+	envShouldContain(t, env, "OPTION_E", "$FOO")
+	envShouldContain(t, env, "OPTION_F", "foo/bar")
+	envShouldContain(t, env, "OPTION_G", "foo/bar")
+	envShouldContain(t, env, "OPTION_H", "foo/bar")
+	envShouldContain(t, env, "OPTION_I", "foo/bar")
+	envShouldContain(t, env, "OPTION_J", "$FOO/bar")
+	envShouldContain(t, env, "OPTION_K", "")
+	envShouldContain(t, env, "OPTION_L", "")
+	envShouldContain(t, env, "OPTION_M", "")
+	envShouldContain(t, env, "OPTION_N", "")
+	envShouldContain(t, env, "OPTION_O", "$BAR")
+	envShouldContain(t, env, "OPTION_P", "/baz")
+	envShouldContain(t, env, "OPTION_Q", "/baz")
+	envShouldContain(t, env, "OPTION_R", "/baz")
+	envShouldContain(t, env, "OPTION_S", "/baz")
+	envShouldContain(t, env, "OPTION_T", "$BAR/baz")
+	envShouldContain(t, env, "OPTION_U", "foo/bar")
+	envShouldContain(t, env, "OPTION_V", "foo/bar")
+	envShouldContain(t, env, "OPTION_W", "foo/bar")
+	envShouldContain(t, env, "OPTION_X", "foo/bar")
+	envShouldContain(t, env, "OPTION_Y", "foo/bar")
+	envShouldContain(t, env, "OPTION_Z", "$OPTION_A/bar")
+	envShouldContain(t, env, "OPTION_A1", "foo/bar/foo/bar/foo")
 }

@@ -6,6 +6,7 @@ package dotenv
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -57,9 +58,13 @@ func Parse(data string) (map[string]string, error) {
 		}
 
 		key := match[1]
-		value := parseValue(match[2])
+		value := match[2]
 
-		dotenv[key] = value
+		err := parseValue(key, value, dotenv)
+
+		if err != nil {
+			return nil, fmt.Errorf("unable to parse %s, %s: %s", key, value, err)
+		}
 	}
 
 	return dotenv, nil
@@ -74,12 +79,17 @@ func MustParse(data string) map[string]string {
 	return env
 }
 
-func parseValue(value string) string {
+func parseValue(key string, value string, dotenv map[string]string) error {
 	if len(value) <= 1 {
-		return value
+		dotenv[key] = value
+		return nil
 	}
 
+	singleQuoted := false
+
 	if value[0:1] == "'" && value[len(value)-1:] == "'" {
+		// single-quoted string, do not expand
+		singleQuoted = true
 		value = value[1 : len(value)-1]
 	} else if value[0:1] == `"` && value[len(value)-1:] == `"` {
 		value = value[1 : len(value)-1]
@@ -87,7 +97,12 @@ func parseValue(value string) string {
 		value = unescapeCharacters(value)
 	}
 
-	return value
+	if !singleQuoted {
+		value = expandEnv(value, dotenv)
+	}
+
+	dotenv[key] = value
+	return nil
 }
 
 var escRe = regexp.MustCompile("\\\\([^$])")
@@ -100,4 +115,23 @@ func expandNewLines(value string) string {
 	value = strings.Replace(value, "\\n", "\n", -1)
 	value = strings.Replace(value, "\\r", "\r", -1)
 	return value
+}
+
+func expandEnv(value string, dotenv map[string]string) string {
+	expander := func(value string) string {
+		expanded, found := lookupDotenv(value, dotenv)
+
+		if found {
+			return expanded
+		} else {
+			return os.Getenv(value)
+		}
+	}
+
+	return os.Expand(value, expander)
+}
+
+func lookupDotenv(value string, dotenv map[string]string) (string, bool) {
+	retval, ok := dotenv[value]
+	return retval, ok
 }
