@@ -2,20 +2,20 @@
 
 
 [[projects]]
-  digest = "1:289dd4d7abfb3ad2b5f728fbe9b1d5c1bf7d265a3eb9ef92869af1f7baba4c7a"
+  digest = "1:e4b30804a381d7603b8a344009987c1ba351c26043501b23b8c7ce21f0b67474"
   name = "github.com/BurntSushi/toml"
   packages = ["."]
   pruneopts = ""
-  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
-  version = "v0.3.0"
+  revision = "3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005"
+  version = "v0.3.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:81095ba56fd43f25ebe9824b9cd637365aa1e8cbe4b41dabad2a3dd738777977"
+  digest = "1:40d00f66d1007d8c834141b4847ebe567d2069a98a68285c932341262c7a94ca"
   name = "github.com/direnv/go-dotenv"
   packages = ["."]
   pruneopts = ""
-  revision = "4738ec4932d7ea82d158b6900f0c7a12f116e5e5"
+  revision = "4cce6d1a66f7bc8dc730eab85cab6af1b801abed"
 
 [solve-meta]
   analyzer-name = "dep"
