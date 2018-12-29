@@ -1,0 +1,16 @@
+# https://www.appveyor.com/docs/lang/go/
+build: off
+
+clone_folder: c:\gopath\src\github.com\direnv\direnv
+
+environment:
+  GOPATH: c:\gopath
+
+stack: go 1.10
+
+before_test:
+  - go vet ./...
+
+test_script:
+  - go test ./...
+
