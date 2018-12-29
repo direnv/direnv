@@ -1,0 +1,22 @@
+# https://www.appveyor.com/docs/lang/go/
+build: off
+
+# fetch repository as zip archive
+shallow_clone: true
+
+clone_folder: c:\gopath\src\github.com\direnv\direnv
+
+install:
+  - choco install msys2
+
+environment:
+  GOPATH: c:\gopath
+
+stack: go 1.10
+
+before_test:
+  - go vet ./...
+
+test_script:
+  - go test ./...
+
