@@ -5,8 +5,8 @@ in
 pkgs.mkShell {
   #imputsFrom = [ direnv ];
   buildInputs = with pkgs; [
-    cargo
     carnix
-    rustc
+    rust.cargo
+    rust.rustc
   ];
 }
