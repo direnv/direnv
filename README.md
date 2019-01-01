@@ -214,7 +214,7 @@ source_up
 
 ## Common things people don't know
 
-Based on GitHub issues interractions, here are the top things that have been confusing for users:
+Based on GitHub issues interactions, here are the top things that have been confusing for users:
 
 1. direnv has a standard library of functions, a collection of utilities that I found useful to have and accumulated over the years. If you know how to read bash, you can find it here: https://github.com/direnv/direnv/blob/master/stdlib.sh
 
