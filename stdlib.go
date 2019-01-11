@@ -1,6 +1,6 @@
 package main
 
-const STDLIB = "#!bash\n" +
+const STDLIB = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# These are the commands available in an .envrc context\n" +
 	"#\n" +
@@ -19,8 +19,8 @@ const STDLIB = "#!bash\n" +
 	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %s}\"\n" +
 	"\n" +
 	"# This variable can be used by programs to detect when they are running inside\n" +
-	"# of a .envrc evaluation context. All variables starting with `DIRENV_` are\n" +
-	"# ignored by the direnv diffing algorithm and so it won't be re-exported.\n" +
+	"# of a .envrc evaluation context. It is ignored by the direnv diffing\n" +
+	"# algorithm and so it won't be re-exported.\n" +
 	"export DIRENV_IN_ENVRC=1\n" +
 	"\n" +
 	"# Usage: direnv_layout_dir\n" +
