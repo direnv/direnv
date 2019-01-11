@@ -1,4 +1,9 @@
 
+2.19.0 / 2019-01-11
+==================
+
+  * NEW: add support for .env variable expansion. Thanks to @hakamadare!
+
 2.18.2 / 2018-11-23
 ==================
 
