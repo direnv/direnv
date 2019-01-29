@@ -1,15 +1,21 @@
 { pkgs ? import <nixpkgs> {} }:
 with pkgs;
+
 buildGoPackage rec {
-  version = lib.fileContents ./version.txt;
   name = "direnv-${version}";
-  goPackagePath = "github.com/zimbatm/direnv";
+  version = lib.fileContents ./version.txt;
+  goPackagePath = "github.com/direnv/direnv";
 
   src = lib.cleanSource ./.;
 
-  postConfigure = "cd $NIX_BUILD_TOP/go/src/$goPackagePath";
+  postConfigure = ''
+    cd $NIX_BUILD_TOP/go/src/$goPackagePath
+  '';
 
-  buildPhase = "make BASH_PATH=${bash}/bin/bash";
+  # we have no bash at the moment for windows
+  makeFlags = stdenv.lib.optional (!stdenv.hostPlatform.isWindows) [
+    "BASH_PATH=${bash}/bin/bash"
+  ];
 
   installPhase = ''
     mkdir -p $out
@@ -19,10 +25,9 @@ buildGoPackage rec {
   '';
 
   meta = with stdenv.lib; {
-    homepage = http://direnv.net;
     description = "A shell extension that manages your environment";
-    maintainers = with maintainers; [ zimbatm ];
+    homepage = https://direnv.net;
     license = licenses.mit;
-    platforms = go.meta.platforms;
+    maintainers = with maintainers; [ zimbatm ];
   };
 }
