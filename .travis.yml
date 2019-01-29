@@ -4,7 +4,9 @@ os:
   - linux
 language: nix
 
-script: nix-shell --pure --run "make test"
+script:
+- nix-shell --pure --run "make test"
+- nix-build
 
 # Deploy
 before_deploy:
