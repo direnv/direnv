@@ -1,4 +1,9 @@
 
+2.19.1 / 2019-01-31
+==================
+
+  * FIX: watched files now handle symlinks properly. Thanks @grahamc! #452
+
 2.19.0 / 2019-01-11
 ==================
 
