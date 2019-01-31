@@ -29,6 +29,8 @@ func (times *FileTimes) Update(path string) (err error) {
 	var modtime int64
 	var exists bool
 
+	// Handle the path with Stat, which looks at the other
+	// end of symlinks
 	stat, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		exists = false
@@ -38,6 +40,28 @@ func (times *FileTimes) Update(path string) (err error) {
 			return
 		}
 		modtime = stat.ModTime().Unix()
+	}
+
+	// Handle the path with Lstat, which examines the
+	// symlink itself.
+	//
+	// This second case is useful in case the symlink
+	// changes where it is pointing, and should handle
+	// the case where the symlink's target doesn't exist.
+	stat, err = os.Lstat(path)
+	if os.IsNotExist(err) {
+		exists = false
+	} else {
+		exists = true
+		if err != nil {
+			return
+		}
+		symlink_modtime := stat.ModTime().Unix()
+
+		if symlink_modtime > modtime {
+			// take the newest of the two
+			modtime = symlink_modtime
+		}
 	}
 
 	err = times.NewTime(path, modtime, exists)
