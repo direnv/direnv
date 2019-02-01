@@ -14,6 +14,7 @@ type ExportContext struct {
 	env      Env
 	oldEnv   Env
 	newEnv   Env
+	quotes   ShellQuotes
 }
 
 func (self *ExportContext) loadConfig() (err error) {
@@ -70,6 +71,9 @@ func (self *ExportContext) updateRC() (err error) {
 
 func (self *ExportContext) loadRC() (err error) {
 	self.newEnv, err = self.foundRC.Load(self.config, self.oldEnv)
+	if err == nil {
+		self.quotes = self.newEnv.GetShellQuotes()
+	}
 	return
 }
 
@@ -77,6 +81,7 @@ func (self *ExportContext) unloadEnv() (err error) {
 	log_status(self.env, "unloading")
 	self.newEnv = self.oldEnv.Copy()
 	cleanEnv(self.newEnv)
+	self.quotes = nil
 	return
 }
 
@@ -87,6 +92,7 @@ func (self *ExportContext) resetEnv() {
 		delete(self.newEnv, DIRENV_DIFF)
 		self.foundRC.RecordState(self.oldEnv, self.newEnv)
 	}
+	self.quotes = nil
 }
 
 func cleanEnv(env Env) {
@@ -123,7 +129,7 @@ func (self *ExportContext) diffString(shell Shell) string {
 	}
 
 	diff := self.env.Diff(self.newEnv)
-	return diff.ToShell(shell)
+	return diff.ToShell(shell) + self.quotes[shell]
 }
 
 func exportCommand(env Env, args []string) (err error) {

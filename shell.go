@@ -24,6 +24,9 @@ func (e ShellExport) Remove(key string) {
 	e[key] = nil
 }
 
+// Shell-specific commands
+type ShellQuotes map[Shell]string
+
 func DetectShell(target string) Shell {
 	target = filepath.Base(target)
 	// $0 starts with "-"

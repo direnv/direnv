@@ -84,3 +84,18 @@ func (e Env) Fetch(key, def string) string {
 	}
 	return v
 }
+
+func (env Env) GetShellQuotes() (quotes ShellQuotes) {
+	quotes = make(map[Shell]string)
+	for key, value := range env {
+		target := strings.TrimPrefix(key, "DIRENV_QUOTE_")
+		if target == key {
+			continue
+		}
+		shell := DetectShell(target)
+		if shell != nil {
+			quotes[shell] = value
+		}
+	}
+	return
+}

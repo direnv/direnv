@@ -127,6 +127,9 @@ func IgnoredEnv(key string) bool {
 	if strings.HasPrefix(key, "BASH_FUNC_") {
 		return true
 	}
+	if strings.HasPrefix(key, "DIRENV_QUOTE_") {
+		return true
+	}
 	_, found := IGNORED_KEYS[key]
 	return found
 }
