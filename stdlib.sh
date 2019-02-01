@@ -704,6 +704,22 @@ use_guix() {
   eval "$(guix environment "$@" --search-paths)"
 }
 
+# Usage: quote <shell> [...]
+#
+# Example:
+#
+#  quote zsh alias foo=bar
+#
+# This will add `alias foo=bar;` to the output of `direnv export zsh`
+quote() {
+  local shell=$1
+  local quote_var="DIRENV_QUOTE_${shell}"
+  shift
+  local previous=${!quote_var:-''}
+  printf -v "${quote_var}" "%s%s;" "$previous" "$*"
+  export "${quote_var?}"
+}
+
 ## Load the global ~/.direnvrc if present
 if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
   # shellcheck disable=SC1090

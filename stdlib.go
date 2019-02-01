@@ -706,6 +706,22 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  eval \"$(guix environment \"$@\" --search-paths)\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: quote <shell> [...]\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#  quote zsh alias foo=bar\n" +
+	"#\n" +
+	"# This will add `alias foo=bar;` to the output of `direnv export zsh`\n" +
+	"quote() {\n" +
+	"  local shell=$1\n" +
+	"  local quote_var=\"DIRENV_QUOTE_${shell}\"\n" +
+	"  shift\n" +
+	"  local previous=${!quote_var:-''}\n" +
+	"  printf -v \"${quote_var}\" \"%s%s;\" \"$previous\" \"$*\"\n" +
+	"  export \"${quote_var?}\"\n" +
+	"}\n" +
+	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then\n" +
 	"  # shellcheck disable=SC1090\n" +
