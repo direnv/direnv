@@ -145,8 +145,7 @@ test-tcsh:
 	tcsh -e ./test/direnv-test.tcsh
 
 test-zsh:
-	# Currently missing
-	#zsh ./test/direnv-test.zsh
+	zsh ./test/direnv-test.zsh
 
 ############################################################################
 # Installation
