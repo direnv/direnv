@@ -1,5 +1,7 @@
 package main
 
+import "strings"
+
 // ZSH is a singleton instance of ZSH_T
 type zsh struct{}
 
@@ -19,7 +21,7 @@ func (sh zsh) Hook() (string, error) {
 	return ZSH_HOOK, nil
 }
 
-func (sh zsh) Export(e ShellExport) (out string) {
+func (sh zsh) Export(e ShellExport, q ShellQuotes) (out string) {
 	for key, value := range e {
 		if value == nil {
 			out += sh.unset(key)
@@ -27,6 +29,9 @@ func (sh zsh) Export(e ShellExport) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
+	// For quotes, prefer "\n" over ";", since it will handle comments and
+	// empty commands better
+	out += strings.Join(q[sh], "\n")
 	return out
 }
 

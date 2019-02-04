@@ -18,6 +18,7 @@ unset DIRENV_DIR
 unset DIRENV_MTIME
 unset DIRENV_WATCHES
 unset DIRENV_DIFF
+unset "DIRENV_ON_UNLOAD_${TARGET_SHELL}"
 
 export XDG_CONFIG_HOME=${TEST_DIR}/config
 mkdir -p ${XDG_CONFIG_HOME}/direnv
@@ -173,6 +174,59 @@ test_start "symlink-changed"
   direnv_eval
   test_eq "${STATE}" "B"
 test_stop
+
+test_start "shell-specific"
+  unset BAR FOO FOOX FOO_OR_NAN FOOX_OR_NAN BAR_OR_NAN
+
+  direnv_eval
+  # FOO=x; ON UNLOAD WILL RUN FOO=x + 100
+  # export FOOX=y; ON UNLOAD WILL RUN FOOX=FOOX + 100
+
+  test "$FOO" -ge 0
+  test "$FOOX" -ge 0
+  test "$BAR" -ge 0
+
+  FOO_0=$FOO
+  FOOX_0=$FOOX
+  BAR_0=$BAR
+
+  direnv allow nested/.envrc
+  cd nested
+  direnv_eval
+  # Set by nested/.envrc
+  test_eq "$FOO_OR_NAN" "NaN"
+  test_eq "$BAR_OR_NAN" "NaN"
+  test_eq "$FOOX_OR_NAN" $FOOX_0  # unlike BAR
+
+  # Set by unload action of ./.envrc
+  test_eq "$FOO" "$((FOO_0 + 100))"
+
+  # Set by combination of action in nested/..envrc and unload of .envrc
+  test_eq "$FOOX" "$(((FOOX_0 + 100) % 3))"
+
+  cd ..
+  direnv_eval
+
+  # New random values
+  test "$FOO" -ge 0
+  test "$BAR" -ge 0
+
+  # Random value overrides the FOOX + 1000 on_unload from nested/.envrc
+  test "$FOOX" -ge 0
+  test "$FOOX" -lt 100
+
+  FOO_1=$FOO
+  BAR_1=$BAR
+  FOOX_1=$FOOX
+
+  cd ..
+  direnv_eval
+
+  # Unload actions from .envrc
+  test_eq "$FOO" $((FOO_1 + 100))
+  test_eq "$FOOX" $((FOOX_1 + 100))
+
+ test_stop
 
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find

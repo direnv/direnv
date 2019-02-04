@@ -720,6 +720,34 @@ quote() {
   export "${quote_var?}"
 }
 
+quote bash "unset DIRENV_ON_UNLOAD_bash"
+quote zsh  "unset DIRENV_ON_UNLOAD_zsh"
+
+# Usage: shell_specific <shell> <make_on_unload> <on_load>
+#
+# Creates a shell-specific action. Both `make_on_unload` and `on_load`
+# are strings with code to be executed on the given host shell.
+# `make_on_unload` will be executed first; it is expected to output
+# shell-specific code to "undo" the effects of `on_load`.
+shell_specific() {
+  local shell=$1
+  local make_on_unload=$2
+  local on_load=$3
+  local on_unload_var="DIRENV_ON_UNLOAD_${shell}"
+  case "$shell" in
+    bash | zsh)
+       printf -v cmd \
+         "export ${on_unload_var}; ${on_unload_var}+=\$($direnv gzenv encode \"\$(%s)\"),;%s" \
+         "$make_on_unload" \
+         "$on_load"
+       quote "$shell" "$cmd"
+       ;;
+    *)
+       log_error "shell_specific: '$shell' unsupported."
+       ;;
+  esac
+}
+
 ## Load the global ~/.direnvrc if present
 if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
   # shellcheck disable=SC1090

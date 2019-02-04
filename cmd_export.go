@@ -72,16 +72,18 @@ func (self *ExportContext) updateRC() (err error) {
 func (self *ExportContext) loadRC() (err error) {
 	self.newEnv, err = self.foundRC.Load(self.config, self.oldEnv)
 	if err == nil {
-		self.quotes = self.newEnv.GetShellQuotes()
+		unloading_quotes := self.oldEnv.GetOnUnloadShellQuotes()
+		loading_quotes := self.newEnv.GetShellQuotes()
+		self.quotes = MergeShellQuotes(unloading_quotes, loading_quotes)
 	}
 	return
 }
 
 func (self *ExportContext) unloadEnv() (err error) {
 	log_status(self.env, "unloading")
+	self.quotes = self.env.GetOnUnloadShellQuotes()
 	self.newEnv = self.oldEnv.Copy()
 	cleanEnv(self.newEnv)
-	self.quotes = nil
 	return
 }
 
@@ -129,7 +131,8 @@ func (self *ExportContext) diffString(shell Shell) string {
 	}
 
 	diff := self.env.Diff(self.newEnv)
-	return diff.ToShell(shell) + self.quotes[shell]
+	log_debug("quotes[shell]: %s", self.quotes[shell])
+	return diff.ToShell(shell, self.quotes)
 }
 
 func exportCommand(env Env, args []string) (err error) {

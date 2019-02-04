@@ -722,6 +722,34 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  export \"${quote_var?}\"\n" +
 	"}\n" +
 	"\n" +
+	"quote bash \"unset DIRENV_ON_UNLOAD_bash\"\n" +
+	"quote zsh  \"unset DIRENV_ON_UNLOAD_zsh\"\n" +
+	"\n" +
+	"# Usage: shell_specific <shell> <make_on_unload> <on_load>\n" +
+	"#\n" +
+	"# Creates a shell-specific action. Both `make_on_unload` and `on_load`\n" +
+	"# are strings with code to be executed on the given host shell.\n" +
+	"# `make_on_unload` will be executed first; it is expected to output\n" +
+	"# shell-specific code to \"undo\" the effects of `on_load`.\n" +
+	"shell_specific() {\n" +
+	"  local shell=$1\n" +
+	"  local make_on_unload=$2\n" +
+	"  local on_load=$3\n" +
+	"  local on_unload_var=\"DIRENV_ON_UNLOAD_${shell}\"\n" +
+	"  case \"$shell\" in\n" +
+	"    bash | zsh)\n" +
+	"       printf -v cmd \\\n" +
+	"         \"export ${on_unload_var}; ${on_unload_var}+=\\$($direnv gzenv encode \\\"\\$(%s)\\\"),;%s\" \\\n" +
+	"         \"$make_on_unload\" \\\n" +
+	"         \"$on_load\"\n" +
+	"       quote \"$shell\" \"$cmd\"\n" +
+	"       ;;\n" +
+	"    *)\n" +
+	"       log_error \"shell_specific: '$shell' unsupported.\"\n" +
+	"       ;;\n" +
+	"  esac\n" +
+	"}\n" +
+	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then\n" +
 	"  # shellcheck disable=SC1090\n" +

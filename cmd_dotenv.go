@@ -45,7 +45,7 @@ var CmdDotEnv = &Cmd{
 			return err
 		}
 
-		str := env.ToShell(shell)
+		str := env.ToShell(shell, nil)
 		fmt.Println(str)
 
 		return

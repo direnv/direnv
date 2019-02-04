@@ -75,7 +75,7 @@ func (self *EnvDiff) Any() bool {
 	return len(self.Prev) > 0 || len(self.Next) > 0
 }
 
-func (self *EnvDiff) ToShell(shell Shell) string {
+func (self *EnvDiff) ToShell(shell Shell, quotes ShellQuotes) string {
 	e := make(ShellExport)
 
 	for key := range self.Prev {
@@ -89,7 +89,7 @@ func (self *EnvDiff) ToShell(shell Shell) string {
 		e.Add(key, value)
 	}
 
-	return shell.Export(e)
+	return shell.Export(e, quotes)
 }
 
 func (self *EnvDiff) Patch(env Env) (newEnv Env) {
@@ -128,6 +128,9 @@ func IgnoredEnv(key string) bool {
 		return true
 	}
 	if strings.HasPrefix(key, "DIRENV_QUOTE_") {
+		return true
+	}
+	if strings.HasPrefix(key, "DIRENV_ON_UNLOAD_") {
 		return true
 	}
 	_, found := IGNORED_KEYS[key]

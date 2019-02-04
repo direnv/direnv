@@ -43,7 +43,7 @@ func watchCommand(env Env, args []string) (err error) {
 	e := make(ShellExport)
 	e.Add(DIRENV_WATCHES, watches.Marshal())
 
-	fmt.Printf(shell.Export(e))
+	fmt.Printf(shell.Export(e, nil))
 
 	return
 }

@@ -19,7 +19,7 @@ func (sh fish) Hook() (string, error) {
 	return FISH_HOOK, nil
 }
 
-func (sh fish) Export(e ShellExport) (out string) {
+func (sh fish) Export(e ShellExport, q ShellQuotes) (out string) {
 	for key, value := range e {
 		if value == nil {
 			out += sh.unset(key)
@@ -27,6 +27,9 @@ func (sh fish) Export(e ShellExport) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
+	// For quotes, prefer "\n" over ";", since it will handle comments and
+	// empty commands better
+	out += strings.Join(q[sh], "\n")
 	return out
 }
 

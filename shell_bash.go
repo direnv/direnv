@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type bash struct{}
 
@@ -21,7 +24,7 @@ func (sh bash) Hook() (string, error) {
 	return BASH_HOOK, nil
 }
 
-func (sh bash) Export(e ShellExport) (out string) {
+func (sh bash) Export(e ShellExport, q ShellQuotes) (out string) {
 	for key, value := range e {
 		if value == nil {
 			out += sh.unset(key)
@@ -29,6 +32,9 @@ func (sh bash) Export(e ShellExport) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
+	// For quotes, prefer "\n" over ";", since it will handle comments and
+	// empty commands better
+	out += strings.Join(q[sh], "\n")
 	return out
 }
 
