@@ -21,7 +21,7 @@ used to build solutions similar to rbenv, pyenv and phpenv.
 
 ## Example
 
-```
+```sh
 $ cd ~/my_project
 $ echo ${FOO-nope}
 nope
