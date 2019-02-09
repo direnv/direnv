@@ -159,10 +159,10 @@ test_stop
 test_start "symlink-changed"
   # when using a symlink, reload if the symlink changes, or if the
   # target file changes.
-
   ln -fs ./state-A ./symlink
   direnv_eval
   test_eq "${STATE}" "A"
+  sleep 1
 
   ln -fs ./state-B ./symlink
   direnv_eval
