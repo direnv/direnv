@@ -724,6 +724,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"quote bash \"unset DIRENV_ON_UNLOAD_bash\"\n" +
 	"quote zsh  \"unset DIRENV_ON_UNLOAD_zsh\"\n" +
+	"quote fish  \"set -e DIRENV_ON_UNLOAD_fish\"\n" +
 	"\n" +
 	"# Usage: shell_specific <shell> <make_on_unload> <on_load>\n" +
 	"#\n" +
@@ -735,15 +736,24 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  local shell=$1\n" +
 	"  local make_on_unload=$2\n" +
 	"  local on_load=$3\n" +
-	"  local on_unload_var=\"DIRENV_ON_UNLOAD_${shell}\"\n" +
 	"  case \"$shell\" in\n" +
 	"    bash | zsh)\n" +
+	"       local on_unload_var=\"DIRENV_ON_UNLOAD_${shell}\"\n" +
 	"       printf -v cmd \\\n" +
 	"         \"export ${on_unload_var}; ${on_unload_var}+=\\$($direnv gzenv encode \\\"\\$(%s)\\\"),;%s\" \\\n" +
 	"         \"$make_on_unload\" \\\n" +
 	"         \"$on_load\"\n" +
 	"       quote \"$shell\" \"$cmd\"\n" +
 	"       ;;\n" +
+	"    fish)\n" +
+	"      # shellcheck disable=SC2016\n" +
+	"      printf -v cmd \\\n" +
+	"        '%s | read -lz DIRENV_UNLOAD; set DIRENV_UNLOAD (%s gzenv encode \"$DIRENV_UNLOAD\"); set -x -g DIRENV_ON_UNLOAD_fish \"$DIRENV_ON_UNLOAD_fish$DIRENV_UNLOAD,\";set -e DIRENV_UNLOAD;%s' \\\n" +
+	"          \"$make_on_unload\" \\\n" +
+	"          \"$direnv\" \\\n" +
+	"          \"$on_load\"\n" +
+	"      quote \"$shell\" \"$cmd\"\n" +
+	"      ;;\n" +
 	"    *)\n" +
 	"       log_error \"shell_specific: '$shell' unsupported.\"\n" +
 	"       ;;\n" +

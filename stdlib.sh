@@ -722,6 +722,7 @@ quote() {
 
 quote bash "unset DIRENV_ON_UNLOAD_bash"
 quote zsh  "unset DIRENV_ON_UNLOAD_zsh"
+quote fish "set -e DIRENV_ON_UNLOAD_fish"
 
 # Usage: shell_specific <shell> <make_on_unload> <on_load>
 #
@@ -733,15 +734,24 @@ shell_specific() {
   local shell=$1
   local make_on_unload=$2
   local on_load=$3
-  local on_unload_var="DIRENV_ON_UNLOAD_${shell}"
   case "$shell" in
     bash | zsh)
+       local on_unload_var="DIRENV_ON_UNLOAD_${shell}"
        printf -v cmd \
          "export ${on_unload_var}; ${on_unload_var}+=\$($direnv gzenv encode \"\$(%s)\"),;%s" \
          "$make_on_unload" \
          "$on_load"
        quote "$shell" "$cmd"
        ;;
+    fish)
+      # shellcheck disable=SC2016
+      printf -v cmd \
+        '%s | read -lz DIRENV_UNLOAD; set DIRENV_UNLOAD (%s gzenv encode "$DIRENV_UNLOAD"); set -x -g DIRENV_ON_UNLOAD_fish "$DIRENV_ON_UNLOAD_fish$DIRENV_UNLOAD,";set -e DIRENV_UNLOAD;%s' \
+          "$make_on_unload" \
+          "$direnv" \
+          "$on_load"
+      quote "$shell" "$cmd"
+      ;;
     *)
        log_error "shell_specific: '$shell' unsupported."
        ;;
