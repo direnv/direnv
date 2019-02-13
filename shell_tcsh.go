@@ -21,9 +21,8 @@ func (sh tcsh) Export(e ShellExport, q ShellQuotes) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
-	// For quotes, prefer "\n" over ";", since it will handle comments and
-	// empty commands better
-	out += strings.Join(q[sh], "\n")
+	// For quotes, use ";\n" since it will handle comments and empty commands better
+	out += strings.Join(q[sh], ";\n")
 	return out
 }
 

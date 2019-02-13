@@ -723,6 +723,7 @@ quote() {
 quote bash "unset DIRENV_ON_UNLOAD_bash"
 quote zsh  "unset DIRENV_ON_UNLOAD_zsh"
 quote fish "set -e DIRENV_ON_UNLOAD_fish"
+quote tcsh "unsetenv DIRENV_ON_UNLOAD_tcsh"
 
 # Usage: shell_specific <shell> <make_on_unload> <on_load>
 #
@@ -752,9 +753,17 @@ shell_specific() {
           "$on_load"
       quote "$shell" "$cmd"
       ;;
+    tcsh)
+      printf -v cmd \
+        "set DIRENV_UNLOAD=\`%s\`;if ( \$?DIRENV_ON_UNLOAD_tcsh == 0 ) setenv DIRENV_ON_UNLOAD_tcsh;setenv DIRENV_ON_UNLOAD_tcsh \$DIRENV_ON_UNLOAD_tcsh\`%s gzenv encode \"\$DIRENV_UNLOAD\"\`,;unset DIRENV_UNLOAD;%s" \
+          "$make_on_unload" \
+          "$direnv" \
+          "$on_load"
+      quote "$shell" "$cmd"
+      ;;
     *)
-       log_error "shell_specific: '$shell' unsupported."
-       ;;
+      log_error "shell_specific: '$shell' unsupported."
+      ;;
   esac
 }
 

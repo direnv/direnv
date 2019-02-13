@@ -724,7 +724,8 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"quote bash \"unset DIRENV_ON_UNLOAD_bash\"\n" +
 	"quote zsh  \"unset DIRENV_ON_UNLOAD_zsh\"\n" +
-	"quote fish  \"set -e DIRENV_ON_UNLOAD_fish\"\n" +
+	"quote fish \"set -e DIRENV_ON_UNLOAD_fish\"\n" +
+	"quote tcsh \"unsetenv DIRENV_ON_UNLOAD_tcsh\"\n" +
 	"\n" +
 	"# Usage: shell_specific <shell> <make_on_unload> <on_load>\n" +
 	"#\n" +
@@ -754,9 +755,17 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"          \"$on_load\"\n" +
 	"      quote \"$shell\" \"$cmd\"\n" +
 	"      ;;\n" +
+	"    tcsh)\n" +
+	"      printf -v cmd \\\n" +
+	"        \"set DIRENV_UNLOAD=\\`%s\\`;if ( \\$?DIRENV_ON_UNLOAD_tcsh == 0 ) setenv DIRENV_ON_UNLOAD_tcsh;setenv DIRENV_ON_UNLOAD_tcsh \\$DIRENV_ON_UNLOAD_tcsh\\`%s gzenv encode \\\"\\$DIRENV_UNLOAD\\\"\\`,;unset DIRENV_UNLOAD;%s\" \\\n" +
+	"          \"$make_on_unload\" \\\n" +
+	"          \"$direnv\" \\\n" +
+	"          \"$on_load\"\n" +
+	"      quote \"$shell\" \"$cmd\"\n" +
+	"      ;;\n" +
 	"    *)\n" +
-	"       log_error \"shell_specific: '$shell' unsupported.\"\n" +
-	"       ;;\n" +
+	"      log_error \"shell_specific: '$shell' unsupported.\"\n" +
+	"      ;;\n" +
 	"  esac\n" +
 	"}\n" +
 	"\n" +
