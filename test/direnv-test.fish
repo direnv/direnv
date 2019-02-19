@@ -135,3 +135,57 @@ test_start "shell-specific"
   eq (math "$FOO_1" + 100) "$FOO"
   eq (math "$FOOX_1" + 100) "$FOOX"
 test_stop
+
+test_start "alias"
+  functions -e foo
+  alias bar='original bar'
+
+  function expected_alias_def --argument-names name val
+    printf "function %s --description 'alias %s=%s'\n\t%s \$argv;\nend" "$name" "$name" "$val" "$val"
+  end
+
+  direnv_eval
+
+  set expected_foo (expected_alias_def foo "ls -l")
+  set actual_foo (functions foo | grep -v '^#')
+  eq "$expected_foo" "$actual_foo"
+
+  set expected_bar (expected_alias_def bar "ls -t")
+  set actual_bar (functions bar | grep -v '^#')
+  eq "$expected_bar" "$actual_bar"
+
+  cd nested
+  direnv allow
+  direnv_eval
+
+  set expected_foo ""
+  set actual_foo (functions foo; or true)
+  eq "$expected_foo"  "$actual_foo"
+
+  set expected_bar (expected_alias_def bar "df -h")
+  set actual_bar (functions bar | grep -v '^#')
+  eq "$expected_bar" "$actual_bar"
+
+  cd ..
+  direnv_eval
+
+  set expected_foo (expected_alias_def foo "ls -l")
+  set actual_foo (functions foo | grep -v '^#')
+  eq "$expected_foo" "$actual_foo"
+
+  set expected_bar (expected_alias_def bar "ls -t")
+  set actual_bar (functions bar | grep -v '^#')
+  eq "$expected_bar" "$actual_bar"
+
+  cd ..
+  direnv_eval
+
+  set expected_foo ""
+  set actual_foo (functions foo; or true)
+  eq "$expected_foo" "$actual_foo"
+
+  set expected_bar (expected_alias_def bar "original bar")
+  set actual_bar (functions bar | grep -v '^#')
+  eq "$expected_bar" "$actual_bar"
+
+test_stop

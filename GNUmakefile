@@ -143,6 +143,7 @@ test-fish:
 
 test-tcsh:
 	tcsh -e ./test/direnv-test.tcsh
+	tcsh    ./test/direnv-test-lax.tcsh
 
 test-zsh:
 	zsh ./test/direnv-test.zsh

@@ -769,6 +769,46 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  esac\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use aliases\n" +
+	"#\n" +
+	"# After this is called, the effect of subsequent usages of the `alias`\n" +
+	"# command will be available on the outer shell, by way of `shell_specific`\n" +
+	"# code.\n" +
+	"use_aliases() {\n" +
+	"  function _alias() {\n" +
+	"    local args=(\"$@\")\n" +
+	"\n" +
+	"    while [[ $# -gt 0 ]]; do\n" +
+	"      local arg=$1\n" +
+	"      local name\n" +
+	"      IFS='=' read -r name value <<< \"$arg\"\n" +
+	"      if [[ -n \"${value:-''}\" ]]; then\n" +
+	"        shell_specific \"bash\" \\\n" +
+	"          \"$(printf \"alias %q 2>/dev/null || echo \\\"unalias %q\\\"\" \"$name\" \"$name\")\" \\\n" +
+	"          \"$(printf \"alias %q=%q\" \"$name\" \"$value\")\"\n" +
+	"\n" +
+	"        shell_specific \"zsh\" \\\n" +
+	"          \"$(printf \"(_A=\\$(alias %q 2>/dev/null) && echo \\\"alias \\$_A\\\") || echo unalias %q\" \"$name\" \"$name\")\" \\\n" +
+	"          \"$(printf \"alias %q=%q\" \"$name\" \"$value\")\"\n" +
+	"\n" +
+	"        shell_specific \"fish\" \\\n" +
+	"          \"$(printf \"begin; functions %q; or echo functions -e %q; end\" \"$name\" \"$name\")\" \\\n" +
+	"          \"$(printf \"alias %q=%q\" \"$name\" \"$value\")\"\n" +
+	"\n" +
+	"        # shellcheck disable=SC2006\n" +
+	"        shell_specific \"tcsh\" \\\n" +
+	"          \"$(printf \"(alias | grep -q '^%q[[:space:]]') && (alias %q  | xargs -0 -r printf \\\"alias %q %%s\\\\\\n\\\") || echo unalias %q\" \"$name\" \"$name\" \"$name\" \"$name\")\" \\\n" +
+	"          \"$(printf \"alias %q %q\" \"$name\" \"$value\")\"\n" +
+	"      fi\n" +
+	"      shift\n" +
+	"    done\n" +
+	"    command alias \"${args[@]}\"\n" +
+	"  }\n" +
+	"\n" +
+	"  alias alias=_alias\n" +
+	"  shopt -s expand_aliases\n" +
+	"}\n" +
+	"\n" +
 	"## Load the global ~/.direnvrc if present\n" +
 	"if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then\n" +
 	"  # shellcheck disable=SC1090\n" +

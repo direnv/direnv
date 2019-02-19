@@ -228,6 +228,34 @@ test_start "shell-specific"
 
  test_stop
 
+test_start "alias"
+  unalias foo 2>/dev/null || true
+  alias bar='original bar'
+
+  direnv_eval
+
+  # NB. zsh and bash differ in that bash will prepend an "alias " to
+  # the output of `alias foo`
+  test_eq "$(alias foo | sed -e 's/^alias //')" "foo='ls -l'"
+  test_eq "$(alias bar | sed -e 's/^alias //')" "bar='ls -t'"
+
+  cd nested
+  direnv allow
+  direnv_eval
+  test_eq "$(alias foo 2>/dev/null || true)" ""
+  test_eq "$(alias bar | sed -e 's/^alias //')" "bar='df -h'"
+
+  cd ..
+  direnv_eval
+  test_eq "$(alias foo | sed -e 's/^alias //')" "foo='ls -l'"
+  test_eq "$(alias bar | sed -e 's/^alias //')" "bar='ls -t'"
+
+  cd ..
+  direnv_eval
+  test_eq "$(alias foo 2>/dev/null || true)" ""
+  test_eq "$(alias bar | sed -e 's/^alias //')" "bar='original bar'"
+test_stop
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.

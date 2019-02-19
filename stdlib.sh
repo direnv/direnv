@@ -767,6 +767,46 @@ shell_specific() {
   esac
 }
 
+# Usage: use aliases
+#
+# After this is called, the effect of subsequent usages of the `alias`
+# command will be available on the outer shell, by way of `shell_specific`
+# code.
+use_aliases() {
+  function _alias() {
+    local args=("$@")
+
+    while [[ $# -gt 0 ]]; do
+      local arg=$1
+      local name
+      IFS='=' read -r name value <<< "$arg"
+      if [[ -n "${value:-''}" ]]; then
+        shell_specific "bash" \
+          "$(printf "alias %q 2>/dev/null || echo \"unalias %q\"" "$name" "$name")" \
+          "$(printf "alias %q=%q" "$name" "$value")"
+
+        shell_specific "zsh" \
+          "$(printf "(_A=\$(alias %q 2>/dev/null) && echo \"alias \$_A\") || echo unalias %q" "$name" "$name")" \
+          "$(printf "alias %q=%q" "$name" "$value")"
+
+        shell_specific "fish" \
+          "$(printf "begin; functions %q; or echo functions -e %q; end" "$name" "$name")" \
+          "$(printf "alias %q=%q" "$name" "$value")"
+
+        # shellcheck disable=SC2006
+        shell_specific "tcsh" \
+          "$(printf "(alias | grep -q '^%q[[:space:]]') && (alias %q  | xargs -0 -r printf \"alias %q %%s\\\n\") || echo unalias %q" "$name" "$name" "$name" "$name")" \
+          "$(printf "alias %q %q" "$name" "$value")"
+      fi
+      shift
+    done
+    command alias "${args[@]}"
+  }
+
+  alias alias=_alias
+  shopt -s expand_aliases
+}
+
 ## Load the global ~/.direnvrc if present
 if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
   # shellcheck disable=SC1090
