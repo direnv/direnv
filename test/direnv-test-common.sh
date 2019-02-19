@@ -24,7 +24,7 @@ mkdir -p ${XDG_CONFIG_HOME}/direnv
 touch ${XDG_CONFIG_HOME}/direnv/direnvrc
 
 direnv_eval() {
-  eval `direnv export $TARGET_SHELL`
+  eval "$(direnv export $TARGET_SHELL)"
 }
 
 test_start() {
