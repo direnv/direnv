@@ -484,7 +484,7 @@ layout_anaconda() {
     conda=$(command -v conda)
   fi
   PATH_add "$(dirname "$conda")"
-  env_loc=$("$conda" env list | grep -- "$env_name")
+  env_loc=$("$conda" env list | grep -- "^$env_name\s")
   if [[ ! "$env_loc" == $env_name*$env_name ]]; then
     if [[ -e environment.yml ]]; then
       log_status "creating conda environment"
