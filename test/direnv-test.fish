@@ -25,7 +25,7 @@ set -e DIRENV_DIFF
 
 function direnv_eval
   #direnv export fish # for debugging
-  eval (direnv export fish)
+  direnv export fish | source
 end
 
 function test_start -a name
