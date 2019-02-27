@@ -245,8 +245,6 @@ Or drop by on [IRC (#direnv on freenode)](irc://irc.freenode.net/#direnv) to
 have a chat. If you ask a question make sure to stay around as not everyone is
 active all day.
 
-[![Build Status](https://api.travis-ci.org/direnv/direnv.png?branch=master)](http://travis-ci.org/direnv/direnv)
-
 ## COPYRIGHT
 
 Copyright (C) 2014 shared by all
