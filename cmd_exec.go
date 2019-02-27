@@ -51,7 +51,7 @@ var CmdExec = &Cmd{
 
 		// Restore pristine environment if needed
 		if backupDiff, err = config.EnvDiff(); err == nil {
-			backupDiff.Reverse().Patch(env)
+			env = backupDiff.Reverse().Patch(env)
 		}
 		env.CleanContext()
 
