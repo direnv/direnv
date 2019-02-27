@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -31,6 +32,11 @@ func (env Env) CleanContext() {
 	delete(env, DIRENV_DIR)
 	delete(env, DIRENV_WATCHES)
 	delete(env, DIRENV_DIFF)
+	for key := range env {
+		if _, err := TryGetShellTarget("DIRENV_ON_UNLOAD_", key); err == nil {
+			delete(env, key)
+		}
+	}
 }
 
 func LoadEnv(gzenvStr string) (env Env, err error) {
@@ -59,14 +65,14 @@ func (env Env) ToGoEnv() []string {
 	return goEnv
 }
 
-func (env Env) ToShell(shell Shell) string {
+func (env Env) ToShell(shell Shell, quotes ShellQuotes) string {
 	e := make(ShellExport)
 
 	for key, value := range env {
 		e.Add(key, value)
 	}
 
-	return shell.Export(e)
+	return shell.Export(e, quotes)
 }
 
 func (env Env) Serialize() string {
@@ -83,4 +89,43 @@ func (e Env) Fetch(key, def string) string {
 		v = def
 	}
 	return v
+}
+
+func (env Env) GetShellQuotes() (quotes ShellQuotes) {
+	quotes = make(ShellQuotes)
+	for key, value := range env {
+		if shell, err := TryGetShellTarget("DIRENV_QUOTE_", key); err == nil {
+			quotes[shell] = []string{value}
+		}
+	}
+	return
+}
+
+func (env Env) GetOnUnloadShellQuotes() (quotes ShellQuotes) {
+	quotes = make(ShellQuotes)
+	for key, value := range env {
+		if shell, err := TryGetShellTarget("DIRENV_ON_UNLOAD_", key); err == nil {
+			qs := strings.Split(value, ",")
+			for i, encodedQuote := range qs {
+				var unencodedQuote string
+				gzenv.Unmarshal(encodedQuote, &unencodedQuote)
+				qs[i] = unencodedQuote
+			}
+			quotes[shell] = qs
+		}
+	}
+	return
+}
+
+func TryGetShellTarget(prefix, s string) (shell Shell, err error) {
+	target := strings.TrimPrefix(s, prefix)
+	if target == s {
+		err = fmt.Errorf("TryGetShellTarget() - %q is not prefix of %q", prefix, s)
+		return
+	}
+	shell = DetectShell(target)
+	if shell == nil {
+		err = fmt.Errorf("TryGetShellTarget() - unknown shell %q", target)
+	}
+	return
 }

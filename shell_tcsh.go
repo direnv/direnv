@@ -13,7 +13,7 @@ func (sh tcsh) Hook() (string, error) {
 	return "alias precmd 'eval `{{.SelfPath}} export tcsh`'", nil
 }
 
-func (sh tcsh) Export(e ShellExport) (out string) {
+func (sh tcsh) Export(e ShellExport, q ShellQuotes) (out string) {
 	for key, value := range e {
 		if value == nil {
 			out += sh.unset(key)
@@ -21,6 +21,8 @@ func (sh tcsh) Export(e ShellExport) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
+	// For quotes, use ";\n" since it will handle comments and empty commands better
+	out += strings.Join(q[sh], ";\n")
 	return out
 }
 

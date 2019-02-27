@@ -142,12 +142,11 @@ test-fish:
 	fish ./test/direnv-test.fish
 
 test-tcsh:
-	# Currently broken
-	#tcsh -e ./test/direnv-test.tcsh
+	tcsh -e ./test/direnv-test.tcsh
+	tcsh    ./test/direnv-test-lax.tcsh
 
 test-zsh:
-	# Currently missing
-	#zsh ./test/direnv-test.zsh
+	zsh ./test/direnv-test.zsh
 
 ############################################################################
 # Installation

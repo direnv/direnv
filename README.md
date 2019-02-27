@@ -123,7 +123,7 @@ eval "$(direnv hook zsh)"
 Add the following line at the end of the `~/.config/fish/config.fish` file:
 
 ```fish
-eval (direnv hook fish)
+direnv hook fish | source
 ```
 
 ### TCSH

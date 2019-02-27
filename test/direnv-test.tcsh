@@ -11,10 +11,8 @@ unsetenv DIRENV_DIR
 unsetenv DIRENV_MTIME
 unsetenv DIRENV_WATCHES
 unsetenv DIRENV_DIFF
+unsetenv DIRENV_ON_UNLOAD_tcsh
 
-# direnv_eval() {
-#   eval `direnv export bash`
-# }
 alias direnv_eval 'eval `direnv export tcsh`'
 
 # test_start() {
@@ -51,15 +49,20 @@ cd $TEST_DIR/scenarios/base
 
   cd ..
   direnv_eval
-  echo "$?HELLO"
   test 0 -eq "$?HELLO"
 cd $TEST_DIR ; direnv_eval
 
 cd $TEST_DIR/scenarios/inherit
+  cp ../base/.envrc ../inherited/.envrc
   direnv allow
   echo "Testing inherit"
   direnv_eval
   test "$HELLO" = "world"
+
+  sleep 1
+  echo "export HELLO=goodbye" > ../inherited/.envrc
+  direnv_eval
+  test "$HELLO" = "goodbye"
 cd $TEST_DIR ; direnv_eval
 
 cd $TEST_DIR/scenarios/ruby-layout
@@ -114,6 +117,74 @@ cd $TEST_DIR/scenarios/"empty-var-unset"
   direnv_eval
   test "$?FOO" -eq '0'
   unsetenv FOO
+cd $TEST_DIR ; direnv_eval
+
+cd $TEST_DIR/scenarios/"shell-specific"
+  direnv allow
+  echo "Testing shell-specific"
+
+  unsetenv BAR
+  unsetenv FOO
+  unsetenv FOOX
+  unsetenv FOO_OR_NAN
+  unsetenv FOOX_OR_NAN
+  unsetenv BAR_OR_NAN
+
+  setenv TARGET_SHELL tcsh
+
+  direnv_eval
+  # FOO=x; ON UNLOAD WILL RUN FOO=x + 100
+  # export FOOX=y; ON UNLOAD WILL RUN FOOX=FOOX + 100
+
+  test "$FOO" -ge 0
+  test "$FOOX" -ge 0
+  test "$BAR" -ge 0
+
+  set FOO_0=$FOO
+  set FOOX_0=$FOOX
+  set BAR_0=$BAR
+
+  direnv allow nested/.envrc
+  cd nested
+  direnv_eval
+  # Set by nested/.envrc
+  test "$FOO_OR_NAN" = "NaN"
+  test "$BAR_OR_NAN" = "NaN"
+  test "$FOOX_OR_NAN" = $FOOX_0  # unlike BAR
+
+  # NB. In what follows, the usages of expr are safe since the result != 0.
+  # Othewise, `expr` will exit with status 1, which is normal, not an error, but
+  # this will break since tcsh is ran with -e.
+
+  # Set by unload action of ./.envrc
+  test "$FOO" -eq `expr "$FOO_0" + 100`
+
+  # Set by combination of action in nested/..envrc and unload of .envrc
+  # The +1 on both sides of -eq is to ensure the exist status of expr is 0
+  test `expr $FOOX + 1` -eq `expr \( "$FOOX_0" + 100 \) % 3 + 1`
+
+  cd ..
+  direnv_eval
+
+  # New random values
+  test "$FOO" -ge 0
+  test "$BAR" -ge 0
+
+  # Random value overrides the FOOX + 1000 on_unload from nested/.envrc
+  test "$FOOX" -ge 0
+  test "$FOOX" -lt 100
+
+  set FOO_1=$FOO
+  set BAR_1=$BAR
+  set FOOX_1=$FOOX
+
+  cd ..
+  direnv_eval
+
+  # Unload actions from .envrc
+  test "$FOO" -eq `expr "$FOO_1" + 100`
+  test "$FOOX" -eq `expr "$FOOX_1" + 100`
+
 cd $TEST_DIR ; direnv_eval
 
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file

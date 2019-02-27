@@ -30,6 +30,7 @@ func init() {
 		CmdExec,
 		CmdExpandPath,
 		CmdExport,
+		CmdGzEnv,
 		CmdHelp,
 		CmdHook,
 		CmdPrune,

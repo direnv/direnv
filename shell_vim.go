@@ -13,7 +13,7 @@ func (sh vim) Hook() (string, error) {
 	return "", errors.New("this feature is not supported. Install the direnv.vim plugin instead.")
 }
 
-func (sh vim) Export(e ShellExport) (out string) {
+func (sh vim) Export(e ShellExport, q ShellQuotes) (out string) {
 	for key, value := range e {
 		if value == nil {
 			out += sh.unset(key)
@@ -21,6 +21,7 @@ func (sh vim) Export(e ShellExport) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
+	out += strings.Join(q[sh], "\n")
 	return out
 }
 

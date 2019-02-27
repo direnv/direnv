@@ -28,7 +28,7 @@ func (elvish) Hook() (string, error) {
 `, nil
 }
 
-func (sh elvish) Export(e ShellExport) string {
+func (sh elvish) Export(e ShellExport, q ShellQuotes) string {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(e)
 	if err != nil {

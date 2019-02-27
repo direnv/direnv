@@ -704,6 +704,109 @@ use_guix() {
   eval "$(guix environment "$@" --search-paths)"
 }
 
+# Usage: quote <shell> [...]
+#
+# Example:
+#
+#  quote zsh alias foo=bar
+#
+# This will add `alias foo=bar;` to the output of `direnv export zsh`
+quote() {
+  local shell=$1
+  local quote_var="DIRENV_QUOTE_${shell}"
+  shift
+  local previous=${!quote_var:-''}
+  printf -v "${quote_var}" "%s%s;" "$previous" "$*"
+  export "${quote_var?}"
+}
+
+quote bash "unset DIRENV_ON_UNLOAD_bash"
+quote zsh  "unset DIRENV_ON_UNLOAD_zsh"
+quote fish "set -e DIRENV_ON_UNLOAD_fish"
+quote tcsh "unsetenv DIRENV_ON_UNLOAD_tcsh"
+
+# Usage: shell_specific <shell> <make_on_unload> <on_load>
+#
+# Creates a shell-specific action. Both `make_on_unload` and `on_load`
+# are strings with code to be executed on the given host shell.
+# `make_on_unload` will be executed first; it is expected to output
+# shell-specific code to "undo" the effects of `on_load`.
+shell_specific() {
+  local shell=$1
+  local make_on_unload=$2
+  local on_load=$3
+  case "$shell" in
+    bash | zsh)
+       local on_unload_var="DIRENV_ON_UNLOAD_${shell}"
+       printf -v cmd \
+         "export ${on_unload_var}; ${on_unload_var}+=\$($direnv gzenv encode \"\$(%s)\"),;%s" \
+         "$make_on_unload" \
+         "$on_load"
+       quote "$shell" "$cmd"
+       ;;
+    fish)
+      # shellcheck disable=SC2016
+      printf -v cmd \
+        '%s | read -lz DIRENV_UNLOAD; set DIRENV_UNLOAD (%s gzenv encode "$DIRENV_UNLOAD"); set -x -g DIRENV_ON_UNLOAD_fish "$DIRENV_ON_UNLOAD_fish$DIRENV_UNLOAD,";set -e DIRENV_UNLOAD;%s' \
+          "$make_on_unload" \
+          "$direnv" \
+          "$on_load"
+      quote "$shell" "$cmd"
+      ;;
+    tcsh)
+      printf -v cmd \
+        "set DIRENV_UNLOAD=\`%s\`;if ( \$?DIRENV_ON_UNLOAD_tcsh == 0 ) setenv DIRENV_ON_UNLOAD_tcsh;setenv DIRENV_ON_UNLOAD_tcsh \$DIRENV_ON_UNLOAD_tcsh\`%s gzenv encode \"\$DIRENV_UNLOAD\"\`,;unset DIRENV_UNLOAD;%s" \
+          "$make_on_unload" \
+          "$direnv" \
+          "$on_load"
+      quote "$shell" "$cmd"
+      ;;
+    *)
+      log_error "shell_specific: '$shell' unsupported."
+      ;;
+  esac
+}
+
+# Usage: use aliases
+#
+# After this is called, the effect of subsequent usages of the `alias`
+# command will be available on the outer shell, by way of `shell_specific`
+# code.
+use_aliases() {
+  function _alias() {
+    local args=("$@")
+
+    while [[ $# -gt 0 ]]; do
+      local arg=$1
+      local name
+      IFS='=' read -r name value <<< "$arg"
+      if [[ -n "${value:-''}" ]]; then
+        shell_specific "bash" \
+          "$(printf "alias %q 2>/dev/null || echo \"unalias %q\"" "$name" "$name")" \
+          "$(printf "alias %q=%q" "$name" "$value")"
+
+        shell_specific "zsh" \
+          "$(printf "(_A=\$(alias %q 2>/dev/null) && echo \"alias \$_A\") || echo unalias %q" "$name" "$name")" \
+          "$(printf "alias %q=%q" "$name" "$value")"
+
+        shell_specific "fish" \
+          "$(printf "begin; functions %q; or echo functions -e %q; end" "$name" "$name")" \
+          "$(printf "alias %q=%q" "$name" "$value")"
+
+        # shellcheck disable=SC2006
+        shell_specific "tcsh" \
+          "$(printf "(alias | grep -q '^%q[[:space:]]') && (alias %q  | xargs -0 -r printf \"alias %q %%s\\\n\") || echo unalias %q" "$name" "$name" "$name" "$name")" \
+          "$(printf "alias %q %q" "$name" "$value")"
+      fi
+      shift
+    done
+    command alias "${args[@]}"
+  }
+
+  alias alias=_alias
+  shopt -s expand_aliases
+}
+
 ## Load the global ~/.direnvrc if present
 if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
   # shellcheck disable=SC1090

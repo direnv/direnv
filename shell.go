@@ -9,7 +9,7 @@ import (
  */
 type Shell interface {
 	Hook() (string, error)
-	Export(e ShellExport) string
+	Export(e ShellExport, q ShellQuotes) string
 	Dump(env Env) string
 }
 
@@ -22,6 +22,20 @@ func (e ShellExport) Add(key, value string) {
 
 func (e ShellExport) Remove(key string) {
 	e[key] = nil
+}
+
+// Shell-specific commands
+type ShellQuotes map[Shell][]string
+
+func MergeShellQuotes(l, r ShellQuotes) (merged ShellQuotes) {
+	merged = make(ShellQuotes)
+	for k, v := range l {
+		merged[k] = v
+	}
+	for k, v := range r {
+		merged[k] = append(merged[k], v...)
+	}
+	return
 }
 
 func DetectShell(target string) Shell {

@@ -33,7 +33,7 @@ var CmdApplyDump = &Cmd{
 
 		diff := env.Diff(dumpedEnv)
 
-		exports := diff.ToShell(BASH)
+		exports := diff.ToShell(BASH, nil)
 
 		_, err = fmt.Println(exports)
 		if err != nil {

@@ -15,7 +15,7 @@ func (s gzenvShell) Hook() (string, error) {
 	return "", errors.New("the gzenv shell doesn't support hooking")
 }
 
-func (s gzenvShell) Export(e ShellExport) string {
+func (s gzenvShell) Export(e ShellExport, q ShellQuotes) string {
 	return gzenv.Marshal(e)
 }
 
