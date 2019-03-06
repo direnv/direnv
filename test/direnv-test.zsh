@@ -1,3 +1,3 @@
-#!/usr/bin/env bash
-export TARGET_SHELL=bash
+#!/usr/bin/env zsh
+export TARGET_SHELL=zsh
 source "$(dirname $0)/direnv-test-common.sh"

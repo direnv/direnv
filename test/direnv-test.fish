@@ -25,7 +25,7 @@ set -e DIRENV_DIFF
 
 function direnv_eval
   #direnv export fish # for debugging
-  eval (direnv export fish)
+  direnv export fish | source
 end
 
 function test_start -a name
@@ -46,7 +46,7 @@ direnv allow
 direnv_eval
 
 test_start dump
-	set -ex LS_COLORS
+	set -e LS_COLORS
 	direnv_eval
 	eq "$LS_COLORS" "*.ogg=38;5;45:*.wav=38;5;45"
 	eq "$LESSOPEN" "||/usr/bin/lesspipe.sh %s"

@@ -11,7 +11,7 @@ var FISH Shell = fish{}
 
 const FISH_HOOK = `
 function __direnv_export_eval --on-event fish_prompt;
-	eval ("{{.SelfPath}}" export fish);
+	"{{.SelfPath}}" export fish | source;
 end
 `
 
