@@ -12,7 +12,9 @@ _direnv_hook() {
   eval "$("{{.SelfPath}}" export bash)";
   return $previous_exit_status;
 };
-if ! [[ "$PROMPT_COMMAND" =~ _direnv_hook ]]; then
+if [[ -z "$PROMPT_COMMAND" ]]; then
+  PROMPT_COMMAND="_direnv_hook"
+elif ! [[ "$PROMPT_COMMAND" =~ _direnv_hook ]]; then
   PROMPT_COMMAND="_direnv_hook;$PROMPT_COMMAND"
 fi
 `
