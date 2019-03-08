@@ -123,7 +123,7 @@ eval "$(direnv hook zsh)"
 Add the following line at the end of the `~/.config/fish/config.fish` file:
 
 ```fish
-eval (direnv hook fish)
+direnv hook fish | source
 ```
 
 ### TCSH
@@ -194,6 +194,9 @@ It's also possible to create your own extensions by creating a bash file at
 ".envrc" and thus allows you to make your own extensions to direnv.
 
 #### Loading layered .envrc
+
+NOTE: the authorization framework doesn't apply here and all the `.envrc` will
+be loaded without verification
 
 Let's say you have the following structure:
 
