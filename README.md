@@ -195,6 +195,9 @@ It's also possible to create your own extensions by creating a bash file at
 
 #### Loading layered .envrc
 
+NOTE: the authorization framework doesn't apply here and all the `.envrc` will
+be loaded without verification
+
 Let's say you have the following structure:
 
 - "/a/.envrc"
