@@ -486,7 +486,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"    conda=$(command -v conda)\n" +
 	"  fi\n" +
 	"  PATH_add \"$(dirname \"$conda\")\"\n" +
-	"  env_loc=$(\"$conda\" env list | grep -- \"$env_name\")\n" +
+	"  env_loc=$(\"$conda\" env list | grep -- \"^$env_name\\s\")\n" +
 	"  if [[ ! \"$env_loc\" == $env_name*$env_name ]]; then\n" +
 	"    if [[ -e environment.yml ]]; then\n" +
 	"      log_status \"creating conda environment\"\n" +

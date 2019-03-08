@@ -12,9 +12,6 @@ unsetenv DIRENV_MTIME
 unsetenv DIRENV_WATCHES
 unsetenv DIRENV_DIFF
 
-# direnv_eval() {
-#   eval `direnv export bash`
-# }
 alias direnv_eval 'eval `direnv export tcsh`'
 
 # test_start() {
@@ -51,15 +48,20 @@ cd $TEST_DIR/scenarios/base
 
   cd ..
   direnv_eval
-  echo "$?HELLO"
   test 0 -eq "$?HELLO"
 cd $TEST_DIR ; direnv_eval
 
 cd $TEST_DIR/scenarios/inherit
+  cp ../base/.envrc ../inherited/.envrc
   direnv allow
   echo "Testing inherit"
   direnv_eval
   test "$HELLO" = "world"
+
+  sleep 1
+  echo "export HELLO=goodbye" > ../inherited/.envrc
+  direnv_eval
+  test "$HELLO" = "goodbye"
 cd $TEST_DIR ; direnv_eval
 
 cd $TEST_DIR/scenarios/ruby-layout
