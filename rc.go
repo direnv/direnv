@@ -158,6 +158,9 @@ func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	if err != nil {
 		return
 	}
+	if newEnv2["PS1"] != "" {
+		log_error("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
+	}
 	newEnv = newEnv2
 
 	return
