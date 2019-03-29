@@ -14,7 +14,7 @@ func (elvish) Hook() (string, error) {
 @edit:before-readline = $@edit:before-readline {
 	try {
 		m = [("{{.SelfPath}}" export elvish | from-json)]
-		if (> (count $m) 1) {
+		if (> (count $m) 0) {
 			m = (explode $m)
 			keys $m | each [k]{
 				if (==s $k 'null') {
