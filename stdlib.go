@@ -587,13 +587,13 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"rvm() {\n" +
 	"  unset rvm\n" +
 	"  if [[ -n ${rvm_scripts_path:-} ]]; then\n" +
-	"    # shellcheck source=/dev/null\n" +
+	"    # shellcheck disable=SC1090\n" +
 	"    source \"${rvm_scripts_path}/rvm\"\n" +
 	"  elif [[ -n ${rvm_path:-} ]]; then\n" +
-	"    # shellcheck source=/dev/null\n" +
+	"    # shellcheck disable=SC1090\n" +
 	"    source \"${rvm_path}/scripts/rvm\"\n" +
 	"  else\n" +
-	"    # shellcheck source=/dev/null\n" +
+	"    # shellcheck disable=SC1090\n" +
 	"    source \"$HOME/.rvm/scripts/rvm\"\n" +
 	"  fi\n" +
 	"  rvm \"$@\"\n" +
