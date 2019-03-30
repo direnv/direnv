@@ -1,0 +1,19 @@
+steps:
+  - checkout: self
+    fetchDepth: 1
+  - bash: |
+      set -euo pipefail
+      curl -sfL https://nixos.org/nix/install | bash
+    displayName: 'Install Nix'
+  - bash: |
+      set -euo pipefail
+      MANPATH=
+      source $HOME/.nix-profile/etc/profile.d/nix.sh
+      nix-build
+    displayName: 'Build'
+  - bash: |
+      set -euo pipefail
+      MANPATH=
+      source $HOME/.nix-profile/etc/profile.d/nix.sh
+      nix-shell --pure --run "make test"
+    displayName: 'Test'
