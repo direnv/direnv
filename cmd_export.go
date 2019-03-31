@@ -80,15 +80,6 @@ func (self *ExportContext) unloadEnv() (err error) {
 	return
 }
 
-func (self *ExportContext) resetEnv() {
-	self.newEnv = self.oldEnv.Copy()
-	cleanEnv(self.oldEnv)
-	if self.foundRC != nil {
-		delete(self.newEnv, DIRENV_DIFF)
-		self.foundRC.RecordState(self.oldEnv, self.newEnv)
-	}
-}
-
 func cleanEnv(env Env) {
 	env.CleanContext()
 }
@@ -156,12 +147,11 @@ func exportCommand(env Env, args []string) (err error) {
 	log_debug("updating RC")
 	if err = context.updateRC(); err != nil {
 		log_debug("err: %v", err)
-		context.resetEnv()
 	}
 
 	if context.newEnv == nil {
 		log_debug("newEnv nil, exiting")
-		return nil
+		return
 	}
 
 	diffString := context.diffString(shell)
