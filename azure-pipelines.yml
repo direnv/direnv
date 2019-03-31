@@ -16,6 +16,12 @@ jobs:
     steps:
       - template: ci/build-steps.yml
 
+  - job: Release
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - template: ci/release-steps.yml
+
   # - job: Windows
   #   pool:
   #     vmImage: 'windows-2019'
