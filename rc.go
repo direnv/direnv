@@ -121,11 +121,15 @@ const NOT_ALLOWED = "%s is blocked. Run `direnv allow` to approve its content."
 func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	wd := config.WorkDir
 	direnv := config.SelfPath
-	shellEnv := env.Copy()
-	shellEnv[DIRENV_WATCHES] = self.times.Marshal()
+	newEnv = env.Copy()
+	newEnv[DIRENV_WATCHES] = self.times.Marshal()
+	defer func() {
+		self.RecordState(env, newEnv)
+	}()
 
 	if !self.Allowed() {
-		return nil, fmt.Errorf(NOT_ALLOWED, self.RelTo(wd))
+		err = fmt.Errorf(NOT_ALLOWED, self.RelTo(wd))
+		return
 	}
 
 	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
@@ -142,7 +146,7 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	}
 
 	cmd.Stderr = os.Stderr
-	cmd.Env = shellEnv.ToGoEnv()
+	cmd.Env = newEnv.ToGoEnv()
 	cmd.Dir = wd
 
 	out, err := cmd.Output()
@@ -150,12 +154,11 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		return
 	}
 
-	newEnv, err = LoadEnv(string(out))
+	newEnv2, err := LoadEnv(string(out))
 	if err != nil {
 		return
 	}
-
-	self.RecordState(env, newEnv)
+	newEnv = newEnv2
 
 	return
 }
