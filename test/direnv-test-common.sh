@@ -1,15 +1,16 @@
 # Test script for Bourne-shell extensions. Set TARGET_SHELL
 # to the shell to be tested (bash, zsh, etc) before sourcing it.
-if [[ -z "TARGET_SHELL" ]]; then
+if [[ -z "$TARGET_SHELL" ]]; then
   echo "TARGET_SHELL variable not set"
   exit 1
 fi
 
 set -e
 
-cd `dirname $0`
+cd "$(dirname "$0")"
 TEST_DIR=$PWD
-export PATH=`dirname $TEST_DIR`:$PATH
+PATH=$(dirname "$TEST_DIR"):$PATH
+export PATH
 
 # Reset the direnv loading if any
 export DIRENV_CONFIG=$PWD
@@ -20,11 +21,11 @@ unset DIRENV_WATCHES
 unset DIRENV_DIFF
 
 export XDG_CONFIG_HOME=${TEST_DIR}/config
-mkdir -p ${XDG_CONFIG_HOME}/direnv
-touch ${XDG_CONFIG_HOME}/direnv/direnvrc
+mkdir -p "${XDG_CONFIG_HOME}/direnv"
+touch "${XDG_CONFIG_HOME}/direnv/direnvrc"
 
 direnv_eval() {
-  eval "$(direnv export $TARGET_SHELL)"
+  eval "$(direnv export "$TARGET_SHELL")"
 }
 
 test_start() {
@@ -40,7 +41,7 @@ test_start() {
 }
 
 test_stop() {
-  cd $TEST_DIR
+  cd "$TEST_DIR"
   direnv_eval
 }
 
@@ -91,7 +92,7 @@ test_stop
 test_start inherit
   cp ../base/.envrc ../inherited/.envrc
   direnv_eval
-  echo "HELLO should be world:" $HELLO
+  echo "HELLO should be world:" "$HELLO"
 
   sleep 1
   echo "export HELLO=goodbye" > ../inherited/.envrc
@@ -119,7 +120,7 @@ test_start "child-env"
 test_stop
 
 test_start "special-vars"
-  export DIRENV_BASH=`command -v bash`
+  export DIRENV_BASH=$(command -v bash)
   export DIRENV_CONFIG=foobar
   direnv_eval || true
   test -n "$DIRENV_BASH"
