@@ -1,10 +1,11 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import ./nix {} }:
 with pkgs;
 
 buildGoPackage rec {
   name = "direnv-${version}";
   version = lib.fileContents ./version.txt;
   goPackagePath = "github.com/direnv/direnv";
+  subPackages = ["."];
 
   src = lib.cleanSource ./.;
 
