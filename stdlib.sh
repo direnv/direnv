@@ -198,8 +198,12 @@ find_up() {
 source_env() {
   local rcpath=${1/#\~/$HOME}
   local rcfile
-  if ! [[ -f $rcpath ]]; then
+  if [[ -d $rcpath ]]; then
     rcpath=$rcpath/.envrc
+  fi
+  if [[ ! -e $rcpath ]]; then
+    log_status "referenced $rcpath does not exist"
+    return 1
   fi
 
   rcfile=$(user_rel_path "$rcpath")
