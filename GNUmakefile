@@ -6,6 +6,7 @@
 DESTDIR ?= /usr/local
 BINDIR   = ${DESTDIR}/bin
 MANDIR   = ${DESTDIR}/share/man
+DISTDIR ?= dist
 
 # filename of the executable
 exe = direnv$(shell go env GOEXE)
@@ -161,5 +162,5 @@ install: all
 .PHONY: dist
 dist: | $(base)
 	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
-	cd "$(base)" && gox -output "dist/direnv.{{.OS}}-{{.Arch}}"
+	cd "$(base)" && gox -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}"
 

@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import ./nix {} }:
 with pkgs;
 mkShell {
   buildInputs = [

@@ -209,7 +209,7 @@ source_env() {
   pushd "$(dirname "$rcpath")" >/dev/null
   if [[ -f ./$(basename "$rcpath") ]]; then
     log_status "loading $rcfile"
-    # shellcheck source=/dev/null
+    # shellcheck disable=SC1090
     . "./$(basename "$rcpath")"
   else
     log_status "referenced $rcfile does not exist"
@@ -585,13 +585,13 @@ use_rbenv() {
 rvm() {
   unset rvm
   if [[ -n ${rvm_scripts_path:-} ]]; then
-    # shellcheck source=/dev/null
+    # shellcheck disable=SC1090
     source "${rvm_scripts_path}/rvm"
   elif [[ -n ${rvm_path:-} ]]; then
-    # shellcheck source=/dev/null
+    # shellcheck disable=SC1090
     source "${rvm_path}/scripts/rvm"
   else
-    # shellcheck source=/dev/null
+    # shellcheck disable=SC1090
     source "$HOME/.rvm/scripts/rvm"
   fi
   rvm "$@"

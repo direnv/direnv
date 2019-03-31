@@ -1,0 +1,29 @@
+# See https://aka.ms/yaml
+
+trigger:
+- master
+
+jobs:
+  - job: Linux
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - template: ci/build-steps.yml
+
+  - job: macOS
+    pool:
+      vmImage: 'macOS-10.13'
+    steps:
+      - template: ci/build-steps.yml
+
+  - job: Release
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - template: ci/release-steps.yml
+
+  # - job: Windows
+  #   pool:
+  #     vmImage: 'windows-2019'
+  #   steps:
+  #     - template: azure-pipelines-windows.yml
