@@ -200,8 +200,12 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"source_env() {\n" +
 	"  local rcpath=${1/#\\~/$HOME}\n" +
 	"  local rcfile\n" +
-	"  if ! [[ -f $rcpath ]]; then\n" +
+	"  if [[ -d $rcpath ]]; then\n" +
 	"    rcpath=$rcpath/.envrc\n" +
+	"  fi\n" +
+	"  if [[ ! -e $rcpath ]]; then\n" +
+	"    log_status \"referenced $rcpath does not exist\"\n" +
+	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
 	"  rcfile=$(user_rel_path \"$rcpath\")\n" +
@@ -211,7 +215,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  pushd \"$(dirname \"$rcpath\")\" >/dev/null\n" +
 	"  if [[ -f ./$(basename \"$rcpath\") ]]; then\n" +
 	"    log_status \"loading $rcfile\"\n" +
-	"    # shellcheck source=/dev/null\n" +
+	"    # shellcheck disable=SC1090\n" +
 	"    . \"./$(basename \"$rcpath\")\"\n" +
 	"  else\n" +
 	"    log_status \"referenced $rcfile does not exist\"\n" +
