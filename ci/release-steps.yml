@@ -17,6 +17,5 @@ steps:
       artifactName: direnv-bins
   - task: GithubRelease@0
     displayName: 'Create GitHub Release'
-    condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/v')
     inputs:
       githubConnection: direnv-releases
