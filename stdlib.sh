@@ -19,6 +19,9 @@ direnv="$(command -v direnv)"
 # Config, change in the direnvrc
 DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
 
+# Where direnv configuration should be stored
+direnv_config_dir=${XDG_CONFIG_DIR:-$HOME/.config}/direnv
+
 # This variable can be used by programs to detect when they are running inside
 # of a .envrc evaluation context. It is ignored by the direnv diffing
 # algorithm and so it won't be re-exported.
@@ -791,10 +794,16 @@ use_guix() {
   eval "$(guix environment "$@" --search-paths)"
 }
 
-## Load the global ~/.direnvrc if present
-if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
+## Load direnv libraries
+for lib in "$direnv_config_dir/lib/"*.sh; do
   # shellcheck disable=SC1090
-  source "${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc" >&2
+  source "$lib"
+done
+
+## Load the global ~/.direnvrc if present
+if [[ -f $direnv_config_dir/direnvrc ]]; then
+  # shellcheck disable=SC1090
+  source "$direnv_config_dir/direnvrc" >&2
 elif [[ -f $HOME/.direnvrc ]]; then
   # shellcheck disable=SC1090
   source "$HOME/.direnvrc" >&2

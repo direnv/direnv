@@ -97,8 +97,9 @@ To find the documentation for all available functions check the
 [direnv-stdlib(1) man page](man/direnv-stdlib.1.md).
 
 It's also possible to create your own extensions by creating a bash file at
-`~/.config/direnv/direnvrc` or `~/.direnvrc`. This file is loaded before your
-`.envrc` and thus allows you to make your own extensions to direnv.
+`~/.config/direnv/direnvrc` or `~/.config/direnv/lib/*.sh`. This file is
+loaded before your `.envrc` and thus allows you to make your own extensions to
+direnv.
 
 ## Docs
 

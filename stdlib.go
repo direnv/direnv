@@ -21,6 +21,9 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"# Config, change in the direnvrc\n" +
 	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %s}\"\n" +
 	"\n" +
+	"# Where direnv configuration should be stored\n" +
+	"direnv_config_dir=${XDG_CONFIG_DIR:-$HOME/.config}/direnv\n" +
+	"\n" +
 	"# This variable can be used by programs to detect when they are running inside\n" +
 	"# of a .envrc evaluation context. It is ignored by the direnv diffing\n" +
 	"# algorithm and so it won't be re-exported.\n" +
@@ -793,10 +796,16 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  eval \"$(guix environment \"$@\" --search-paths)\"\n" +
 	"}\n" +
 	"\n" +
-	"## Load the global ~/.direnvrc if present\n" +
-	"if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then\n" +
+	"## Load direnv libraries\n" +
+	"for lib in \"$direnv_config_dir/lib/\"*.sh; do\n" +
 	"  # shellcheck disable=SC1090\n" +
-	"  source \"${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc\" >&2\n" +
+	"  source \"$lib\"\n" +
+	"done\n" +
+	"\n" +
+	"## Load the global ~/.direnvrc if present\n" +
+	"if [[ -f $direnv_config_dir/direnvrc ]]; then\n" +
+	"  # shellcheck disable=SC1090\n" +
+	"  source \"$direnv_config_dir/direnvrc\" >&2\n" +
 	"elif [[ -f $HOME/.direnvrc ]]; then\n" +
 	"  # shellcheck disable=SC1090\n" +
 	"  source \"$HOME/.direnvrc\" >&2\n" +
