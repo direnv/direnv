@@ -10,16 +10,11 @@ import (
 var CmdPrune = &Cmd{
 	Name: "prune",
 	Desc: "removes old allowed files",
-	Fn: func(env Env, args []string) (err error) {
-		var config *Config
+	Action: actionWithConfig(func(env Env, args []string, config *Config) (err error) {
 		var dir *os.File
 		var fi os.FileInfo
 		var dir_list []string
 		var envrc []byte
-
-		if config, err = LoadConfig(env); err != nil {
-			return err
-		}
 
 		allowed := config.AllowDir()
 		if dir, err = os.Open(allowed); err != nil {
@@ -55,5 +50,5 @@ var CmdPrune = &Cmd{
 
 		}
 		return nil
-	},
+	}),
 }

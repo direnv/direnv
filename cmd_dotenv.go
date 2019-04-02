@@ -17,7 +17,7 @@ var CmdDotEnv = &Cmd{
 	Desc:    "Transforms a .env file to evaluatable `export KEY=PAIR` statements",
 	Args:    []string{"[SHELL]", "[PATH_TO_DOTENV]"},
 	Private: true,
-	Fn: func(env Env, args []string) (err error) {
+	Action: actionSimple(func(env Env, args []string) (err error) {
 		var shell Shell
 		var target string
 
@@ -49,5 +49,5 @@ var CmdDotEnv = &Cmd{
 		fmt.Println(str)
 
 		return
-	},
+	}),
 }

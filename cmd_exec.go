@@ -12,10 +12,9 @@ var CmdExec = &Cmd{
 	Name: "exec",
 	Desc: "Executes a command after loading the first .envrc found in DIR",
 	Args: []string{"[DIR]", "COMMAND", "[...ARGS]"},
-	Fn: func(env Env, args []string) (err error) {
+	Action: actionWithConfig(func(env Env, args []string, config *Config) (err error) {
 		var (
 			backupDiff *EnvDiff
-			config     *Config
 			newEnv     Env
 			rcPath     string
 			command    string
@@ -43,10 +42,6 @@ var CmdExec = &Cmd{
 			args = args[1:]
 		}
 
-		if config, err = LoadConfig(env); err != nil {
-			return
-		}
-
 		rc := FindRC(rcPath, config)
 
 		// Restore pristine environment if needed
@@ -71,5 +66,5 @@ var CmdExec = &Cmd{
 
 		err = syscall.Exec(command, args, newEnv.ToGoEnv())
 		return
-	},
+	}),
 }

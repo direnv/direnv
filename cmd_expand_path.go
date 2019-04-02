@@ -20,7 +20,7 @@ var CmdExpandPath = &Cmd{
 	Desc:    "Transforms a PATH to an absolute path to REL_TO or $PWD",
 	Args:    []string{"PATH", "[REL_TO]"},
 	Private: true,
-	Fn: func(env Env, args []string) (err error) {
+	Action: actionSimple(func(env Env, args []string) (err error) {
 		var path string
 
 		flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
@@ -50,5 +50,5 @@ var CmdExpandPath = &Cmd{
 		_, err = fmt.Println(path)
 
 		return
-	},
+	}),
 }

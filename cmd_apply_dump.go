@@ -11,7 +11,7 @@ var CmdApplyDump = &Cmd{
 	Desc:    "Accepts a filename containing `direnv dump` output and generates a series of bash export statements to apply the given env",
 	Args:    []string{"FILE"},
 	Private: true,
-	Fn: func(env Env, args []string) (err error) {
+	Action: actionSimple(func(env Env, args []string) (err error) {
 		if len(args) < 2 {
 			return fmt.Errorf("Not enough arguments")
 		}
@@ -41,5 +41,5 @@ var CmdApplyDump = &Cmd{
 		}
 
 		return
-	},
+	}),
 }

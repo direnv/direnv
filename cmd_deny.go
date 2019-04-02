@@ -10,9 +10,8 @@ var CmdDeny = &Cmd{
 	Name: "deny",
 	Desc: "Revokes the authorization of a given .envrc",
 	Args: []string{"[PATH_TO_RC]"},
-	Fn: func(env Env, args []string) (err error) {
+	Action: actionWithConfig(func(env Env, args []string, config *Config) (err error) {
 		var rcPath string
-		var config *Config
 
 		if len(args) > 1 {
 			rcPath = args[1]
@@ -22,14 +21,10 @@ var CmdDeny = &Cmd{
 			}
 		}
 
-		if config, err = LoadConfig(env); err != nil {
-			return
-		}
-
 		rc := FindRC(rcPath, config)
 		if rc == nil {
 			return fmt.Errorf(".envrc file not found")
 		}
 		return rc.Deny()
-	},
+	}),
 }

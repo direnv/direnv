@@ -14,7 +14,7 @@ var CmdShowDump = &Cmd{
 	Desc:    "Show the data inside of a dump for debugging purposes",
 	Args:    []string{"DUMP"},
 	Private: true,
-	Fn: func(env Env, args []string) (err error) {
+	Action: actionSimple(func(env Env, args []string) (err error) {
 		if len(args) < 2 {
 			return fmt.Errorf("Missing DUMP argument")
 		}
@@ -28,5 +28,5 @@ var CmdShowDump = &Cmd{
 		e := json.NewEncoder(os.Stdout)
 		e.SetIndent("", "  ")
 		return e.Encode(f)
-	},
+	}),
 }

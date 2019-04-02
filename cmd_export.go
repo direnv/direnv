@@ -16,11 +16,6 @@ type ExportContext struct {
 	newEnv   Env
 }
 
-func (self *ExportContext) loadConfig() (err error) {
-	self.config, err = LoadConfig(self.env)
-	return
-}
-
 func (self *ExportContext) getRCs() {
 	self.loadedRC = self.config.LoadedRC()
 	self.foundRC = self.config.FindRC()
@@ -117,11 +112,14 @@ func (self *ExportContext) diffString(shell Shell) string {
 	return diff.ToShell(shell)
 }
 
-func exportCommand(env Env, args []string) (err error) {
+func exportCommand(env Env, args []string, config *Config) (err error) {
 	defer log.SetPrefix(log.Prefix())
 	log.SetPrefix(log.Prefix() + "export:")
 	log_debug("start")
-	context := ExportContext{env: env}
+	context := ExportContext{
+		env:    env,
+		config: config,
+	}
 
 	var target string
 
@@ -132,11 +130,6 @@ func exportCommand(env Env, args []string) (err error) {
 	shell := DetectShell(target)
 	if shell == nil {
 		return fmt.Errorf("Unknown target shell '%s'", target)
-	}
-
-	log_debug("load config")
-	if err = context.loadConfig(); err != nil {
-		return
 	}
 
 	log_debug("loading RCs")
@@ -167,7 +160,7 @@ var CmdExport = &Cmd{
 	Desc:    "loads an .envrc and prints the diff in terms of exports",
 	Args:    []string{"SHELL"},
 	Private: true,
-	Fn:      exportCommand,
+	Action:  cmdWithWarnTimeout(actionWithConfig(exportCommand)),
 }
 
 func direnvKey(key string) bool {
