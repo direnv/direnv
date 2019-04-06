@@ -127,7 +127,7 @@ test-go: | $(base)
 	cd "$(base)" && $(GO) test -v ./...
 
 test-go-fmt:
-	[ $$($(GO) fmt | tee /dev/stderr | wc -l) = 0 ]
+	[ $$($(GO) fmt | go run script/both/main.go | wc -l) = 0 ]
 
 test-shellcheck:
 	shellcheck stdlib.sh
