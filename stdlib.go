@@ -964,6 +964,18 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  eval \"$(guix environment \"$@\" --search-paths)\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use_vim [<vimrc_file>]\n" +
+	"#\n" +
+	"# Prepends the specified vim script (or .vimrc.local by default) to the\n" +
+	"# `DIRENV_EXTRA_VIMRC` environment variable.\n" +
+	"#\n" +
+	"# This variable is understood by the direnv/direnv.vim extension. When found,\n" +
+	"# it will source it after opening files in the directory.\n" +
+	"use_vim() {\n" +
+	"  local extra_vimrc=${1:-.vimrc.local}\n" +
+	"  path_add DIRENV_EXTRA_VIMRC \"$extra_vimrc\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: direnv_version <version_at_least>\n" +
 	"#\n" +
 	"# Checks that the direnv version is at least old as <version_at_least>.\n" +

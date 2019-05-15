@@ -432,6 +432,15 @@ use node 4.2.2
 .fi
 .RE
 
+.SS \fB\fCuse vim [<vimrc\_file>]\fR
+.PP
+Prepends the specified vim script (or .vimrc.local by default) to the
+\fB\fCDIRENV\_EXTRA\_VIMRC\fR environment variable.
+
+.PP
+This variable is understood by the direnv/direnv.vim extension. When found,
+it will source it after opening files in the directory.
+
 .SS \fB\fCwatch\_file <path> [<path> ...]\fR
 .PP
 Adds each file to direnv's watch\-list. If the file changes direnv will reload the environment on the next prompt.
