@@ -9,7 +9,7 @@ direnv.toml - the direnv configuration file
 DESCRIPTION
 -----------
 
-A configuration file in [TOML](https://github.com/toml-lang/toml) format to specify a variety of configuration options for direnv. Resides at CONFIGURATION_DIR/config.toml. For many users, this will be located at $HOME/.config/direnv/config.toml.
+A configuration file in [TOML](https://github.com/toml-lang/toml) format to specify a variety of configuration options for direnv. Resides at CONFIGURATION_DIR/direnv.toml. For many users, this will be located at $HOME/.config/direnv/direnv.toml.
 
 FORMAT
 ------
