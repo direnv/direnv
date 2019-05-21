@@ -1,4 +1,4 @@
-DIRENV 1 "APRIL 2014" direnv "User Manuals"
+DIRENV 1 "2019" direnv "User Manuals"
 ===========================================
 
 NAME
@@ -19,7 +19,7 @@ hook into bash, zsh and fish shell to load or unload environment variables
 depending on your current directory. This allows you to have project-specific
 environment variables and not clutter the "~/.profile" file.
 
-Before each prompt it checks for the existence of an ".envrc" file in the
+Before each prompt it checks for the existence of an `.envrc` file in the
 current and parent directories. If the file exists, it is loaded into a bash
 sub-shell and all exported variables are then captured by direnv and then made
 available to your current shell, while unset variables are removed.
@@ -108,10 +108,10 @@ use direnv
 USAGE
 -----
 
-In some target folder, create an ".envrc" file and add some export(1)
+In some target folder, create an `.envrc` file and add some export(1)
 and unset(1) directives in it.
 
-On the next prompt you will notice that direnv complains about the ".envrc"
+On the next prompt you will notice that direnv complains about the `.envrc`
 being blocked. This is the security mechanism to avoid loading new files
 automatically. Otherwise any git repo that you pull, or tar archive that you
 unpack, would be able to wipe your hard drive once you `cd` into it.
@@ -127,7 +127,7 @@ loaded again. That's the base of the mechanism that allows you to build cool
 things.
 
 Exporting variables by hand is a bit repetitive so direnv provides a set of
-utility functions that are made available in the context of the ".envrc" file.
+utility functions that are made available in the context of the `.envrc` file.
 Check the direnv-stdlib(1) man page for more details. You can also define
 your own extensions inside a "~/.direnvrc" file.
 
@@ -150,9 +150,9 @@ have a chat.
 COPYRIGHT
 ---------
 
-Copyright (C) 2014 zimbatm and contributors under the MIT licence.
+MIT licence - Copyright (C) 2019 @zimbatm and contributors
 
 SEE ALSO
 --------
 
-direnv-stdlib(1)
+direnv-stdlib(1), direnv.toml(1)

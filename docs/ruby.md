@@ -31,7 +31,7 @@ ln -s 2.0.0-p247 2.0.0
 ln -s 2.0.0-p247 2.0
 ```
 
-The end goal is that each project will have an ".envrc" file that contains
+The end goal is that each project will have an `.envrc` file that contains
 a descriptive syntax like `use ruby 1.9.3` to selects the right ruby version
 for the project.
 

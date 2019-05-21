@@ -1,4 +1,4 @@
-.TH DIRENV.TOML 1 "FEBRUARY 2018" direnv "User Manuals"
+.TH DIRENV.TOML 1 "2019" direnv "User Manuals"
 .SH NAME
 .PP
 direnv.toml \- the direnv configuration file
@@ -6,7 +6,7 @@ direnv.toml \- the direnv configuration file
 .SH DESCRIPTION
 .PP
 A configuration file in TOML
-\[la]https://github.com/toml-lang/toml\[ra] format to specify a variety of configuration options for direnv. Resides at CONFIGURATION\_DIR/config.toml. For many users, this will be located at $HOME/.config/direnv/config.toml.
+\[la]https://github.com/toml-lang/toml\[ra] format to specify a variety of configuration options for direnv. Resides at CONFIGURATION\_DIR/direnv.toml. For many users, this will be located at $HOME/.config/direnv/direnv.toml.
 
 .SH FORMAT
 .PP
@@ -125,9 +125,8 @@ If set to true, stdin is disabled (redirected to /dev/null) during the \fB\fC\&.
 
 .SH COPYRIGHT
 .PP
-Copyright (C) 2018 zimbatm 
-\[la]http://zimbatm.com\[ra] and contributors under the MIT licence.
+MIT licence \- Copyright (C) 2019 @zimbatm and contributors
 
 .SH SEE ALSO
 .PP
-direnv(1)
+direnv(1), direnv\-stdlib(1)

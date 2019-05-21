@@ -1,5 +1,5 @@
-DIRENV.TOML 1 "FEBRUARY 2018" direnv "User Manuals"
-==================================================
+DIRENV.TOML 1 "2019" direnv "User Manuals"
+==========================================
 
 NAME
 ----
@@ -46,6 +46,7 @@ Specifying whitelist directives marks specific directory hierarchies or specific
 There are two types of whitelist directives supported:
 
 ### `prefix`
+
 Accepts an array of strings. If any of the strings in this list are a prefix of an .envrc file's absolute path, that file will be implicitly allowed, regardless of contents or past usage of `direnv allow` or `direnv deny`.
 
 Example:
@@ -98,9 +99,9 @@ If set to true, stdin is disabled (redirected to /dev/null) during the `.envrc` 
 COPYRIGHT
 ---------
 
-Copyright (C) 2018 zimbatm <http://zimbatm.com> and contributors under the MIT licence.
+MIT licence - Copyright (C) 2019 @zimbatm and contributors
 
 SEE ALSO
 --------
 
-direnv(1)
+direnv(1), direnv-stdlib(1)
