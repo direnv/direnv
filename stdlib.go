@@ -685,12 +685,19 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# Load environment variables from `nix-shell`.\n" +
 	"# If you have a `default.nix` or `shell.nix` these will be\n" +
-	"# used by default, but you can also specify packages directly\n" +
-	"# (e.g `use nix -p ocaml`).\n" +
+	"# used by default unless NIX_NO_WATCH_DEFAULT is set to \"true\"\n" +
+	"# or by passing `--no-watch-default` as first parameter\n" +
+	"# Arguments are passed to nix-shell as is, eg. you can specify packages directly\n" +
+	"# using `use nix -p ocaml`.\n" +
 	"#\n" +
 	"use_nix() {\n" +
+	"  local NIX_NO_WATCH_DEFAULT=\"${NIX_NO_WATCH_DEFAULT:-false}\"\n" +
+	"  if [[ \"${1:-}\" == \"--no-watch-default\" ]]; then\n" +
+	"    NIX_NO_WATCH_DEFAULT=\"true\"\n" +
+	"    shift\n" +
+	"  fi\n" +
 	"  direnv_load nix-shell --show-trace \"$@\" --run \"$(join_args \"$direnv\" dump)\"\n" +
-	"  if [[ $# == 0 ]]; then\n" +
+	"  if [[ \"${NO_WATCH_DEFAULT:-false}\" == \"false\" ]]; then\n" +
 	"    watch_file default.nix\n" +
 	"    watch_file shell.nix\n" +
 	"  fi\n" +

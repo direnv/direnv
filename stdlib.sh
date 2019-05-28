@@ -683,12 +683,19 @@ use_node() {
 #
 # Load environment variables from `nix-shell`.
 # If you have a `default.nix` or `shell.nix` these will be
-# used by default, but you can also specify packages directly
-# (e.g `use nix -p ocaml`).
+# used by default unless NIX_NO_WATCH_DEFAULT is set to "true"
+# or by passing `--no-watch-default` as first parameter
+# Arguments are passed to nix-shell as is, eg. you can specify packages directly
+# using `use nix -p ocaml`.
 #
 use_nix() {
+  local NIX_NO_WATCH_DEFAULT="${NIX_NO_WATCH_DEFAULT:-false}"
+  if [[ "${1:-}" == "--no-watch-default" ]]; then
+    NIX_NO_WATCH_DEFAULT="true"
+    shift
+  fi
   direnv_load nix-shell --show-trace "$@" --run "$(join_args "$direnv" dump)"
-  if [[ $# == 0 ]]; then
+  if [[ "${NO_WATCH_DEFAULT:-false}" == "false" ]]; then
     watch_file default.nix
     watch_file shell.nix
   fi
