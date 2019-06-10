@@ -542,6 +542,29 @@ layout_pipenv() {
   export VIRTUAL_ENV
 }
 
+# Usage: layout pyenv <python version number>
+#
+# Example:
+#
+#    layout pyenv 3.6.7
+#
+# Uses pyenv and layout_python to create and load a virtual environment under
+# "$direnv_layout_dir/python-$python_version".
+#
+layout_pyenv() {
+  local python_version=$1
+  local pyenv_python
+  pyenv_python=$(pyenv root)/versions/${python_version}/bin/python
+  if [[ -x "$pyenv_python" ]]; then
+    if layout_python "$pyenv_python"; then
+      export PYENV_VERSION=$python_version
+    fi
+  else
+    log_error "pyenv: version '$python_version' not installed"
+    return 1
+  fi
+}
+
 # Usage: layout ruby
 #
 # Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".

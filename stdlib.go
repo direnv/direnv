@@ -544,6 +544,29 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  export VIRTUAL_ENV\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: layout pyenv <python version number>\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    layout pyenv 3.6.7\n" +
+	"#\n" +
+	"# Uses pyenv and layout_python to create and load a virtual environment under\n" +
+	"# \"$direnv_layout_dir/python-$python_version\".\n" +
+	"#\n" +
+	"layout_pyenv() {\n" +
+	"  local python_version=$1\n" +
+	"  local pyenv_python\n" +
+	"  pyenv_python=$(pyenv root)/versions/${python_version}/bin/python\n" +
+	"  if [[ -x \"$pyenv_python\" ]]; then\n" +
+	"    if layout_python \"$pyenv_python\"; then\n" +
+	"      export PYENV_VERSION=$python_version\n" +
+	"    fi\n" +
+	"  else\n" +
+	"    log_error \"pyenv: version '$python_version' not installed\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: layout ruby\n" +
 	"#\n" +
 	"# Sets the GEM_HOME environment variable to \"$(direnv_layout_dir)/ruby/RUBY_VERSION\".\n" +
