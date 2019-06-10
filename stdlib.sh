@@ -438,25 +438,35 @@ layout_python() {
   old_env=$(direnv_layout_dir)/virtualenv
   unset PYTHONHOME
   if [[ -d $old_env && $python == python ]]; then
-    export VIRTUAL_ENV=$old_env
+    VIRTUAL_ENV=$old_env
   else
-    local python_version
-    python_version=$("$python" -c "import platform as p;print(p.python_version())")
+    local python_version ve
+    # shellcheck disable=SC2046
+    read -r python_version ve <<<$($python -c "import pkgutil as u, platform as p;ve='venv' if u.find_loader('venv') else ('virtualenv' if u.find_loader('virtualenv') else '');print(p.python_version()+' '+ve)")
     if [[ -z $python_version ]]; then
       log_error "Could not find python's version"
       return 1
     fi
 
     VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
-    export VIRTUAL_ENV
-    if [[ ! -d $VIRTUAL_ENV ]]; then
-      if $python -c "import venv"; then
-        $python -m venv "$@" "$VIRTUAL_ENV"
-      else
-        virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
-      fi
-    fi
+    case $ve in
+      "venv")
+        if [[ ! -d $VIRTUAL_ENV ]]; then
+          $python -m venv "$@" "$VIRTUAL_ENV"
+        fi
+        ;;
+      "virtualenv")
+        if [[ ! -d $VIRTUAL_ENV ]]; then
+          virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
+        fi
+        ;;
+      *)
+        log_error "Error: neither venv nor virtualenv are available."
+        return 1
+        ;;
+    esac
   fi
+  export VIRTUAL_ENV
   PATH_add "$VIRTUAL_ENV/bin"
 }
 

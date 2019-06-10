@@ -440,25 +440,35 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  old_env=$(direnv_layout_dir)/virtualenv\n" +
 	"  unset PYTHONHOME\n" +
 	"  if [[ -d $old_env && $python == python ]]; then\n" +
-	"    export VIRTUAL_ENV=$old_env\n" +
+	"    VIRTUAL_ENV=$old_env\n" +
 	"  else\n" +
-	"    local python_version\n" +
-	"    python_version=$(\"$python\" -c \"import platform as p;print(p.python_version())\")\n" +
+	"    local python_version ve\n" +
+	"    # shellcheck disable=SC2046\n" +
+	"    read -r python_version ve <<<$($python -c \"import pkgutil as u, platform as p;ve='venv' if u.find_loader('venv') else ('virtualenv' if u.find_loader('virtualenv') else '');print(p.python_version()+' '+ve)\")\n" +
 	"    if [[ -z $python_version ]]; then\n" +
 	"      log_error \"Could not find python's version\"\n" +
 	"      return 1\n" +
 	"    fi\n" +
 	"\n" +
 	"    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
-	"    export VIRTUAL_ENV\n" +
-	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"      if $python -c \"import venv\"; then\n" +
-	"        $python -m venv \"$@\" \"$VIRTUAL_ENV\"\n" +
-	"      else\n" +
-	"        virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
-	"      fi\n" +
-	"    fi\n" +
+	"    case $ve in\n" +
+	"      \"venv\")\n" +
+	"        if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
+	"          $python -m venv \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"        fi\n" +
+	"        ;;\n" +
+	"      \"virtualenv\")\n" +
+	"        if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
+	"          virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"        fi\n" +
+	"        ;;\n" +
+	"      *)\n" +
+	"        log_error \"Error: neither venv nor virtualenv are available.\"\n" +
+	"        return 1\n" +
+	"        ;;\n" +
+	"    esac\n" +
 	"  fi\n" +
+	"  export VIRTUAL_ENV\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
 	"}\n" +
 	"\n" +
