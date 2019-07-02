@@ -511,20 +511,18 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"# virtualenv from the Pipfile located in the same directory.\n" +
 	"#\n" +
 	"layout_pipenv() {\n" +
-	"  local venv\n" +
 	"  PIPENV_PIPFILE=\"${PIPENV_PIPFILE:-Pipfile}\"\n" +
 	"  if [[ ! -f \"$PIPENV_PIPFILE\" ]]; then\n" +
 	"    log_error \"No Pipfile found.  Use \\`pipenv\\` to create a \\`$PIPENV_PIPFILE\\` first.\"\n" +
 	"    exit 2\n" +
 	"  fi\n" +
 	"\n" +
-	"  venv=$(pipenv --bare --venv 2>/dev/null)\n" +
+	"  VIRTUAL_ENV=$(pipenv --venv 2>/dev/null ; true)\n" +
 	"\n" +
-	"  if [[ -z $venv || ! -d $venv ]]; then\n" +
+	"  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then\n" +
 	"    pipenv install --dev\n" +
+	"    VIRTUAL_ENV=$(pipenv --venv)\n" +
 	"  fi\n" +
-	"\n" +
-	"  VIRTUAL_ENV=$(pipenv --venv)\n" +
 	"\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
 	"  export PIPENV_ACTIVE=1\n" +
