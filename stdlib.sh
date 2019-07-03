@@ -509,20 +509,18 @@ layout_anaconda() {
 # virtualenv from the Pipfile located in the same directory.
 #
 layout_pipenv() {
-  local venv
   PIPENV_PIPFILE="${PIPENV_PIPFILE:-Pipfile}"
   if [[ ! -f "$PIPENV_PIPFILE" ]]; then
     log_error "No Pipfile found.  Use \`pipenv\` to create a \`$PIPENV_PIPFILE\` first."
     exit 2
   fi
 
-  venv=$(pipenv --bare --venv 2>/dev/null)
+  VIRTUAL_ENV=$(pipenv --venv 2>/dev/null ; true)
 
-  if [[ -z $venv || ! -d $venv ]]; then
+  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
     pipenv install --dev
+    VIRTUAL_ENV=$(pipenv --venv)
   fi
-
-  VIRTUAL_ENV=$(pipenv --venv)
 
   PATH_add "$VIRTUAL_ENV/bin"
   export PIPENV_ACTIVE=1
