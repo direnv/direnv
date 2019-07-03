@@ -17,10 +17,10 @@ func (elvish) Hook() (string, error) {
 		if (> (count $m) 0) {
 			m = (explode $m)
 			keys $m | each [k]{
-				if (==s $k 'null') {
-					unset-env $k
-				} else {
+				if $m[$k] {
 					set-env $k $m[$k]
+				} else {
+					unset-env $k
 				}
 			}
 		}
