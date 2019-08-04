@@ -425,9 +425,10 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"# Usage: layout python <python_exe>\n" +
 	"#\n" +
-	"# Creates and loads a virtualenv environment under\n" +
+	"# Creates and loads a virtual environment under\n" +
 	"# \"$direnv_layout_dir/python-$python_version\".\n" +
 	"# This forces the installation of any egg into the project's sub-folder.\n" +
+	"# For python older then 3.3 this requires virtualenv to be installed.\n" +
 	"#\n" +
 	"# It's possible to specify the python executable if you want to use different\n" +
 	"# versions of python.\n" +
@@ -439,21 +440,35 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  old_env=$(direnv_layout_dir)/virtualenv\n" +
 	"  unset PYTHONHOME\n" +
 	"  if [[ -d $old_env && $python == python ]]; then\n" +
-	"    export VIRTUAL_ENV=$old_env\n" +
+	"    VIRTUAL_ENV=$old_env\n" +
 	"  else\n" +
-	"    local python_version\n" +
-	"    python_version=$(\"$python\" -c \"import platform as p;print(p.python_version())\")\n" +
+	"    local python_version ve\n" +
+	"    # shellcheck disable=SC2046\n" +
+	"    read -r python_version ve <<<$($python -c \"import pkgutil as u, platform as p;ve='venv' if u.find_loader('venv') else ('virtualenv' if u.find_loader('virtualenv') else '');print(p.python_version()+' '+ve)\")\n" +
 	"    if [[ -z $python_version ]]; then\n" +
 	"      log_error \"Could not find python's version\"\n" +
 	"      return 1\n" +
 	"    fi\n" +
 	"\n" +
 	"    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
-	"    export VIRTUAL_ENV\n" +
-	"    if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"      virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
-	"    fi\n" +
+	"    case $ve in\n" +
+	"      \"venv\")\n" +
+	"        if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
+	"          $python -m venv \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"        fi\n" +
+	"        ;;\n" +
+	"      \"virtualenv\")\n" +
+	"        if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
+	"          virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"        fi\n" +
+	"        ;;\n" +
+	"      *)\n" +
+	"        log_error \"Error: neither venv nor virtualenv are available.\"\n" +
+	"        return 1\n" +
+	"        ;;\n" +
+	"    esac\n" +
 	"  fi\n" +
+	"  export VIRTUAL_ENV\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
 	"}\n" +
 	"\n" +
@@ -527,6 +542,29 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  PATH_add \"$VIRTUAL_ENV/bin\"\n" +
 	"  export PIPENV_ACTIVE=1\n" +
 	"  export VIRTUAL_ENV\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: layout pyenv <python version number>\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    layout pyenv 3.6.7\n" +
+	"#\n" +
+	"# Uses pyenv and layout_python to create and load a virtual environment under\n" +
+	"# \"$direnv_layout_dir/python-$python_version\".\n" +
+	"#\n" +
+	"layout_pyenv() {\n" +
+	"  local python_version=$1\n" +
+	"  local pyenv_python\n" +
+	"  pyenv_python=$(pyenv root)/versions/${python_version}/bin/python\n" +
+	"  if [[ -x \"$pyenv_python\" ]]; then\n" +
+	"    if layout_python \"$pyenv_python\"; then\n" +
+	"      export PYENV_VERSION=$python_version\n" +
+	"    fi\n" +
+	"  else\n" +
+	"    log_error \"pyenv: version '$python_version' not installed\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout ruby\n" +

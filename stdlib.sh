@@ -423,9 +423,10 @@ layout_php() {
 
 # Usage: layout python <python_exe>
 #
-# Creates and loads a virtualenv environment under
+# Creates and loads a virtual environment under
 # "$direnv_layout_dir/python-$python_version".
 # This forces the installation of any egg into the project's sub-folder.
+# For python older then 3.3 this requires virtualenv to be installed.
 #
 # It's possible to specify the python executable if you want to use different
 # versions of python.
@@ -437,21 +438,35 @@ layout_python() {
   old_env=$(direnv_layout_dir)/virtualenv
   unset PYTHONHOME
   if [[ -d $old_env && $python == python ]]; then
-    export VIRTUAL_ENV=$old_env
+    VIRTUAL_ENV=$old_env
   else
-    local python_version
-    python_version=$("$python" -c "import platform as p;print(p.python_version())")
+    local python_version ve
+    # shellcheck disable=SC2046
+    read -r python_version ve <<<$($python -c "import pkgutil as u, platform as p;ve='venv' if u.find_loader('venv') else ('virtualenv' if u.find_loader('virtualenv') else '');print(p.python_version()+' '+ve)")
     if [[ -z $python_version ]]; then
       log_error "Could not find python's version"
       return 1
     fi
 
     VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
-    export VIRTUAL_ENV
-    if [[ ! -d $VIRTUAL_ENV ]]; then
-      virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
-    fi
+    case $ve in
+      "venv")
+        if [[ ! -d $VIRTUAL_ENV ]]; then
+          $python -m venv "$@" "$VIRTUAL_ENV"
+        fi
+        ;;
+      "virtualenv")
+        if [[ ! -d $VIRTUAL_ENV ]]; then
+          virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
+        fi
+        ;;
+      *)
+        log_error "Error: neither venv nor virtualenv are available."
+        return 1
+        ;;
+    esac
   fi
+  export VIRTUAL_ENV
   PATH_add "$VIRTUAL_ENV/bin"
 }
 
@@ -525,6 +540,29 @@ layout_pipenv() {
   PATH_add "$VIRTUAL_ENV/bin"
   export PIPENV_ACTIVE=1
   export VIRTUAL_ENV
+}
+
+# Usage: layout pyenv <python version number>
+#
+# Example:
+#
+#    layout pyenv 3.6.7
+#
+# Uses pyenv and layout_python to create and load a virtual environment under
+# "$direnv_layout_dir/python-$python_version".
+#
+layout_pyenv() {
+  local python_version=$1
+  local pyenv_python
+  pyenv_python=$(pyenv root)/versions/${python_version}/bin/python
+  if [[ -x "$pyenv_python" ]]; then
+    if layout_python "$pyenv_python"; then
+      export PYENV_VERSION=$python_version
+    fi
+  else
+    log_error "pyenv: version '$python_version' not installed"
+    return 1
+  fi
 }
 
 # Usage: layout ruby
