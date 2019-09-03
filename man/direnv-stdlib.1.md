@@ -77,7 +77,7 @@ NOTE: the other `.envrc` is not checked by the security framework.
 
 ### `source_up [<filename>]`
 
-Loads another `.envrc` if found with the `find_up` command.
+Loads another `.envrc` if found when searching from the parent directory up to /.
 
 NOTE: the other `.envrc` is not checked by the security framework.
 
