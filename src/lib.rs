@@ -1,3 +1,8 @@
+extern crate toml;
+#[macro_use]
+extern crate serde_derive;
+extern crate serde;
+
 pub mod config;
 pub mod stdlib;
 pub mod env;

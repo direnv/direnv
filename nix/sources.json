@@ -1,0 +1,26 @@
+{
+    "naersk": {
+        "branch": "master",
+        "description": "Fast, flexible and eco-friendly Nix shipping of cargo crates since 2019",
+        "homepage": null,
+        "owner": "nmattia",
+        "repo": "naersk",
+        "rev": "5b148cf5ef11aa80a035a27f08b611eff5305647",
+        "sha256": "1mfyyk3glhz4kjmvsi2srsmxzn4d2l64k1bavc7lzp3lq01gv599",
+        "type": "tarball",
+        "url": "https://github.com/nmattia/naersk/archive/5b148cf5ef11aa80a035a27f08b611eff5305647.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixpkgs": {
+        "branch": "nixos-unstable",
+        "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
+        "homepage": "https://github.com/NixOS/nixpkgs",
+        "owner": "NixOS",
+        "repo": "nixpkgs-channels",
+        "rev": "d484f2b7fc0834a068e8ace851faa449a03963f5",
+        "sha256": "0jk93ikryi2hqc30l2n5i4vlgmklrlzb8cf7b3sg1q3k70q344jn",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/d484f2b7fc0834a068e8ace851faa449a03963f5.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    }
+}

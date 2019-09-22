@@ -1,12 +1,13 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ sources ? import ./nix/sources.nix
+, pkgs ? import ./nix { inherit sources; }
+}:
 let
   direnv = import ./. { inherit pkgs; };
 in
 pkgs.mkShell {
   #imputsFrom = [ direnv ];
-  buildInputs = with pkgs; [
-    carnix
-    rust.cargo
-    rust.rustc
+  buildInputs = [
+    pkgs.rustPlatform.rust.cargo
+    pkgs.rustPlatform.rust.rustc
   ];
 }
