@@ -9,5 +9,6 @@ pkgs.mkShell {
   buildInputs = [
     pkgs.rustPlatform.rust.cargo
     pkgs.rustPlatform.rust.rustc
+    pkgs.rustfmt
   ];
 }

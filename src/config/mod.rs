@@ -4,8 +4,8 @@ use toml;
 //use std::env::{current_exe};
 use std::fs::File;
 use std::io::Read;
-use std::option::{Option};
-use std::path::{PathBuf};
+use std::option::Option;
+use std::path::PathBuf;
 
 const BASH_PATH: Option<&'static str> = option_env!("BASH_PATH");
 
@@ -49,10 +49,9 @@ pub fn load(path: PathBuf) -> std::io::Result<Config> {
     if config.global.bash_path.to_string_lossy() == "" {
         match BASH_PATH {
             Some(bash_path) => config.global.bash_path = PathBuf::from(bash_path),
-            None => ()
+            None => (),
         }
     }
 
-
-    return Ok(config)
+    return Ok(config);
 }

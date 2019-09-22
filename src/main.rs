@@ -1,7 +1,5 @@
-extern crate direnv;
-
-use std::io::{self, Write};
 use direnv::stdlib;
+use std::io::{self, Write};
 
 const USAGE: &'static str = "
 Per-directory shell environment variables

@@ -1,11 +1,9 @@
-extern crate toml;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde;
 
 pub mod config;
-pub mod stdlib;
 pub mod env;
+pub mod stdlib;
 
 pub struct VersionInfo {
     pub major: String,
@@ -16,10 +14,14 @@ pub struct VersionInfo {
 
 pub fn version() -> VersionInfo {
     macro_rules! env_str {
-        ($name:expr) => { env!($name).to_string() }
+        ($name:expr) => {
+            env!($name).to_string()
+        };
     }
     macro_rules! option_env_str {
-        ($name:expr) => { option_env!($name).map(|s| s.to_string()) }
+        ($name:expr) => {
+            option_env!($name).map(|s| s.to_string())
+        };
     }
     VersionInfo {
         major: env_str!("CARGO_PKG_VERSION_MAJOR"),
