@@ -7,8 +7,10 @@ in
 pkgs.mkShell {
   #imputsFrom = [ direnv ];
   buildInputs = [
-    pkgs.rustPlatform.rust.cargo
-    pkgs.rustPlatform.rust.rustc
-    pkgs.rustfmt
+    pkgs.rust.packages.stable.cargo
+    pkgs.rust.packages.stable.clippy
+    pkgs.rust.packages.stable.rls
+    pkgs.rust.packages.stable.rustc
+    pkgs.rust.packages.stable.rustfmt
   ];
 }

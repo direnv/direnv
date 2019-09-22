@@ -1,1 +1,1 @@
-pub const STDLIB: &'static str = include_str!("stdlib.sh");
+pub const STDLIB: &str = include_str!("stdlib.sh");

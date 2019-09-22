@@ -1,7 +1,7 @@
 use direnv::stdlib;
 use std::io::{self, Write};
 
-const USAGE: &'static str = "
+const USAGE: &str = "
 Per-directory shell environment variables
 
 Usage:
@@ -22,9 +22,17 @@ See 'direnv help <command>' for more information on a specific command.
 ";
 
 fn main() {
-    io::stdout().write(stdlib::STDLIB.as_bytes()).unwrap();
+    if let Err(err) = try_main() {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    }
+}
 
-    io::stdout().write(USAGE.as_bytes()).unwrap();
+fn try_main() -> Result<(), Box<dyn std::error::Error>> {
+    io::stdout().write_all(stdlib::STDLIB.as_bytes())?;
 
-    io::stdout().flush().unwrap();
+    io::stdout().write_all(USAGE.as_bytes())?;
+
+    io::stdout().flush()?;
+    Ok(())
 }

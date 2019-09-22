@@ -1,5 +1,3 @@
-#![deny(warnings)]
-
 use toml;
 //use std::env::{current_exe};
 use std::fs::File;
@@ -47,11 +45,10 @@ pub fn load(path: PathBuf) -> std::io::Result<Config> {
     let mut config: Config = toml::from_str(&contents)?;
 
     if config.global.bash_path.to_string_lossy() == "" {
-        match BASH_PATH {
-            Some(bash_path) => config.global.bash_path = PathBuf::from(bash_path),
-            None => (),
+        if let Some(bash_path) = BASH_PATH {
+            config.global.bash_path = PathBuf::from(bash_path)
         }
     }
 
-    return Ok(config);
+    Ok(config)
 }
