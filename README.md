@@ -89,7 +89,7 @@ Exporting variables by hand is a bit repetitive so direnv provides a set of
 utility functions that are made available in the context of the `.envrc` file.
 
 As an example, the `PATH_add` function is used to expand and prepend a path to
-the $PATH environment variable. Instead of `export $PATH=$PWD/bin:$PATH` you
+the $PATH environment variable. Instead of `export PATH=$PWD/bin:$PATH` you
 can write `PATH_add bin`. It's shorter and avoids a common mistake where
 `$PATH=bin`.
 
