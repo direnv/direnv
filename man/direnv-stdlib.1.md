@@ -221,9 +221,9 @@ Example (.envrc):
     set -e
     use node 4.2.2
 
-### `watch_file <path>`
+### `watch_file <path> [<path> ...]`
 
-Adds a file to direnv's watch-list. If the file changes direnv will reload the environment on the next prompt.
+Adds each file to direnv's watch-list. If the file changes direnv will reload the environment on the next prompt.
 
 Example (.envrc):
 

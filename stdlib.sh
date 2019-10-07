@@ -222,15 +222,14 @@ source_env() {
   popd >/dev/null
 }
 
-# Usage: watch_file <filename>
+# Usage: watch_file <filename> [<filename> ...]
 #
-# Adds <path> to the list of files that direnv will watch for changes - useful when the contents
-# of a file influence how variables are set - especially in direnvrc
+# Adds each <filename> to the list of files that direnv will watch for changes -
+# useful when the contents of a file influence how variables are set -
+# especially in direnvrc
 #
 watch_file() {
-  local file=${1/#\~/$HOME}
-
-  eval "$("$direnv" watch "$file")"
+  eval "$("$direnv" watch "$@")"
 }
 
 # Usage: source_up [<filename>]
@@ -725,8 +724,7 @@ use_node() {
 use_nix() {
   direnv_load nix-shell --show-trace "$@" --run "$(join_args "$direnv" dump)"
   if [[ $# == 0 ]]; then
-    watch_file default.nix
-    watch_file shell.nix
+    watch_file default.nix shell.nix
   fi
 }
 

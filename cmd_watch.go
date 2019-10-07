@@ -11,7 +11,7 @@ var CmdWatch = &Cmd{
 }
 
 func watchCommand(env Env, args []string) (err error) {
-	var path, shellName string
+	var shellName string
 
 	args = args[1:]
 	if len(args) < 1 {
@@ -30,15 +30,15 @@ func watchCommand(env Env, args []string) (err error) {
 		return fmt.Errorf("Unknown target shell '%s'", shellName)
 	}
 
-	path = args[0]
-
 	watches := NewFileTimes()
 	watchString, ok := env[DIRENV_WATCHES]
 	if ok {
 		watches.Unmarshal(watchString)
 	}
 
-	watches.Update(path)
+	for idx := range args {
+		watches.Update(args[idx])
+	}
 
 	e := make(ShellExport)
 	e.Add(DIRENV_WATCHES, watches.Marshal())

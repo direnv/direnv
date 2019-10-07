@@ -224,15 +224,14 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  popd >/dev/null\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: watch_file <filename>\n" +
+	"# Usage: watch_file <filename> [<filename> ...]\n" +
 	"#\n" +
-	"# Adds <path> to the list of files that direnv will watch for changes - useful when the contents\n" +
-	"# of a file influence how variables are set - especially in direnvrc\n" +
+	"# Adds each <filename> to the list of files that direnv will watch for changes -\n" +
+	"# useful when the contents of a file influence how variables are set -\n" +
+	"# especially in direnvrc\n" +
 	"#\n" +
 	"watch_file() {\n" +
-	"  local file=${1/#\\~/$HOME}\n" +
-	"\n" +
-	"  eval \"$(\"$direnv\" watch \"$file\")\"\n" +
+	"  eval \"$(\"$direnv\" watch \"$@\")\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: source_up [<filename>]\n" +
@@ -727,8 +726,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"use_nix() {\n" +
 	"  direnv_load nix-shell --show-trace \"$@\" --run \"$(join_args \"$direnv\" dump)\"\n" +
 	"  if [[ $# == 0 ]]; then\n" +
-	"    watch_file default.nix\n" +
-	"    watch_file shell.nix\n" +
+	"    watch_file default.nix shell.nix\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
