@@ -1,3 +1,7 @@
+UNRELEASED
+==========
+
+  * CHANGE: Watch multiple files in a single invocation of `watch_file` / `direnv watch`.
 
 2.20.1 / 2019-03-31
 ==================
