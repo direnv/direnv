@@ -300,8 +300,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# Works like PATH_add except that it's for an arbitrary <varname>.\n" +
 	"path_add() {\n" +
-	"  local path\n" +
-	"  local var_name=\"$1\"\n" +
+	"  local path i var_name=\"$1\"\n" +
 	"  # split existing paths into an array\n" +
 	"  declare -a path_array\n" +
 	"  IFS=: read -ra path_array <<<\"${!1}\"\n" +

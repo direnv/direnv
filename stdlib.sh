@@ -298,8 +298,7 @@ PATH_add() {
 #
 # Works like PATH_add except that it's for an arbitrary <varname>.
 path_add() {
-  local path
-  local var_name="$1"
+  local path i var_name="$1"
   # split existing paths into an array
   declare -a path_array
   IFS=: read -ra path_array <<<"${!1}"
