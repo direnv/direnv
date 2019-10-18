@@ -455,7 +455,7 @@ layout_python() {
         ;;
       "virtualenv")
         if [[ ! -d $VIRTUAL_ENV ]]; then
-          virtualenv "--python=$python" "$@" "$VIRTUAL_ENV"
+          $python -m virtualenv "$@" "$VIRTUAL_ENV"
         fi
         ;;
       *)
@@ -540,7 +540,7 @@ layout_pipenv() {
   export VIRTUAL_ENV
 }
 
-# Usage: layout pyenv <python version number>
+# Usage: layout pyenv <python version number> [<python version number> ...]
 #
 # Example:
 #
@@ -550,17 +550,27 @@ layout_pipenv() {
 # "$direnv_layout_dir/python-$python_version".
 #
 layout_pyenv() {
-  local python_version=$1
-  local pyenv_python
-  pyenv_python=$(pyenv root)/versions/${python_version}/bin/python
-  if [[ -x "$pyenv_python" ]]; then
-    if layout_python "$pyenv_python"; then
-      export PYENV_VERSION=$python_version
+  unset PYENV_VERSION
+  # layout_python prepends each python version to the PATH, so we add each
+  # version in reverse order so that the first listed version ends up
+  # first in the path
+  local i
+  for ((i = $#; i > 0; i--)); do
+    local python_version=${!i}
+    local pyenv_python
+    pyenv_python=$(pyenv root)/versions/${python_version}/bin/python
+    if [[ -x "$pyenv_python" ]]; then
+      if layout_python "$pyenv_python"; then
+        # e.g. Given "use pyenv 3.6.9 2.7.16", PYENV_VERSION becomes "3.6.9:2.7.16"
+        PYENV_VERSION=${python_version}${PYENV_VERSION:+:$PYENV_VERSION}
+      fi
+    else
+      log_error "pyenv: version '$python_version' not installed"
+      return 1
     fi
-  else
-    log_error "pyenv: version '$python_version' not installed"
-    return 1
-  fi
+  done
+
+  [[ -n "$PYENV_VERSION" ]] && export PYENV_VERSION
 }
 
 # Usage: layout ruby

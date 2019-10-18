@@ -457,7 +457,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"        ;;\n" +
 	"      \"virtualenv\")\n" +
 	"        if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"          virtualenv \"--python=$python\" \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"          $python -m virtualenv \"$@\" \"$VIRTUAL_ENV\"\n" +
 	"        fi\n" +
 	"        ;;\n" +
 	"      *)\n" +
@@ -542,7 +542,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  export VIRTUAL_ENV\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: layout pyenv <python version number>\n" +
+	"# Usage: layout pyenv <python version number> [<python version number> ...]\n" +
 	"#\n" +
 	"# Example:\n" +
 	"#\n" +
@@ -552,17 +552,27 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"# \"$direnv_layout_dir/python-$python_version\".\n" +
 	"#\n" +
 	"layout_pyenv() {\n" +
-	"  local python_version=$1\n" +
-	"  local pyenv_python\n" +
-	"  pyenv_python=$(pyenv root)/versions/${python_version}/bin/python\n" +
-	"  if [[ -x \"$pyenv_python\" ]]; then\n" +
-	"    if layout_python \"$pyenv_python\"; then\n" +
-	"      export PYENV_VERSION=$python_version\n" +
+	"  unset PYENV_VERSION\n" +
+	"  # layout_python prepends each python version to the PATH, so we add each\n" +
+	"  # version in reverse order so that the first listed version ends up\n" +
+	"  # first in the path\n" +
+	"  local i\n" +
+	"  for ((i = $#; i > 0; i--)); do\n" +
+	"    local python_version=${!i}\n" +
+	"    local pyenv_python\n" +
+	"    pyenv_python=$(pyenv root)/versions/${python_version}/bin/python\n" +
+	"    if [[ -x \"$pyenv_python\" ]]; then\n" +
+	"      if layout_python \"$pyenv_python\"; then\n" +
+	"        # e.g. Given \"use pyenv 3.6.9 2.7.16\", PYENV_VERSION becomes \"3.6.9:2.7.16\"\n" +
+	"        PYENV_VERSION=${python_version}${PYENV_VERSION:+:$PYENV_VERSION}\n" +
+	"      fi\n" +
+	"    else\n" +
+	"      log_error \"pyenv: version '$python_version' not installed\"\n" +
+	"      return 1\n" +
 	"    fi\n" +
-	"  else\n" +
-	"    log_error \"pyenv: version '$python_version' not installed\"\n" +
-	"    return 1\n" +
-	"  fi\n" +
+	"  done\n" +
+	"\n" +
+	"  [[ -n \"$PYENV_VERSION\" ]] && export PYENV_VERSION\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout ruby\n" +
