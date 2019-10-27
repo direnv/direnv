@@ -751,6 +751,78 @@ use_guix() {
   eval "$(guix environment "$@" --search-paths)"
 }
 
+## Usage: use_asdf [...]
+#
+# Loads environment variables from `asdf` current tools.
+#
+# If first argument is a file it is expected to be a path to a .tool-versions file.
+# Otherwise two argments are expected, a plugin name and version.
+# If no arguments are given, a .tool-versions file will be looked up.
+use_asdf() {
+  local plugin
+  local version
+  if [ -z "$*" ]; then
+    local tool_versions
+    tool_versions="$(find_up .tool-versions)"
+    if [ -f "$tool_versions" ]; then
+      use asdf "$tool_versions"
+    else
+      echo "direnv: could not find .tool-versions file" >&2
+      return 1
+    fi
+  elif [ -f "$1" ]; then
+    local tool_versions="$1"
+    watch_file "$tool_versions"
+    local IFS
+    IFS=$'\n'
+    for plugin_and_version in $(cut -d'#' -f1 "$tool_versions" | awk NF | tail -r); do
+      IFS=$' ' read -r plugin version <<< "$plugin_and_version"
+      echo "direnv: using asdf $plugin $version"
+      direnv_load _direnv_asdf_dump_env "$plugin" "$version"
+    done
+  elif [ -n "$1" ]; then
+    plugin="$1"
+    version="${2:-$(_direnv_asdf_preset_version "$plugin")}"
+    if [ -z "$version" ]; then
+      echo "asdf: could not find current version for $plugin" >&2
+      return 1
+    fi
+    echo "direnv: using asdf $plugin $version"
+    direnv_load _direnv_asdf_dump_env "$1" "$2"
+  else
+    echo "direnv: Invalid args: use asdf $*"     >&2
+    echo "        use asdf TOOL_VERSIONS_FILE"   >&2
+    echo "        use asdf TOOL_NAME [VERSION]"  >&2
+    return 1
+  fi
+}
+
+# asdf helper: create this wrapper since asdf expects a function callback
+_direnv_asdf_dump() {
+  direnv dump
+}
+
+# asdf helper: get a tool version
+_direnv_asdf_preset_version() {
+  local plugin=$1
+  ( # use a sub-shell since asdf introduces set -e
+    # shellcheck disable=SC1090 # Can't follow non-constant source. Use a directive to specify location.
+    source "$ASDF_DIR/lib/utils.sh"
+    get_preset_version_for "$plugin"
+  )
+}
+
+# asdf helper: dump the environment needed for plugin and version
+_direnv_asdf_dump_env() {
+  local plugin=$1
+  local version=$2
+  ( # use a sub-shell since asdf introduces set -e
+    # shellcheck disable=SC1090 # Can't follow non-constant source. Use a directive to specify location.
+    source "$ASDF_DIR/lib/utils.sh"
+    with_plugin_env "$plugin" "$version" _direnv_asdf_dump
+  )
+}
+
 ## Load the global ~/.direnvrc if present
 if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/direnv/direnvrc ]]; then
   # shellcheck disable=SC1090
