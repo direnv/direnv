@@ -28,6 +28,12 @@ See also:
 
 ## From binary builds
 
+To install binary builds you can run this bash installer:
+
+```
+curl -sfL https://direnv.net/install.sh | bash
+```
+
 Binary builds for a variety of architectures are also available for
 [each release](https://github.com/direnv/direnv/releases).
 
