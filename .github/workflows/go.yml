@@ -1,0 +1,41 @@
+name: Go
+on:
+  push:
+    branches: [ master ]
+  pull_request: {}
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    steps:
+
+    - name: Set up Go 1.13.6
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13.6
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Build
+      env:
+        GO111MODULE: on
+      run: go build -v .
+
+    - name: Test
+      env:
+        GO111MODULE: on
+      run: go test -v ./...
+
+    - name: Test Host bash
+      env:
+        GO111MODULE: on
+      run: make test-bash
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          # TODO: - windows-latest
