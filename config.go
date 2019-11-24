@@ -47,7 +47,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.ConfDir = XdgConfigDir(env, "direnv")
 	}
 	if config.ConfDir == "" {
-		err = fmt.Errorf("Couldn't find a configuration directory for direnv")
+		err = fmt.Errorf("couldn't find a configuration directory for direnv")
 		return
 	}
 
@@ -91,9 +91,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 			return
 		}
 
-		for _, prefix := range tomlConf.Whitelist.Prefix {
-			config.WhitelistPrefix = append(config.WhitelistPrefix, prefix)
-		}
+		config.WhitelistPrefix = append(config.WhitelistPrefix, tomlConf.Whitelist.Prefix...)
 
 		for _, path := range tomlConf.Whitelist.Exact {
 			if !strings.HasSuffix(path, "/.envrc") {
@@ -123,7 +121,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		} else if bashPath != "" {
 			config.BashPath = bashPath
 		} else if config.BashPath, err = exec.LookPath("bash"); err != nil {
-			err = fmt.Errorf("Can't find bash: %q", err)
+			err = fmt.Errorf("can't find bash: %q", err)
 			return
 		}
 	}
@@ -131,33 +129,33 @@ func LoadConfig(env Env) (config *Config, err error) {
 	return
 }
 
-func (self *Config) AllowDir() string {
-	return filepath.Join(self.ConfDir, "allow")
+func (config *Config) AllowDir() string {
+	return filepath.Join(config.ConfDir, "allow")
 }
 
-func (self *Config) LoadedRC() *RC {
-	if self.RCDir == "" {
+func (config *Config) LoadedRC() *RC {
+	if config.RCDir == "" {
 		log_debug("RCDir is blank - loadedRC is nil")
 		return nil
 	}
-	rcPath := filepath.Join(self.RCDir, ".envrc")
+	rcPath := filepath.Join(config.RCDir, ".envrc")
 
-	times_string := self.Env[DIRENV_WATCHES]
+	times_string := config.Env[DIRENV_WATCHES]
 
-	return RCFromEnv(rcPath, times_string, self)
+	return RCFromEnv(rcPath, times_string, config)
 }
 
-func (self *Config) FindRC() *RC {
-	return FindRC(self.WorkDir, self)
+func (config *Config) FindRC() *RC {
+	return FindRC(config.WorkDir, config)
 }
 
-func (self *Config) EnvDiff() (*EnvDiff, error) {
-	if self.Env[DIRENV_DIFF] == "" {
-		if self.Env[DIRENV_WATCHES] == "" {
-			return self.Env.Diff(self.Env), nil
+func (config *Config) EnvDiff() (*EnvDiff, error) {
+	if config.Env[DIRENV_DIFF] == "" {
+		if config.Env[DIRENV_WATCHES] == "" {
+			return config.Env.Diff(config.Env), nil
 		} else {
 			return nil, fmt.Errorf("DIRENV_DIFF is empty")
 		}
 	}
-	return LoadEnvDiff(self.Env[DIRENV_DIFF])
+	return LoadEnvDiff(config.Env[DIRENV_DIFF])
 }

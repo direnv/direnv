@@ -16,7 +16,7 @@ var CmdShowDump = &Cmd{
 	Private: true,
 	Action: actionSimple(func(env Env, args []string) (err error) {
 		if len(args) < 2 {
-			return fmt.Errorf("Missing DUMP argument")
+			return fmt.Errorf("missing DUMP argument")
 		}
 
 		var f interface{}

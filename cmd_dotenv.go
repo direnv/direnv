@@ -19,6 +19,7 @@ var CmdDotEnv = &Cmd{
 	Private: true,
 	Action: actionSimple(func(env Env, args []string) (err error) {
 		var shell Shell
+		var newenv Env
 		var target string
 
 		if len(args) > 1 {
@@ -40,12 +41,12 @@ var CmdDotEnv = &Cmd{
 			return
 		}
 
-		env, err = dotenv.Parse(string(data))
+		newenv, err = dotenv.Parse(string(data))
 		if err != nil {
 			return err
 		}
 
-		str := env.ToShell(shell)
+		str := newenv.ToShell(shell)
 		fmt.Println(str)
 
 		return

@@ -16,46 +16,46 @@ type ExportContext struct {
 	newEnv   Env
 }
 
-func (self *ExportContext) getRCs() {
-	self.loadedRC = self.config.LoadedRC()
-	self.foundRC = self.config.FindRC()
+func (context *ExportContext) getRCs() {
+	context.loadedRC = context.config.LoadedRC()
+	context.foundRC = context.config.FindRC()
 }
 
-func (self *ExportContext) hasRC() bool {
-	return self.foundRC != nil || self.loadedRC != nil
+func (context *ExportContext) hasRC() bool {
+	return context.foundRC != nil || context.loadedRC != nil
 }
 
-func (self *ExportContext) updateRC() (err error) {
+func (context *ExportContext) updateRC() (err error) {
 	defer log.SetPrefix(log.Prefix())
 	log.SetPrefix(log.Prefix() + "update:")
 
-	self.oldEnv = self.env.Copy()
+	context.oldEnv = context.env.Copy()
 	var backupDiff *EnvDiff
 
-	if backupDiff, err = self.config.EnvDiff(); err != nil {
+	if backupDiff, err = context.config.EnvDiff(); err != nil {
 		err = fmt.Errorf("EnvDiff() failed: %q", err)
 		return
 	}
 
-	self.oldEnv = backupDiff.Reverse().Patch(self.env)
+	context.oldEnv = backupDiff.Reverse().Patch(context.env)
 
 	log_debug("Determining action:")
-	log_debug("foundRC: %#v", self.foundRC)
-	log_debug("loadedRC: %#v", self.loadedRC)
+	log_debug("foundRC: %#v", context.foundRC)
+	log_debug("loadedRC: %#v", context.loadedRC)
 
 	switch {
-	case self.foundRC == nil:
+	case context.foundRC == nil:
 		log_debug("no RC found, unloading")
-		err = self.unloadEnv()
-	case self.loadedRC == nil:
+		err = context.unloadEnv()
+	case context.loadedRC == nil:
 		log_debug("no RC (implies no DIRENV_DIFF),loading")
-		err = self.loadRC()
-	case self.loadedRC.path != self.foundRC.path:
+		err = context.loadRC()
+	case context.loadedRC.path != context.foundRC.path:
 		log_debug("new RC, loading")
-		err = self.loadRC()
-	case self.loadedRC.times.Check() != nil:
+		err = context.loadRC()
+	case context.loadedRC.times.Check() != nil:
 		log_debug("file changed, reloading")
-		err = self.loadRC()
+		err = context.loadRC()
 	default:
 		log_debug("no update needed")
 	}
@@ -63,15 +63,15 @@ func (self *ExportContext) updateRC() (err error) {
 	return
 }
 
-func (self *ExportContext) loadRC() (err error) {
-	self.newEnv, err = self.foundRC.Load(self.config, self.oldEnv)
+func (context *ExportContext) loadRC() (err error) {
+	context.newEnv, err = context.foundRC.Load(context.config, context.oldEnv)
 	return
 }
 
-func (self *ExportContext) unloadEnv() (err error) {
-	log_status(self.env, "unloading")
-	self.newEnv = self.oldEnv.Copy()
-	cleanEnv(self.newEnv)
+func (context *ExportContext) unloadEnv() (err error) {
+	log_status(context.env, "unloading")
+	context.newEnv = context.oldEnv.Copy()
+	cleanEnv(context.newEnv)
 	return
 }
 
@@ -79,8 +79,8 @@ func cleanEnv(env Env) {
 	env.CleanContext()
 }
 
-func (self *ExportContext) diffString(shell Shell) string {
-	oldDiff := self.oldEnv.Diff(self.newEnv)
+func (context *ExportContext) diffString(shell Shell) string {
+	oldDiff := context.oldEnv.Diff(context.newEnv)
 	if oldDiff.Any() {
 		var out []string
 		for key := range oldDiff.Prev {
@@ -104,11 +104,11 @@ func (self *ExportContext) diffString(shell Shell) string {
 
 		sort.Strings(out)
 		if len(out) > 0 {
-			log_status(self.env, "export %s", strings.Join(out, " "))
+			log_status(context.env, "export %s", strings.Join(out, " "))
 		}
 	}
 
-	diff := self.env.Diff(self.newEnv)
+	diff := context.env.Diff(context.newEnv)
 	return diff.ToShell(shell)
 }
 
@@ -129,7 +129,7 @@ func exportCommand(env Env, args []string, config *Config) (err error) {
 
 	shell := DetectShell(target)
 	if shell == nil {
-		return fmt.Errorf("Unknown target shell '%s'", target)
+		return fmt.Errorf("unknown target shell '%s'", target)
 	}
 
 	log_debug("loading RCs")

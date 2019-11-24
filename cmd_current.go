@@ -14,7 +14,7 @@ var CmdCurrent = &Cmd{
 
 func currentCommandFn(env Env, args []string) (err error) {
 	if len(args) < 2 {
-		err = errors.New("Missing PATH argument")
+		err = errors.New("missing PATH argument")
 		return
 	}
 

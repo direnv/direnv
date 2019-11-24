@@ -132,14 +132,14 @@ func (time FileTime) Check() (err error) {
 	return nil
 }
 
-func (self *FileTime) Formatted(relDir string) string {
-	timeBytes, err := time.Unix(self.Modtime, 0).MarshalText()
+func (times *FileTime) Formatted(relDir string) string {
+	timeBytes, err := time.Unix(times.Modtime, 0).MarshalText()
 	if err != nil {
 		timeBytes = []byte("<<???>>")
 	}
-	path, err := filepath.Rel(relDir, self.Path)
+	path, err := filepath.Rel(relDir, times.Path)
 	if err != nil {
-		path = self.Path
+		path = times.Path
 	}
 	return fmt.Sprintf("%q - %s", path, timeBytes)
 }
