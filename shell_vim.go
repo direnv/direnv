@@ -10,7 +10,7 @@ type vim struct{}
 var VIM Shell = vim{}
 
 func (sh vim) Hook() (string, error) {
-	return "", errors.New("this feature is not supported. Install the direnv.vim plugin instead.")
+	return "", errors.New("this feature is not supported. Install the direnv.vim plugin instead")
 }
 
 func (sh vim) Export(e ShellExport) (out string) {

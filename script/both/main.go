@@ -2,13 +2,12 @@
 package main
 
 import (
-	"os"
 	"io"
+	"os"
 )
 
 func main() {
 	buf := make([]byte, 2048)
-
 
 	for {
 		size, err := os.Stdin.Read(buf)

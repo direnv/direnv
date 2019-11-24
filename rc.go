@@ -49,46 +49,46 @@ func RCFromEnv(path, marshalled_times string, config *Config) *RC {
 	return &RC{path, "", times, config}
 }
 
-func (self *RC) Allow() (err error) {
-	if self.allowPath == "" {
-		return fmt.Errorf("Cannot allow empty path")
+func (rc *RC) Allow() (err error) {
+	if rc.allowPath == "" {
+		return fmt.Errorf("cannot allow empty path")
 	}
-	if err = os.MkdirAll(filepath.Dir(self.allowPath), 0755); err != nil {
+	if err = os.MkdirAll(filepath.Dir(rc.allowPath), 0755); err != nil {
 		return
 	}
-	if err = allow(self.path, self.allowPath); err != nil {
+	if err = allow(rc.path, rc.allowPath); err != nil {
 		return
 	}
-	self.times.Update(self.allowPath)
+	rc.times.Update(rc.allowPath)
 	return
 }
 
-func (self *RC) Deny() error {
-	return os.Remove(self.allowPath)
+func (rc *RC) Deny() error {
+	return os.Remove(rc.allowPath)
 }
 
-func (self *RC) Allowed() bool {
+func (rc *RC) Allowed() bool {
 	// happy path is if this envrc has been explicitly allowed, O(1)ish common case
-	_, err := os.Stat(self.allowPath)
+	_, err := os.Stat(rc.allowPath)
 
 	if err == nil {
 		return true
 	}
 
 	// when whitelisting we want to be (path) absolutely sure we've not been duped with a symlink
-	path, err := filepath.Abs(self.path)
+	path, err := filepath.Abs(rc.path)
 	// seems unlikely that we'd hit this, but have to handle it
 	if err != nil {
 		return false
 	}
 
 	// exact whitelists are O(1)ish to check, so look there first
-	if self.config.WhitelistExact[path] {
+	if rc.config.WhitelistExact[path] {
 		return true
 	}
 
 	// finally we check if any of our whitelist prefixes match
-	for _, prefix := range self.config.WhitelistPrefix {
+	for _, prefix := range rc.config.WhitelistPrefix {
 		if strings.HasPrefix(path, prefix) {
 			return true
 		}
@@ -101,39 +101,39 @@ func (self *RC) Allowed() bool {
 // are completely different.
 // Eg:  /home/foo and /home/bar => ../foo
 // But: /home/foo and /tmp/bar  => /home/foo
-func (self *RC) RelTo(wd string) string {
-	if rootDir(wd) != rootDir(self.path) {
-		return self.path
+func (rc *RC) RelTo(wd string) string {
+	if rootDir(wd) != rootDir(rc.path) {
+		return rc.path
 	}
-	x, err := filepath.Rel(wd, self.path)
+	x, err := filepath.Rel(wd, rc.path)
 	if err != nil {
 		panic(err)
 	}
 	return x
 }
 
-func (self *RC) Touch() error {
-	return touch(self.path)
+func (rc *RC) Touch() error {
+	return touch(rc.path)
 }
 
-const NOT_ALLOWED = "%s is blocked. Run `direnv allow` to approve its content."
+const NOT_ALLOWED = "%s is blocked. Run `direnv allow` to approve its content"
 
-func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
+func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	wd := config.WorkDir
 	direnv := config.SelfPath
 	newEnv = env.Copy()
-	newEnv[DIRENV_WATCHES] = self.times.Marshal()
+	newEnv[DIRENV_WATCHES] = rc.times.Marshal()
 	defer func() {
-		self.RecordState(env, newEnv)
+		rc.RecordState(env, newEnv)
 	}()
 
-	if !self.Allowed() {
-		err = fmt.Errorf(NOT_ALLOWED, self.RelTo(wd))
+	if !rc.Allowed() {
+		err = fmt.Errorf(NOT_ALLOWED, rc.RelTo(wd))
 		return
 	}
 
 	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
-	arg := fmt.Sprintf(argtmpl, direnv, self.RelTo(wd), direnv)
+	arg := fmt.Sprintf(argtmpl, direnv, rc.RelTo(wd), direnv)
 	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
 
 	if config.DisableStdin {
@@ -163,8 +163,8 @@ func (self *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	return
 }
 
-func (self *RC) RecordState(env Env, newEnv Env) {
-	newEnv[DIRENV_DIR] = "-" + filepath.Dir(self.path)
+func (rc *RC) RecordState(env Env, newEnv Env) {
+	newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
 	newEnv[DIRENV_DIFF] = env.Diff(newEnv).Serialize()
 }
 

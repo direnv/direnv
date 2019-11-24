@@ -36,7 +36,7 @@ var CmdEdit = &Cmd{
 			}
 		} else {
 			if foundRC == nil {
-				return fmt.Errorf(".envrc not found. Use `direnv edit .` to create a new envrc in the current directory.")
+				return fmt.Errorf(".envrc not found. Use `direnv edit .` to create a new envrc in the current directory")
 			}
 			rcPath = foundRC.path
 		}
@@ -46,7 +46,7 @@ var CmdEdit = &Cmd{
 			log_error("$EDITOR not found.")
 			editor = detectEditor(env["PATH"])
 			if editor == "" {
-				err = fmt.Errorf("Could not find a default editor in the PATH")
+				err = fmt.Errorf("could not find a default editor in the PATH")
 				return
 			}
 		}

@@ -33,7 +33,7 @@ var CmdHook = &Cmd{
 
 		shell := DetectShell(target)
 		if shell == nil {
-			return fmt.Errorf("Unknown target shell '%s'", target)
+			return fmt.Errorf("unknown target shell '%s'", target)
 		}
 
 		hookStr, err := shell.Hook()

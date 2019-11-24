@@ -71,51 +71,51 @@ func LoadEnvDiff(gzenvStr string) (diff *EnvDiff, err error) {
 	return
 }
 
-func (self *EnvDiff) Any() bool {
-	return len(self.Prev) > 0 || len(self.Next) > 0
+func (diff *EnvDiff) Any() bool {
+	return len(diff.Prev) > 0 || len(diff.Next) > 0
 }
 
-func (self *EnvDiff) ToShell(shell Shell) string {
+func (diff *EnvDiff) ToShell(shell Shell) string {
 	e := make(ShellExport)
 
-	for key := range self.Prev {
-		_, ok := self.Next[key]
+	for key := range diff.Prev {
+		_, ok := diff.Next[key]
 		if !ok {
 			e.Remove(key)
 		}
 	}
 
-	for key, value := range self.Next {
+	for key, value := range diff.Next {
 		e.Add(key, value)
 	}
 
 	return shell.Export(e)
 }
 
-func (self *EnvDiff) Patch(env Env) (newEnv Env) {
+func (diff *EnvDiff) Patch(env Env) (newEnv Env) {
 	newEnv = make(Env)
 
 	for k, v := range env {
 		newEnv[k] = v
 	}
 
-	for key := range self.Prev {
+	for key := range diff.Prev {
 		delete(newEnv, key)
 	}
 
-	for key, value := range self.Next {
+	for key, value := range diff.Next {
 		newEnv[key] = value
 	}
 
 	return newEnv
 }
 
-func (self *EnvDiff) Reverse() *EnvDiff {
-	return &EnvDiff{self.Next, self.Prev}
+func (diff *EnvDiff) Reverse() *EnvDiff {
+	return &EnvDiff{diff.Next, diff.Prev}
 }
 
-func (self *EnvDiff) Serialize() string {
-	return gzenv.Marshal(self)
+func (diff *EnvDiff) Serialize() string {
+	return gzenv.Marshal(diff)
 }
 
 //// Utils

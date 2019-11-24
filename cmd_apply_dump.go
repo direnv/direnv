@@ -13,11 +13,11 @@ var CmdApplyDump = &Cmd{
 	Private: true,
 	Action: actionSimple(func(env Env, args []string) (err error) {
 		if len(args) < 2 {
-			return fmt.Errorf("Not enough arguments")
+			return fmt.Errorf("not enough arguments")
 		}
 
 		if len(args) > 2 {
-			return fmt.Errorf("Too many arguments")
+			return fmt.Errorf("too many arguments")
 		}
 		filename := args[1]
 

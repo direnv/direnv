@@ -65,13 +65,6 @@ func init() {
 	}
 }
 
-func loadCmdConfig(env Env, existingConfig *Config) (config *Config, err error) {
-	if existingConfig != nil {
-		return existingConfig, nil
-	}
-	return LoadConfig(env)
-}
-
 func cmdWithWarnTimeout(fn action) action {
 	return actionWithConfig(func(env Env, args []string, config *Config) (err error) {
 		done := make(chan bool, 1)
@@ -121,7 +114,7 @@ func CommandsDispatch(env Env, args []string) error {
 	}
 
 	if command == nil {
-		return fmt.Errorf("Command \"%s\" not found", commandPrefix)
+		return fmt.Errorf("command \"%s\" not found", commandPrefix)
 	}
 
 	return command.Action.Call(env, commandArgs, nil)
