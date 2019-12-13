@@ -20,7 +20,7 @@ var CmdWatchList = &Cmd{
 func watchListCommand(env Env, args []string) (err error) {
 	var shellName string
 
-	if len(args) >= 1 {
+	if len(args) >= 2 {
 		shellName = args[1]
 	} else {
 		shellName = "bash"
@@ -53,7 +53,7 @@ func watchListCommand(env Env, args []string) (err error) {
 			if err != nil {
 				return fmt.Errorf("line %d: %s", i, err)
 			}
-			path := elems[1]
+			path := elems[1][:len(elems[1])-1]
 
 			// add to watches
 			watches.NewTime(path, int64(mtime), true)

@@ -232,16 +232,6 @@ watch_file() {
   eval "$("$direnv" watch bash "$@")"
 }
 
-# Usage: echo "<mtime> <path>" | watch_list
-#
-# This is like `watch_file` except that the mtime is also provided. This is
-# useful when the list already exists from another build tool such as `redo`.
-#
-# The list of `<mtime> <path>` pairs has to be passed to stdin.
-watch_list() {
-  eval "$("$direnv" watch-list bash)"
-}
-
 # Usage: source_up [<filename>]
 #
 # Loads another ".envrc" if found with the find_up command.
