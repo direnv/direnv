@@ -229,7 +229,7 @@ source_env() {
 # especially in direnvrc
 #
 watch_file() {
-  eval "$("$direnv" watch "$@")"
+  eval "$("$direnv" watch bash "$@")"
 }
 
 # Usage: source_up [<filename>]

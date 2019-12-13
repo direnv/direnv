@@ -8,7 +8,7 @@ import (
 var CmdWatch = &Cmd{
 	Name:    "watch",
 	Desc:    "Adds a path to the list that direnv watches for changes",
-	Args:    []string{"[SHELL]", "PATH"},
+	Args:    []string{"SHELL", "PATH"},
 	Private: false,
 	Action:  actionSimple(watchCommand),
 }
@@ -16,13 +16,11 @@ var CmdWatch = &Cmd{
 func watchCommand(env Env, args []string) (err error) {
 	var shellName string
 
-	args = args[1:]
-	if len(args) < 1 {
+	if len(args) < 2 {
 		return fmt.Errorf("a path is required to add to the list of watches")
 	}
 	if len(args) >= 2 {
-		shellName = args[0]
-		args = args[1:]
+		shellName = args[1]
 	} else {
 		shellName = "bash"
 	}
@@ -39,8 +37,8 @@ func watchCommand(env Env, args []string) (err error) {
 		watches.Unmarshal(watchString)
 	}
 
-	for idx := range args {
-		watches.Update(args[idx])
+	for _, arg := range args[2:] {
+		watches.Update(arg)
 	}
 
 	e := make(ShellExport)
