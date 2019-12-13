@@ -231,7 +231,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"# especially in direnvrc\n" +
 	"#\n" +
 	"watch_file() {\n" +
-	"  eval \"$(\"$direnv\" watch \"$@\")\"\n" +
+	"  eval \"$(\"$direnv\" watch bash \"$@\")\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: source_up [<filename>]\n" +
