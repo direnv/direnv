@@ -234,6 +234,16 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"  eval \"$(\"$direnv\" watch bash \"$@\")\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: echo \"<mtime> <path>\" | watch_list\n" +
+	"#\n" +
+	"# This is like `watch_file` except that the mtime is also provided. This is\n" +
+	"# useful when the list already exists from another build tool such as `redo`.\n" +
+	"#\n" +
+	"# The list of `<mtime> <path>` pairs has to be passed to stdin.\n" +
+	"watch_list() {\n" +
+	"  eval \"$(\"$direnv\" watch-list bash)\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: source_up [<filename>]\n" +
 	"#\n" +
 	"# Loads another \".envrc\" if found with the find_up command.\n" +
