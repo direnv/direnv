@@ -10,7 +10,7 @@ type fish struct{}
 var FISH Shell = fish{}
 
 const FISH_HOOK = `
-function __direnv_export_eval --on-event fish_preexec;
+function __direnv_export_eval --on-event fish_postexec;
 	"{{.SelfPath}}" export fish | source;
 end
 `
