@@ -109,7 +109,8 @@ man: $(roffs)
 ############################################################################
 
 tests = \
-			 	test-shellcheck \
+				test-stdlib \
+				test-shellcheck \
 				test-go \
 				test-go-fmt \
 				test-bash \
@@ -131,6 +132,9 @@ test-go-fmt:
 
 test-shellcheck:
 	shellcheck stdlib.sh
+
+test-stdlib:
+	./test/stdlib/*/*.sh
 
 test-bash:
 	bash ./test/direnv-test.bash
