@@ -9,7 +9,7 @@ var CmdWatch = &Cmd{
 	Name:    "watch",
 	Desc:    "Adds a path to the list that direnv watches for changes",
 	Args:    []string{"SHELL", "PATH"},
-	Private: false,
+	Private: true,
 	Action:  actionSimple(watchCommand),
 }
 

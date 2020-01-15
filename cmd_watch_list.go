@@ -13,7 +13,7 @@ var CmdWatchList = &Cmd{
 	Name:    "watch-list",
 	Desc:    "Pipe pairs of `mtime path` to stdin to build a list of files to watch.",
 	Args:    []string{"[SHELL]"},
-	Private: false,
+	Private: true,
 	Action:  actionSimple(watchListCommand),
 }
 
