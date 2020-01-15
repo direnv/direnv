@@ -11,7 +11,12 @@ var CmdStatus = &Cmd{
 	Action: actionWithConfig(func(env Env, args []string, config *Config) error {
 		fmt.Println("direnv exec path", config.SelfPath)
 		fmt.Println("DIRENV_CONFIG", config.ConfDir)
-		fmt.Println("DIRENV_BASH", config.BashPath)
+
+		fmt.Println("bash_path", config.BashPath)
+		fmt.Println("disable_stdin", config.DisableStdin)
+		fmt.Println("warn_timeout", config.WarnTimeout)
+		fmt.Println("whitelist.prefix", config.WhitelistPrefix)
+		fmt.Println("whitelist.exact", config.WhitelistExact)
 
 		loadedRC := config.LoadedRC()
 		foundRC := config.FindRC()
