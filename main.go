@@ -8,6 +8,10 @@ import (
 var bashPath string
 
 func main() {
+	// We drop $PWD from caller since it can include symlinks, which will
+	// break relative path access when finding .envrc in a parent.
+	_ = os.Unsetenv("PWD")
+
 	var env = GetEnv()
 	var args = os.Args
 
