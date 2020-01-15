@@ -59,12 +59,14 @@ var CmdExec = &Cmd{
 			newEnv = env
 		}
 
-		command, err = lookPath(command, newEnv["PATH"])
+		var commandPath string
+		commandPath, err = lookPath(command, newEnv["PATH"])
 		if err != nil {
+			err = fmt.Errorf("command '%s' not found on PATH '%s'", command, newEnv["PATH"])
 			return
 		}
 
-		err = syscall.Exec(command, args, newEnv.ToGoEnv())
+		err = syscall.Exec(commandPath, args, newEnv.ToGoEnv())
 		return
 	}),
 }
