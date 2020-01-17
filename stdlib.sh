@@ -258,18 +258,48 @@ source_up() {
 # the results with direnv_load.
 #
 direnv_load() {
-  local exports
-  # backup and restore watches in case of nix-shell --pure
-  local __watches=$DIRENV_WATCHES
+  # Backup watches in case of `nix-shell --pure`
+  local prev_watches=$DIRENV_WATCHES
+  local prev_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}
 
-  exports=$("$direnv" apply_dump <("$@"))
+  # Create pipe
+  DIRENV_DUMP_FILE_PATH=$(mktemp -u)
+  export DIRENV_DUMP_FILE_PATH
+  mkfifo "$DIRENV_DUMP_FILE_PATH"
+
+  # Run program in the background
+  ("$@")&
+
+  # Apply the output of the dump
+  local exports
+  exports=$("$direnv" apply_dump "$DIRENV_DUMP_FILE_PATH")
   local es=$?
+
+  # Regroup
+  rm "$DIRENV_DUMP_FILE_PATH"
+  wait # wait on the child process to exit
+  local es2=$?
+
   if [[ $es -ne 0 ]]; then
     return $es
   fi
+
+  if [[ $es2 -ne 0 ]]; then
+    return $es2
+  fi
+
   eval "$exports"
 
-  export DIRENV_WATCHES=$__watches
+  # Restore watches if the dump wiped them
+  if [[ -z "$DIRENV_WATCHES" ]]; then
+    export DIRENV_WATCHES=$prev_watches
+  fi
+  # Allow nesting
+  if [[ -n "$prev_dump_file_path" ]]; then
+    export DIRENV_DUMP_FILE_PATH=$prev_dump_file_path
+  else
+    unset DIRENV_DUMP_FILE_PATH
+  fi
 }
 
 # Usage: PATH_add <path> [<path> ...]

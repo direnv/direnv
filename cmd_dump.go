@@ -1,18 +1,36 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
-// `direnv dump`
+// CmdDump is `direnv dump`
 var CmdDump = &Cmd{
 	Name:    "dump",
 	Desc:    "Used to export the inner bash state at the end of execution",
-	Args:    []string{"[SHELL]"},
+	Args:    []string{"[SHELL]", "[FILE]"},
 	Private: true,
 	Action: actionSimple(func(env Env, args []string) (err error) {
 		target := "gzenv"
+		w := os.Stdout
 
 		if len(args) > 1 {
 			target = args[1]
+		}
+
+		var filePath string
+		if len(args) > 2 {
+			filePath = args[2]
+		} else {
+			filePath = os.Getenv("DIRENV_DUMP_FILE_PATH")
+		}
+
+		if filePath != "" {
+			w, err = os.OpenFile(filePath, os.O_WRONLY, 0666)
+			if err != nil {
+				return err
+			}
 		}
 
 		shell := DetectShell(target)
@@ -20,7 +38,7 @@ var CmdDump = &Cmd{
 			return fmt.Errorf("unknown target shell '%s'", target)
 		}
 
-		fmt.Println(shell.Dump(env))
+		_, err = fmt.Fprintln(w, shell.Dump(env))
 
 		return
 	}),
