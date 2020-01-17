@@ -1,0 +1,4 @@
+github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
+github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/direnv/go-dotenv v0.0.0-20181227095604-4cce6d1a66f7 h1:JsyIu/zmj8ZuCbyTRYczeOaxLsnSDCAmRwHa0jl4YqY=
+github.com/direnv/go-dotenv v0.0.0-20181227095604-4cce6d1a66f7/go.mod h1:T/OO6ZHPlA9WCvpwKhgyBiWiMcLwbP/rsGgxkxVHk6g=
