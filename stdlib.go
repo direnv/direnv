@@ -260,18 +260,48 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"# the results with direnv_load.\n" +
 	"#\n" +
 	"direnv_load() {\n" +
-	"  local exports\n" +
-	"  # backup and restore watches in case of nix-shell --pure\n" +
-	"  local __watches=$DIRENV_WATCHES\n" +
+	"  # Backup watches in case of `nix-shell --pure`\n" +
+	"  local prev_watches=$DIRENV_WATCHES\n" +
+	"  local prev_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}\n" +
 	"\n" +
-	"  exports=$(\"$direnv\" apply_dump <(\"$@\"))\n" +
+	"  # Create pipe\n" +
+	"  DIRENV_DUMP_FILE_PATH=$(mktemp -u)\n" +
+	"  export DIRENV_DUMP_FILE_PATH\n" +
+	"  mkfifo \"$DIRENV_DUMP_FILE_PATH\"\n" +
+	"\n" +
+	"  # Run program in the background\n" +
+	"  (\"$@\")&\n" +
+	"\n" +
+	"  # Apply the output of the dump\n" +
+	"  local exports\n" +
+	"  exports=$(\"$direnv\" apply_dump \"$DIRENV_DUMP_FILE_PATH\")\n" +
 	"  local es=$?\n" +
+	"\n" +
+	"  # Regroup\n" +
+	"  rm \"$DIRENV_DUMP_FILE_PATH\"\n" +
+	"  wait # wait on the child process to exit\n" +
+	"  local es2=$?\n" +
+	"\n" +
 	"  if [[ $es -ne 0 ]]; then\n" +
 	"    return $es\n" +
 	"  fi\n" +
+	"\n" +
+	"  if [[ $es2 -ne 0 ]]; then\n" +
+	"    return $es2\n" +
+	"  fi\n" +
+	"\n" +
 	"  eval \"$exports\"\n" +
 	"\n" +
-	"  export DIRENV_WATCHES=$__watches\n" +
+	"  # Restore watches if the dump wiped them\n" +
+	"  if [[ -z \"$DIRENV_WATCHES\" ]]; then\n" +
+	"    export DIRENV_WATCHES=$prev_watches\n" +
+	"  fi\n" +
+	"  # Allow nesting\n" +
+	"  if [[ -n \"$prev_dump_file_path\" ]]; then\n" +
+	"    export DIRENV_DUMP_FILE_PATH=$prev_dump_file_path\n" +
+	"  else\n" +
+	"    unset DIRENV_DUMP_FILE_PATH\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: PATH_add <path> [<path> ...]\n" +
