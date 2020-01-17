@@ -124,7 +124,7 @@ expand_path() {
 # Loads a ".env" file into the current environment
 #
 dotenv() {
-  local path=$1
+  local path=${1:-}
   if [[ -z $path ]]; then
     path=$PWD/.env
   elif [[ -d $path ]]; then
