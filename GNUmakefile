@@ -28,14 +28,7 @@ SHELL = bash
 .PHONY: all
 all: build man
 
-export GOPATH = $(CURDIR)/.gopath
-export GO15VENDOREXPERIMENT=1
-
-# Creates the GOPATH for us
-base = $(GOPATH)/src/$(PACKAGE)
-$(base):
-	@mkdir -p "$(dir $@)"
-	@ln -sf "$(CURDIR)" "$@"
+export GO111MODULE=on
 
 ############################################################################
 # Build
@@ -50,6 +43,7 @@ clean:
 		.gopath \
 		direnv
 
+GO_FLAGS = -mod=vendor
 GO_LDFLAGS =
 
 ifeq ($(shell uname), Darwin)
@@ -66,8 +60,8 @@ ifdef GO_LDFLAGS
 	GO_FLAGS += -ldflags '$(GO_LDFLAGS)'
 endif
 
-direnv: stdlib.go *.go | $(base)
-	cd "$(base)" && $(GO) build $(GO_FLAGS) -o $(exe)
+direnv: stdlib.go *.go
+	$(GO) build $(GO_FLAGS) -o $(exe)
 
 stdlib.go: stdlib.sh
 	cat $< | ./script/str2go main STDLIB $< > $@
@@ -123,8 +117,8 @@ test: build $(tests)
 	@echo
 	@echo SUCCESS!
 
-test-go: | $(base)
-	cd "$(base)" && $(GO) test -v ./...
+test-go:
+	$(GO) test $(GO_FLAGS) -v ./...
 
 test-go-fmt:
 	[ $$($(GO) fmt | go run script/both/main.go | wc -l) = 0 ]
@@ -160,7 +154,7 @@ install: all
 	cp -R man/*.1 $(MANDIR)/man1
 
 .PHONY: dist
-dist: | $(base)
+dist:
 	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
-	cd "$(base)" && gox -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}"
+	gox -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}"
 
