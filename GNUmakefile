@@ -29,6 +29,7 @@ SHELL = bash
 all: build man
 
 export GO111MODULE=on
+export GOFLAGS=-mod=vendor
 
 ############################################################################
 # Build
@@ -43,7 +44,6 @@ clean:
 		.gopath \
 		direnv
 
-GO_FLAGS = -mod=vendor
 GO_LDFLAGS =
 
 ifeq ($(shell uname), Darwin)
@@ -56,12 +56,12 @@ ifdef BASH_PATH
 	GO_LDFLAGS += -X main.bashPath=$(BASH_PATH)
 endif
 
-ifdef GO_LDFLAGS
-	GO_FLAGS += -ldflags '$(GO_LDFLAGS)'
+ifneq ($(strip $(GO_LDFLAGS)),)
+	GO_BUILD_FLAGS = -ldflags '$(GO_LDFLAGS)'
 endif
 
 direnv: stdlib.go *.go
-	$(GO) build $(GO_FLAGS) -o $(exe)
+	$(GO) build $(GO_BUILD_FLAGS) -o $(exe)
 
 stdlib.go: stdlib.sh
 	cat $< | ./script/str2go main STDLIB $< > $@
@@ -118,7 +118,7 @@ test: build $(tests)
 	@echo SUCCESS!
 
 test-go:
-	$(GO) test $(GO_FLAGS) -v ./...
+	$(GO) test -v ./...
 
 test-go-fmt:
 	[ $$($(GO) fmt | go run script/both/main.go | wc -l) = 0 ]

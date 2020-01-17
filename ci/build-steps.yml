@@ -10,10 +10,13 @@ steps:
       MANPATH=
       source $HOME/.nix-profile/etc/profile.d/nix.sh
       nix-build
+      nix-shell --pure --run "make dist"
     displayName: 'Build'
   - bash: |
       set -euo pipefail
       MANPATH=
       source $HOME/.nix-profile/etc/profile.d/nix.sh
       nix-shell --pure --run "make test"
+      # Test bash on host
+      make test-bash
     displayName: 'Test'
