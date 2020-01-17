@@ -126,7 +126,7 @@ const STDLIB = "#!/usr/bin/env bash\n" +
 	"# Loads a \".env\" file into the current environment\n" +
 	"#\n" +
 	"dotenv() {\n" +
-	"  local path=$1\n" +
+	"  local path=${1:-}\n" +
 	"  if [[ -z $path ]]; then\n" +
 	"    path=$PWD/.env\n" +
 	"  elif [[ -d $path ]]; then\n" +
