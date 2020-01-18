@@ -12,6 +12,7 @@ import (
 	"github.com/direnv/direnv/xdg"
 )
 
+// Config represents the direnv configuration and state.
 type Config struct {
 	Env             Env
 	WorkDir         string // Current directory
@@ -39,6 +40,7 @@ type whitelist struct {
 	Exact  []string
 }
 
+// LoadConfig opens up the direnv configuration from the Env.
 func LoadConfig(env Env) (config *Config, err error) {
 	config = &Config{
 		Env: env,
@@ -111,7 +113,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 	if config.WarnTimeout == 0 {
 		timeout, err := time.ParseDuration(env.Fetch("DIRENV_WARN_TIMEOUT", "5s"))
 		if err != nil {
-			log_error("invalid DIRENV_WARN_TIMEOUT: " + err.Error())
+			logError("invalid DIRENV_WARN_TIMEOUT: " + err.Error())
 			timeout = 5 * time.Second
 		}
 		config.WarnTimeout = timeout
@@ -132,40 +134,43 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.DataDir = xdg.DataDir(env, "direnv")
 	}
 	if config.DataDir == "" {
-		err = fmt.Errorf("Couldn't find a data directory for direnv")
+		err = fmt.Errorf("couldn't find a data directory for direnv")
 		return
 	}
 
 	return
 }
 
+// AllowDir is the folder where all the "allow" files are stored.
 func (config *Config) AllowDir() string {
 	return filepath.Join(config.DataDir, "allow")
 }
 
+// LoadedRC returns a RC file if any has been loaded
 func (config *Config) LoadedRC() *RC {
 	if config.RCDir == "" {
-		log_debug("RCDir is blank - loadedRC is nil")
+		logDebug("RCDir is blank - loadedRC is nil")
 		return nil
 	}
 	rcPath := filepath.Join(config.RCDir, ".envrc")
 
-	times_string := config.Env[DIRENV_WATCHES]
+	timesString := config.Env[DIRENV_WATCHES]
 
-	return RCFromEnv(rcPath, times_string, config)
+	return RCFromEnv(rcPath, timesString, config)
 }
 
+// FindRC looks for a RC file in the config environment
 func (config *Config) FindRC() *RC {
 	return FindRC(config.WorkDir, config)
 }
 
+// EnvDiff returns the recorded environment diff that was stored if any.
 func (config *Config) EnvDiff() (*EnvDiff, error) {
-	if config.Env[DIRENV_DIFF] == "" {
-		if config.Env[DIRENV_WATCHES] == "" {
-			return config.Env.Diff(config.Env), nil
-		} else {
-			return nil, fmt.Errorf("DIRENV_DIFF is empty")
-		}
+	if config.Env[DIRENV_DIFF] != "" {
+		return LoadEnvDiff(config.Env[DIRENV_DIFF])
 	}
-	return LoadEnvDiff(config.Env[DIRENV_DIFF])
+	if config.Env[DIRENV_WATCHES] == "" {
+		return config.Env.Diff(config.Env), nil
+	}
+	return nil, fmt.Errorf("DIRENV_DIFF is empty")
 }

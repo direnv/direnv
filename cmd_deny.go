@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// `direnv deny [PATH_TO_RC]`
+// CmdDeny is `direnv deny [PATH_TO_RC]`
 var CmdDeny = &Cmd{
 	Name: "deny",
 	Desc: "Revokes the authorization of a given .envrc",

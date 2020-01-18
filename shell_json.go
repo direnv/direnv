@@ -8,6 +8,8 @@ import (
 // jsonShell is not a real shell
 type jsonShell struct{}
 
+// JSON is not really a shell but it fits. Useful to add support to editor and
+// other external tools that understand JSON as a format.
 var JSON Shell = jsonShell{}
 
 func (sh jsonShell) Hook() (string, error) {

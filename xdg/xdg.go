@@ -33,4 +33,3 @@ func ConfigDir(env map[string]string, programName string) string {
 	// the process' UID
 	return ""
 }
-

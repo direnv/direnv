@@ -5,6 +5,7 @@ mkShell {
     gnumake
     go
     go-md2man
+    golangci-lint
     gox
     shellcheck
     shfmt

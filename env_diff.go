@@ -6,8 +6,8 @@ import (
 	"github.com/direnv/direnv/gzenv"
 )
 
-// A list of keys we don't want to deal with
-var IGNORED_KEYS = map[string]bool{
+// IgnoredKeys is list of keys we don't want to deal with
+var IgnoredKeys = map[string]bool{
 	// direnv env config
 	"DIRENV_CONFIG": true,
 	"DIRENV_BASH":   true,
@@ -27,15 +27,19 @@ var IGNORED_KEYS = map[string]bool{
 	"_":         true,
 }
 
+// EnvDiff represents the diff between two environments
 type EnvDiff struct {
 	Prev map[string]string `json:"p"`
 	Next map[string]string `json:"n"`
 }
 
+// NewEnvDiff is an empty constructor for EnvDiff
 func NewEnvDiff() *EnvDiff {
 	return &EnvDiff{make(map[string]string), make(map[string]string)}
 }
 
+// BuildEnvDiff analyses the changes between 'e1' and 'e2' and builds an
+// EnvDiff out of it.
 func BuildEnvDiff(e1, e2 Env) *EnvDiff {
 	diff := NewEnvDiff()
 
@@ -65,16 +69,21 @@ func BuildEnvDiff(e1, e2 Env) *EnvDiff {
 	return diff
 }
 
+// LoadEnvDiff unmarshalls a gzenv string back into an EnvDiff.
 func LoadEnvDiff(gzenvStr string) (diff *EnvDiff, err error) {
 	diff = new(EnvDiff)
 	err = gzenv.Unmarshal(gzenvStr, diff)
 	return
 }
 
+// Any returns if the diff contains any changes.
 func (diff *EnvDiff) Any() bool {
 	return len(diff.Prev) > 0 || len(diff.Next) > 0
 }
 
+// ToShell applies the env diff as a set of commands that are understood by
+// the target `shell`. The outputted string is then meant to be evaluated in
+// the target shell.
 func (diff *EnvDiff) ToShell(shell Shell) string {
 	e := make(ShellExport)
 
@@ -92,6 +101,8 @@ func (diff *EnvDiff) ToShell(shell Shell) string {
 	return shell.Export(e)
 }
 
+// Patch applies the diff to the given env and returns a new env with the
+// changes applied.
 func (diff *EnvDiff) Patch(env Env) (newEnv Env) {
 	newEnv = make(Env)
 
@@ -110,16 +121,19 @@ func (diff *EnvDiff) Patch(env Env) (newEnv Env) {
 	return newEnv
 }
 
+// Reverse flips the diff so that it applies the other way around.
 func (diff *EnvDiff) Reverse() *EnvDiff {
 	return &EnvDiff{diff.Next, diff.Prev}
 }
 
+// Serialize marshalls the environment diff to the gzenv format.
 func (diff *EnvDiff) Serialize() string {
 	return gzenv.Marshal(diff)
 }
 
 //// Utils
 
+// IgnoredEnv returns true if the key should be ignored in environment diffs.
 func IgnoredEnv(key string) bool {
 	if strings.HasPrefix(key, "__fish") {
 		return true
@@ -127,6 +141,6 @@ func IgnoredEnv(key string) bool {
 	if strings.HasPrefix(key, "BASH_FUNC_") {
 		return true
 	}
-	_, found := IGNORED_KEYS[key]
+	_, found := IgnoredKeys[key]
 	return found
 }

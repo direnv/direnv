@@ -4,26 +4,36 @@ import (
 	"path/filepath"
 )
 
-/*
- * Shells
- */
+// Shell is the interface that represents the interaction with the host shell.
 type Shell interface {
+	// Hook is the string that gets evaluated into the host shell config and
+	// setups direnv as a prompt hook.
 	Hook() (string, error)
+
+	// Export outputs the ShellExport as an evaluatable string on the host shell
 	Export(e ShellExport) string
+
+	// Dump outputs and evaluatable string that sets the env in the host shell
 	Dump(env Env) string
 }
 
-// Used to describe what to generate for the shell
+// ShellExport represents environment variables to add and remove on the host
+// shell.
 type ShellExport map[string]*string
 
+// Add represents the additon of a new environment variable
 func (e ShellExport) Add(key, value string) {
 	e[key] = &value
 }
 
+// Remove represents the removal of a given `key` environment variable.
 func (e ShellExport) Remove(key string) {
 	e[key] = nil
 }
 
+// DetectShell returns a Shell instance from the given target.
+//
+// target is usually $0 and can also be prefixed by `-`
 func DetectShell(target string) Shell {
 	target = filepath.Base(target)
 	// $0 starts with "-"
@@ -33,21 +43,21 @@ func DetectShell(target string) Shell {
 
 	switch target {
 	case "bash":
-		return BASH
+		return Bash
 	case "zsh":
-		return ZSH
+		return Zsh
 	case "fish":
-		return FISH
+		return Fish
 	case "gzenv":
-		return GZENV
+		return GzEnv
 	case "vim":
-		return VIM
+		return Vim
 	case "tcsh":
-		return TCSH
+		return Tcsh
 	case "json":
 		return JSON
 	case "elvish":
-		return ELVISH
+		return Elvish
 	}
 
 	return nil

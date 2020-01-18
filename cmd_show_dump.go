@@ -8,7 +8,7 @@ import (
 	"github.com/direnv/direnv/gzenv"
 )
 
-// `direnv show_dump`
+// CmdShowDump is `direnv show_dump`
 var CmdShowDump = &Cmd{
 	Name:    "show_dump",
 	Desc:    "Show the data inside of a dump for debugging purposes",

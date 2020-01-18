@@ -14,7 +14,7 @@ func expandPath(path, relTo string) string {
 	return filepath.Clean(filepath.Join(relTo, path))
 }
 
-// `direnv expand_path PATH [REL_TO]`
+// CmdExpandPath is `direnv expand_path PATH [REL_TO]`
 var CmdExpandPath = &Cmd{
 	Name:    "expand_path",
 	Desc:    "Transforms a PATH to an absolute path to REL_TO or $PWD",
@@ -24,7 +24,10 @@ var CmdExpandPath = &Cmd{
 		var path string
 
 		flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
-		flagset.Parse(args[1:])
+		err = flagset.Parse(args[1:])
+		if err != nil {
+			return err
+		}
 
 		path = flagset.Arg(0)
 		if path == "" {

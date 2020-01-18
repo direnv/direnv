@@ -12,7 +12,7 @@ type HookContext struct {
 	SelfPath string
 }
 
-// `direnv hook $0`
+// CmdHook is `direnv hook $0`
 var CmdHook = &Cmd{
 	Name: "hook",
 	Desc: "Used to setup the shell hook",

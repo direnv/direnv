@@ -16,8 +16,7 @@ func TestSomething(t *testing.T) {
 }
 
 func TestRootDir(t *testing.T) {
-	var r string
-	r = rootDir("/foo")
+	r := rootDir("/foo")
 	if r != "/foo" {
 		t.Error(r)
 	}

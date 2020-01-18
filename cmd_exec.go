@@ -7,7 +7,7 @@ import (
 	"syscall"
 )
 
-// `direnv exec DIR <COMMAND> ...`
+// CmdExec is `direnv exec DIR <COMMAND> ...`
 var CmdExec = &Cmd{
 	Name: "exec",
 	Desc: "Executes a command after loading the first .envrc found in DIR",

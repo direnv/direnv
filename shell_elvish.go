@@ -7,7 +7,8 @@ import (
 
 type elvish struct{}
 
-var ELVISH Shell = elvish{}
+// Elvish add support for the elvish shell
+var Elvish Shell = elvish{}
 
 func (elvish) Hook() (string, error) {
 	return `## hook for direnv

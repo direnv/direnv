@@ -103,8 +103,9 @@ man: $(roffs)
 ############################################################################
 
 tests = \
-			 	test-shellcheck \
+				test-shellcheck \
 				test-go \
+				test-go-lint \
 				test-go-fmt \
 				test-bash \
 				test-elvish \
@@ -120,8 +121,8 @@ test: build $(tests)
 test-go:
 	$(GO) test -v ./...
 
-test-go-fmt:
-	[ $$($(GO) fmt | go run script/both/main.go | wc -l) = 0 ]
+test-go-lint:
+	golangci-lint run
 
 test-shellcheck:
 	shellcheck stdlib.sh

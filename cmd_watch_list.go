@@ -35,7 +35,10 @@ func watchListCommand(env Env, args []string) (err error) {
 	watches := NewFileTimes()
 	watchString, ok := env[DIRENV_WATCHES]
 	if ok {
-		watches.Unmarshal(watchString)
+		err = watches.Unmarshal(watchString)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Read `mtime path` lines from stdin
@@ -56,7 +59,10 @@ func watchListCommand(env Env, args []string) (err error) {
 			path := elems[1][:len(elems[1])-1]
 
 			// add to watches
-			watches.NewTime(path, int64(mtime), true)
+			err = watches.NewTime(path, int64(mtime), true)
+			if err != nil {
+				return err
+			}
 		} else if err == io.EOF {
 			break
 		} else {

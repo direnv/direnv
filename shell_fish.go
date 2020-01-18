@@ -7,16 +7,17 @@ import (
 
 type fish struct{}
 
-var FISH Shell = fish{}
+// Fish adds support for the fish shell as a host
+var Fish Shell = fish{}
 
-const FISH_HOOK = `
+const fishHook = `
 function __direnv_export_eval --on-event fish_postexec;
 	"{{.SelfPath}}" export fish | source;
 end
 `
 
 func (sh fish) Hook() (string, error) {
-	return FISH_HOOK, nil
+	return fishHook, nil
 }
 
 func (sh fish) Export(e ShellExport) (out string) {
@@ -96,7 +97,7 @@ func (sh fish) escape(str string) string {
 		default:
 			hex(char)
 		}
-		i += 1
+		i++
 	}
 
 	out += "'"

@@ -4,9 +4,10 @@ import "fmt"
 
 type bash struct{}
 
-var BASH Shell = bash{}
+// Bash shell instance
+var Bash Shell = bash{}
 
-const BASH_HOOK = `
+const bashHook = `
 _direnv_hook() {
   local previous_exit_status=$?;
   eval "$("{{.SelfPath}}" export bash)";
@@ -18,7 +19,7 @@ fi
 `
 
 func (sh bash) Hook() (string, error) {
-	return BASH_HOOK, nil
+	return bashHook, nil
 }
 
 func (sh bash) Export(e ShellExport) (out string) {
@@ -55,6 +56,7 @@ func (sh bash) escape(str string) string {
  * Escaping
  */
 
+//nolint
 const (
 	ACK           = 6
 	TAB           = 9
@@ -122,6 +124,8 @@ func BashEscape(str string) string {
 	for i < l {
 		char := in[i]
 		switch {
+		case char == ACK:
+			hex(char)
 		case char == TAB:
 			escaped(`\t`)
 		case char == LF:
@@ -146,14 +150,12 @@ func BashEscape(str string) string {
 			quoted(char)
 		case char == BACKSLASH:
 			backslash(char)
-		case char <= CLOSE_BRACKET:
-			quoted(char)
 		case char == UNDERSCORE:
 			literal(char)
+		case char <= CLOSE_BRACKET:
+			quoted(char)
 		case char <= BACKTICK:
 			quoted(char)
-		case char <= LOWERCASE_Z:
-			literal(char)
 		case char <= TILDA:
 			quoted(char)
 		case char == DEL:
@@ -161,7 +163,7 @@ func BashEscape(str string) string {
 		default:
 			hex(char)
 		}
-		i += 1
+		i++
 	}
 
 	if escape {

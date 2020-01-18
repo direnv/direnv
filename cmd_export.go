@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// ExportContext is a sort of state holder struct that is being used to
+// record changes before the export finishes.
 type ExportContext struct {
 	config   *Config
 	foundRC  *RC
@@ -39,25 +41,25 @@ func (context *ExportContext) updateRC() (err error) {
 
 	context.oldEnv = backupDiff.Reverse().Patch(context.env)
 
-	log_debug("Determining action:")
-	log_debug("foundRC: %#v", context.foundRC)
-	log_debug("loadedRC: %#v", context.loadedRC)
+	logDebug("Determining action:")
+	logDebug("foundRC: %#v", context.foundRC)
+	logDebug("loadedRC: %#v", context.loadedRC)
 
 	switch {
 	case context.foundRC == nil:
-		log_debug("no RC found, unloading")
-		err = context.unloadEnv()
+		logDebug("no RC found, unloading")
+		context.unloadEnv()
 	case context.loadedRC == nil:
-		log_debug("no RC (implies no DIRENV_DIFF),loading")
+		logDebug("no RC (implies no DIRENV_DIFF),loading")
 		err = context.loadRC()
 	case context.loadedRC.path != context.foundRC.path:
-		log_debug("new RC, loading")
+		logDebug("new RC, loading")
 		err = context.loadRC()
 	case context.loadedRC.times.Check() != nil:
-		log_debug("file changed, reloading")
+		logDebug("file changed, reloading")
 		err = context.loadRC()
 	default:
-		log_debug("no update needed")
+		logDebug("no update needed")
 	}
 
 	return
@@ -68,11 +70,10 @@ func (context *ExportContext) loadRC() (err error) {
 	return
 }
 
-func (context *ExportContext) unloadEnv() (err error) {
-	log_status(context.env, "unloading")
+func (context *ExportContext) unloadEnv() {
+	logStatus(context.env, "unloading")
 	context.newEnv = context.oldEnv.Copy()
 	cleanEnv(context.newEnv)
-	return
 }
 
 func cleanEnv(env Env) {
@@ -104,7 +105,7 @@ func (context *ExportContext) diffString(shell Shell) string {
 
 		sort.Strings(out)
 		if len(out) > 0 {
-			log_status(context.env, "export %s", strings.Join(out, " "))
+			logStatus(context.env, "export %s", strings.Join(out, " "))
 		}
 	}
 
@@ -115,7 +116,7 @@ func (context *ExportContext) diffString(shell Shell) string {
 func exportCommand(env Env, args []string, config *Config) (err error) {
 	defer log.SetPrefix(log.Prefix())
 	log.SetPrefix(log.Prefix() + "export:")
-	log_debug("start")
+	logDebug("start")
 	context := ExportContext{
 		env:    env,
 		config: config,
@@ -132,29 +133,29 @@ func exportCommand(env Env, args []string, config *Config) (err error) {
 		return fmt.Errorf("unknown target shell '%s'", target)
 	}
 
-	log_debug("loading RCs")
+	logDebug("loading RCs")
 	if context.getRCs(); !context.hasRC() {
 		return nil
 	}
 
-	log_debug("updating RC")
+	logDebug("updating RC")
 	if err = context.updateRC(); err != nil {
-		log_debug("err: %v", err)
+		logDebug("err: %v", err)
 	}
 
 	if context.newEnv == nil {
-		log_debug("newEnv nil, exiting")
+		logDebug("newEnv nil, exiting")
 		return
 	}
 
 	diffString := context.diffString(shell)
-	log_debug("env diff %s", diffString)
+	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
 
 	return
 }
 
-// `direnv export $0`
+// CmdExport is `direnv export $0`
 var CmdExport = &Cmd{
 	Name:    "export",
 	Desc:    "loads an .envrc and prints the diff in terms of exports",

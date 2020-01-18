@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	debugLogFormat          = "DBG-direnv: %s"
 	defaultLogFormat        = "direnv: %s"
 	errorLogFormat          = defaultLogFormat
 	errorLogFormatWithColor = "\033[31mdirenv: %s\033[0m"
@@ -26,7 +25,7 @@ func setupLogging(env Env) {
 	}
 }
 
-func log_error(msg string, a ...interface{}) {
+func logError(msg string, a ...interface{}) {
 	if noColor {
 		logMsg(errorLogFormat, msg, a...)
 	} else {
@@ -34,7 +33,7 @@ func log_error(msg string, a ...interface{}) {
 	}
 }
 
-func log_status(env Env, msg string, a ...interface{}) {
+func logStatus(env Env, msg string, a ...interface{}) {
 	format, ok := env["DIRENV_LOG_FORMAT"]
 	if !ok {
 		format = defaultLogFormat
@@ -44,14 +43,14 @@ func log_status(env Env, msg string, a ...interface{}) {
 	}
 }
 
-func log_debug(msg string, a ...interface{}) {
+func logDebug(msg string, a ...interface{}) {
 	if !debugging {
 		return
 	}
 	defer log.SetFlags(log.Flags())
 	log.SetFlags(log.Flags() | log.Lshortfile)
 	msg = fmt.Sprintf(msg, a...)
-	log.Output(2, msg)
+	_ = log.Output(2, msg)
 }
 
 func logMsg(format, msg string, a ...interface{}) {
