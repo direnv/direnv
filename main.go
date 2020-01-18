@@ -19,7 +19,7 @@ func main() {
 
 	err := CommandsDispatch(env, args)
 	if err != nil {
-		log_error("error %v", err)
+		logError("error %v", err)
 		os.Exit(1)
 	}
 }

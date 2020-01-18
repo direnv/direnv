@@ -1,0 +1,9 @@
+linters:
+  presets:
+    - bugs
+    - unused
+  enable:
+    - gofmt
+    - golint
+    - misspell
+    - stylecheck

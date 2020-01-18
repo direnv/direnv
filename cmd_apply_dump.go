@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 )
 
-// `direnv apply_dump FILE`
+// CmdApplyDump is `direnv apply_dump FILE`
 var CmdApplyDump = &Cmd{
 	Name:    "apply_dump",
 	Desc:    "Accepts a filename containing `direnv dump` output and generates a series of bash export statements to apply the given env",
@@ -33,7 +33,7 @@ var CmdApplyDump = &Cmd{
 
 		diff := env.Diff(dumpedEnv)
 
-		exports := diff.ToShell(BASH)
+		exports := diff.ToShell(Bash)
 
 		_, err = fmt.Println(exports)
 		if err != nil {

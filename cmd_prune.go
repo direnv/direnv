@@ -7,13 +7,14 @@ import (
 	"strings"
 )
 
+// CmdPrune is `direnv prune`
 var CmdPrune = &Cmd{
 	Name: "prune",
 	Desc: "removes old allowed files",
 	Action: actionWithConfig(func(env Env, args []string, config *Config) (err error) {
 		var dir *os.File
 		var fi os.FileInfo
-		var dir_list []string
+		var dirList []string
 		var envrc []byte
 
 		allowed := config.AllowDir()
@@ -22,11 +23,11 @@ var CmdPrune = &Cmd{
 		}
 		defer dir.Close()
 
-		if dir_list, err = dir.Readdirnames(0); err != nil {
+		if dirList, err = dir.Readdirnames(0); err != nil {
 			return err
 		}
 
-		for _, hash := range dir_list {
+		for _, hash := range dirList {
 			filename := path.Join(allowed, hash)
 			if fi, err = os.Stat(filename); err != nil {
 				return err
@@ -36,13 +37,13 @@ var CmdPrune = &Cmd{
 				if envrc, err = ioutil.ReadFile(filename); err != nil {
 					return err
 				}
-				envrc_str := strings.TrimSpace(string(envrc))
+				envrcStr := strings.TrimSpace(string(envrc))
 
 				// skip old files, w/o path inside
-				if envrc_str == "" {
+				if envrcStr == "" {
 					continue
 				}
-				if !fileExists(envrc_str) {
+				if !fileExists(envrcStr) {
 					_ = os.Remove(filename)
 				}
 

@@ -7,7 +7,8 @@ import (
 
 type tcsh struct{}
 
-var TCSH Shell = tcsh{}
+// Tcsh adds support for the tickle shell
+var Tcsh Shell = tcsh{}
 
 func (sh tcsh) Hook() (string, error) {
 	return "alias precmd 'eval `{{.SelfPath}} export tcsh`'", nil
@@ -78,6 +79,8 @@ func (sh tcsh) escape(str string) string {
 	for i < l {
 		char := in[i]
 		switch {
+		case char == ACK:
+			hex(char)
 		case char == TAB:
 			escaped(`\t`)
 		case char == LF:
@@ -104,14 +107,12 @@ func (sh tcsh) escape(str string) string {
 			quoted(char)
 		case char == BACKSLASH:
 			backslash(char)
-		case char <= CLOSE_BRACKET:
-			quoted(char)
 		case char == UNDERSCORE:
 			literal(char)
+		case char <= CLOSE_BRACKET:
+			quoted(char)
 		case char <= BACKTICK:
 			quoted(char)
-		case char <= LOWERCASE_Z:
-			literal(char)
 		case char <= TILDA:
 			quoted(char)
 		case char == DEL:
@@ -119,7 +120,7 @@ func (sh tcsh) escape(str string) string {
 		default:
 			hex(char)
 		}
-		i += 1
+		i++
 	}
 
 	return out

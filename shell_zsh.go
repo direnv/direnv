@@ -3,9 +3,10 @@ package main
 // ZSH is a singleton instance of ZSH_T
 type zsh struct{}
 
-var ZSH Shell = zsh{}
+// Zsh adds support for the venerable Z shell.
+var Zsh Shell = zsh{}
 
-const ZSH_HOOK = `
+const zshHook = `
 _direnv_hook() {
   eval "$("{{.SelfPath}}" export zsh)";
 }
@@ -20,7 +21,7 @@ fi
 `
 
 func (sh zsh) Hook() (string, error) {
-	return ZSH_HOOK, nil
+	return zshHook, nil
 }
 
 func (sh zsh) Export(e ShellExport) (out string) {

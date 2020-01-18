@@ -7,7 +7,7 @@ import (
 	"github.com/direnv/go-dotenv"
 )
 
-// `direnv private dotenv [SHELL [PATH_TO_DOTENV]]`
+// CmdDotEnv is `direnv dotenv [SHELL [PATH_TO_DOTENV]]`
 // Transforms a .env file to evaluatable `export KEY=PAIR` statements.
 //
 // See: https://github.com/bkeepers/dotenv and
@@ -25,7 +25,7 @@ var CmdDotEnv = &Cmd{
 		if len(args) > 1 {
 			shell = DetectShell(args[1])
 		} else {
-			shell = BASH
+			shell = Bash
 		}
 
 		if len(args) > 2 {

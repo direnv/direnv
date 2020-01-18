@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// `direnv edit [PATH_TO_RC]`
+// CmdEdit is `direnv edit [PATH_TO_RC]`
 var CmdEdit = &Cmd{
 	Name: "edit",
 	Desc: `Opens PATH_TO_RC or the current .envrc into an $EDITOR and allow
@@ -43,7 +43,7 @@ var CmdEdit = &Cmd{
 
 		editor := env["EDITOR"]
 		if editor == "" {
-			log_error("$EDITOR not found.")
+			logError("$EDITOR not found.")
 			editor = detectEditor(env["PATH"])
 			if editor == "" {
 				err = fmt.Errorf("could not find a default editor in the PATH")
@@ -62,13 +62,13 @@ var CmdEdit = &Cmd{
 		}
 
 		foundRC = FindRC(rcPath, config)
-		log_debug("foundRC: %#v", foundRC)
-		log_debug("times: %#v", times)
+		logDebug("foundRC: %#v", foundRC)
+		logDebug("times: %#v", times)
 		if times != nil {
-			log_debug("times.Check(): %#v", times.Check())
+			logDebug("times.Check(): %#v", times.Check())
 		}
 		if foundRC != nil && (times == nil || times.Check() != nil) {
-			foundRC.Allow()
+			err = foundRC.Allow()
 		}
 
 		return
@@ -77,7 +77,8 @@ var CmdEdit = &Cmd{
 
 // Utils
 
-var EDITORS = [][]string{
+// Editors contains a list of known editors and how to start them.
+var Editors = [][]string{
 	{"subl", "-w"},
 	{"mate", "-w"},
 	{"open", "-t", "-W"}, // Opens with the default text editor on mac
@@ -87,7 +88,7 @@ var EDITORS = [][]string{
 }
 
 func detectEditor(pathenv string) string {
-	for _, editor := range EDITORS {
+	for _, editor := range Editors {
 		if _, err := lookPath(editor[0], pathenv); err == nil {
 			return strings.Join(editor, " ")
 		}

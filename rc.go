@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+// RC represents the .envrc file
 type RC struct {
 	path      string
 	allowPath string
@@ -19,6 +20,7 @@ type RC struct {
 	config    *Config
 }
 
+// FindRC looks the RC file from the wd, up to the root
 func FindRC(wd string, config *Config) *RC {
 	rcPath := findUp(wd, ".envrc")
 	if rcPath == "" {
@@ -28,6 +30,7 @@ func FindRC(wd string, config *Config) *RC {
 	return RCFromPath(rcPath, config)
 }
 
+// RCFromPath inits the RC from a given path
 func RCFromPath(path string, config *Config) *RC {
 	hash, err := fileHash(path)
 	if err != nil {
@@ -37,18 +40,31 @@ func RCFromPath(path string, config *Config) *RC {
 	allowPath := filepath.Join(config.AllowDir(), hash)
 
 	times := NewFileTimes()
-	times.Update(path)
-	times.Update(allowPath)
+
+	err = times.Update(path)
+	if err != nil {
+		return nil
+	}
+
+	err = times.Update(allowPath)
+	if err != nil {
+		return nil
+	}
 
 	return &RC{path, allowPath, times, config}
 }
 
-func RCFromEnv(path, marshalled_times string, config *Config) *RC {
+// RCFromEnv inits the RC from the environment
+func RCFromEnv(path, marshalledTimes string, config *Config) *RC {
 	times := NewFileTimes()
-	times.Unmarshal(marshalled_times)
+	err := times.Unmarshal(marshalledTimes)
+	if err != nil {
+		return nil
+	}
 	return &RC{path, "", times, config}
 }
 
+// Allow grants the RC as allowed to load
 func (rc *RC) Allow() (err error) {
 	if rc.allowPath == "" {
 		return fmt.Errorf("cannot allow empty path")
@@ -59,14 +75,16 @@ func (rc *RC) Allow() (err error) {
 	if err = allow(rc.path, rc.allowPath); err != nil {
 		return
 	}
-	rc.times.Update(rc.allowPath)
+	err = rc.times.Update(rc.allowPath)
 	return
 }
 
+// Deny revokes the permission of the RC file to load
 func (rc *RC) Deny() error {
 	return os.Remove(rc.allowPath)
 }
 
+// Allowed checks if the RC file has been granted loading
 func (rc *RC) Allowed() bool {
 	// happy path is if this envrc has been explicitly allowed, O(1)ish common case
 	_, err := os.Stat(rc.allowPath)
@@ -97,8 +115,9 @@ func (rc *RC) Allowed() bool {
 	return false
 }
 
-// Makes the path relative to the current directory. Except when both paths
-// are completely different.
+// RelTo returns the path to the RC relative to the current directory. Except
+// when both paths are completely different.
+//
 // Eg:  /home/foo and /home/bar => ../foo
 // But: /home/foo and /tmp/bar  => /home/foo
 func (rc *RC) RelTo(wd string) string {
@@ -112,12 +131,17 @@ func (rc *RC) RelTo(wd string) string {
 	return x
 }
 
+// Touch updates the mtime of the RC file. This is mainly used to trigger a
+// reload in direnv.
 func (rc *RC) Touch() error {
 	return touch(rc.path)
 }
 
-const NOT_ALLOWED = "%s is blocked. Run `direnv allow` to approve its content"
+const notAllowed = "%s is blocked. Run `direnv allow` to approve its content"
 
+// Load evaluates the RC file and returns the new Env or error.
+//
+// This functions is key to the implementation of direnv.
 func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	wd := config.WorkDir
 	direnv := config.SelfPath
@@ -128,7 +152,7 @@ func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	}()
 
 	if !rc.Allowed() {
-		err = fmt.Errorf(NOT_ALLOWED, rc.RelTo(wd))
+		err = fmt.Errorf(notAllowed, rc.RelTo(wd))
 		return
 	}
 
@@ -159,13 +183,14 @@ func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		return
 	}
 	if newEnv2["PS1"] != "" {
-		log_error("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
+		logError("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
 	}
 	newEnv = newEnv2
 
 	return
 }
 
+// RecordState just applies the new environment
 func (rc *RC) RecordState(env Env, newEnv Env) {
 	newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
 	newEnv[DIRENV_DIFF] = env.Diff(newEnv).Serialize()
@@ -226,7 +251,10 @@ func fileHash(path string) (hash string, err error) {
 	}
 
 	hasher := sha256.New()
-	hasher.Write([]byte(path + "\n"))
+	_, err = hasher.Write([]byte(path + "\n"))
+	if err != nil {
+		return
+	}
 	if _, err = io.Copy(hasher, fd); err != nil {
 		return
 	}

@@ -4,6 +4,7 @@ import (
 	"errors"
 )
 
+// CmdCurrent is `direnv current`
 var CmdCurrent = &Cmd{
 	Name:    "current",
 	Desc:    "Reports whether direnv's view of a file is current (or stale)",
@@ -22,7 +23,10 @@ func currentCommandFn(env Env, args []string) (err error) {
 	watches := NewFileTimes()
 	watchString, ok := env[DIRENV_WATCHES]
 	if ok {
-		watches.Unmarshal(watchString)
+		err = watches.Unmarshal(watchString)
+		if err != nil {
+			return
+		}
 	}
 
 	err = watches.CheckOne(path)

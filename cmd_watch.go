@@ -5,10 +5,11 @@ import (
 	"os"
 )
 
+// CmdWatch is `direnv watch SHELL [PATH...]`
 var CmdWatch = &Cmd{
 	Name:    "watch",
 	Desc:    "Adds a path to the list that direnv watches for changes",
-	Args:    []string{"SHELL", "PATH"},
+	Args:    []string{"SHELL", "PATH..."},
 	Private: true,
 	Action:  actionSimple(watchCommand),
 }
@@ -34,11 +35,17 @@ func watchCommand(env Env, args []string) (err error) {
 	watches := NewFileTimes()
 	watchString, ok := env[DIRENV_WATCHES]
 	if ok {
-		watches.Unmarshal(watchString)
+		err = watches.Unmarshal(watchString)
+		if err != nil {
+			return
+		}
 	}
 
 	for _, arg := range args[2:] {
-		watches.Update(arg)
+		err = watches.Update(arg)
+		if err != nil {
+			return
+		}
 	}
 
 	e := make(ShellExport)

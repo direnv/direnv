@@ -22,7 +22,8 @@ func Marshal(obj interface{}) string {
 
 	zlibData := bytes.NewBuffer([]byte{})
 	w := zlib.NewWriter(zlibData)
-	w.Write(jsonData)
+	// we assume the zlib writer would never fail
+	_, _ = w.Write(jsonData)
 	w.Close()
 
 	base64Data := base64.URLEncoding.EncodeToString(zlibData.Bytes())

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// `direnv help`
+// CmdHelp is `direnv help`
 var CmdHelp = &Cmd{
 	Name:    "help",
 	Desc:    "shows this help",
