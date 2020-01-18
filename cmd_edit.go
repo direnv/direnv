@@ -14,65 +14,67 @@ var CmdEdit = &Cmd{
 	Name: "edit",
 	Desc: `Opens PATH_TO_RC or the current .envrc into an $EDITOR and allow
   the file to be loaded afterwards.`,
-	Args: []string{"[PATH_TO_RC]"},
-	Action: actionWithConfig(func(env Env, args []string, config *Config) (err error) {
-		var rcPath string
-		var times *FileTimes
-		var foundRC *RC
+	Args:   []string{"[PATH_TO_RC]"},
+	Action: actionWithConfig(cmdEditAction),
+}
 
-		defer log.SetPrefix(log.Prefix())
-		log.SetPrefix(log.Prefix() + "cmd_edit: ")
+func cmdEditAction(env Env, args []string, config *Config) (err error) {
+	var rcPath string
+	var times *FileTimes
+	var foundRC *RC
 
-		foundRC = config.FindRC()
-		if foundRC != nil {
-			times = &foundRC.times
+	defer log.SetPrefix(log.Prefix())
+	log.SetPrefix(log.Prefix() + "cmd_edit: ")
+
+	foundRC = config.FindRC()
+	if foundRC != nil {
+		times = &foundRC.times
+	}
+
+	if len(args) > 1 {
+		rcPath = args[1]
+		fi, _ := os.Stat(rcPath)
+		if fi != nil && fi.IsDir() {
+			rcPath = filepath.Join(rcPath, ".envrc")
 		}
-
-		if len(args) > 1 {
-			rcPath = args[1]
-			fi, _ := os.Stat(rcPath)
-			if fi != nil && fi.IsDir() {
-				rcPath = filepath.Join(rcPath, ".envrc")
-			}
-		} else {
-			if foundRC == nil {
-				return fmt.Errorf(".envrc not found. Use `direnv edit .` to create a new envrc in the current directory")
-			}
-			rcPath = foundRC.path
+	} else {
+		if foundRC == nil {
+			return fmt.Errorf(".envrc not found. Use `direnv edit .` to create a new envrc in the current directory")
 		}
+		rcPath = foundRC.path
+	}
 
-		editor := env["EDITOR"]
+	editor := env["EDITOR"]
+	if editor == "" {
+		logError("$EDITOR not found.")
+		editor = detectEditor(env["PATH"])
 		if editor == "" {
-			logError("$EDITOR not found.")
-			editor = detectEditor(env["PATH"])
-			if editor == "" {
-				err = fmt.Errorf("could not find a default editor in the PATH")
-				return
-			}
-		}
-
-		run := fmt.Sprintf("%s %s", editor, BashEscape(rcPath))
-
-		cmd := exec.Command(config.BashPath, "-c", run)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err = cmd.Run(); err != nil {
+			err = fmt.Errorf("could not find a default editor in the PATH")
 			return
 		}
+	}
 
-		foundRC = FindRC(rcPath, config)
-		logDebug("foundRC: %#v", foundRC)
-		logDebug("times: %#v", times)
-		if times != nil {
-			logDebug("times.Check(): %#v", times.Check())
-		}
-		if foundRC != nil && (times == nil || times.Check() != nil) {
-			err = foundRC.Allow()
-		}
+	run := fmt.Sprintf("%s %s", editor, BashEscape(rcPath))
 
+	cmd := exec.Command(config.BashPath, "-c", run)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err = cmd.Run(); err != nil {
 		return
-	}),
+	}
+
+	foundRC = FindRC(rcPath, config)
+	logDebug("foundRC: %#v", foundRC)
+	logDebug("times: %#v", times)
+	if times != nil {
+		logDebug("times.Check(): %#v", times.Check())
+	}
+	if foundRC != nil && (times == nil || times.Check() != nil) {
+		err = foundRC.Allow()
+	}
+
+	return
 }
 
 // Utils

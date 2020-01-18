@@ -20,38 +20,40 @@ var CmdExpandPath = &Cmd{
 	Desc:    "Transforms a PATH to an absolute path to REL_TO or $PWD",
 	Args:    []string{"PATH", "[REL_TO]"},
 	Private: true,
-	Action: actionSimple(func(env Env, args []string) (err error) {
-		var path string
+	Action:  actionSimple(cmdExpandPathAction),
+}
 
-		flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
-		err = flagset.Parse(args[1:])
+func cmdExpandPathAction(env Env, args []string) (err error) {
+	var path string
+
+	flagset := flag.NewFlagSet(args[0], flag.ExitOnError)
+	err = flagset.Parse(args[1:])
+	if err != nil {
+		return err
+	}
+
+	path = flagset.Arg(0)
+	if path == "" {
+		return fmt.Errorf("PATH missing")
+	}
+
+	if !filepath.IsAbs(path) {
+		wd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
 
-		path = flagset.Arg(0)
-		if path == "" {
-			return fmt.Errorf("PATH missing")
+		relTo := flagset.Arg(1)
+		if relTo == "" {
+			relTo = wd
+		} else {
+			relTo = expandPath(relTo, wd)
 		}
 
-		if !filepath.IsAbs(path) {
-			wd, err := os.Getwd()
-			if err != nil {
-				return err
-			}
+		path = expandPath(path, relTo)
+	}
 
-			relTo := flagset.Arg(1)
-			if relTo == "" {
-				relTo = wd
-			} else {
-				relTo = expandPath(relTo, wd)
-			}
+	_, err = fmt.Println(path)
 
-			path = expandPath(path, relTo)
-		}
-
-		_, err = fmt.Println(path)
-
-		return
-	}),
+	return
 }

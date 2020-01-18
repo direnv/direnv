@@ -11,35 +11,37 @@ var CmdApplyDump = &Cmd{
 	Desc:    "Accepts a filename containing `direnv dump` output and generates a series of bash export statements to apply the given env",
 	Args:    []string{"FILE"},
 	Private: true,
-	Action: actionSimple(func(env Env, args []string) (err error) {
-		if len(args) < 2 {
-			return fmt.Errorf("not enough arguments")
-		}
+	Action:  actionSimple(cmdApplyDumpAction),
+}
 
-		if len(args) > 2 {
-			return fmt.Errorf("too many arguments")
-		}
-		filename := args[1]
+func cmdApplyDumpAction(env Env, args []string) (err error) {
+	if len(args) < 2 {
+		return fmt.Errorf("not enough arguments")
+	}
 
-		dumped, err := ioutil.ReadFile(filename)
-		if err != nil {
-			return err
-		}
+	if len(args) > 2 {
+		return fmt.Errorf("too many arguments")
+	}
+	filename := args[1]
 
-		dumpedEnv, err := LoadEnv(string(dumped))
-		if err != nil {
-			return err
-		}
+	dumped, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
 
-		diff := env.Diff(dumpedEnv)
+	dumpedEnv, err := LoadEnv(string(dumped))
+	if err != nil {
+		return err
+	}
 
-		exports := diff.ToShell(Bash)
+	diff := env.Diff(dumpedEnv)
 
-		_, err = fmt.Println(exports)
-		if err != nil {
-			return err
-		}
+	exports := diff.ToShell(Bash)
 
-		return
-	}),
+	_, err = fmt.Println(exports)
+	if err != nil {
+		return err
+	}
+
+	return
 }

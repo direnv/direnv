@@ -11,10 +11,10 @@ var CmdWatch = &Cmd{
 	Desc:    "Adds a path to the list that direnv watches for changes",
 	Args:    []string{"SHELL", "PATH..."},
 	Private: true,
-	Action:  actionSimple(watchCommand),
+	Action:  actionSimple(cmdWatchAction),
 }
 
-func watchCommand(env Env, args []string) (err error) {
+func cmdWatchAction(env Env, args []string) (err error) {
 	var shellName string
 
 	if len(args) < 2 {

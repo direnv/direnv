@@ -45,7 +45,7 @@ func main() {
 	out := bufio.NewWriter(os.Stdout)
 	defer out.Flush()
 
-	fmt.Fprintf(out, "package %s\n\nconst %s = \"", packageName, constantName)
+	fmt.Fprintf(out, "package %s\n\n// %s ...\nconst %s = \"", packageName, constantName, constantName)
 
 	for {
 		r, _, err := in.ReadRune()

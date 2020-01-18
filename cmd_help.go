@@ -18,7 +18,7 @@ Usage: direnv COMMAND [...ARGS]
 
 Available commands
 ------------------
-`, VERSION)
+`, Version)
 		for _, cmd := range CmdList {
 			var opts string
 			if len(cmd.Args) > 0 {

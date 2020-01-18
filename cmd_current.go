@@ -10,10 +10,10 @@ var CmdCurrent = &Cmd{
 	Desc:    "Reports whether direnv's view of a file is current (or stale)",
 	Args:    []string{"PATH"},
 	Private: true,
-	Action:  actionSimple(currentCommandFn),
+	Action:  actionSimple(cmdCurrentAction),
 }
 
-func currentCommandFn(env Env, args []string) (err error) {
+func cmdCurrentAction(env Env, args []string) (err error) {
 	if len(args) < 2 {
 		err = errors.New("missing PATH argument")
 		return

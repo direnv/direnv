@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// CmdWatchList is `direnv watch-list`
 var CmdWatchList = &Cmd{
 	Name:    "watch-list",
 	Desc:    "Pipe pairs of `mtime path` to stdin to build a list of files to watch.",

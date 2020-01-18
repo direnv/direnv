@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// CmdReload is `direnv reload`
 var CmdReload = &Cmd{
 	Name: "reload",
 	Desc: "triggers an env reload",

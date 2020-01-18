@@ -1,3 +1,4 @@
 package main
 
-const VERSION = "2.20.1"
+// Version is direnv's version
+const Version = "2.20.1"

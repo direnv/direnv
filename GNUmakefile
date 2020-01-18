@@ -64,12 +64,13 @@ direnv: stdlib.go *.go
 	$(GO) build $(GO_BUILD_FLAGS) -o $(exe)
 
 stdlib.go: stdlib.sh
-	cat $< | ./script/str2go main STDLIB $< > $@
+	cat $< | ./script/str2go main StdLib $< > $@
 
 version.go: version.txt
 	echo package main > $@
 	echo >> $@
-	echo 'const VERSION = "$(shell cat $<)"' >> $@
+	echo "// Version is direnv's version"
+	echo 'const Version = "$(shell cat $<)"' >> $@
 
 ############################################################################
 # Format all the things

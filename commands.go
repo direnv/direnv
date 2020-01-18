@@ -30,6 +30,7 @@ type action interface {
 	Call(env Env, args []string, config *Config) error
 }
 
+// Cmd represents a direnv sub-command
 type Cmd struct {
 	Name    string
 	Desc    string
@@ -39,6 +40,7 @@ type Cmd struct {
 	Action  action
 }
 
+// CmdList contains the list of all direnv sub-commands
 var CmdList []*Cmd
 
 func init() {
@@ -84,6 +86,7 @@ func cmdWithWarnTimeout(fn action) action {
 	})
 }
 
+// CommandsDispatch is called by the main() function to dispatch to a sub-command
 func CommandsDispatch(env Env, args []string) error {
 	var command *Cmd
 	var commandName string

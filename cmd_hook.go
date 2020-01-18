@@ -14,43 +14,45 @@ type HookContext struct {
 
 // CmdHook is `direnv hook $0`
 var CmdHook = &Cmd{
-	Name: "hook",
-	Desc: "Used to setup the shell hook",
-	Args: []string{"SHELL"},
-	Action: actionSimple(func(env Env, args []string) (err error) {
-		var target string
+	Name:   "hook",
+	Desc:   "Used to setup the shell hook",
+	Args:   []string{"SHELL"},
+	Action: actionSimple(cmdHookAction),
+}
 
-		if len(args) > 1 {
-			target = args[1]
-		}
+func cmdHookAction(env Env, args []string) (err error) {
+	var target string
 
-		selfPath, err := os.Executable()
-		if err != nil {
-			return err
-		}
+	if len(args) > 1 {
+		target = args[1]
+	}
 
-		ctx := HookContext{selfPath}
+	selfPath, err := os.Executable()
+	if err != nil {
+		return err
+	}
 
-		shell := DetectShell(target)
-		if shell == nil {
-			return fmt.Errorf("unknown target shell '%s'", target)
-		}
+	ctx := HookContext{selfPath}
 
-		hookStr, err := shell.Hook()
-		if err != nil {
-			return err
-		}
+	shell := DetectShell(target)
+	if shell == nil {
+		return fmt.Errorf("unknown target shell '%s'", target)
+	}
 
-		hookTemplate, err := template.New("hook").Parse(hookStr)
-		if err != nil {
-			return err
-		}
+	hookStr, err := shell.Hook()
+	if err != nil {
+		return err
+	}
 
-		err = hookTemplate.Execute(os.Stdout, ctx)
-		if err != nil {
-			return err
-		}
+	hookTemplate, err := template.New("hook").Parse(hookStr)
+	if err != nil {
+		return err
+	}
 
-		return
-	}),
+	err = hookTemplate.Execute(os.Stdout, ctx)
+	if err != nil {
+		return err
+	}
+
+	return
 }

@@ -14,19 +14,21 @@ var CmdShowDump = &Cmd{
 	Desc:    "Show the data inside of a dump for debugging purposes",
 	Args:    []string{"DUMP"},
 	Private: true,
-	Action: actionSimple(func(env Env, args []string) (err error) {
-		if len(args) < 2 {
-			return fmt.Errorf("missing DUMP argument")
-		}
+	Action:  actionSimple(cmdShowDumpAction),
+}
 
-		var f interface{}
-		err = gzenv.Unmarshal(args[1], &f)
-		if err != nil {
-			return err
-		}
+func cmdShowDumpAction(env Env, args []string) (err error) {
+	if len(args) < 2 {
+		return fmt.Errorf("missing DUMP argument")
+	}
 
-		e := json.NewEncoder(os.Stdout)
-		e.SetIndent("", "  ")
-		return e.Encode(f)
-	}),
+	var f interface{}
+	err = gzenv.Unmarshal(args[1], &f)
+	if err != nil {
+		return err
+	}
+
+	e := json.NewEncoder(os.Stdout)
+	e.SetIndent("", "  ")
+	return e.Encode(f)
 }

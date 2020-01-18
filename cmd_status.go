@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 )
 
+// CmdStatus is `direnv status`
 var CmdStatus = &Cmd{
 	Name: "status",
 	Desc: "prints some debug status information",

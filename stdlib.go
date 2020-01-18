@@ -1,6 +1,7 @@
 package main
 
-const STDLIB = "#!/usr/bin/env bash\n" +
+// StdLib ...
+const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# These are the commands available in an .envrc context\n" +
 	"#\n" +

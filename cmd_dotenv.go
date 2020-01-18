@@ -17,38 +17,40 @@ var CmdDotEnv = &Cmd{
 	Desc:    "Transforms a .env file to evaluatable `export KEY=PAIR` statements",
 	Args:    []string{"[SHELL]", "[PATH_TO_DOTENV]"},
 	Private: true,
-	Action: actionSimple(func(env Env, args []string) (err error) {
-		var shell Shell
-		var newenv Env
-		var target string
+	Action:  actionSimple(cmdDotEnvAction),
+}
 
-		if len(args) > 1 {
-			shell = DetectShell(args[1])
-		} else {
-			shell = Bash
-		}
+func cmdDotEnvAction(env Env, args []string) (err error) {
+	var shell Shell
+	var newenv Env
+	var target string
 
-		if len(args) > 2 {
-			target = args[2]
-		}
+	if len(args) > 1 {
+		shell = DetectShell(args[1])
+	} else {
+		shell = Bash
+	}
 
-		if target == "" {
-			target = ".env"
-		}
+	if len(args) > 2 {
+		target = args[2]
+	}
 
-		var data []byte
-		if data, err = ioutil.ReadFile(target); err != nil {
-			return
-		}
+	if target == "" {
+		target = ".env"
+	}
 
-		newenv, err = dotenv.Parse(string(data))
-		if err != nil {
-			return err
-		}
-
-		str := newenv.ToShell(shell)
-		fmt.Println(str)
-
+	var data []byte
+	if data, err = ioutil.ReadFile(target); err != nil {
 		return
-	}),
+	}
+
+	newenv, err = dotenv.Parse(string(data))
+	if err != nil {
+		return err
+	}
+
+	str := newenv.ToShell(shell)
+	fmt.Println(str)
+
+	return
 }
