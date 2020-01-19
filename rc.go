@@ -115,20 +115,9 @@ func (rc *RC) Allowed() bool {
 	return false
 }
 
-// RelTo returns the path to the RC relative to the current directory. Except
-// when both paths are completely different.
-//
-// Eg:  /home/foo and /home/bar => ../foo
-// But: /home/foo and /tmp/bar  => /home/foo
-func (rc *RC) RelTo(wd string) string {
-	if rootDir(wd) != rootDir(rc.path) {
-		return rc.path
-	}
-	x, err := filepath.Rel(wd, rc.path)
-	if err != nil {
-		panic(err)
-	}
-	return x
+// Path returns the path to the RC file
+func (rc *RC) Path() string {
+	return rc.path
 }
 
 // Touch updates the mtime of the RC file. This is mainly used to trigger a
@@ -152,12 +141,12 @@ func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 	}()
 
 	if !rc.Allowed() {
-		err = fmt.Errorf(notAllowed, rc.RelTo(wd))
+		err = fmt.Errorf(notAllowed, rc.Path())
 		return
 	}
 
 	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
-	arg := fmt.Sprintf(argtmpl, direnv, rc.RelTo(wd), direnv)
+	arg := fmt.Sprintf(argtmpl, direnv, rc.Path(), direnv)
 	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
 
 	if config.DisableStdin {
