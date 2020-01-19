@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 )
 
 // CmdDump is `direnv dump`
@@ -30,9 +31,13 @@ func cmdDumpAction(env Env, args []string) (err error) {
 	}
 
 	if filePath != "" {
-		w, err = os.OpenFile(filePath, os.O_WRONLY, 0666)
-		if err != nil {
-			return err
+		if num, err := strconv.Atoi(filePath); err == nil {
+			w = os.NewFile(uintptr(num), filePath)
+		} else {
+			w, err = os.OpenFile(filePath, os.O_WRONLY, 0666)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
