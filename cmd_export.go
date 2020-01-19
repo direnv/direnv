@@ -20,7 +20,7 @@ func cmdExportAction(env Env, args []string, config *Config) (err error) {
 	defer log.SetPrefix(log.Prefix())
 	log.SetPrefix(log.Prefix() + "export:")
 	logDebug("start")
-	context := ExportContext{
+	ec := ExportContext{
 		env:    env,
 		config: config,
 	}
@@ -37,21 +37,21 @@ func cmdExportAction(env Env, args []string, config *Config) (err error) {
 	}
 
 	logDebug("loading RCs")
-	if context.getRCs(); !context.hasRC() {
+	if ec.getRCs(); !ec.hasRC() {
 		return nil
 	}
 
 	logDebug("updating RC")
-	if err = context.updateRC(); err != nil {
+	if err = ec.updateRC(); err != nil {
 		logDebug("err: %v", err)
 	}
 
-	if context.newEnv == nil {
+	if ec.newEnv == nil {
 		logDebug("newEnv nil, exiting")
 		return
 	}
 
-	diffString := context.diffString(shell)
+	diffString := ec.diffString(shell)
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
 
