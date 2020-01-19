@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"sort"
 	"strings"
 )
@@ -13,13 +16,31 @@ var CmdExport = &Cmd{
 	Desc:    "loads an .envrc and prints the diff in terms of exports",
 	Args:    []string{"SHELL"},
 	Private: true,
-	Action:  cmdWithWarnTimeout(actionWithConfig(cmdExportAction)),
+	Action:  cmdWithWarnTimeout(actionWithConfig(actionWithCancel(exportCommand))),
 }
 
-func cmdExportAction(env Env, args []string, config *Config) (err error) {
+func actionWithCancel(fn func(ctx context.Context, env Env, args []string, config *Config) error) actionWithConfig {
+	return func(env Env, args []string, config *Config) error {
+		ctx, cancel := context.WithCancel(context.Background())
+
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+
+		// cancel the context on Ctrl-C
+		go func() {
+			<-c
+			cancel()
+		}()
+
+		return fn(ctx, env, args, config)
+	}
+}
+
+func exportCommand(ctx context.Context, env Env, args []string, config *Config) (err error) {
 	defer log.SetPrefix(log.Prefix())
 	log.SetPrefix(log.Prefix() + "export:")
 	logDebug("start")
+
 	ec := ExportContext{
 		env:    env,
 		config: config,
@@ -42,7 +63,7 @@ func cmdExportAction(env Env, args []string, config *Config) (err error) {
 	}
 
 	logDebug("updating RC")
-	if err = ec.updateRC(); err != nil {
+	if err = ec.updateRC(ctx); err != nil {
 		logDebug("err: %v", err)
 	}
 
@@ -78,19 +99,20 @@ func (ec *ExportContext) hasRC() bool {
 	return ec.foundRC != nil || ec.loadedRC != nil
 }
 
-func (ec *ExportContext) updateRC() (err error) {
+func (ec *ExportContext) updateRC(ctx context.Context) (err error) {
 	defer log.SetPrefix(log.Prefix())
 	log.SetPrefix(log.Prefix() + "update:")
 
 	ec.oldEnv = ec.env.Copy()
-	var backupDiff *EnvDiff
 
-	if backupDiff, err = ec.config.EnvDiff(); err != nil {
+	var backupDiff *EnvDiff
+	if backupDiff, err = ec.config.EnvDiff(); err == nil && backupDiff != nil {
+		ec.oldEnv = backupDiff.Reverse().Patch(ec.env)
+	}
+	if err != nil {
 		err = fmt.Errorf("EnvDiff() failed: %q", err)
 		return
 	}
-
-	ec.oldEnv = backupDiff.Reverse().Patch(ec.env)
 
 	logDebug("Determining action:")
 	logDebug("foundRC: %#v", ec.foundRC)
@@ -102,13 +124,13 @@ func (ec *ExportContext) updateRC() (err error) {
 		ec.unloadEnv()
 	case ec.loadedRC == nil:
 		logDebug("no RC (implies no DIRENV_DIFF),loading")
-		err = ec.loadRC()
+		err = ec.loadRC(ctx)
 	case ec.loadedRC.path != ec.foundRC.path:
 		logDebug("new RC, loading")
-		err = ec.loadRC()
+		err = ec.loadRC(ctx)
 	case ec.loadedRC.times.Check() != nil:
 		logDebug("file changed, reloading")
-		err = ec.loadRC()
+		err = ec.loadRC(ctx)
 	default:
 		logDebug("no update needed")
 	}
@@ -116,8 +138,8 @@ func (ec *ExportContext) updateRC() (err error) {
 	return
 }
 
-func (ec *ExportContext) loadRC() (err error) {
-	ec.newEnv, err = ec.foundRC.Load(ec.config, ec.oldEnv)
+func (ec *ExportContext) loadRC(ctx context.Context) (err error) {
+	ec.newEnv, err = ec.foundRC.Load(ctx, ec.config, ec.oldEnv)
 	return
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"strings"
 
@@ -45,6 +46,13 @@ func LoadEnv(gzenvStr string) (env Env, err error) {
 	env = make(Env)
 	err = gzenv.Unmarshal(gzenvStr, &env)
 	return
+}
+
+// LoadEnvJSON unmarshals the env back from a JSON string
+func LoadEnvJSON(jsonBytes []byte) (env Env, err error) {
+	env = make(Env)
+	err = json.Unmarshal(jsonBytes, &env)
+	return env, err
 }
 
 // Copy returns a fresh copy of the env. Because the env is a map under the

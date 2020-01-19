@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"io"
@@ -131,7 +132,7 @@ const notAllowed = "%s is blocked. Run `direnv allow` to approve its content"
 // Load evaluates the RC file and returns the new Env or error.
 //
 // This functions is key to the implementation of direnv.
-func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
+func (rc *RC) Load(ctx context.Context, config *Config, env Env) (newEnv Env, err error) {
 	wd := config.WorkDir
 	direnv := config.SelfPath
 	newEnv = env.Copy()
@@ -145,9 +146,15 @@ func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		return
 	}
 
-	argtmpl := `eval "$("%s" stdlib)" >&2 && source_env "%s" >&2 && "%s" dump`
-	arg := fmt.Sprintf(argtmpl, direnv, rc.Path(), direnv)
-	cmd := exec.Command(config.BashPath, "--noprofile", "--norc", "-c", arg)
+	arg := fmt.Sprintf(
+		`eval "$("%s" stdlib)" && __main__ source_env "%s"`,
+		direnv,
+		rc.Path(),
+	)
+	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
+	cmd.Dir = wd
+	cmd.Env = newEnv.ToGoEnv()
+	cmd.Stderr = os.Stderr
 
 	if config.DisableStdin {
 		cmd.Stdin, err = os.Open(os.DevNull)
@@ -158,23 +165,22 @@ func (rc *RC) Load(config *Config, env Env) (newEnv Env, err error) {
 		cmd.Stdin = os.Stdin
 	}
 
-	cmd.Stderr = os.Stderr
-	cmd.Env = newEnv.ToGoEnv()
-	cmd.Dir = wd
-
 	out, err := cmd.Output()
 	if err != nil {
 		return
 	}
 
-	newEnv2, err := LoadEnv(string(out))
-	if err != nil {
-		return
+	if len(out) > 0 {
+		var newEnv2 Env
+		newEnv2, err = LoadEnvJSON(out)
+		if err != nil {
+			return
+		}
+		if newEnv2["PS1"] != "" {
+			logError("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
+		}
+		newEnv = newEnv2
 	}
-	if newEnv2["PS1"] != "" {
-		logError("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
-	}
-	newEnv = newEnv2
 
 	return
 }

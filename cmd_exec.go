@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -48,14 +49,14 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 	rc := FindRC(rcPath, config)
 
 	// Restore pristine environment if needed
-	if backupDiff, err = config.EnvDiff(); err == nil {
+	if backupDiff, err = config.EnvDiff(); err == nil && backupDiff != nil {
 		env = backupDiff.Reverse().Patch(env)
 	}
 	env.CleanContext()
 
 	// Load the rc
 	if rc != nil {
-		if newEnv, err = rc.Load(config, env); err != nil {
+		if newEnv, err = rc.Load(context.Background(), config, env); err != nil {
 			return
 		}
 	} else {

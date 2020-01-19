@@ -8,7 +8,9 @@ var Zsh Shell = zsh{}
 
 const zshHook = `
 _direnv_hook() {
+  trap -- '' SIGINT;
   eval "$("{{.SelfPath}}" export zsh)";
+  trap - SIGINT;
 }
 typeset -ag precmd_functions;
 if [[ -z ${precmd_functions[(r)_direnv_hook]} ]]; then

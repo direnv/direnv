@@ -166,11 +166,8 @@ func (config *Config) FindRC() *RC {
 
 // EnvDiff returns the recorded environment diff that was stored if any.
 func (config *Config) EnvDiff() (*EnvDiff, error) {
-	if config.Env[DIRENV_DIFF] != "" {
-		return LoadEnvDiff(config.Env[DIRENV_DIFF])
+	if config.Env[DIRENV_DIFF] == "" {
+		return nil, nil
 	}
-	if config.Env[DIRENV_WATCHES] == "" {
-		return config.Env.Diff(config.Env), nil
-	}
-	return nil, fmt.Errorf("DIRENV_DIFF is empty")
+	return LoadEnvDiff(config.Env[DIRENV_DIFF])
 }
