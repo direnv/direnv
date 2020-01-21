@@ -19,7 +19,7 @@ Migrating the allow data to the new location
 
 The allowed .envrc permissions used to be stored in the XDG_CONFIG_DIR. It's
 better to keep that folder for user-editable configuration so the data is
-being moved to XDG_RUNTIME_DIR.
+being moved to XDG_DATA_HOME.
 `
 
 func cmdAllowAction(env Env, args []string, config *Config) (err error) {
