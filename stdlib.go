@@ -797,6 +797,13 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  eval \"$(guix environment \"$@\" --search-paths)\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: direnv_version <version_at_least>\n" +
+	"#\n" +
+	"# Checks that the direnv version is at least old as <version_at_least>.\n" +
+	"direnv_version() {\n" +
+	"  \"$direnv\" version \"$@\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: __main__ <cmd> [...<args>]\n" +
 	"#\n" +
 	"# Used by rc.go\n" +

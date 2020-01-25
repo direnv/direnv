@@ -794,6 +794,13 @@ use_guix() {
   eval "$(guix environment "$@" --search-paths)"
 }
 
+# Usage: direnv_version <version_at_least>
+#
+# Checks that the direnv version is at least old as <version_at_least>.
+direnv_version() {
+  "$direnv" version "$@"
+}
+
 # Usage: __main__ <cmd> [...<args>]
 #
 # Used by rc.go
