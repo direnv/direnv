@@ -1,7 +1,78 @@
-UNRELEASED
-==========
+2.21.0 / 2020-01-25
+==================
 
-  * CHANGE: Watch multiple files in a single invocation of `watch_file` / `direnv watch`.
+This is a massive release!
+
+## Highlights
+
+You can now hit Ctrl-C during a long reload in bash and zsh and it will not
+loop anymore.
+
+Commands that use `direnv_load` won't fail when there is an output to stdout
+anymore (eg: `use_nix`).
+
+Direnv now also loads files from `.config/direnv/lib/*.sh`. This is intended
+to be used by third-party tools to augment direnv with their own stdlib
+functions.
+
+The `.envrc` is now loaded with `set -euo pipefail`. This will more likely
+expose issues with existing `.envrc` files.
+
+## docs
+
+  * Update README.md (#536)
+  * Add link to asdf-direnv. (#535)
+  * docs: fix invalid link (#533)
+  * adds experimental curl based installer (#539)
+
+## commands
+
+  * change where the allow files are being stored
+  * direnv status: also show the config
+  * direnv exec: improve the error message
+  * warn if PS1 is being exported
+  * handle SIGINT during export in bash
+  * export: display the full RC path instead of a relative one
+  * direnv exec: the DIR argument is always required (#493)
+
+## build
+
+  * ci: use GitHub Actions instead of Azure Pipelines
+  * staticcheck (#543)
+  * use go modules
+  * make: handle when /dev/stderr doesn't exist (#491)
+  * site: use jekyll to render the website
+  * Pin nixpkgs to current NixOS 19.09 channel (#526)
+
+## shells
+
+  * fix elvish hook
+  * Use `fish_preexec` hook instead of `fish_prompt` (#512)
+  * Use `fish_postexec` to make sure direnv hook executed 'after' the directory has changed when using `cd`.
+  * improve zsh hook (#514)
+
+## config.toml
+
+  * rename the configuration from config.toml to direnv.toml (#498)
+  * add warn_timeout option. DIRENV_WARN_TIMEOUT is now deprecated.
+
+## stdlib
+
+  * `direnv_load` can now handle stdout outputs
+  * stdlib: add layout_julia
+  * Handle failing pipenv on empty file and avoid an extra pipenv execution (#510)
+  * fix `source_env` behaviour when the file doesn't exists (#487)
+  * `watch_file` can now watch multiple files in a single invocation (#524)
+  * `layout_python`: prefer venv over virtualenv. Do not export VIRUAL_ENV if $python_version is unavailable or a virtual environment does not exist/can't be created
+  * Adds layout_pyenv (#505)
+  * Fix `source_up` docs to explain that search starts in parent directory (#518)
+  * fix `path_add` to not leak local variables
+  * `layout_pyenv`: support multiple python versions (#525)
+  * Add a `direnv_version <version_at_least>` command to check the direnv
+    version.
+  * `dotenv`: handle undefined variables
+  * source files from `.config/direnv/lib/*.sh`
+  * stdlib: set `-euo pipefail`
 
 2.20.1 / 2019-03-31
 ==================
