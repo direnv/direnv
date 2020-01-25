@@ -229,6 +229,12 @@ Example (.envrc):
 
     watch_file Gemfile
 
+### `direnv_version <version_at_least>`
+
+Checks that the direnv version is at least old as `version_at_least`. This can
+be useful when sharing an `.envrc` and to make sure that the users are up to
+date.
+
 COPYRIGHT
 ---------
 
