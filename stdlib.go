@@ -247,11 +247,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# NOTE: the other \".envrc\" is not checked by the security framework.\n" +
 	"source_up() {\n" +
-	"  local file=$1\n" +
-	"  local dir\n" +
-	"  if [[ -z $file ]]; then\n" +
-	"    file=.envrc\n" +
-	"  fi\n" +
+	"  local dir file=${1:-.envrc}\n" +
 	"  dir=$(cd .. && find_up \"$file\")\n" +
 	"  if [[ -n $dir ]]; then\n" +
 	"    source_env \"$dir\"\n" +
