@@ -687,7 +687,7 @@ rvm() {
 # Usage: use node
 # Loads NodeJS version from a `.node-version` or `.nvmrc` file.
 #
-# Usage: use node <version>
+# Usage: use node [<version>]
 # Loads specified NodeJS version.
 #
 # If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match
@@ -702,23 +702,23 @@ rvm() {
 #   Overrides the default version prefix.
 
 use_node() {
-  local version=$1
+  local version=${1:-}
   local via=""
   local node_version_prefix=${NODE_VERSION_PREFIX-node-v}
   local node_wanted
   local node_prefix
 
-  if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then
+  if [[ -z ${NODE_VERSIONS:-} || ! -d $NODE_VERSIONS ]]; then
     log_error "You must specify a \$NODE_VERSIONS environment variable and the directory specified must exist!"
     return 1
   fi
 
-  if [[ -z $version ]] && [[ -f .nvmrc ]]; then
+  if [[ -z $version && -f .nvmrc ]]; then
     version=$(<.nvmrc)
     via=".nvmrc"
   fi
 
-  if [[ -z $version ]] && [[ -f .node-version ]]; then
+  if [[ -z $version && -f .node-version ]]; then
     version=$(<.node-version)
     via=".node-version"
   fi

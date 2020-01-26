@@ -690,7 +690,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# Usage: use node\n" +
 	"# Loads NodeJS version from a `.node-version` or `.nvmrc` file.\n" +
 	"#\n" +
-	"# Usage: use node <version>\n" +
+	"# Usage: use node [<version>]\n" +
 	"# Loads specified NodeJS version.\n" +
 	"#\n" +
 	"# If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match\n" +
@@ -705,23 +705,23 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#   Overrides the default version prefix.\n" +
 	"\n" +
 	"use_node() {\n" +
-	"  local version=$1\n" +
+	"  local version=${1:-}\n" +
 	"  local via=\"\"\n" +
 	"  local node_version_prefix=${NODE_VERSION_PREFIX-node-v}\n" +
 	"  local node_wanted\n" +
 	"  local node_prefix\n" +
 	"\n" +
-	"  if [[ -z $NODE_VERSIONS ]] || [[ ! -d $NODE_VERSIONS ]]; then\n" +
+	"  if [[ -z ${NODE_VERSIONS:-} || ! -d $NODE_VERSIONS ]]; then\n" +
 	"    log_error \"You must specify a \\$NODE_VERSIONS environment variable and the directory specified must exist!\"\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
-	"  if [[ -z $version ]] && [[ -f .nvmrc ]]; then\n" +
+	"  if [[ -z $version && -f .nvmrc ]]; then\n" +
 	"    version=$(<.nvmrc)\n" +
 	"    via=\".nvmrc\"\n" +
 	"  fi\n" +
 	"\n" +
-	"  if [[ -z $version ]] && [[ -f .node-version ]]; then\n" +
+	"  if [[ -z $version && -f .node-version ]]; then\n" +
 	"    version=$(<.node-version)\n" +
 	"    via=\".node-version\"\n" +
 	"  fi\n" +
