@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#
+# Upload binary artifacts when a new release is made.
+#
+# Usage: ./script/dist-push [<tag>]
+#
+# Depends on: bash, coreutils, jq, curl
+set -euo pipefail
+
+# Ensure that the GITHUB_TOKEN secret is included
+if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+  echo "Set the GITHUB_TOKEN env variable."
+  exit 1
+fi
+
+# Prepare the headers for our curl-command.
+AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
+# Set the github repository in CI
+: "${GITHUB_REPOSITORY:=direnv/direnv}"
+
+# Create the correct Upload URL.
+if [[ -n "${1:-}" ]]; then
+  RELEASE_ID=$(curl -sfL \
+    -H "${AUTH_HEADER}" \
+    "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$1" \
+    | jq .id)
+else
+  # if not tag is given, assume we are in CI
+  RELEASE_ID=$(jq --raw-output '.release.id' "$GITHUB_EVENT_PATH")
+fi
+
+# start from the project root
+cd "$(dirname "$0")/.."
+
+# make sure we have all the dist files
+make dist
+
+# For each matching file..
+for file in dist/*; do
+  echo "Processing '${file}'"
+
+  filename=$(basename "${file}")
+
+  upload_url="https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=${filename}"
+  echo "Upload URL is '${upload_url}'"
+
+  # Generate a temporary file.
+  tmp=$(mktemp)
+
+  # Upload the artifact - capturing HTTP response-code in our output file.
+  if ! response=$(
+    curl \
+      -sSL \
+      -XPOST \
+      -H "${AUTH_HEADER}" \
+      --upload-file "${file}" \
+      --header "Content-Type:application/octet-stream" \
+      --write-out "%{http_code}" \
+      --output "$tmp" \
+      "${upload_url}"
+  ); then
+    echo "**********************************"
+    echo " curl command did not return zero."
+    echo " Aborting"
+    echo "**********************************"
+    cat "$tmp"
+    rm "$tmp"
+    exit 1
+  fi
+
+  # If upload is not successful, we must abort
+  if [[ $response -ge 400 ]]; then
+    echo "***************************"
+    echo " upload was not successful."
+    echo " Aborting"
+    echo " HTTP status is $response"
+    echo "**********************************"
+    cat "$tmp"
+    rm "$tmp"
+    exit 1
+  fi
+
+  # Show pretty output, since we already have jq
+  jq . <"$tmp"
+  rm "$tmp"
+done
