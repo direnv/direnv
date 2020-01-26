@@ -1,3 +1,13 @@
+2.21.1 / 2020-01-26
+==================
+
+Fix release
+
+  * stdlib: fix unused variable in `use node`
+  * stdlib: fix unused variable in `source_up`
+  * test: add stdlib test skeleton
+  * add dist release utility
+
 2.21.0 / 2020-01-25
 ==================
 
