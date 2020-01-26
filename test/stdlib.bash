@@ -26,3 +26,10 @@ assert_eq() {
   path=$(find_up "README.md")
   assert_eq "$path" "$root/README.md"
 )
+
+# test source_up
+(
+  load_stdlib
+  cd scenarios/inherited
+  source_up
+)

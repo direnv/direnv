@@ -244,11 +244,7 @@ watch_file() {
 #
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_up() {
-  local file=$1
-  local dir
-  if [[ -z $file ]]; then
-    file=.envrc
-  fi
+  local dir file=${1:-.envrc}
   dir=$(cd .. && find_up "$file")
   if [[ -n $dir ]]; then
     source_env "$dir"
