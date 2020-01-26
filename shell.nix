@@ -22,4 +22,8 @@ mkShell {
     shellcheck
     shfmt
   ];
+
+  shellHook = ''
+    unset GOPATH GOROOT
+  '';
 }

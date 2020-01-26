@@ -17,6 +17,7 @@ type Config struct {
 	Env             Env
 	WorkDir         string // Current directory
 	ConfDir         string
+	CacheDir        string
 	DataDir         string
 	SelfPath        string
 	BashPath        string
@@ -151,6 +152,14 @@ func LoadConfig(env Env) (config *Config, err error) {
 			err = fmt.Errorf("can't find bash: %q", err)
 			return
 		}
+	}
+
+	if config.CacheDir == "" {
+		config.CacheDir = xdg.CacheDir(env, "direnv")
+	}
+	if config.CacheDir == "" {
+		err = fmt.Errorf("couldn't find a cache directory for direnv")
+		return
 	}
 
 	if config.DataDir == "" {
