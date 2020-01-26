@@ -105,6 +105,7 @@ man: $(roffs)
 
 tests = \
 				test-shellcheck \
+				test-stdlib \
 				test-go \
 				test-go-lint \
 				test-go-fmt \
@@ -119,14 +120,17 @@ test: build $(tests)
 	@echo
 	@echo SUCCESS!
 
+test-shellcheck:
+	shellcheck stdlib.sh
+
+test-stdlib: build
+	./test/stdlib.bash
+
 test-go:
 	$(GO) test -v ./...
 
 test-go-lint:
 	golangci-lint run
-
-test-shellcheck:
-	shellcheck stdlib.sh
 
 test-bash:
 	bash ./test/direnv-test.bash
