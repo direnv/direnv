@@ -266,6 +266,34 @@ source_up() {
   fi
 }
 
+# Usage: fetchurl <url> [<integrity-hash>]
+#
+# Fetches a URL and outputs a file with its content. If the <integrity-hash>
+# is given it will also validate the content of the file before returning it.
+fetchurl() {
+  "$direnv" fetchurl "$@"
+}
+
+# Usage: source_url <url> <integrity-hash>
+#
+# Fetches a URL and evalutes its content.
+source_url() {
+  local url=$1 integrity_hash=${2:-} path
+  if [[ -z $url ]]; then
+    log_error "source_url: <url> argument missing"
+    return 1
+  fi
+  if [[ -z $integrity_hash ]]; then
+    log_error "source_url: <integrity-hash> argument missing. Use \`direnv fetchurl $url\` to find out the hash."
+    return 1
+  fi
+
+  log_status "loading $url ($integrity_hash)"
+  path=$(fetchurl "$url" "$integrity_hash")
+  # shellcheck disable=SC1090
+  source "$path"
+}
+
 # Usage: direnv_load <command-generating-dump-output>
 #   e.g: direnv_load opam-env exec -- "$direnv" dump
 #

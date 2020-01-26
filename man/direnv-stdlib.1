@@ -108,6 +108,29 @@ Loads another \fB\fC\&.envrc\fR if found when searching from the parent director
 .PP
 NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.
 
+.SS \fB\fCsource\_url <url> <integrity\-hash>\fR
+.PP
+Loads another script from the given \fB\fCurl\fR\&. Before loading it it will check the
+integrity using the provided \fB\fCintegrity\-hash\fR\&.
+
+.PP
+To find the value of the \fB\fCintegrity\-hash\fR, call \fB\fCdirenv fetchurl <url>\fR and
+extract the hash from the outputted message.
+
+.PP
+See also \fB\fCdirenv\-fetchurl(1)\fR for more details.
+
+.SS \fB\fCfetchurl <url> [<integrity\-hash>]\fR
+.PP
+Fetches the given \fB\fCurl\fR onto disk and outputs it's path location on stdout.
+
+.PP
+If the \fB\fCintegrity\-hash\fR argument is provided, it will also check the integrity
+of the script.
+
+.PP
+See also \fB\fCdirenv\-fetchurl(1)\fR for more details.
+
 .SS \fB\fCdirenv\_apply\_dump <file>\fR
 .PP
 Loads the output of \fB\fCdirenv dump\fR that was stored in a file.

@@ -269,6 +269,34 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: fetchurl <url> [<integrity-hash>]\n" +
+	"#\n" +
+	"# Fetches a URL and outputs a file with its content. If the <integrity-hash>\n" +
+	"# is given it will also validate the content of the file before returning it.\n" +
+	"fetchurl() {\n" +
+	"  \"$direnv\" fetchurl \"$@\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: source_url <url> <integrity-hash>\n" +
+	"#\n" +
+	"# Fetches a URL and evalutes its content.\n" +
+	"source_url() {\n" +
+	"  local url=$1 integrity_hash=${2:-} path\n" +
+	"  if [[ -z $url ]]; then\n" +
+	"    log_error \"source_url: <url> argument missing\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"  if [[ -z $integrity_hash ]]; then\n" +
+	"    log_error \"source_url: <integrity-hash> argument missing. Use \\`direnv fetchurl $url\\` to find out the hash.\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  log_status \"loading $url ($integrity_hash)\"\n" +
+	"  path=$(fetchurl \"$url\" \"$integrity_hash\")\n" +
+	"  # shellcheck disable=SC1090\n" +
+	"  source \"$path\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: direnv_load <command-generating-dump-output>\n" +
 	"#   e.g: direnv_load opam-env exec -- \"$direnv\" dump\n" +
 	"#\n" +

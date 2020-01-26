@@ -81,6 +81,25 @@ Loads another `.envrc` if found when searching from the parent directory up to /
 
 NOTE: the other `.envrc` is not checked by the security framework.
 
+### `source_url <url> <integrity-hash>`
+
+Loads another script from the given `url`. Before loading it it will check the
+integrity using the provided `integrity-hash`.
+
+To find the value of the `integrity-hash`, call `direnv fetchurl <url>` and
+extract the hash from the outputted message.
+
+See also `direnv-fetchurl(1)` for more details.
+
+### `fetchurl <url> [<integrity-hash>]`
+
+Fetches the given `url` onto disk and outputs it's path location on stdout.
+
+If the `integrity-hash` argument is provided, it will also check the integrity
+of the script.
+
+See also `direnv-fetchurl(1)` for more details.
+
 ### `direnv_apply_dump <file>`
 
 Loads the output of `direnv dump` that was stored in a file.
