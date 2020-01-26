@@ -31,7 +31,7 @@ jobs:
     - name: Test Host bash
       env:
         GO111MODULE: on
-      run: make test-bash
+      run: make test-stdlib test-bash
 
     strategy:
       matrix:
