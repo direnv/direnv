@@ -28,7 +28,7 @@ func cmdAllowAction(env Env, args []string, config *Config) (err error) {
 		rcPath = args[1]
 	} else {
 		if rcPath, err = os.Getwd(); err != nil {
-			return
+			return err
 		}
 	}
 
@@ -38,15 +38,17 @@ func cmdAllowAction(env Env, args []string, config *Config) (err error) {
 			fmt.Println(migrationMessage)
 
 			fmt.Printf("moving %s to %s\n", oldAllowDir, config.AllowDir())
-			err = os.Rename(oldAllowDir, config.AllowDir())
-			if err != nil {
-				return
+			if err = os.MkdirAll(config.AllowDir(), 0755); err != nil {
+				return err
+			}
+
+			if err = os.Rename(oldAllowDir, config.AllowDir()); err != nil {
+				return err
 			}
 
 			fmt.Printf("creating a symlink back from %s to %s for back-compat.\n", config.AllowDir(), oldAllowDir)
-			err = os.Symlink(config.AllowDir(), oldAllowDir)
-			if err != nil {
-				return
+			if err = os.Symlink(config.AllowDir(), oldAllowDir); err != nil {
+				return err
 			}
 			fmt.Println("")
 			fmt.Println("All done, have a nice day!")
