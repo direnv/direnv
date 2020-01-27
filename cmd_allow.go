@@ -38,7 +38,7 @@ func cmdAllowAction(env Env, args []string, config *Config) (err error) {
 			fmt.Println(migrationMessage)
 
 			fmt.Printf("moving %s to %s\n", oldAllowDir, config.AllowDir())
-			if err = os.MkdirAll(config.AllowDir(), 0755); err != nil {
+			if err = os.MkdirAll(filepath.Dir(config.AllowDir()), 0755); err != nil {
 				return err
 			}
 
