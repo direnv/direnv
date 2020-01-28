@@ -11,7 +11,6 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# SC1091: Not following: (file missing)\n" +
 	"# SC1117: Backslash is literal in \"\\n\". Prefer explicit escaping: \"\\\\n\".\n" +
 	"# SC2059: Don't use variables in the printf format string. Use printf \"..%s..\" \"$foo\".\n" +
-	"set -euo pipefail\n" +
 	"shopt -s gnu_errfmt\n" +
 	"shopt -s nullglob\n" +
 	"\n" +

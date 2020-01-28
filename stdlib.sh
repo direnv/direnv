@@ -8,7 +8,6 @@
 # SC1091: Not following: (file missing)
 # SC1117: Backslash is literal in "\n". Prefer explicit escaping: "\\n".
 # SC2059: Don't use variables in the printf format string. Use printf "..%s.." "$foo".
-set -euo pipefail
 shopt -s gnu_errfmt
 shopt -s nullglob
 
