@@ -258,49 +258,41 @@ source_up() {
 # process - cause that process to run "direnv dump" and then wrap
 # the results with direnv_load.
 #
+# shellcheck disable=SC1090
 direnv_load() {
   # Backup watches in case of `nix-shell --pure`
   local prev_watches=$DIRENV_WATCHES
-  local prev_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}
+  local temp_dir output_file script_file exit_code
 
-  # Create pipe
-  DIRENV_DUMP_FILE_PATH=$(mktemp -u)
-  export DIRENV_DUMP_FILE_PATH
-  mkfifo "$DIRENV_DUMP_FILE_PATH"
+  # Prepare a temporary place for dumps and such.
+  temp_dir=$(mktemp -dt direnv.XXXXXX)
+  output_file="$temp_dir/output"
+  script_file="$temp_dir/script"
 
-  # Run program in the background
-  ("$@")&
+  # Chain the following commands explicitly so that we can capture the exit code
+  # of the whole chain. Crucially this ensures that we don't return early (via
+  # `set -e`, for example) and hence always remove the temporary directory.
+  touch "$output_file" &&
+    DIRENV_DUMP_FILE_PATH="$output_file" "$@" &&
+    { test -s "$output_file" || {
+        log_error "Environment not dumped; did you invoke 'direnv dump'?"
+        false
+      }
+    } &&
+    "$direnv" apply_dump "$output_file" > "$script_file" &&
+    source "$script_file" ||
+      exit_code=$?
 
-  # Apply the output of the dump
-  local exports
-  exports=$("$direnv" apply_dump "$DIRENV_DUMP_FILE_PATH")
-  local es=$?
-
-  # Regroup
-  rm "$DIRENV_DUMP_FILE_PATH"
-  wait # wait on the child process to exit
-  local es2=$?
-
-  if [[ $es -ne 0 ]]; then
-    return $es
-  fi
-
-  if [[ $es2 -ne 0 ]]; then
-    return $es2
-  fi
-
-  eval "$exports"
+  # Scrub temporary directory
+  rm -rf "$temp_dir"
 
   # Restore watches if the dump wiped them
-  if [[ -z "$DIRENV_WATCHES" ]]; then
+  if [[ -z "${DIRENV_WATCHES:-}" ]]; then
     export DIRENV_WATCHES=$prev_watches
   fi
-  # Allow nesting
-  if [[ -n "$prev_dump_file_path" ]]; then
-    export DIRENV_DUMP_FILE_PATH=$prev_dump_file_path
-  else
-    unset DIRENV_DUMP_FILE_PATH
-  fi
+
+  # Exit accordingly
+  return ${exit_code:-0}
 }
 
 # Usage: PATH_add <path> [<path> ...]

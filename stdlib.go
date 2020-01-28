@@ -261,49 +261,41 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# process - cause that process to run \"direnv dump\" and then wrap\n" +
 	"# the results with direnv_load.\n" +
 	"#\n" +
+	"# shellcheck disable=SC1090\n" +
 	"direnv_load() {\n" +
 	"  # Backup watches in case of `nix-shell --pure`\n" +
 	"  local prev_watches=$DIRENV_WATCHES\n" +
-	"  local prev_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}\n" +
+	"  local temp_dir output_file script_file exit_code\n" +
 	"\n" +
-	"  # Create pipe\n" +
-	"  DIRENV_DUMP_FILE_PATH=$(mktemp -u)\n" +
-	"  export DIRENV_DUMP_FILE_PATH\n" +
-	"  mkfifo \"$DIRENV_DUMP_FILE_PATH\"\n" +
+	"  # Prepare a temporary place for dumps and such.\n" +
+	"  temp_dir=$(mktemp -dt direnv.XXXXXX)\n" +
+	"  output_file=\"$temp_dir/output\"\n" +
+	"  script_file=\"$temp_dir/script\"\n" +
 	"\n" +
-	"  # Run program in the background\n" +
-	"  (\"$@\")&\n" +
+	"  # Chain the following commands explicitly so that we can capture the exit code\n" +
+	"  # of the whole chain. Crucially this ensures that we don't return early (via\n" +
+	"  # `set -e`, for example) and hence always remove the temporary directory.\n" +
+	"  touch \"$output_file\" &&\n" +
+	"    DIRENV_DUMP_FILE_PATH=\"$output_file\" \"$@\" &&\n" +
+	"    { test -s \"$output_file\" || {\n" +
+	"        log_error \"Environment not dumped; did you invoke 'direnv dump'?\"\n" +
+	"        false\n" +
+	"      }\n" +
+	"    } &&\n" +
+	"    \"$direnv\" apply_dump \"$output_file\" > \"$script_file\" &&\n" +
+	"    source \"$script_file\" ||\n" +
+	"      exit_code=$?\n" +
 	"\n" +
-	"  # Apply the output of the dump\n" +
-	"  local exports\n" +
-	"  exports=$(\"$direnv\" apply_dump \"$DIRENV_DUMP_FILE_PATH\")\n" +
-	"  local es=$?\n" +
-	"\n" +
-	"  # Regroup\n" +
-	"  rm \"$DIRENV_DUMP_FILE_PATH\"\n" +
-	"  wait # wait on the child process to exit\n" +
-	"  local es2=$?\n" +
-	"\n" +
-	"  if [[ $es -ne 0 ]]; then\n" +
-	"    return $es\n" +
-	"  fi\n" +
-	"\n" +
-	"  if [[ $es2 -ne 0 ]]; then\n" +
-	"    return $es2\n" +
-	"  fi\n" +
-	"\n" +
-	"  eval \"$exports\"\n" +
+	"  # Scrub temporary directory\n" +
+	"  rm -rf \"$temp_dir\"\n" +
 	"\n" +
 	"  # Restore watches if the dump wiped them\n" +
-	"  if [[ -z \"$DIRENV_WATCHES\" ]]; then\n" +
+	"  if [[ -z \"${DIRENV_WATCHES:-}\" ]]; then\n" +
 	"    export DIRENV_WATCHES=$prev_watches\n" +
 	"  fi\n" +
-	"  # Allow nesting\n" +
-	"  if [[ -n \"$prev_dump_file_path\" ]]; then\n" +
-	"    export DIRENV_DUMP_FILE_PATH=$prev_dump_file_path\n" +
-	"  else\n" +
-	"    unset DIRENV_DUMP_FILE_PATH\n" +
-	"  fi\n" +
+	"\n" +
+	"  # Exit accordingly\n" +
+	"  return ${exit_code:-0}\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: PATH_add <path> [<path> ...]\n" +
