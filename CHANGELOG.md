@@ -1,3 +1,13 @@
+2.21.2 / 2020-01-28
+==================
+
+Making things stable again.
+
+  * stdlib: revert the `set -euo pipefail` change. It was causing too many
+    issues for users.
+  * direnv allow: fix the allow migration by also creating the parent target
+    directory.
+
 2.21.1 / 2020-01-26
 ==================
 
