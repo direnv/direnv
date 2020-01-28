@@ -265,7 +265,10 @@ direnv_load() {
   local temp_dir output_file script_file exit_code
 
   # Prepare a temporary place for dumps and such.
-  temp_dir=$(mktemp -dt direnv.XXXXXX)
+  temp_dir=$(mktemp -dt direnv.XXXXXX) || {
+    log_error "Could not create temporary directory."
+    return 1
+  }
   output_file="$temp_dir/output"
   script_file="$temp_dir/script"
 

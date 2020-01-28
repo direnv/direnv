@@ -268,7 +268,10 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  local temp_dir output_file script_file exit_code\n" +
 	"\n" +
 	"  # Prepare a temporary place for dumps and such.\n" +
-	"  temp_dir=$(mktemp -dt direnv.XXXXXX)\n" +
+	"  temp_dir=$(mktemp -dt direnv.XXXXXX) || {\n" +
+	"    log_error \"Could not create temporary directory.\"\n" +
+	"    return 1\n" +
+	"  }\n" +
 	"  output_file=\"$temp_dir/output\"\n" +
 	"  script_file=\"$temp_dir/script\"\n" +
 	"\n" +
