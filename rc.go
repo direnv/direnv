@@ -146,8 +146,14 @@ func (rc *RC) Load(ctx context.Context, config *Config, env Env) (newEnv Env, er
 		return
 	}
 
+	prelude := ""
+	if config.StrictEnv {
+		prelude = "set -euo pipefail && "
+	}
+
 	arg := fmt.Sprintf(
-		`eval "$("%s" stdlib)" && __main__ source_env "%s"`,
+		`%seval "$("%s" stdlib)" && __main__ source_env "%s"`,
+		prelude,
 		direnv,
 		rc.Path(),
 	)

@@ -96,6 +96,11 @@ This allows one to hard-code the position of bash. It maybe be useful to set thi
 
 If set to true, stdin is disabled (redirected to /dev/null) during the `.envrc` evaluation.
 
+## `strict_env`
+
+If set to true, the `.envrc` will be loaded with `set -euo pipefail`. This
+option will be the default in the future.
+
 COPYRIGHT
 ---------
 

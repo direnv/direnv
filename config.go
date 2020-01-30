@@ -23,6 +23,7 @@ type Config struct {
 	RCDir           string
 	TomlPath        string
 	DisableStdin    bool
+	StrictEnv       bool
 	WarnTimeout     time.Duration
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
@@ -41,6 +42,7 @@ func (d *tomlDuration) UnmarshalText(text []byte) error {
 type tomlConfig struct {
 	BashPath     string       `toml:"bash_path"`
 	DisableStdin bool         `toml:"disable_stdin"`
+	StrictEnv    bool         `toml:"strict_env"`
 	WarnTimeout  tomlDuration `toml:"warn_timeout"`
 	Whitelist    whitelist    `toml:"whitelist"`
 }
@@ -113,8 +115,9 @@ func LoadConfig(env Env) (config *Config, err error) {
 			config.WhitelistExact[path] = true
 		}
 
-		config.DisableStdin = tomlConf.DisableStdin
 		config.BashPath = tomlConf.BashPath
+		config.DisableStdin = tomlConf.DisableStdin
+		config.StrictEnv = tomlConf.StrictEnv
 		config.WarnTimeout = tomlConf.WarnTimeout.Duration
 	}
 
