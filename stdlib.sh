@@ -12,7 +12,6 @@ shopt -s gnu_errfmt
 shopt -s nullglob
 shopt -s extglob
 
-
 # NOTE: don't touch the RHS, it gets replaced at runtime
 direnv="$(command -v direnv)"
 
@@ -26,6 +25,90 @@ direnv_config_dir="${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}"
 # of a .envrc evaluation context. It is ignored by the direnv diffing
 # algorithm and so it won't be re-exported.
 export DIRENV_IN_ENVRC=1
+
+__env_strictness() {
+  local mode tmpfile old_shell_options
+  local -i res
+
+  tmpfile=$(mktemp)
+  res=0
+  mode="$1"
+  shift
+
+  set +o | grep 'pipefail\|nounset\|errexit' > "$tmpfile"
+  old_shell_options=$(< "$tmpfile")
+  rm -f tmpfile
+
+  case "$mode" in
+  strict)
+    set -o errexit -o nounset -o pipefail
+    ;;
+  unstrict)
+    set +o errexit +o nounset +o pipefail
+    ;;
+  *)
+    log_error "Unknown strictness mode '${mode}'."
+    exit 1
+    ;;
+  esac
+
+  if (($#)); then
+    "${@}"
+    res=$?
+    eval "$old_shell_options"
+  fi
+
+  # Force failure if the inner script has failed and the mode is strict
+  if [[ $mode = strict && $res -gt 0 ]]; then
+    exit 1
+  fi
+
+  return $res
+}
+
+# Usage: strict_env [<command> ...]
+#
+# Turns on shell execution strictness. This will force the .envrc
+# evaluation context to exit immediately if:
+#
+# - any command in a pipeline returns a non-zero exit status that is
+#   not otherwise handled as part of `if`, `while`, or `until` tests,
+#   return value negation (`!`), or part of a boolean (`&&` or `||`)
+#   chain.
+# - any variable that has not explicitly been set or declared (with
+#   either `declare` or `local`) is referenced.
+#
+# If followed by a command-line, the strictness applies for the duration
+# of the command.
+#
+# Example:
+#
+#    strict_env
+#    has curl
+#
+#    strict_env has curl
+strict_env() {
+  __env_strictness strict "$@"
+}
+
+# Usage: unstrict_env [<command> ...]
+#
+# Turns off shell execution strictness. If followed by a command-line, the
+# strictness applies for the duration of the command.
+#
+# Example:
+#
+#    unstrict_env
+#    has curl
+#
+#    unstrict_env has curl
+unstrict_env() {
+  if (($#)); then
+    __env_strictness unstrict "$@"
+  else
+    set +o errexit +o nounset +o pipefail
+  fi
+}
 
 # Usage: direnv_layout_dir
 #

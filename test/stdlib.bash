@@ -155,4 +155,7 @@ test_name source_env_if_exists
   [[ $FOO = bar ]]
 )
 
+# test strict_env and unstrict_env
+./strict_env_test.bash
+
 echo OK

@@ -474,6 +474,78 @@ Checks that the direnv version is at least old as \fB\fCversion\_at\_least\fR\&.
 be useful when sharing an \fB\fC\&.envrc\fR and to make sure that the users are up to
 date.
 
+.SS \fB\fCstrict\_env [<command> ...]\fR
+.PP
+Turns on shell execution strictness. This will force the .envrc
+evaluation context to exit immediately if:
+.IP \(bu 2
+any command in a pipeline returns a non\-zero exit status that is not
+otherwise handled as part of \fB\fCif\fR, \fB\fCwhile\fR, or \fB\fCuntil\fR tests,
+return value negation (\fB\fC!\fR), or part of a boolean (\fB\fC\&\&\fR or \fB\fC||\fR)
+chain.
+.IP \(bu 2
+any variable that has not explicitly been set or declared (with
+either \fB\fCdeclare\fR or \fB\fClocal\fR) is referenced.
+
+.PP
+If followed by a command\-line, the strictness applies for the duration
+of the command.
+
+.PP
+Example (Whole Script):
+
+.PP
+.RS
+
+.nf
+strict\_env
+has curl
+
+.fi
+.RE
+
+.PP
+Example (Command):
+
+.PP
+.RS
+
+.nf
+strict\_env has curl
+
+.fi
+.RE
+
+.SS \fB\fCunstrict\_env [<command> ...]\fR
+.PP
+Turns off shell execution strictness. If followed by a command\-line, the
+strictness applies for the duration of the command.
+
+.PP
+Example (Whole Script):
+
+.PP
+.RS
+
+.nf
+unstrict\_env
+has curl
+
+.fi
+.RE
+
+.PP
+Example (Command):
+
+.PP
+.RS
+
+.nf
+unstrict\_env has curl
+
+.fi
+.RE
+
 .SH COPYRIGHT
 .PP
 MIT licence \- Copyright (C) 2019 @zimbatm and contributors
