@@ -123,6 +123,11 @@ This allows one to hard\-code the position of bash. It maybe be useful to set th
 .PP
 If set to true, stdin is disabled (redirected to /dev/null) during the \fB\fC\&.envrc\fR evaluation.
 
+.SH \fB\fCstrict\_env\fR
+.PP
+If set to true, the \fB\fC\&.envrc\fR will be loaded with \fB\fCset \-euo pipefail\fR\&. This
+option will be the default in the future.
+
 .SH COPYRIGHT
 .PP
 MIT licence \- Copyright (C) 2019 @zimbatm and contributors
