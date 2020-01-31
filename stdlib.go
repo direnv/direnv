@@ -217,8 +217,8 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  rcfile=$(user_rel_path \"$rcpath\")\n" +
 	"  watch_file \"$rcpath\"\n" +
 	"\n" +
-	"  pushd \"$(pwd 2>/dev/null)\" >/dev/null\n" +
-	"  pushd \"$(dirname \"$rcpath\")\" >/dev/null\n" +
+	"  pushd \"$(pwd 2>/dev/null)\" >/dev/null || return 1\n" +
+	"  pushd \"$(dirname \"$rcpath\")\" >/dev/null || return 1\n" +
 	"  if [[ -f ./$(basename \"$rcpath\") ]]; then\n" +
 	"    log_status \"loading $rcfile\"\n" +
 	"    # shellcheck disable=SC1090\n" +
@@ -226,8 +226,8 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  else\n" +
 	"    log_status \"referenced $rcfile does not exist\"\n" +
 	"  fi\n" +
-	"  popd >/dev/null\n" +
-	"  popd >/dev/null\n" +
+	"  popd >/dev/null || return 1\n" +
+	"  popd >/dev/null || return 1\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: watch_file <filename> [<filename> ...]\n" +
