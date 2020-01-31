@@ -214,8 +214,8 @@ source_env() {
   rcfile=$(user_rel_path "$rcpath")
   watch_file "$rcpath"
 
-  pushd "$(pwd 2>/dev/null)" >/dev/null
-  pushd "$(dirname "$rcpath")" >/dev/null
+  pushd "$(pwd 2>/dev/null)" >/dev/null || return 1
+  pushd "$(dirname "$rcpath")" >/dev/null || return 1
   if [[ -f ./$(basename "$rcpath") ]]; then
     log_status "loading $rcfile"
     # shellcheck disable=SC1090
@@ -223,8 +223,8 @@ source_env() {
   else
     log_status "referenced $rcfile does not exist"
   fi
-  popd >/dev/null
-  popd >/dev/null
+  popd >/dev/null || return 1
+  popd >/dev/null || return 1
 }
 
 # Usage: watch_file <filename> [<filename> ...]
