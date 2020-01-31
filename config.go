@@ -80,12 +80,10 @@ func LoadConfig(env Env) (config *Config, err error) {
 	// Load the TOML config
 	config.TomlPath = filepath.Join(config.ConfDir, "direnv.toml")
 	if _, statErr := os.Stat(config.TomlPath); statErr != nil {
-		config.TomlPath = ""
-	}
-
-	config.TomlPath = filepath.Join(config.ConfDir, "config.toml")
-	if _, statErr := os.Stat(config.TomlPath); statErr != nil {
-		config.TomlPath = ""
+		config.TomlPath = filepath.Join(config.ConfDir, "config.toml")
+		if _, statErr := os.Stat(config.TomlPath); statErr != nil {
+			config.TomlPath = ""
+		}
 	}
 
 	if config.TomlPath != "" {
