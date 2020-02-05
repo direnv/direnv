@@ -40,14 +40,19 @@ func (d *tomlDuration) UnmarshalText(text []byte) error {
 }
 
 type tomlConfig struct {
+	*tomlGlobal               // For backward-compatibility
+	Global      *tomlGlobal   `toml:"global"`
+	Whitelist   tomlWhitelist `toml:"whitelist"`
+}
+
+type tomlGlobal struct {
 	BashPath     string       `toml:"bash_path"`
 	DisableStdin bool         `toml:"disable_stdin"`
 	StrictEnv    bool         `toml:"strict_env"`
 	WarnTimeout  tomlDuration `toml:"warn_timeout"`
-	Whitelist    whitelist    `toml:"whitelist"`
 }
 
-type whitelist struct {
+type tomlWhitelist struct {
 	Prefix []string
 	Exact  []string
 }
@@ -99,7 +104,14 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 
 	if config.TomlPath != "" {
-		var tomlConf tomlConfig
+		// Declare global once and then share it between the top-level and Global
+		// keys. The goal here is to let the decoder fill global regardless of if
+		// the values are in the [global] section or not. The reason we do that is
+		var global tomlGlobal
+		tomlConf := tomlConfig{
+			tomlGlobal: &global,
+			Global:     &global,
+		}
 		if _, err = toml.DecodeFile(config.TomlPath, &tomlConf); err != nil {
 			err = fmt.Errorf("LoadConfig() failed to parse %s: %q", config.TomlPath, err)
 			return
