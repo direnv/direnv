@@ -28,11 +28,21 @@ type Config struct {
 	WhitelistExact  map[string]bool
 }
 
+type tomlDuration struct {
+	time.Duration
+}
+
+func (d *tomlDuration) UnmarshalText(text []byte) error {
+	var err error
+	d.Duration, err = time.ParseDuration(string(text))
+	return err
+}
+
 type tomlConfig struct {
-	BashPath     string        `toml:"bash_path"`
-	DisableStdin bool          `toml:"disable_stdin"`
-	WarnTimeout  time.Duration `toml:"warn_timeout"`
-	Whitelist    whitelist     `toml:"whitelist"`
+	BashPath     string       `toml:"bash_path"`
+	DisableStdin bool         `toml:"disable_stdin"`
+	WarnTimeout  tomlDuration `toml:"warn_timeout"`
+	Whitelist    whitelist    `toml:"whitelist"`
 }
 
 type whitelist struct {
@@ -105,7 +115,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 		config.DisableStdin = tomlConf.DisableStdin
 		config.BashPath = tomlConf.BashPath
-		config.WarnTimeout = tomlConf.WarnTimeout
+		config.WarnTimeout = tomlConf.WarnTimeout.Duration
 	}
 
 	if config.WarnTimeout == 0 {
