@@ -20,16 +20,34 @@ assert_eq() {
   fi
 }
 
-# test find_up
+test_name() {
+  echo "--- $*"
+}
+
+test_name find_up
 (
   load_stdlib
   path=$(find_up "README.md")
   assert_eq "$path" "$root/README.md"
 )
 
-# test source_up
+test_name source_up
 (
   load_stdlib
   cd scenarios/inherited
   source_up
 )
+
+test_name direnv_apply_dump
+(
+  tmpfile=$(mktemp)
+  cleanup() { rm "$tmpfile"; }
+  trap cleanup EXIT
+
+  load_stdlib
+  FOO=bar direnv dump > "$tmpfile"
+  direnv_apply_dump "$tmpfile"
+  assert_eq "$FOO" bar
+)
+
+echo OK
