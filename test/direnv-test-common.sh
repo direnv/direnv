@@ -182,6 +182,11 @@ test_start "symlink-changed"
   test_eq "${STATE}" "B"
 test_stop
 
+test_start "utf-8"
+  direnv_eval
+  test_eq "${UTFSTUFF}" "♀♂"
+test_stop
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.

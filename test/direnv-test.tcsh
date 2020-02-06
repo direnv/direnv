@@ -120,6 +120,14 @@ cd $TEST_DIR/scenarios/"empty-var-unset"
   unsetenv FOO
 cd $TEST_DIR ; direnv_eval
 
+# Currently broken
+# cd $TEST_DIR/scenarios/"utf-8"
+#   direnv allow
+#   echo "Testing utf-8"
+#   direnv_eval
+#   test "$UTFSTUFF" -eq '♀♂'
+# cd $TEST_DIR ; direnv_eval
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.
