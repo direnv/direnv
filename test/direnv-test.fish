@@ -48,9 +48,15 @@ direnv allow
 direnv_eval
 
 test_start dump
-	set -e LS_COLORS
-	direnv_eval
-	eq "$LS_COLORS" "*.ogg=38;5;45:*.wav=38;5;45"
-	eq "$LESSOPEN" "||/usr/bin/lesspipe.sh %s"
-	eq "$THREE_BACKSLASHES" "\\\\\\"
+  set -e LS_COLORS
+  direnv_eval
+  eq "$LS_COLORS" "*.ogg=38;5;45:*.wav=38;5;45"
+  eq "$LESSOPEN" "||/usr/bin/lesspipe.sh %s"
+  eq "$THREE_BACKSLASHES" "\\\\\\"
 test_stop
+
+# Currently broken
+# test_start utf-8
+#   direnv_eval
+#   eq "$UTFSTUFF" "♀♂"
+# test_stop

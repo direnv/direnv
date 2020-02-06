@@ -129,6 +129,11 @@ test-scenario "child-env" {
 	test-eq $E:REMOVE_ME ""
 }
 
+test-scenario "utf-8" {
+	direnv-eval
+	test-eq $E:UTFSTUFF "♀♂"
+}
+
 ## TODO: special-vars
 ## TODO: dump
 ## TODO: empty-var
