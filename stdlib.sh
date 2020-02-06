@@ -260,47 +260,47 @@ source_up() {
 #
 direnv_load() {
   # Backup watches in case of `nix-shell --pure`
-  local prev_watches=$DIRENV_WATCHES
+  local es
   local prev_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}
+  local prev_watches=$DIRENV_WATCHES
 
   # Create pipe
-  DIRENV_DUMP_FILE_PATH=$(mktemp -u)
+  DIRENV_DUMP_FILE_PATH=$(mktemp)
   export DIRENV_DUMP_FILE_PATH
-  mkfifo "$DIRENV_DUMP_FILE_PATH"
 
-  # Run program in the background
-  ("$@")&
+  __direnv_load_exit() {
+    rm -f "$DIRENV_DUMP_FILE_PATH"
+    # Restore watches if the dump wiped them
+    if [[ -z "$DIRENV_WATCHES" ]]; then
+      export DIRENV_WATCHES=$1
+    fi
+    # Allow nesting
+    if [[ -n "$2" ]]; then
+      export DIRENV_DUMP_FILE_PATH=$2
+    else
+      unset DIRENV_DUMP_FILE_PATH
+    fi
+  }
+
+  # Chain the program
+  ("$@")
+  es=$?
+  if [[ $es -ne 0 ]]; then
+    __direnv_load_exit "$prev_watches" "$prev_dump_file_path"
+    return $es
+  fi
 
   # Apply the output of the dump
   local exports
   exports=$("$direnv" apply_dump "$DIRENV_DUMP_FILE_PATH")
-  local es=$?
-
-  # Regroup
-  rm "$DIRENV_DUMP_FILE_PATH"
-  wait # wait on the child process to exit
-  local es2=$?
-
+  es=$?
   if [[ $es -ne 0 ]]; then
+    __direnv_load_exit "$prev_watches" "$prev_dump_file_path"
     return $es
   fi
-
-  if [[ $es2 -ne 0 ]]; then
-    return $es2
-  fi
-
   eval "$exports"
 
-  # Restore watches if the dump wiped them
-  if [[ -z "$DIRENV_WATCHES" ]]; then
-    export DIRENV_WATCHES=$prev_watches
-  fi
-  # Allow nesting
-  if [[ -n "$prev_dump_file_path" ]]; then
-    export DIRENV_DUMP_FILE_PATH=$prev_dump_file_path
-  else
-    unset DIRENV_DUMP_FILE_PATH
-  fi
+  __direnv_load_exit "$prev_watches" "$prev_dump_file_path"
 }
 
 # Usage: PATH_add <path> [<path> ...]

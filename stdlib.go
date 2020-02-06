@@ -263,47 +263,47 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"direnv_load() {\n" +
 	"  # Backup watches in case of `nix-shell --pure`\n" +
-	"  local prev_watches=$DIRENV_WATCHES\n" +
+	"  local es\n" +
 	"  local prev_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}\n" +
+	"  local prev_watches=$DIRENV_WATCHES\n" +
 	"\n" +
 	"  # Create pipe\n" +
-	"  DIRENV_DUMP_FILE_PATH=$(mktemp -u)\n" +
+	"  DIRENV_DUMP_FILE_PATH=$(mktemp)\n" +
 	"  export DIRENV_DUMP_FILE_PATH\n" +
-	"  mkfifo \"$DIRENV_DUMP_FILE_PATH\"\n" +
 	"\n" +
-	"  # Run program in the background\n" +
-	"  (\"$@\")&\n" +
+	"  __direnv_load_exit() {\n" +
+	"    rm -f \"$DIRENV_DUMP_FILE_PATH\"\n" +
+	"    # Restore watches if the dump wiped them\n" +
+	"    if [[ -z \"$DIRENV_WATCHES\" ]]; then\n" +
+	"      export DIRENV_WATCHES=$1\n" +
+	"    fi\n" +
+	"    # Allow nesting\n" +
+	"    if [[ -n \"$2\" ]]; then\n" +
+	"      export DIRENV_DUMP_FILE_PATH=$2\n" +
+	"    else\n" +
+	"      unset DIRENV_DUMP_FILE_PATH\n" +
+	"    fi\n" +
+	"  }\n" +
+	"\n" +
+	"  # Chain the program\n" +
+	"  (\"$@\")\n" +
+	"  es=$?\n" +
+	"  if [[ $es -ne 0 ]]; then\n" +
+	"    __direnv_load_exit \"$prev_watches\" \"$prev_dump_file_path\"\n" +
+	"    return $es\n" +
+	"  fi\n" +
 	"\n" +
 	"  # Apply the output of the dump\n" +
 	"  local exports\n" +
 	"  exports=$(\"$direnv\" apply_dump \"$DIRENV_DUMP_FILE_PATH\")\n" +
-	"  local es=$?\n" +
-	"\n" +
-	"  # Regroup\n" +
-	"  rm \"$DIRENV_DUMP_FILE_PATH\"\n" +
-	"  wait # wait on the child process to exit\n" +
-	"  local es2=$?\n" +
-	"\n" +
+	"  es=$?\n" +
 	"  if [[ $es -ne 0 ]]; then\n" +
+	"    __direnv_load_exit \"$prev_watches\" \"$prev_dump_file_path\"\n" +
 	"    return $es\n" +
 	"  fi\n" +
-	"\n" +
-	"  if [[ $es2 -ne 0 ]]; then\n" +
-	"    return $es2\n" +
-	"  fi\n" +
-	"\n" +
 	"  eval \"$exports\"\n" +
 	"\n" +
-	"  # Restore watches if the dump wiped them\n" +
-	"  if [[ -z \"$DIRENV_WATCHES\" ]]; then\n" +
-	"    export DIRENV_WATCHES=$prev_watches\n" +
-	"  fi\n" +
-	"  # Allow nesting\n" +
-	"  if [[ -n \"$prev_dump_file_path\" ]]; then\n" +
-	"    export DIRENV_DUMP_FILE_PATH=$prev_dump_file_path\n" +
-	"  else\n" +
-	"    unset DIRENV_DUMP_FILE_PATH\n" +
-	"  fi\n" +
+	"  __direnv_load_exit \"$prev_watches\" \"$prev_dump_file_path\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: PATH_add <path> [<path> ...]\n" +
