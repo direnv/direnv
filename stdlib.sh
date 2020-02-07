@@ -298,6 +298,14 @@ direnv_load() {
   return ${exit_code:-0}
 }
 
+# Usage: direnv_apply_dump <file>
+#
+# Loads the output of `direnv dump` that was stored in a file.
+direnv_apply_dump() {
+  local path=$1
+  eval "$("$direnv" apply_dump "$path")"
+}
+
 # Usage: PATH_add <path> [<path> ...]
 #
 # Prepends the expanded <path> to the PATH environment variable, in order.

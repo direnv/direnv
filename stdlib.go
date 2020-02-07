@@ -301,6 +301,14 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  return ${exit_code:-0}\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: direnv_apply_dump <file>\n" +
+	"#\n" +
+	"# Loads the output of `direnv dump` that was stored in a file.\n" +
+	"direnv_apply_dump() {\n" +
+	"  local path=$1\n" +
+	"  eval \"$(\"$direnv\" apply_dump \"$path\")\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: PATH_add <path> [<path> ...]\n" +
 	"#\n" +
 	"# Prepends the expanded <path> to the PATH environment variable, in order.\n" +
