@@ -787,9 +787,16 @@ use_nix() {
 # `--ad-hoc` flag is used `use guix --ad-hoc hello`. Other options
 # include `--load` which allows loading an environment from a
 # file. For a full list of options, consult the documentation for the
-# `guix environment` command.
+# `guix environment` command. The results will be cached in a profile
+# under ./.guix-profile to speed up subsequent loading. Remember to
+# remove it when you make changes!
 use_guix() {
-  eval "$(guix environment "$@" --search-paths)"
+  if [[ -e ./.guix-profile/etc/profile ]]; then
+    # shellcheck disable=SC1091
+    source ./.guix-profile/etc/profile
+  else
+    eval "$(guix environment --root=./.guix-profile "$@" --search-paths)"
+  fi
 }
 
 # Usage: direnv_version <version_at_least>
