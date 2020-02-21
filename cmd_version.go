@@ -25,7 +25,7 @@ var CmdVersion = &Cmd{
 			}
 			cmp := semver.Compare(semVersion, atLeast)
 			if cmp < 0 {
-				return fmt.Errorf("%s it older than the desired %s", semVersion, atLeast)
+				return fmt.Errorf("current version %s is older than the desired version %s", semVersion, atLeast)
 			}
 		} else {
 			fmt.Println(Version)
