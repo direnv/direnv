@@ -22,10 +22,10 @@ fn direnv-eval {
 	try {
 		m = (direnv export elvish | from-json)
 		keys $m | each [k]{
-			if (==s $k 'null') {
-				unset-env $k
-			} else {
+			if $m[$k] {
 				set-env $k $m[$k]
+			} else {
+				unset-env $k
 			}
 		}
 	} except e {

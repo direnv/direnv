@@ -36,7 +36,7 @@ $ cd ~/my_project
 $ echo ${FOO-nope}
 nope
 $ echo export FOO=foo > .envrc
-.envrc is not allowed
+\.envrc is not allowed
 $ direnv allow .
 direnv: reloading
 direnv: loading .envrc
