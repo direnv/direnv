@@ -10,6 +10,7 @@ import (
 
 	toml "github.com/BurntSushi/toml"
 	"github.com/direnv/direnv/xdg"
+	"golang.org/x/sys/unix"
 )
 
 // Config represents the direnv configuration and state.
@@ -161,6 +162,12 @@ func LoadConfig(env Env) (config *Config, err error) {
 		return
 	}
 
+	_, err = config.HasWritePermissions()
+	if err != nil {
+		err = fmt.Errorf("permissions check failed: %s", err.Error())
+		return
+	}
+
 	return
 }
 
@@ -180,6 +187,26 @@ func (config *Config) LoadedRC() *RC {
 	timesString := config.Env[DIRENV_WATCHES]
 
 	return RCFromEnv(rcPath, timesString, config)
+}
+
+// HasWritePermissions return false if unable to write to DataDir parent directory.
+func (config *Config) HasWritePermissions() (bool, error) {
+	dataHomeDir := filepath.Dir(config.DataDir)
+	info, err := os.Stat(dataHomeDir)
+
+	if err != nil {
+		return false, fmt.Errorf("data home directory %s doesn't exist", dataHomeDir)
+	}
+
+	if info.Mode().Perm()&(1<<(uint(6))) == 0 {
+		return false, fmt.Errorf("can't read directory %s", dataHomeDir)
+	}
+
+	if unix.Access(dataHomeDir, unix.W_OK) != nil {
+		return false, fmt.Errorf("can't write to data home directory %s", dataHomeDir)
+	}
+
+	return true, nil
 }
 
 // FindRC looks for a RC file in the config environment

@@ -6,4 +6,5 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/direnv/go-dotenv v0.0.0-20181227095604-4cce6d1a66f7
 	golang.org/x/mod v0.2.0
+	golang.org/x/sys v0.0.0-20190412213103-97732733099d
 )

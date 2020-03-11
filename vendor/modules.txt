@@ -4,3 +4,5 @@ github.com/BurntSushi/toml
 github.com/direnv/go-dotenv
 # golang.org/x/mod v0.2.0
 golang.org/x/mod/semver
+# golang.org/x/sys v0.0.0-20190412213103-97732733099d
+golang.org/x/sys/unix

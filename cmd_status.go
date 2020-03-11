@@ -21,6 +21,7 @@ var CmdStatus = &Cmd{
 
 		loadedRC := config.LoadedRC()
 		foundRC := config.FindRC()
+		hasWritePermissions, _ := config.HasWritePermissions()
 
 		if loadedRC != nil {
 			formatRC("Loaded", loadedRC)
@@ -32,6 +33,10 @@ var CmdStatus = &Cmd{
 			formatRC("Found", foundRC)
 		} else {
 			fmt.Println("No .envrc found")
+		}
+
+		if !hasWritePermissions {
+			fmt.Println("Unable to write to data directory")
 		}
 
 		return nil
