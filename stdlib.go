@@ -230,6 +230,31 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  popd >/dev/null || return 1\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: source_hash <file_or_dir_path> <shasum>\n" +
+	"#\n" +
+	"# Loads another \".envrc\" either by specifying its path or filename.\n" +
+	"# The other \".envrc\" is validated using shasum check.\n" +
+	"#\n" +
+	"source_hash() {\n" +
+	"  local rcpath=${1/#\\~/$HOME}\n" +
+	"  local hash=${2}\n" +
+	"  local rcfile\n" +
+	"  if [[ -d $rcpath ]]; then\n" +
+	"    rcpath=$rcpath/.envrc\n" +
+	"  fi\n" +
+	"  if [[ ! -e $rcpath ]]; then\n" +
+	"    log_status \"referenced $rcpath does not exist\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"  rchash=$(shasum -t \"$rcpath\" | cut -d \\  -f 1)\n" +
+	"  if [[ \"$hash\" != \"$rchash\" ]]; then\n" +
+	"    log_error \"referenced $rcpath has change, please rehash\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  source_env \"$rcpath\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: watch_file <filename> [<filename> ...]\n" +
 	"#\n" +
 	"# Adds each <filename> to the list of files that direnv will watch for changes -\n" +

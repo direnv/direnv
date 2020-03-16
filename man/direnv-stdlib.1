@@ -101,6 +101,13 @@ Loads another \fB\fC\&.envrc\fR either by specifying its path or filename.
 .PP
 NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.
 
+.SS \fB\fCsource\_hash <file\_or\_dir\_path> <shasum>\fR
+.PP
+Loads another \fB\fC\&.envrc\fR either by specifying its path or filename.
+
+.PP
+The other ".envrc" is validated using shasum check.
+
 .SS \fB\fCsource\_up [<filename>]\fR
 .PP
 Loads another \fB\fC\&.envrc\fR if found when searching from the parent directory up to /.
