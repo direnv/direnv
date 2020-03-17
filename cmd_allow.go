@@ -55,8 +55,10 @@ func cmdAllowAction(env Env, args []string, config *Config) (err error) {
 		}
 	}
 
-	rc := FindRC(rcPath, config)
-	if rc == nil {
+	rc, err := FindRC(rcPath, config)
+	if err != nil {
+		return err
+	} else if rc == nil {
 		return fmt.Errorf(".envrc file not found")
 	}
 	return rc.Allow()

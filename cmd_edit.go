@@ -26,7 +26,10 @@ func cmdEditAction(env Env, args []string, config *Config) (err error) {
 	defer log.SetPrefix(log.Prefix())
 	log.SetPrefix(log.Prefix() + "cmd_edit: ")
 
-	foundRC = config.FindRC()
+	foundRC, err = config.FindRC()
+	if err != nil {
+		return err
+	}
 	if foundRC != nil {
 		times = &foundRC.times
 	}
@@ -64,13 +67,13 @@ func cmdEditAction(env Env, args []string, config *Config) (err error) {
 		return
 	}
 
-	foundRC = FindRC(rcPath, config)
+	foundRC, err = FindRC(rcPath, config)
 	logDebug("foundRC: %#v", foundRC)
 	logDebug("times: %#v", times)
 	if times != nil {
 		logDebug("times.Check(): %#v", times.Check())
 	}
-	if foundRC != nil && (times == nil || times.Check() != nil) {
+	if err == nil && foundRC != nil && (times == nil || times.Check() != nil) {
 		err = foundRC.Allow()
 	}
 
