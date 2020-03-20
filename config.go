@@ -183,7 +183,7 @@ func (config *Config) LoadedRC() *RC {
 }
 
 // FindRC looks for a RC file in the config environment
-func (config *Config) FindRC() *RC {
+func (config *Config) FindRC() (*RC, error) {
 	return FindRC(config.WorkDir, config)
 }
 

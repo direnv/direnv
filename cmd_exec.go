@@ -46,7 +46,10 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 		args = args[1:]
 	}
 
-	rc := FindRC(rcPath, config)
+	rc, err := FindRC(rcPath, config)
+	if err != nil {
+		return
+	}
 
 	// Restore pristine environment if needed
 	if backupDiff, err = config.EnvDiff(); err == nil && backupDiff != nil {

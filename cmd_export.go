@@ -92,7 +92,7 @@ type ExportContext struct {
 
 func (ec *ExportContext) getRCs() {
 	ec.loadedRC = ec.config.LoadedRC()
-	ec.foundRC = ec.config.FindRC()
+	ec.foundRC, _ = ec.config.FindRC()
 }
 
 func (ec *ExportContext) hasRC() bool {

@@ -20,7 +20,10 @@ var CmdStatus = &Cmd{
 		fmt.Println("whitelist.exact", config.WhitelistExact)
 
 		loadedRC := config.LoadedRC()
-		foundRC := config.FindRC()
+		foundRC, err := config.FindRC()
+		if err != nil {
+			return err
+		}
 
 		if loadedRC != nil {
 			formatRC("Loaded", loadedRC)
