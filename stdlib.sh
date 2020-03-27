@@ -10,6 +10,7 @@
 # SC2059: Don't use variables in the printf format string. Use printf "..%s.." "$foo".
 shopt -s gnu_errfmt
 shopt -s nullglob
+shopt -s extglob
 
 
 # NOTE: don't touch the RHS, it gets replaced at runtime
@@ -367,6 +368,63 @@ MANPATH_add() {
   local dir
   dir=$(expand_path "$1")
   export "MANPATH=$dir:$old_paths"
+}
+
+# Usage: PATH_rm <pattern> [<pattern> ...]
+# Removes directories that match any of the given shell patterns from
+# the PATH environment variable. Order of the remaining directories is
+# preserved in the resulting PATH.
+#
+# Bash pattern syntax:
+#   https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html
+#
+# Example:
+#
+#   echo $PATH
+#   # output: /dontremove/me:/remove/me:/usr/local/bin/:...
+#   PATH_rm '/remove/*'
+#   echo $PATH
+#   # output: /dontremove/me:/usr/local/bin/:...
+#
+PATH_rm() {
+  path_rm PATH "$@"
+}
+
+# Usage: path_rm <varname> <pattern> [<pattern> ...]
+#
+# Works like PATH_rm except that it's for an arbitrary <varname>.
+path_rm() {
+  local path i match var_name="$1"
+  # split existing paths into an array
+  declare -a path_array
+  IFS=: read -ra path_array <<<"${!1}"
+  shift
+
+  patterns=("$@")
+  results=()
+
+  # iterate over path entries and test for pattern match
+  for path in "${path_array[@]}"; do
+    match=false
+    for pattern in "${patterns[@]}"; do
+      if [[ "$path" == +($pattern) ]]; then
+        match=true
+        break
+      fi
+    done
+    if ! $match; then
+      results+=($path)
+    fi
+  done
+
+  # join the result paths
+  result=$(
+    IFS=:
+    echo "${results[*]}"
+  )
+
+  # and finally export back the result to the original variable
+  export "$var_name=$result"
 }
 
 # Usage: load_prefix <prefix_path>
