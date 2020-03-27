@@ -113,6 +113,22 @@ Prepends the expanded *path* to the MANPATH environment variable. It takes care 
 
 Works like `PATH_add` except that it's for an arbitrary *varname*.
 
+### `PATH_rm <pattern> [<pattern> ...]`
+
+Removes directories that match any of the given shell patterns from the PATH environment variable. Order of the remaining directories is preserved in the resulting PATH.
+
+Bash pattern syntax:
+  https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html
+
+Example:
+
+    echo $PATH
+    # output: /dontremove/me:/remove/me:/usr/local/bin/:...
+    PATH_rm '/remove/*'
+    echo $PATH
+    # output: /dontremove/me:/usr/local/bin/:...
+
+
 ### `load_prefix <prefix_path>`
 
 Expands some common path variables for the given *prefix_path* prefix. This is useful if you installed something in the *prefix_path* using `./configure --prefix=$prefix_path && make install` and want to use it in the project.

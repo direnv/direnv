@@ -13,6 +13,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# SC2059: Don't use variables in the printf format string. Use printf \"..%s..\" \"$foo\".\n" +
 	"shopt -s gnu_errfmt\n" +
 	"shopt -s nullglob\n" +
+	"shopt -s extglob\n" +
 	"\n" +
 	"\n" +
 	"# NOTE: don't touch the RHS, it gets replaced at runtime\n" +
@@ -370,6 +371,63 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  local dir\n" +
 	"  dir=$(expand_path \"$1\")\n" +
 	"  export \"MANPATH=$dir:$old_paths\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: PATH_rm <pattern> [<pattern> ...]\n" +
+	"# Removes directories that match any of the given shell patterns from\n" +
+	"# the PATH environment variable. Order of the remaining directories is\n" +
+	"# preserved in the resulting PATH.\n" +
+	"#\n" +
+	"# Bash pattern syntax:\n" +
+	"#   https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#   echo $PATH\n" +
+	"#   # output: /dontremove/me:/remove/me:/usr/local/bin/:...\n" +
+	"#   PATH_rm '/remove/*'\n" +
+	"#   echo $PATH\n" +
+	"#   # output: /dontremove/me:/usr/local/bin/:...\n" +
+	"#\n" +
+	"PATH_rm() {\n" +
+	"  path_rm PATH \"$@\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: path_rm <varname> <pattern> [<pattern> ...]\n" +
+	"#\n" +
+	"# Works like PATH_rm except that it's for an arbitrary <varname>.\n" +
+	"path_rm() {\n" +
+	"  local path i discard var_name=\"$1\"\n" +
+	"  # split existing paths into an array\n" +
+	"  declare -a path_array\n" +
+	"  IFS=: read -ra path_array <<<\"${!1}\"\n" +
+	"  shift\n" +
+	"\n" +
+	"  patterns=(\"$@\")\n" +
+	"  results=()\n" +
+	"\n" +
+	"  # iterate over path entries, discard entries that match any of the patterns\n" +
+	"  for path in \"${path_array[@]}\"; do\n" +
+	"    discard=false\n" +
+	"    for pattern in \"${patterns[@]}\"; do\n" +
+	"      if [[ \"$path\" == +($pattern) ]]; then\n" +
+	"        discard=true\n" +
+	"        break\n" +
+	"      fi\n" +
+	"    done\n" +
+	"    if ! $discard; then\n" +
+	"      results+=(\"$path\")\n" +
+	"    fi\n" +
+	"  done\n" +
+	"\n" +
+	"  # join the result paths\n" +
+	"  result=$(\n" +
+	"    IFS=:\n" +
+	"    echo \"${results[*]}\"\n" +
+	"  )\n" +
+	"\n" +
+	"  # and finally export back the result to the original variable\n" +
+	"  export \"$var_name=$result\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: load_prefix <prefix_path>\n" +

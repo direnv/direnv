@@ -156,6 +156,31 @@ Prepends the expanded \fIpath\fP to the MANPATH environment variable. It takes c
 .PP
 Works like \fB\fCPATH\_add\fR except that it's for an arbitrary \fIvarname\fP\&.
 
+.SS \fB\fCPATH\_rm <pattern> [<pattern> ...]\fR
+.PP
+Removes directories that match any of the given shell patterns from the PATH environment variable. Order of the remaining directories is preserved in the resulting PATH.
+
+.PP
+Bash pattern syntax:
+  
+\[la]https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html\[ra]
+
+.PP
+Example:
+
+.PP
+.RS
+
+.nf
+echo $PATH
+# output: /dontremove/me:/remove/me:/usr/local/bin/:...
+PATH\_rm '/remove/*'
+echo $PATH
+# output: /dontremove/me:/usr/local/bin/:...
+
+.fi
+.RE
+
 .SS \fB\fCload\_prefix <prefix\_path>\fR
 .PP
 Expands some common path variables for the given \fIprefix\_path\fP prefix. This is useful if you installed something in the \fIprefix\_path\fP using \fB\fC\&./configure \-\&\-\&prefix=$prefix\_\&path \&\&\&\& make install\fR and want to use it in the project.
