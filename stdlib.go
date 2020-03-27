@@ -397,7 +397,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# Works like PATH_rm except that it's for an arbitrary <varname>.\n" +
 	"path_rm() {\n" +
-	"  local path i match var_name=\"$1\"\n" +
+	"  local path i discard var_name=\"$1\"\n" +
 	"  # split existing paths into an array\n" +
 	"  declare -a path_array\n" +
 	"  IFS=: read -ra path_array <<<\"${!1}\"\n" +
@@ -406,16 +406,16 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  patterns=(\"$@\")\n" +
 	"  results=()\n" +
 	"\n" +
-	"  # iterate over path entries and test for pattern match\n" +
+	"  # iterate over path entries, discard entries that match any of the patterns\n" +
 	"  for path in \"${path_array[@]}\"; do\n" +
-	"    match=false\n" +
+	"    discard=false\n" +
 	"    for pattern in \"${patterns[@]}\"; do\n" +
 	"      if [[ \"$path\" == +($pattern) ]]; then\n" +
-	"        match=true\n" +
+	"        discard=true\n" +
 	"        break\n" +
 	"      fi\n" +
 	"    done\n" +
-	"    if ! $match; then\n" +
+	"    if ! $discard; then\n" +
 	"      results+=(\"$path\")\n" +
 	"    fi\n" +
 	"  done\n" +
