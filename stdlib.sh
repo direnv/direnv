@@ -413,7 +413,7 @@ path_rm() {
       fi
     done
     if ! $match; then
-      results+=($path)
+      results+=("$path")
     fi
   done
 

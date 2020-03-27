@@ -416,7 +416,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"      fi\n" +
 	"    done\n" +
 	"    if ! $match; then\n" +
-	"      results+=($path)\n" +
+	"      results+=(\"$path\")\n" +
 	"    fi\n" +
 	"  done\n" +
 	"\n" +
