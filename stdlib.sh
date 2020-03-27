@@ -394,7 +394,7 @@ PATH_rm() {
 #
 # Works like PATH_rm except that it's for an arbitrary <varname>.
 path_rm() {
-  local path i match var_name="$1"
+  local path i discard var_name="$1"
   # split existing paths into an array
   declare -a path_array
   IFS=: read -ra path_array <<<"${!1}"
@@ -403,16 +403,16 @@ path_rm() {
   patterns=("$@")
   results=()
 
-  # iterate over path entries and test for pattern match
+  # iterate over path entries, discard entries that match any of the patterns
   for path in "${path_array[@]}"; do
-    match=false
+    discard=false
     for pattern in "${patterns[@]}"; do
       if [[ "$path" == +($pattern) ]]; then
-        match=true
+        discard=true
         break
       fi
     done
-    if ! $match; then
+    if ! $discard; then
       results+=("$path")
     fi
   done
