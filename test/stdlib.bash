@@ -50,4 +50,24 @@ test_name direnv_apply_dump
   assert_eq "$FOO" bar
 )
 
+test_name PATH_rm
+(
+  load_stdlib
+
+  export PATH=/usr/local/bin:/home/foo/bin:/usr/bin:/home/foo/.local/bin
+  PATH_rm '/home/foo/*'
+
+  assert_eq "$PATH" /usr/local/bin:/usr/bin
+)
+
+test_name path_rm
+(
+  load_stdlib
+
+  somevar=/usr/local/bin:/usr/bin:/home/foo/.local/bin
+  path_rm somevar '/home/foo/*'
+
+  assert_eq "$somevar" /usr/local/bin:/usr/bin
+)
+
 echo OK
