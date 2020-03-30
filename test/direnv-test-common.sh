@@ -187,6 +187,13 @@ test_start "utf-8"
   test_eq "${UTFSTUFF}" "♀♂"
 test_stop
 
+test_start "hash"
+  direnv_eval
+  test_eq "$HELLO" "world"
+  test_eq "$TEST" "1234"
+  test -z "$UNSET"
+test_stop
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.

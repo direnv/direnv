@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+update_hash() {
+  while IFD=' ' read -r _ _path hash
+  do
+    if [[ -d "$_path" ]]; then
+      rcpath="$_path/.envrc"
+    else
+      rcpath="$_path"
+    fi
+    rchash=$(shasum -t "$rcpath" | cut -d \  -f 1)
+
+    if [[ "$hash" != "$rchash" ]]; then
+      echo "referenced $rcpath has change, rehash ?"
+      echo "------------------"
+      cat "$rcpath"
+      echo "------------------"
+
+      sed -i '/source_hash/ s,'"$_path"'.*,'"$_path"' '"$rchash"',' .envrc
+    fi
+
+  done <<< "$(grep -E '^source_hash' .envrc)"
+}
+
+update_hash

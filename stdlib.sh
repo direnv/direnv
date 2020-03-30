@@ -228,6 +228,31 @@ source_env() {
   popd >/dev/null || return 1
 }
 
+# Usage: source_hash <file_or_dir_path> <shasum>
+#
+# Loads another ".envrc" either by specifying its path or filename.
+# The other ".envrc" is validated using shasum check.
+#
+source_hash() {
+  local rcpath=${1/#\~/$HOME}
+  local hash=${2}
+  local rcfile
+  if [[ -d $rcpath ]]; then
+    rcpath=$rcpath/.envrc
+  fi
+  if [[ ! -e $rcpath ]]; then
+    log_status "referenced $rcpath does not exist"
+    return 1
+  fi
+  rchash=$(shasum -t "$rcpath" | cut -d \  -f 1)
+  if [[ "$hash" != "$rchash" ]]; then
+    log_error "referenced $rcpath has change, please rehash"
+    return 1
+  fi
+
+  source_env "$rcpath"
+}
+
 # Usage: watch_file <filename> [<filename> ...]
 #
 # Adds each <filename> to the list of files that direnv will watch for changes -
