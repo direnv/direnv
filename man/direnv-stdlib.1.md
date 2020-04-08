@@ -161,6 +161,10 @@ Sets the GOPATH environment variable to the current directory.
 
 Adds "$PWD/node_modules/.bin" to the PATH environment variable.
 
+### `layout php`
+
+Adds "$PWD/vendor/bin" to the PATH environment variable.
+
 ### `layout perl`
 
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
