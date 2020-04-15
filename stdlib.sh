@@ -474,10 +474,11 @@ layout() {
 
 # Usage: layout go
 #
-# Sets the GOPATH environment variable to the current directory.
+# Adds "$(direnv_layout_dir)/go" to the GOPATH environment variable.
+# And also adds "$PWD/bin" to the PATH environment variable.
 #
 layout_go() {
-  path_add GOPATH "$PWD"
+  path_add GOPATH "$(direnv_layout_dir)/go"
   PATH_add bin
 }
 
