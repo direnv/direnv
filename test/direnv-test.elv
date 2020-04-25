@@ -1,6 +1,6 @@
 #!/usr/bin/env elvish
 
-E:TEST_DIR = (path-dir (src)[path])
+E:TEST_DIR = (path-dir (src)[name])
 set-env XDG_CONFIG_HOME $E:TEST_DIR/config
 set-env XDG_DATA_HOME $E:TEST_DIR/data
 E:PATH = (path-dir $E:TEST_DIR):$E:PATH
