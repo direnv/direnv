@@ -33,6 +33,7 @@ func cmdApplyDumpAction(env Env, args []string) (err error) {
 	if err != nil {
 		return err
 	}
+	delete(dumpedEnv, DIRENV_PLATFORM_PATH)
 
 	diff := env.Diff(dumpedEnv)
 

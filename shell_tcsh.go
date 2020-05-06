@@ -11,7 +11,7 @@ type tcsh struct{}
 var Tcsh Shell = tcsh{}
 
 func (sh tcsh) Hook() (string, error) {
-	return "alias precmd 'eval `{{.SelfPath}} export tcsh`'", nil
+	return "alias precmd 'eval `{{.SelfPath}} export tcsh \"$PATH\"`'", nil
 }
 
 func (sh tcsh) Export(e ShellExport) (out string) {
