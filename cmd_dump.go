@@ -28,6 +28,8 @@ func cmdDumpAction(env Env, args []string) (err error) {
 		filePath = args[2]
 	} else {
 		filePath = os.Getenv("DIRENV_DUMP_FILE_PATH")
+		// It's an argument for us, not part of the environment to dump
+		delete(env, "DIRENV_DUMP_FILE_PATH")
 	}
 
 	if filePath != "" {

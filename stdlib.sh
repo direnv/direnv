@@ -877,7 +877,7 @@ __main__() {
       # Crossing Windows/Unix path interpretation boundaries:
       # load the Unix-style path, and forward it to the dump command
       PATH=$1
-      trap '__dump_at_exit "" "$PATH"' EXIT
+      trap '__dump_at_exit "${DIRENV_DUMP_FILE_PATH-}" "$PATH"' EXIT
   else
       # The calling shell and direnv have the same kind of PATH:
       # no changes are needed

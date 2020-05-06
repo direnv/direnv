@@ -879,7 +879,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"      # Crossing Windows/Unix path interpretation boundaries:\n" +
 	"      # load the Unix-style path, and forward it to the dump command\n" +
 	"      PATH=$1\n" +
-	"      trap '__dump_at_exit \"\" \"$PATH\"' EXIT\n" +
+	"      trap '__dump_at_exit \"${DIRENV_DUMP_FILE_PATH-}\" \"$PATH\"' EXIT\n" +
 	"  else\n" +
 	"      # The calling shell and direnv have the same kind of PATH:\n" +
 	"      # no changes are needed\n" +
