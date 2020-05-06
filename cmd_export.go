@@ -14,7 +14,7 @@ import (
 var CmdExport = &Cmd{
 	Name:    "export",
 	Desc:    "loads an .envrc and prints the diff in terms of exports",
-	Args:    []string{"SHELL"},
+	Args:    []string{"SHELL", "[UNIX_PATH]"},
 	Private: true,
 	Action:  cmdWithWarnTimeout(actionWithConfig(actionWithCancel(exportCommand))),
 }
@@ -50,6 +50,16 @@ func exportCommand(ctx context.Context, env Env, args []string, config *Config) 
 
 	if len(args) > 1 {
 		target = args[1]
+	}
+
+	// PATH is the "logical" path manipulated by stdlib and .envrc
+	// DIRENV_PLATFORM_PATH is the OS-specific path needed for invoking programs.
+	// Anywhere but Windows, these are both the same.
+	env[DIRENV_PLATFORM_PATH] = env["PATH"]
+
+	if len(args) > 2 && args[2] != "" {
+		// Override Windows-style PATH with Unix-style one for diffs and exports
+		env["PATH"] = args[2]
 	}
 
 	shell := DetectShell(target)
@@ -151,9 +161,14 @@ func (ec *ExportContext) unloadEnv() {
 
 func cleanEnv(env Env) {
 	env.CleanContext()
+	// Don't include this when unloading
+	delete(env, DIRENV_PLATFORM_PATH)
 }
 
 func (ec *ExportContext) diffString(shell Shell) string {
+	// Don't include this when exporting
+	delete(ec.newEnv, DIRENV_PLATFORM_PATH)
+
 	oldDiff := ec.oldEnv.Diff(ec.newEnv)
 	if oldDiff.Any() {
 		var out []string

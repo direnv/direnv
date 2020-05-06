@@ -868,11 +868,22 @@ __main__() {
 
   __dump_at_exit() {
     local ret=$?
-    "$direnv" dump json 3
+    "$direnv" dump json "$@" >&3
     trap - EXIT
     exit "$ret"
   }
-  trap __dump_at_exit EXIT
+
+  if [[ ${1:-$PATH} != "$PATH" ]]; then
+      # Crossing Windows/Unix path interpretation boundaries:
+      # load the Unix-style path, and forward it to the dump command
+      PATH=$1
+      trap '__dump_at_exit "" "$PATH"' EXIT
+  else
+      # The calling shell and direnv have the same kind of PATH:
+      # no changes are needed
+      trap '__dump_at_exit' EXIT
+  fi
+  shift
 
   # load direnv libraries
   for lib in "$direnv_config_dir/lib/"*.sh; do

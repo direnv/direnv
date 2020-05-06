@@ -51,6 +51,10 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 		return
 	}
 
+	// Set the default physical OS path needed for command invocation, as it
+	// may be different than the logical PATH manipulated by the stdlib
+	env[DIRENV_PLATFORM_PATH] = env["PATH"]
+
 	// Restore pristine environment if needed
 	if backupDiff, err = config.EnvDiff(); err == nil && backupDiff != nil {
 		env = backupDiff.Reverse().Patch(env)
@@ -67,9 +71,9 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 	}
 
 	var commandPath string
-	commandPath, err = lookPath(command, newEnv["PATH"])
+	commandPath, err = lookPath(command, newEnv[DIRENV_PLATFORM_PATH])
 	if err != nil {
-		err = fmt.Errorf("command '%s' not found on PATH '%s'", command, newEnv["PATH"])
+		err = fmt.Errorf("command '%s' not found on PATH '%s'", command, newEnv[DIRENV_PLATFORM_PATH])
 		return
 	}
 

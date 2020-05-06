@@ -71,6 +71,19 @@ func (env Env) Copy() Env {
 // ToGoEnv should really be named ToUnixEnv. It turns the env back into a list
 // of "key=value" strings like returns by os.Environ().
 func (env Env) ToGoEnv() []string {
+
+	// Go needs the platform-specific PATH, not the logical PATH
+	if platPath, ok := env[DIRENV_PLATFORM_PATH]; ok {
+		if unixPath, ok := env["PATH"]; ok {
+			if unixPath != platPath {
+				env = env.Copy()
+				env["PATH"] = platPath
+			}
+		}
+		// Never expose this to invoked programs
+		delete(env, DIRENV_PLATFORM_PATH)
+	}
+
 	goEnv := make([]string, len(env))
 	index := 0
 	for key, value := range env {

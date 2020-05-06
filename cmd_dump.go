@@ -10,7 +10,7 @@ import (
 var CmdDump = &Cmd{
 	Name:    "dump",
 	Desc:    "Used to export the inner bash state at the end of execution",
-	Args:    []string{"[SHELL]", "[FILE]"},
+	Args:    []string{"[SHELL]", "[FILE]", "[UNIX_PATH]"},
 	Private: true,
 	Action:  actionSimple(cmdDumpAction),
 }
@@ -39,6 +39,12 @@ func cmdDumpAction(env Env, args []string) (err error) {
 				return err
 			}
 		}
+	}
+
+	env[DIRENV_PLATFORM_PATH] = env["PATH"]
+	if len(args) > 3 && args[3] != "" {
+		// Override possibly-Windows-style PATH with Unix-style one
+		env["PATH"] = args[3]
 	}
 
 	shell := DetectShell(target)

@@ -12,7 +12,7 @@ var Fish Shell = fish{}
 
 const fishHook = `
 function __direnv_export_eval --on-event fish_postexec;
-	"{{.SelfPath}}" export fish | source;
+	"{{.SelfPath}}" export fish (string join : $PATH) | source;
 end
 `
 

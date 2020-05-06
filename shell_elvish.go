@@ -14,7 +14,7 @@ func (elvish) Hook() (string, error) {
 	return `## hook for direnv
 @edit:before-readline = $@edit:before-readline {
 	try {
-		m = [("{{.SelfPath}}" export elvish | from-json)]
+		m = [("{{.SelfPath}}" export elvish "$E:PATH" | from-json)]
 		if (> (count $m) 0) {
 			m = (explode $m)
 			keys $m | each [k]{

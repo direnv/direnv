@@ -152,12 +152,12 @@ func (rc *RC) Load(ctx context.Context, config *Config, env Env) (newEnv Env, er
 	}
 
 	arg := fmt.Sprintf(
-		`%seval "$("%s" stdlib)" && __main__ source_env "%s"`,
+		`%seval "$("%s" stdlib)" && __main__ "$0" source_env "%s"`,
 		prelude,
 		direnv,
 		rc.Path(),
 	)
-	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
+	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg, env["PATH"])
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
 	cmd.Stderr = os.Stderr
