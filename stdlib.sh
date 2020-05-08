@@ -116,8 +116,23 @@ join_args() {
 #    # output: /usr/local/foo
 #
 expand_path() {
-  "$direnv" expand_path "$@"
+  local REPLY; __rp_absolute ${2+"$2"} ${1+"$1"}; echo "$REPLY"
 }
+
+# --- vendored from https://github.com/bashup/realpaths
+__rp_dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$ ]] || REPLY="${1%${BASH_REMATCH[0]}}"; REPLY=${REPLY:-/}; }
+__rp_absolute() {
+	REPLY=$PWD; local eg=extglob; ! shopt -q $eg || eg=; ${eg:+shopt -s $eg}
+	while (($#)); do case $1 in
+		//|//[^/]*) REPLY=//; set -- "${1:2}" "${@:2}" ;;
+		/*) REPLY=/; set -- "${1##+(/)}" "${@:2}" ;;
+		*/*) set -- "${1%%/*}" "${1##${1%%/*}+(/)}" "${@:2}" ;;
+		''|.) shift ;;
+		..) __rp_dirname "$REPLY"; shift ;;
+		*) REPLY="${REPLY%/}/$1"; shift ;;
+	esac; done; ${eg:+shopt -u $eg}
+}
+# ---
 
 # Usage: dotenv [<dotenv>]
 #

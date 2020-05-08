@@ -70,4 +70,16 @@ test_name path_rm
   assert_eq "$somevar" /usr/local/bin:/usr/bin
 )
 
+test_name expand_path
+(
+  load_stdlib
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+  ret=$(expand_path ./bar)
+
+  assert_eq "$ret" "$tmpdir/bar"
+)
+
 echo OK

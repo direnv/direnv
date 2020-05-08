@@ -119,8 +119,23 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#    # output: /usr/local/foo\n" +
 	"#\n" +
 	"expand_path() {\n" +
-	"  \"$direnv\" expand_path \"$@\"\n" +
+	"  local REPLY; __rp_absolute ${2+\"$2\"} ${1+\"$1\"}; echo \"$REPLY\"\n" +
 	"}\n" +
+	"\n" +
+	"# --- vendored from https://github.com/bashup/realpaths\n" +
+	"__rp_dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$ ]] || REPLY=\"${1%${BASH_REMATCH[0]}}\"; REPLY=${REPLY:-/}; }\n" +
+	"__rp_absolute() {\n" +
+	"	REPLY=$PWD; local eg=extglob; ! shopt -q $eg || eg=; ${eg:+shopt -s $eg}\n" +
+	"	while (($#)); do case $1 in\n" +
+	"		//|//[^/]*) REPLY=//; set -- \"${1:2}\" \"${@:2}\" ;;\n" +
+	"		/*) REPLY=/; set -- \"${1##+(/)}\" \"${@:2}\" ;;\n" +
+	"		*/*) set -- \"${1%%/*}\" \"${1##${1%%/*}+(/)}\" \"${@:2}\" ;;\n" +
+	"		''|.) shift ;;\n" +
+	"		..) __rp_dirname \"$REPLY\"; shift ;;\n" +
+	"		*) REPLY=\"${REPLY%/}/$1\"; shift ;;\n" +
+	"	esac; done; ${eg:+shopt -u $eg}\n" +
+	"}\n" +
+	"# ---\n" +
 	"\n" +
 	"# Usage: dotenv [<dotenv>]\n" +
 	"#\n" +
