@@ -53,7 +53,6 @@ func init() {
 		CmdDump,
 		CmdEdit,
 		CmdExec,
-		CmdExpandPath,
 		CmdExport,
 		CmdHelp,
 		CmdHook,
