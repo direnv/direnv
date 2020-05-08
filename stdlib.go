@@ -492,10 +492,11 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"# Usage: layout go\n" +
 	"#\n" +
-	"# Sets the GOPATH environment variable to the current directory.\n" +
+	"# Adds \"$(direnv_layout_dir)/go\" to the GOPATH environment variable.\n" +
+	"# And also adds \"$PWD/bin\" to the PATH environment variable.\n" +
 	"#\n" +
 	"layout_go() {\n" +
-	"  path_add GOPATH \"$PWD\"\n" +
+	"  path_add GOPATH \"$(direnv_layout_dir)/go\"\n" +
 	"  PATH_add bin\n" +
 	"}\n" +
 	"\n" +

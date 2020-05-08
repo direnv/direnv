@@ -1,3 +1,33 @@
+
+2.21.3 / 2020-05-08
+==================
+
+  * Replace `direnv expand_path` with pure bash (#631)
+  * Fix #594 - write error to fd 3 on Windows (#634)
+  * Make direnv hook output work on Windows (#632)
+  * Update hook.md to remove ">" typo in Fish instructions (#624)
+  * stdlib: `layout go` adds layout dir to GOPATH (#622)
+  * direnv-stdlib.1: add layout php (#619)
+  * stdlib: add PATH_rm <pattern> [<pattern> ...] (#615)
+  * Error handling tuples (#610)
+  * Merge pull request #607 from punitagrawal/master
+  * test: elvish: Fix evaluation function
+  * stdlib.sh: Re-write grep pattern to avoid shell escape
+  * man: Escape '.' at the beginning of line to remove manpage warning
+  * stdlib: fix direnv_config_dir usage (#601)
+  * direnv version: improve error message (#599)
+  * README: fix NixOS link in installation.md (#589)
+  * stdlib: add direnv_apply_dump <file> (#587)
+  * Simplify direnv_load and make it work even when the command crashes. (#568)
+  * docs: fix fish installation instruction
+  * test: test for utf-8 compatibility
+  * config: add [global] section
+  * config: add strict_env option
+  * config: fix warn_timeout parsing (#582)
+  * Github action for releases
+  * config: fix the configuration file selection
+  * stdlib: fix shellcheck warnings
+
 2.21.2 / 2020-01-28
 ==================
 
