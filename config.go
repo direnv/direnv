@@ -184,11 +184,11 @@ func (config *Config) LoadedRC() *RC {
 
 // EnvFromRC loads an RC from a specified path and returns the new environment
 func (config *Config) EnvFromRC(path string, previousEnv Env) (Env, error) {
-	if rc, err := RCFromPath(path, config); err != nil {
+	rc, err := RCFromPath(path, config)
+	if err != nil {
 		return nil, err
-	} else {
-		return rc.Load(previousEnv)
 	}
+	return rc.Load(previousEnv)
 }
 
 // FindRC looks for a RC file in the config environment
@@ -204,7 +204,6 @@ func (config *Config) Revert(env Env) (oldEnv Env, err error) {
 	}
 	if diff, err := LoadEnvDiff(config.Env[DIRENV_DIFF]); err == nil {
 		return diff.Reverse().Patch(env), nil
-	} else {
-		return nil, err
 	}
+	return nil, err
 }
