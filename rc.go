@@ -199,18 +199,6 @@ func (rc *RC) RecordState(env Env, newEnv Env) {
 
 /// Utils
 
-func rootDir(path string) string {
-	path, err := filepath.Abs(path)
-	if err != nil {
-		panic(err)
-	}
-	i := strings.Index(path[1:], "/")
-	if i < 0 {
-		return path
-	}
-	return path[:i+1]
-}
-
 func eachDir(path string) (paths []string) {
 	path, err := filepath.Abs(path)
 	if err != nil {
