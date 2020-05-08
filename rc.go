@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strings"
 	"time"
@@ -132,14 +133,12 @@ const notAllowed = "%s is blocked. Run `direnv allow` to approve its content"
 // Load evaluates the RC file and returns the new Env or error.
 //
 // This functions is key to the implementation of direnv.
-func (rc *RC) Load(ctx context.Context, config *Config, env Env) (newEnv Env, err error) {
+func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
+	config := rc.config
 	wd := config.WorkDir
 	direnv := config.SelfPath
-	newEnv = env.Copy()
+	newEnv = previousEnv.Copy()
 	newEnv[DIRENV_WATCHES] = rc.times.Marshal()
-	defer func() {
-		rc.RecordState(env, newEnv)
-	}()
 
 	if !rc.Allowed() {
 		err = fmt.Errorf(notAllowed, rc.Path())
@@ -157,6 +156,16 @@ func (rc *RC) Load(ctx context.Context, config *Config, env Env) (newEnv Env, er
 		direnv,
 		rc.Path(),
 	)
+
+	// Allow RC loads to be canceled with SIGINT
+	ctx, cancel := context.WithCancel(context.Background())
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		cancel()
+	}()
+
 	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
@@ -188,13 +197,9 @@ func (rc *RC) Load(ctx context.Context, config *Config, env Env) (newEnv Env, er
 		newEnv = newEnv2
 	}
 
-	return
-}
-
-// RecordState just applies the new environment
-func (rc *RC) RecordState(env Env, newEnv Env) {
 	newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
-	newEnv[DIRENV_DIFF] = env.Diff(newEnv).Serialize()
+	newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
+	return
 }
 
 /// Utils
