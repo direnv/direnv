@@ -36,6 +36,6 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
           - macos-latest
-          # TODO: - windows-latest
+          - ubuntu-latest
+          - windows-latest
