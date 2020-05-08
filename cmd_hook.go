@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -32,6 +33,8 @@ func cmdHookAction(env Env, args []string) (err error) {
 		return err
 	}
 
+	// Convert Windows path if needed
+	selfPath = strings.Replace(selfPath, "\\", "/", -1)
 	ctx := HookContext{selfPath}
 
 	shell := DetectShell(target)
