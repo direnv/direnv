@@ -53,8 +53,7 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 
 	// Load the rc
 	if toLoad := findUp(rcPath, ".envrc"); toLoad != "" {
-		newEnv, err = config.EnvFromRC(toLoad, previousEnv)
-		if err != nil {
+		if newEnv, err = config.EnvFromRC(toLoad, previousEnv); err != nil {
 			return
 		}
 	} else {

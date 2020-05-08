@@ -139,6 +139,11 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	direnv := config.SelfPath
 	newEnv = previousEnv.Copy()
 	newEnv[DIRENV_WATCHES] = rc.times.Marshal()
+	defer func() {
+		// Record directory changes even if load is disallowed or fails
+		newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
+		newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
+	}()
 
 	if !rc.Allowed() {
 		err = fmt.Errorf(notAllowed, rc.Path())
@@ -180,25 +185,17 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		cmd.Stdin = os.Stdin
 	}
 
-	out, err := cmd.Output()
-	if err != nil {
-		return
-	}
-
-	if len(out) > 0 {
+	if out, err := cmd.Output(); err == nil && len(out) > 0 {
 		var newEnv2 Env
 		newEnv2, err = LoadEnvJSON(out)
-		if err != nil {
-			return
+		if err == nil {
+			newEnv = newEnv2
 		}
 		if newEnv2["PS1"] != "" {
 			logError("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
 		}
-		newEnv = newEnv2
 	}
 
-	newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
-	newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
 	return
 }
 

@@ -77,9 +77,14 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		newEnv, err = config.EnvFromRC(toLoad, previousEnv)
 		if err != nil {
 			logDebug("err: %v", err)
-			return
-		} else if newEnv == nil {
-			logDebug("newEnv nil, exiting")
+			// If loading fails, fall through and deliver a diff anyway,
+			// but still exit with an error.  This prevents retrying on
+			// every prompt.
+		}
+		if newEnv == nil {
+			// unless of course, the error was in hashing and timestamp loading,
+			// in which case we have to abort because we don't know what timestamp
+			// to put in the diff!
 			return
 		}
 	}
