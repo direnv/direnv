@@ -14,15 +14,3 @@ func TestSomething(t *testing.T) {
 		t.Fail()
 	}
 }
-
-func TestRootDir(t *testing.T) {
-	r := rootDir("/foo")
-	if r != "/foo" {
-		t.Error(r)
-	}
-
-	r = rootDir("/foo/bar")
-	if r != "/foo" {
-		t.Error(r)
-	}
-}
