@@ -868,7 +868,7 @@ __main__() {
 
   __dump_at_exit() {
     local ret=$?
-    "$direnv" dump json 3
+    "$direnv" dump json "" >&3
     trap - EXIT
     exit "$ret"
   }

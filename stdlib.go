@@ -870,7 +870,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"  __dump_at_exit() {\n" +
 	"    local ret=$?\n" +
-	"    \"$direnv\" dump json 3\n" +
+	"    \"$direnv\" dump json \"\" >&3\n" +
 	"    trap - EXIT\n" +
 	"    exit \"$ret\"\n" +
 	"  }\n" +
