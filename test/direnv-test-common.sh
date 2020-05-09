@@ -46,7 +46,7 @@ test_start() {
 }
 
 test_stop() {
-  cd "$TEST_DIR"
+  cd /
   direnv_eval
 }
 
@@ -185,6 +185,20 @@ test_stop
 test_start "utf-8"
   direnv_eval
   test_eq "${UTFSTUFF}" "♀♂"
+test_stop
+
+test_start "failure"
+  # Test that DIRENV_DIFF and DIRENV_WATCHES are set even after a failure.
+  #
+  # This is needed so that direnv doesn't go into a loop when the loading
+  # fails.
+  test_eq "${DIRENV_DIFF:-}" ""
+  test_eq "${DIRENV_WATCHES:-}" ""
+
+  direnv_eval
+
+  test_neq "${DIRENV_DIFF:-}" ""
+  test_neq "${DIRENV_WATCHES:-}" ""
 test_stop
 
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
