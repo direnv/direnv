@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -18,10 +17,10 @@ var CmdExec = &Cmd{
 
 func cmdExecAction(env Env, args []string, config *Config) (err error) {
 	var (
-		backupDiff *EnvDiff
-		newEnv     Env
-		rcPath     string
-		command    string
+		newEnv      Env
+		previousEnv Env
+		rcPath      string
+		command     string
 	)
 
 	if len(args) < 2 {
@@ -46,20 +45,15 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 		args = args[1:]
 	}
 
-	rc, err := FindRC(rcPath, config)
-	if err != nil {
+	// Restore pristine environment if needed
+	if previousEnv, err = config.Revert(env); err != nil {
 		return
 	}
-
-	// Restore pristine environment if needed
-	if backupDiff, err = config.EnvDiff(); err == nil && backupDiff != nil {
-		env = backupDiff.Reverse().Patch(env)
-	}
-	env.CleanContext()
+	previousEnv.CleanContext()
 
 	// Load the rc
-	if rc != nil {
-		if newEnv, err = rc.Load(context.Background(), config, env); err != nil {
+	if toLoad := findUp(rcPath, ".envrc"); toLoad != "" {
+		if newEnv, err = config.EnvFromRC(toLoad, previousEnv); err != nil {
 			return
 		}
 	} else {
