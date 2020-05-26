@@ -17,7 +17,7 @@ var CmdAllow = &Cmd{
 var migrationMessage = `
 Migrating the allow data to the new location
 
-The allowed .envrc permissions used to be stored in the XDG_CONFIG_DIR. It's
+The allowed .envrc permissions used to be stored in the XDG_CONFIG_HOME. It's
 better to keep that folder for user-editable configuration so the data is
 being moved to XDG_DATA_HOME.
 `
