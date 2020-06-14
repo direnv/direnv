@@ -60,7 +60,7 @@ func (sh fish) escape(str string) string {
 	l := len(in)
 
 	hex := func(char byte) {
-		out += fmt.Sprintf("'\\x%02x'", char)
+		out += fmt.Sprintf("'\\X%02x'", char)
 	}
 
 	backslash := func(char byte) {
