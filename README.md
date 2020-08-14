@@ -64,7 +64,7 @@ $ echo export FOO=foo > .envrc
 .envrc is not allowed
 
 # The security mechanism didn't allow to load the .envrc. Since we trust it,
-# let's allow it's execution.
+# let's allow its execution.
 $ direnv allow .
 direnv: reloading
 direnv: loading .envrc
