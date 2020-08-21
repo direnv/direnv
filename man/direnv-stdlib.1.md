@@ -157,6 +157,10 @@ A semantic dispatch used to describe common project layouts.
 
 Sets the GOPATH environment variable to the current directory.
 
+### `layout julia`
+
+Sets the `JULIA_PROJECT` environment variable to the current directory.
+
 ### `layout node`
 
 Adds "$PWD/node_modules/.bin" to the PATH environment variable.
