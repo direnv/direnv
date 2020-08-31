@@ -480,6 +480,40 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  path_add PKG_CONFIG_PATH \"$dir/lib/pkgconfig\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: semver_search <directory> <folder_prefix> <partial_version>\n" +
+	"#\n" +
+	"# Search a directory for the highest version number in SemVer format (X.Y.Z).\n" +
+	"#\n" +
+	"# Examples:\n" +
+	"#\n" +
+	"# $ tree .\n" +
+	"# .\n" +
+	"# |-- dir\n" +
+	"#     |-- program-1.4.0\n" +
+	"#     |-- program-1.4.1\n" +
+	"#     |-- program-1.5.0\n" +
+	"# $ semver_search \"dir\" \"program-\" \"1.4.0\"\n" +
+	"# 1.4.0\n" +
+	"# $ semver_search \"dir\" \"program-\" \"1.4\"\n" +
+	"# 1.4.1\n" +
+	"# $ semver_search \"dir\" \"program-\" \"1\"\n" +
+	"# 1.5.0\n" +
+	"#\n" +
+	"semver_search() {\n" +
+	"  local version_dir=${1:-}\n" +
+	"  local prefix=${2:-}\n" +
+	"  local partial_version=${3:-}\n" +
+	"  # Look for matching versions in $version_dir path\n" +
+	"  # Strip possible \"/\" suffix from $version_dir, then use that to\n" +
+	"  # strip $version_dir/$prefix prefix from line.\n" +
+	"  # Sort by version: split by \".\" then reverse numeric sort for each piece of the version string\n" +
+	"  # The first one is the highest\n" +
+	"  find \"$version_dir\" -maxdepth 1 -mindepth 1 -type d -name \"${prefix}${partial_version}*\" \\\n" +
+	"    | while IFS= read -r line; do echo \"${line#${version_dir%/}/${prefix}}\"; done \\\n" +
+	"    | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \\\n" +
+	"    | head -1\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: layout <type>\n" +
 	"#\n" +
 	"# A semantic dispatch used to describe common project layouts.\n" +
@@ -779,12 +813,12 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# - $NODE_VERSION_PREFIX (optional) [default=\"node-v\"]\n" +
 	"#   Overrides the default version prefix.\n" +
-	"\n" +
+	"#\n" +
 	"use_node() {\n" +
 	"  local version=${1:-}\n" +
 	"  local via=\"\"\n" +
 	"  local node_version_prefix=${NODE_VERSION_PREFIX-node-v}\n" +
-	"  local node_wanted\n" +
+	"  local search_version\n" +
 	"  local node_prefix\n" +
 	"\n" +
 	"  if [[ -z ${NODE_VERSIONS:-} || ! -d $NODE_VERSIONS ]]; then\n" +
@@ -807,20 +841,9 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
-	"  node_wanted=${node_version_prefix}${version}\n" +
-	"  node_prefix=$(\n" +
-	"    # Look for matching node versions in $NODE_VERSIONS path\n" +
-	"    # Strip possible \"/\" suffix from $NODE_VERSIONS, then use that to\n" +
-	"    # Strip $NODE_VERSIONS/$NODE_VERSION_PREFIX prefix from line.\n" +
-	"    # Sort by version: split by \".\" then reverse numeric sort for each piece of the version string\n" +
-	"    # The first one is the highest\n" +
-	"    find \"$NODE_VERSIONS\" -maxdepth 1 -mindepth 1 -type d -name \"$node_wanted*\" \\\n" +
-	"      | while IFS= read -r line; do echo \"${line#${NODE_VERSIONS%/}/${node_version_prefix}}\"; done \\\n" +
-	"      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \\\n" +
-	"      | head -1\n" +
-	"  )\n" +
-	"\n" +
-	"  node_prefix=\"${NODE_VERSIONS}/${node_version_prefix}${node_prefix}\"\n" +
+	"  # Search for the highest version matchin $version in the folder\n" +
+	"  search_version=$(semver_search \"$NODE_VERSIONS\" \"${node_version_prefix}\" \"${version}\")\n" +
+	"  node_prefix=\"${NODE_VERSIONS}/${node_version_prefix}${search_version}\"\n" +
 	"\n" +
 	"  if [[ ! -d $node_prefix ]]; then\n" +
 	"    log_error \"Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!\"\n" +

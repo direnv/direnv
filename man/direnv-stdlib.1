@@ -217,6 +217,33 @@ load\_\&prefix \~\&/rubies/ruby\-\&1.9.3
 .fi
 .RE
 
+.SS \fB\fCsemver\_search <directory> <folder\_prefix> <partial\_version>\fR
+.PP
+Search a directory for the highest version number in SemVer format (X.Y.Z).
+
+.PP
+Examples:
+
+.PP
+.RS
+
+.nf
+$ tree .
+.
+|\-\- dir
+    |\-\- program\-1.4.0
+    |\-\- program\-1.4.1
+    |\-\- program\-1.5.0
+$ semver\_search "dir" "program\-" "1.4.0"
+1.4.0
+$ semver\_search "dir" "program\-" "1.4"
+1.4.1
+$ semver\_search "dir" "program\-" "1"
+1.5.0
+
+.fi
+.RE
+
 .SS \fB\fClayout <type>\fR
 .PP
 A semantic dispatch used to describe common project layouts.
