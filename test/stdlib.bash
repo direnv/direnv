@@ -82,4 +82,24 @@ test_name expand_path
   assert_eq "$ret" "$tmpdir/bar"
 )
 
+test_name semver_search
+(
+  load_stdlib
+  versions=$(mktemp -d)
+  trap 'rm -rf $versions' EXIT
+
+  mkdir $versions/program-1.4.0
+  mkdir $versions/program-1.4.1
+  mkdir $versions/program-1.5.0
+  mkdir $versions/1.6.0
+
+  assert_eq "$(semver_search "$versions" "program-" "1.4.0")" "1.4.0"
+  assert_eq "$(semver_search "$versions" "program-" "1.4")"   "1.4.1"
+  assert_eq "$(semver_search "$versions" "program-" "1")"     "1.5.0"
+  assert_eq "$(semver_search "$versions" "program-" "1.8")"   ""
+  assert_eq "$(semver_search "$versions" "" "1.6")"           "1.6.0"
+  assert_eq "$(semver_search "$versions" "program-" "")"      "1.5.0"
+  assert_eq "$(semver_search "$versions" "" "")"              "1.6.0"
+)
+
 echo OK
