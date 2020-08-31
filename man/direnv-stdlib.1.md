@@ -221,6 +221,20 @@ Example:
     use ruby 1.9.3
     # output: Ruby 1.9.3
 
+### `use julia <version>`
+
+Loads the specified Julia version. You must specify a path to the directory with
+installed Julia versions using $JULIA_VERSIONS. You can optionally override the
+prefix for folders inside $JULIA_VERSIONS (default `julia-`) using $JULIA_VERSION_PREFIX.
+If no exact match for `<version>` is found a search will be performed and the latest
+version will be loaded.
+
+Examples (.envrc):
+
+    use julia 1.5.1   # loads $JULIA_VERSIONS/julia-1.5.1
+    use julia 1.5     # loads $JULIA_VERSIONS/julia-1.5.1
+    use julia master  # loads $JULIA_VERSIONS/julia-master
+
 ### `use rbenv`
 
 Loads rbenv which add the ruby wrappers available on the PATH.
