@@ -770,6 +770,50 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  \"use_$cmd\" \"$@\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use julia [<version>]\n" +
+	"# Loads specified Julia version.\n" +
+	"#\n" +
+	"# Environment Variables:\n" +
+	"#\n" +
+	"# - $JULIA_VERSIONS (required)\n" +
+	"#   You must specify a path to your installed Julia versions with the `$JULIA_VERSIONS` variable.\n" +
+	"#\n" +
+	"# - $JULIA_VERSION_PREFIX (optional) [default=\"julia-\"]\n" +
+	"#   Overrides the default version prefix.\n" +
+	"#\n" +
+	"use_julia() {\n" +
+	"  local version=${1:-}\n" +
+	"  local julia_version_prefix=${JULIA_VERSION_PREFIX:-julia-}\n" +
+	"  local search_version\n" +
+	"  local julia_prefix\n" +
+	"\n" +
+	"  if [[ -z ${JULIA_VERSIONS:-} || -z $version ]]; then\n" +
+	"    log_error \"Must specify the \\$JULIA_VERSIONS environment variable and a Julia version!\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  julia_prefix=\"${JULIA_VERSIONS}/${julia_version_prefix}${version}\"\n" +
+	"\n" +
+	"  if [[ ! -d ${julia_prefix} ]]; then\n" +
+	"    search_version=$(semver_search \"${JULIA_VERSIONS}\" \"${julia_version_prefix}\" \"${version}\")\n" +
+	"    julia_prefix=\"${JULIA_VERSIONS}/${julia_version_prefix}${search_version}\"\n" +
+	"  fi\n" +
+	"\n" +
+	"  if [[ ! -d $julia_prefix ]]; then\n" +
+	"    log_error \"Unable to find Julia version ($version) in ($JULIA_VERSIONS)!\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  if [[ ! -x $julia_prefix/bin/julia ]]; then\n" +
+	"    log_error \"Unable to load Julia binary (julia) for version ($version) in ($JULIA_VERSIONS)!\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  load_prefix \"$julia_prefix\"\n" +
+	"\n" +
+	"  log_status \"Successfully loaded $(julia --version), from prefix ($julia_prefix)\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: use rbenv\n" +
 	"#\n" +
 	"# Loads rbenv which add the ruby wrappers available on the PATH.\n" +
