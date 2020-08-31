@@ -149,6 +149,26 @@ Example:
     # Then in the .envrc
     load_prefix ~/rubies/ruby-1.9.3
 
+
+### `semver_search <directory> <folder_prefix> <partial_version>`
+
+Search a directory for the highest version number in SemVer format (X.Y.Z).
+
+Examples:
+
+    $ tree .
+    .
+    |-- dir
+        |-- program-1.4.0
+        |-- program-1.4.1
+        |-- program-1.5.0
+    $ semver_search "dir" "program-" "1.4.0"
+    1.4.0
+    $ semver_search "dir" "program-" "1.4"
+    1.4.1
+    $ semver_search "dir" "program-" "1"
+    1.5.0
+
 ### `layout <type>`
 
 A semantic dispatch used to describe common project layouts.
@@ -187,7 +207,7 @@ A shortcut for `layout python python3`
 
 ### `layout ruby`
 
-Sets the GEM_HOME environment variable to `$PWD/.direnv/ruby/RUBY_VERSION`. This forces the installation of any gems into the project's sub-folder. If you're using bundler it will create wrapper programs that can be invoked directly instead of using the `bundle exec` prefix.  
+Sets the GEM_HOME environment variable to `$PWD/.direnv/ruby/RUBY_VERSION`. This forces the installation of any gems into the project's sub-folder. If you're using bundler it will create wrapper programs that can be invoked directly instead of using the `bundle exec` prefix.
 
 ### `use <program_name> [<version>]`
 

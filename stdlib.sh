@@ -477,6 +477,40 @@ load_prefix() {
   path_add PKG_CONFIG_PATH "$dir/lib/pkgconfig"
 }
 
+# Usage: semver_search <directory> <folder_prefix> <partial_version>
+#
+# Search a directory for the highest version number in SemVer format (X.Y.Z).
+#
+# Examples:
+#
+# $ tree .
+# .
+# |-- dir
+#     |-- program-1.4.0
+#     |-- program-1.4.1
+#     |-- program-1.5.0
+# $ semver_search "dir" "program-" "1.4.0"
+# 1.4.0
+# $ semver_search "dir" "program-" "1.4"
+# 1.4.1
+# $ semver_search "dir" "program-" "1"
+# 1.5.0
+#
+semver_search() {
+  local version_dir=${1:-}
+  local prefix=${2:-}
+  local partial_version=${3:-}
+  # Look for matching versions in $version_dir path
+  # Strip possible "/" suffix from $version_dir, then use that to
+  # strip $version_dir/$prefix prefix from line.
+  # Sort by version: split by "." then reverse numeric sort for each piece of the version string
+  # The first one is the highest
+  find "$version_dir" -maxdepth 1 -mindepth 1 -type d -name "${prefix}${partial_version}*" \
+    | while IFS= read -r line; do echo "${line#${version_dir%/}/${prefix}}"; done \
+    | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
+    | head -1
+}
+
 # Usage: layout <type>
 #
 # A semantic dispatch used to describe common project layouts.
@@ -776,12 +810,12 @@ rvm() {
 #
 # - $NODE_VERSION_PREFIX (optional) [default="node-v"]
 #   Overrides the default version prefix.
-
+#
 use_node() {
   local version=${1:-}
   local via=""
   local node_version_prefix=${NODE_VERSION_PREFIX-node-v}
-  local node_wanted
+  local search_version
   local node_prefix
 
   if [[ -z ${NODE_VERSIONS:-} || ! -d $NODE_VERSIONS ]]; then
@@ -804,20 +838,9 @@ use_node() {
     return 1
   fi
 
-  node_wanted=${node_version_prefix}${version}
-  node_prefix=$(
-    # Look for matching node versions in $NODE_VERSIONS path
-    # Strip possible "/" suffix from $NODE_VERSIONS, then use that to
-    # Strip $NODE_VERSIONS/$NODE_VERSION_PREFIX prefix from line.
-    # Sort by version: split by "." then reverse numeric sort for each piece of the version string
-    # The first one is the highest
-    find "$NODE_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$node_wanted*" \
-      | while IFS= read -r line; do echo "${line#${NODE_VERSIONS%/}/${node_version_prefix}}"; done \
-      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
-      | head -1
-  )
-
-  node_prefix="${NODE_VERSIONS}/${node_version_prefix}${node_prefix}"
+  # Search for the highest version matchin $version in the folder
+  search_version=$(semver_search "$NODE_VERSIONS" "${node_version_prefix}" "${version}")
+  node_prefix="${NODE_VERSIONS}/${node_version_prefix}${search_version}"
 
   if [[ ! -d $node_prefix ]]; then
     log_error "Unable to find NodeJS version ($version) in ($NODE_VERSIONS)!"
