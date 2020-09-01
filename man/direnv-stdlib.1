@@ -307,6 +307,28 @@ use ruby 1.9.3
 .fi
 .RE
 
+.SS \fB\fCuse julia <version>\fR
+.PP
+Loads the specified Julia version. You must specify a path to the directory with
+installed Julia versions using $JULIA\_VERSIONS. You can optionally override the
+prefix for folders inside $JULIA\_VERSIONS (default \fB\fCjulia\-\fR) using $JULIA\_VERSION\_PREFIX.
+If no exact match for \fB\fC<version>\fR is found a search will be performed and the latest
+version will be loaded.
+
+.PP
+Examples (.envrc):
+
+.PP
+.RS
+
+.nf
+use julia 1.5.1   # loads $JULIA\_VERSIONS/julia\-1.5.1
+use julia 1.5     # loads $JULIA\_VERSIONS/julia\-1.5.1
+use julia master  # loads $JULIA\_VERSIONS/julia\-master
+
+.fi
+.RE
+
 .SS \fB\fCuse rbenv\fR
 .PP
 Loads rbenv which add the ruby wrappers available on the PATH.

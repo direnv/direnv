@@ -767,6 +767,50 @@ use() {
   "use_$cmd" "$@"
 }
 
+# Usage: use julia [<version>]
+# Loads specified Julia version.
+#
+# Environment Variables:
+#
+# - $JULIA_VERSIONS (required)
+#   You must specify a path to your installed Julia versions with the `$JULIA_VERSIONS` variable.
+#
+# - $JULIA_VERSION_PREFIX (optional) [default="julia-"]
+#   Overrides the default version prefix.
+#
+use_julia() {
+  local version=${1:-}
+  local julia_version_prefix=${JULIA_VERSION_PREFIX:-julia-}
+  local search_version
+  local julia_prefix
+
+  if [[ -z ${JULIA_VERSIONS:-} || -z $version ]]; then
+    log_error "Must specify the \$JULIA_VERSIONS environment variable and a Julia version!"
+    return 1
+  fi
+
+  julia_prefix="${JULIA_VERSIONS}/${julia_version_prefix}${version}"
+
+  if [[ ! -d ${julia_prefix} ]]; then
+    search_version=$(semver_search "${JULIA_VERSIONS}" "${julia_version_prefix}" "${version}")
+    julia_prefix="${JULIA_VERSIONS}/${julia_version_prefix}${search_version}"
+  fi
+
+  if [[ ! -d $julia_prefix ]]; then
+    log_error "Unable to find Julia version ($version) in ($JULIA_VERSIONS)!"
+    return 1
+  fi
+
+  if [[ ! -x $julia_prefix/bin/julia ]]; then
+    log_error "Unable to load Julia binary (julia) for version ($version) in ($JULIA_VERSIONS)!"
+    return 1
+  fi
+
+  load_prefix "$julia_prefix"
+
+  log_status "Successfully loaded $(julia --version), from prefix ($julia_prefix)"
+}
+
 # Usage: use rbenv
 #
 # Loads rbenv which add the ruby wrappers available on the PATH.
