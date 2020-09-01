@@ -1,4 +1,19 @@
 
+2.22.0 / 2020-09-01
+==================
+
+  * stdlib: use_julia <version> (#666)
+  * stdlib: semver_search (#665)
+  * direnv-stdlib.1: add layout julia (#661)
+  * README: spelling correction (#660)
+  * README.md: add shadowenv to similar projects (#659)
+  * docs: remove Snap from the installations
+  * OSX -> macOS (#655)
+  * Update shell_fish.go to use \X for UTF encoding (#584)
+  * Change XDG_CONFIG_DIR to XDG_CONFIG_HOME (#641)
+  * Streamline core algorithm of export and exec (#636)
+  * test: add failure test-case (#637)
+
 2.21.3 / 2020-05-08
 ==================
 
