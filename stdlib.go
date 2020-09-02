@@ -783,7 +783,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"use_julia() {\n" +
 	"  local version=${1:-}\n" +
-	"  local julia_version_prefix=${JULIA_VERSION_PREFIX:-julia-}\n" +
+	"  local julia_version_prefix=${JULIA_VERSION_PREFIX-julia-}\n" +
 	"  local search_version\n" +
 	"  local julia_prefix\n" +
 	"\n" +
