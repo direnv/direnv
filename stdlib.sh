@@ -528,7 +528,7 @@ layout() {
 #
 layout_go() {
   path_add GOPATH "$(direnv_layout_dir)/go"
-  PATH_add bin
+  PATH_add "$(direnv_layout_dir)/go/bin"
 }
 
 # Usage: layout node

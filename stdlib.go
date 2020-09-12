@@ -531,7 +531,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"layout_go() {\n" +
 	"  path_add GOPATH \"$(direnv_layout_dir)/go\"\n" +
-	"  PATH_add bin\n" +
+	"  PATH_add \"$(direnv_layout_dir)/go/bin\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout node\n" +
