@@ -175,7 +175,8 @@ A semantic dispatch used to describe common project layouts.
 
 ### `layout go`
 
-Sets the GOPATH environment variable to the current directory.
+Adds "$(direnv_layout_dir)/go" to the GOPATH environment variable.
+And also adds "$PWD/bin" to the PATH environment variable.
 
 ### `layout julia`
 

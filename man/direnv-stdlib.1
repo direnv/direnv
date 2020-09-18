@@ -250,7 +250,8 @@ A semantic dispatch used to describe common project layouts.
 
 .SS \fB\fClayout go\fR
 .PP
-Sets the GOPATH environment variable to the current directory.
+Adds "$(direnv\_layout\_dir)/go" to the GOPATH environment variable.
+And also adds "$PWD/bin" to the PATH environment variable.
 
 .SS \fB\fClayout julia\fR
 .PP
