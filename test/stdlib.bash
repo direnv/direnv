@@ -102,4 +102,39 @@ test_name semver_search
   assert_eq "$(semver_search "$versions" "" "")"              "1.6.0"
 )
 
+test_name use_julia
+(
+  load_stdlib
+  JULIA_VERSIONS=$(mktemp -d)
+  trap 'rm -rf $JULIA_VERSIONS' EXIT
+
+  test_julia() {
+    version_prefix="$1"
+    version="$2"
+    # Fake the existence of a julia binary
+    julia=$JULIA_VERSIONS/$version_prefix$version/bin/julia
+    mkdir -p $(dirname $julia)
+    echo "#!/bin/bash
+    echo \"test-julia $version\"" > $julia
+    chmod +x $julia
+    # Locally disable set -u (see https://github.com/direnv/direnv/pull/667)
+    if ! [[ "$(set +u; use julia $version 2>&1)" =~ "Successfully loaded test-julia $version" ]]; then
+      return 1
+    fi
+  }
+
+  # Default JULIA_VERSION_PREFIX
+  unset JULIA_VERSION_PREFIX
+  test_julia "julia-" "1.0.0"
+  test_julia "julia-" "1.1"
+  # Custom JULIA_VERSION_PREFIX
+  JULIA_VERSION_PREFIX="jl-"
+  test_julia "jl-"    "1.2.0"
+  test_julia "jl-"    "1.3"
+  # Empty JULIA_VERSION_PREFIX
+  JULIA_VERSION_PREFIX=
+  test_julia ""    "1.4.0"
+  test_julia ""    "1.5"
+)
+
 echo OK

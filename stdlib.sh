@@ -780,7 +780,7 @@ use() {
 #
 use_julia() {
   local version=${1:-}
-  local julia_version_prefix=${JULIA_VERSION_PREFIX:-julia-}
+  local julia_version_prefix=${JULIA_VERSION_PREFIX-julia-}
   local search_version
   local julia_prefix
 
