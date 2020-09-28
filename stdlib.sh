@@ -351,12 +351,12 @@ path_add() {
   local path i var_name="$1"
   # split existing paths into an array
   declare -a path_array
-  IFS=: read -ra path_array <<<"${!1}"
+  IFS=: read -ra path_array <<<"${!1-}"
   shift
 
   # prepend the passed paths in the right order
   for ((i = $#; i > 0; i--)); do
-    path_array=("$(expand_path "${!i}")" "${path_array[@]}")
+    path_array=("$(expand_path "${!i}")" ${path_array[@]+"${path_array[@]}"})
   done
 
   # join back all the paths
@@ -419,9 +419,9 @@ path_rm() {
   results=()
 
   # iterate over path entries, discard entries that match any of the patterns
-  for path in "${path_array[@]}"; do
+  for path in ${path_array[@]+"${path_array[@]}"}; do
     discard=false
-    for pattern in "${patterns[@]}"; do
+    for pattern in ${patterns[@]+"${patterns[@]}"}; do
       if [[ "$path" == +($pattern) ]]; then
         discard=true
         break

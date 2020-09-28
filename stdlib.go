@@ -354,12 +354,12 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  local path i var_name=\"$1\"\n" +
 	"  # split existing paths into an array\n" +
 	"  declare -a path_array\n" +
-	"  IFS=: read -ra path_array <<<\"${!1}\"\n" +
+	"  IFS=: read -ra path_array <<<\"${!1-}\"\n" +
 	"  shift\n" +
 	"\n" +
 	"  # prepend the passed paths in the right order\n" +
 	"  for ((i = $#; i > 0; i--)); do\n" +
-	"    path_array=(\"$(expand_path \"${!i}\")\" \"${path_array[@]}\")\n" +
+	"    path_array=(\"$(expand_path \"${!i}\")\" ${path_array[@]+\"${path_array[@]}\"})\n" +
 	"  done\n" +
 	"\n" +
 	"  # join back all the paths\n" +
@@ -422,9 +422,9 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  results=()\n" +
 	"\n" +
 	"  # iterate over path entries, discard entries that match any of the patterns\n" +
-	"  for path in \"${path_array[@]}\"; do\n" +
+	"  for path in ${path_array[@]+\"${path_array[@]}\"}; do\n" +
 	"    discard=false\n" +
-	"    for pattern in \"${patterns[@]}\"; do\n" +
+	"    for pattern in ${patterns[@]+\"${patterns[@]}\"}; do\n" +
 	"      if [[ \"$path\" == +($pattern) ]]; then\n" +
 	"        discard=true\n" +
 	"        break\n" +
