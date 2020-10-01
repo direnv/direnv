@@ -6,7 +6,7 @@ direnv.toml \- the direnv configuration file
 .SH DESCRIPTION
 .PP
 A configuration file in TOML
-\[la]https://github.com/toml-lang/toml\[ra] format to specify a variety of configuration options for direnv. Resides at CONFIGURATION\_DIR/direnv.toml. For many users, this will be located at $HOME/.config/direnv/direnv.toml.
+\[la]https://github.com/toml-lang/toml\[ra] format to specify a variety of configuration options for direnv. Read from at CONFIGURATION\_DIR/direnv.toml or $DIRENV\_CONFIG/direnv.toml. For many users, CONFIGURATION\_DIR will be located at $HOME/.config/direnv/direnv.toml.
 
 .SH FORMAT
 .PP
@@ -84,8 +84,6 @@ prefix = [ "/home/user/code/project\-a" ]
 
 .PP
 In this example, the following .envrc files will be implicitly allowed:
-
-.RS
 .IP \(bu 2
 \fB\fC/home/user/code/project\-a/.envrc\fR
 .IP \(bu 2
@@ -93,18 +91,12 @@ In this example, the following .envrc files will be implicitly allowed:
 .IP \(bu 2
 and so on
 
-.RE
-
 .PP
 In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fB\fCdirenv allow\fR):
-
-.RS
 .IP \(bu 2
 \fB\fC/home/user/project\-b/.envrc\fR
 .IP \(bu 2
 \fB\fC/opt/random/.envrc\fR
-
-.RE
 
 .SS \fB\fCexact\fR
 .PP
@@ -125,25 +117,17 @@ exact = [ "/home/user/project\-b/.envrc", "/home/user/project\-b/subdir\-a" ]
 
 .PP
 In this example, the following .envrc files will be implicitly allowed, and no others:
-
-.RS
 .IP \(bu 2
 \fB\fC/home/user/code/project\-b/.envrc\fR
 .IP \(bu 2
 \fB\fC/home/user/code/project\-b/subdir\-a\fR
 
-.RE
-
 .PP
 In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fB\fCdirenv allow\fR):
-
-.RS
 .IP \(bu 2
 \fB\fC/home/user/code/project\-b/subproject\-c/.envrc\fR
 .IP \(bu 2
 \fB\fC/home/user/code/.envrc\fR
-
-.RE
 
 .SH COPYRIGHT
 .PP
