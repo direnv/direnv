@@ -20,7 +20,7 @@ direnv="$(command -v direnv)"
 DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
 
 # Where direnv configuration should be stored
-direnv_config_dir=${XDG_CONFIG_HOME:-$HOME/.config}/direnv
+direnv_config_dir="${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}"
 
 # This variable can be used by programs to detect when they are running inside
 # of a .envrc evaluation context. It is ignored by the direnv diffing

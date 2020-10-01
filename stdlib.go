@@ -23,7 +23,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"DIRENV_LOG_FORMAT=\"${DIRENV_LOG_FORMAT-direnv: %s}\"\n" +
 	"\n" +
 	"# Where direnv configuration should be stored\n" +
-	"direnv_config_dir=${XDG_CONFIG_HOME:-$HOME/.config}/direnv\n" +
+	"direnv_config_dir=\"${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}\"\n" +
 	"\n" +
 	"# This variable can be used by programs to detect when they are running inside\n" +
 	"# of a .envrc evaluation context. It is ignored by the direnv diffing\n" +
