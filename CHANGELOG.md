@@ -1,4 +1,14 @@
 
+2.22.1 / 2020-10-06
+==================
+
+  * Look for stdlib in DIRENV_CONFIG (#679)
+  * stdlib: use Bash 3.0-compatible array expansion (#676)
+  * Clarify path to direnv.toml (#678)
+  * stdlib/use_julia: fix a bug in parameter substitution for empty or (#667)
+  * man: update the layout_go documentation
+  * stdlib:  adds GOPATH/bin to PATH (#670)
+
 2.22.0 / 2020-09-01
 ==================
 
