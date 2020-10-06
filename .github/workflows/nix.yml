@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - uses: cachix/install-nix-action@v6
+      - uses: cachix/install-nix-action@v11
 
       - name: Build
         run: nix-build
