@@ -16,7 +16,7 @@ func (elvish) Hook() (string, error) {
 	try {
 		m = [("{{.SelfPath}}" export elvish | from-json)]
 		if (> (count $m) 0) {
-			m = (explode $m)
+			m = (all $m)
 			keys $m | each [k]{
 				if $m[$k] {
 					set-env $k $m[$k]
