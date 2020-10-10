@@ -156,4 +156,4 @@ MIT licence - Copyright (C) 2019 @zimbatm and contributors
 SEE ALSO
 --------
 
-direnv-stdlib(1), direnv.toml(1)
+direnv-stdlib(1), direnv.toml(1), direnv-fetchurl(1)
