@@ -1,4 +1,11 @@
 
+2.23.0 / 2020-10-10
+==================
+
+  * stdlib: add source_url function (#562)
+  * direnv: add fetchurl command (#686)
+  * shell: Update Elvish hook to replace deprecated `explode` (#685)
+
 2.22.1 / 2020-10-06
 ==================
 
