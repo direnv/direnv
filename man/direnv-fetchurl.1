@@ -14,7 +14,8 @@ content of the retrieved file.
 
 .PP
 This has been introduced to avoid a dependency on \fB\fCcurl\fR or \fB\fCwget\fR, while also
-promoting a more secure way to fetch data from the Internet.
+promoting a more secure way to fetch data from the Internet. Use this instead
+of \fB\fCcurl <url> | sh\fR\&.
 
 .PP
 This command has two modes of operation:
@@ -29,7 +30,8 @@ implication of this design is that URLs must be stable and always return the
 same content.
 
 .PP
-Downloaded files are marked as read\-only and executable.
+Downloaded files are marked as read\-only and executable so it can also be used
+to fetch and execute static binaries.
 
 .SH OPTIONS
 .PP
