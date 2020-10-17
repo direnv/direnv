@@ -116,19 +116,21 @@ join_args() {
 #    # output: /usr/local/foo
 #
 expand_path() {
-  local REPLY; __rp_absolute ${2+"$2"} ${1+"$1"}; echo "$REPLY"
+  local REPLY; realpath.absolute "${2+"$2"}" "${1+"$1"}"; echo "$REPLY"
 }
 
 # --- vendored from https://github.com/bashup/realpaths
-__rp_dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$ ]] || REPLY="${1%${BASH_REMATCH[0]}}"; REPLY=${REPLY:-/}; }
-__rp_absolute() {
+realpath.dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$|^//$ ]] || REPLY="${1%${BASH_REMATCH[0]}}"; REPLY=${REPLY:-/}; }
+realpath.basename(){ REPLY=/; ! [[ $1 =~ /*([^/]+)/*$ ]] || REPLY="${BASH_REMATCH[1]}"; }
+
+realpath.absolute() {
   REPLY=$PWD; local eg=extglob; ! shopt -q $eg || eg=; ${eg:+shopt -s $eg}
   while (($#)); do case $1 in
     //|//[^/]*) REPLY=//; set -- "${1:2}" "${@:2}" ;;
     /*) REPLY=/; set -- "${1##+(/)}" "${@:2}" ;;
     */*) set -- "${1%%/*}" "${1##${1%%/*}+(/)}" "${@:2}" ;;
     ''|.) shift ;;
-    ..) __rp_dirname "$REPLY"; shift ;;
+    ..) realpath.dirname "$REPLY"; shift ;;
     *) REPLY="${REPLY%/}/$1"; shift ;;
   esac; done; ${eg:+shopt -u $eg}
 }
@@ -218,7 +220,7 @@ find_up() {
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_env() {
   local rcpath=${1/#\~/$HOME}
-  local rcfile
+  local REPLY
   if [[ -d $rcpath ]]; then
     rcpath=$rcpath/.envrc
   fi
@@ -227,15 +229,21 @@ source_env() {
     return 1
   fi
 
+  realpath.dirname "$rcpath"
+  local rcpath_dir=$REPLY
+  realpath.basename "$rcpath"
+  local rcpath_base=$REPLY
+
+  local rcfile
   rcfile=$(user_rel_path "$rcpath")
   watch_file "$rcpath"
 
   pushd "$(pwd 2>/dev/null)" >/dev/null || return 1
-  pushd "$(dirname "$rcpath")" >/dev/null || return 1
-  if [[ -f ./$(basename "$rcpath") ]]; then
+  pushd "$rcpath_dir" >/dev/null || return 1
+  if [[ -f ./$rcpath_base ]]; then
     log_status "loading $rcfile"
     # shellcheck disable=SC1090
-    . "./$(basename "$rcpath")"
+    . "./$rcpath_base"
   else
     log_status "referenced $rcfile does not exist"
   fi
@@ -494,15 +502,15 @@ path_rm() {
 #    load_prefix ~/rubies/ruby-1.9.3
 #
 load_prefix() {
-  local dir
-  dir=$(expand_path "$1")
-  MANPATH_add "$dir/man"
-  MANPATH_add "$dir/share/man"
-  path_add CPATH "$dir/include"
-  path_add LD_LIBRARY_PATH "$dir/lib"
-  path_add LIBRARY_PATH "$dir/lib"
-  path_add PATH "$dir/bin"
-  path_add PKG_CONFIG_PATH "$dir/lib/pkgconfig"
+  local REPLY
+  realpath.absolute "$1"
+  MANPATH_add "$REPLY/man"
+  MANPATH_add "$REPLY/share/man"
+  path_add CPATH "$REPLY/include"
+  path_add LD_LIBRARY_PATH "$REPLY/lib"
+  path_add LIBRARY_PATH "$REPLY/lib"
+  path_add PATH "$REPLY/bin"
+  path_add PKG_CONFIG_PATH "$REPLY/lib/pkgconfig"
 }
 
 # Usage: semver_search <directory> <folder_prefix> <partial_version>
@@ -665,12 +673,14 @@ layout_anaconda() {
   local env_name=$1
   local env_loc
   local conda
+  local REPLY
   if [[ $# -gt 1 ]]; then
     conda=${2}
   else
     conda=$(command -v conda)
   fi
-  PATH_add "$(dirname "$conda")"
+  realpath.dirname "$conda"
+  PATH_add "$REPLY/$conda"
   env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
   if [[ ! "$env_loc" == $env_name*$env_name ]]; then
     if [[ -e environment.yml ]]; then

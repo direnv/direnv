@@ -119,21 +119,23 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#    # output: /usr/local/foo\n" +
 	"#\n" +
 	"expand_path() {\n" +
-	"  local REPLY; __rp_absolute ${2+\"$2\"} ${1+\"$1\"}; echo \"$REPLY\"\n" +
+	"  local REPLY; realpath.absolute \"${2+\"$2\"}\" \"${1+\"$1\"}\"; echo \"$REPLY\"\n" +
 	"}\n" +
 	"\n" +
 	"# --- vendored from https://github.com/bashup/realpaths\n" +
-	"__rp_dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$ ]] || REPLY=\"${1%${BASH_REMATCH[0]}}\"; REPLY=${REPLY:-/}; }\n" +
-	"__rp_absolute() {\n" +
-	"	REPLY=$PWD; local eg=extglob; ! shopt -q $eg || eg=; ${eg:+shopt -s $eg}\n" +
-	"	while (($#)); do case $1 in\n" +
-	"		//|//[^/]*) REPLY=//; set -- \"${1:2}\" \"${@:2}\" ;;\n" +
-	"		/*) REPLY=/; set -- \"${1##+(/)}\" \"${@:2}\" ;;\n" +
-	"		*/*) set -- \"${1%%/*}\" \"${1##${1%%/*}+(/)}\" \"${@:2}\" ;;\n" +
-	"		''|.) shift ;;\n" +
-	"		..) __rp_dirname \"$REPLY\"; shift ;;\n" +
-	"		*) REPLY=\"${REPLY%/}/$1\"; shift ;;\n" +
-	"	esac; done; ${eg:+shopt -u $eg}\n" +
+	"realpath.dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$|^//$ ]] || REPLY=\"${1%${BASH_REMATCH[0]}}\"; REPLY=${REPLY:-/}; }\n" +
+	"realpath.basename(){ REPLY=/; ! [[ $1 =~ /*([^/]+)/*$ ]] || REPLY=\"${BASH_REMATCH[1]}\"; }\n" +
+	"\n" +
+	"realpath.absolute() {\n" +
+	"  REPLY=$PWD; local eg=extglob; ! shopt -q $eg || eg=; ${eg:+shopt -s $eg}\n" +
+	"  while (($#)); do case $1 in\n" +
+	"    //|//[^/]*) REPLY=//; set -- \"${1:2}\" \"${@:2}\" ;;\n" +
+	"    /*) REPLY=/; set -- \"${1##+(/)}\" \"${@:2}\" ;;\n" +
+	"    */*) set -- \"${1%%/*}\" \"${1##${1%%/*}+(/)}\" \"${@:2}\" ;;\n" +
+	"    ''|.) shift ;;\n" +
+	"    ..) realpath.dirname \"$REPLY\"; shift ;;\n" +
+	"    *) REPLY=\"${REPLY%/}/$1\"; shift ;;\n" +
+	"  esac; done; ${eg:+shopt -u $eg}\n" +
 	"}\n" +
 	"# ---\n" +
 	"\n" +
@@ -221,7 +223,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# NOTE: the other \".envrc\" is not checked by the security framework.\n" +
 	"source_env() {\n" +
 	"  local rcpath=${1/#\\~/$HOME}\n" +
-	"  local rcfile\n" +
+	"  local REPLY\n" +
 	"  if [[ -d $rcpath ]]; then\n" +
 	"    rcpath=$rcpath/.envrc\n" +
 	"  fi\n" +
@@ -230,15 +232,21 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"\n" +
+	"  realpath.dirname \"$rcpath\"\n" +
+	"  local rcpath_dir=$REPLY\n" +
+	"  realpath.basename \"$rcpath\"\n" +
+	"  local rcpath_base=$REPLY\n" +
+	"\n" +
+	"  local rcfile\n" +
 	"  rcfile=$(user_rel_path \"$rcpath\")\n" +
 	"  watch_file \"$rcpath\"\n" +
 	"\n" +
 	"  pushd \"$(pwd 2>/dev/null)\" >/dev/null || return 1\n" +
-	"  pushd \"$(dirname \"$rcpath\")\" >/dev/null || return 1\n" +
-	"  if [[ -f ./$(basename \"$rcpath\") ]]; then\n" +
+	"  pushd \"$rcpath_dir\" >/dev/null || return 1\n" +
+	"  if [[ -f ./$rcpath_base ]]; then\n" +
 	"    log_status \"loading $rcfile\"\n" +
 	"    # shellcheck disable=SC1090\n" +
-	"    . \"./$(basename \"$rcpath\")\"\n" +
+	"    . \"./$rcpath_base\"\n" +
 	"  else\n" +
 	"    log_status \"referenced $rcfile does not exist\"\n" +
 	"  fi\n" +
@@ -497,15 +505,15 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#    load_prefix ~/rubies/ruby-1.9.3\n" +
 	"#\n" +
 	"load_prefix() {\n" +
-	"  local dir\n" +
-	"  dir=$(expand_path \"$1\")\n" +
-	"  MANPATH_add \"$dir/man\"\n" +
-	"  MANPATH_add \"$dir/share/man\"\n" +
-	"  path_add CPATH \"$dir/include\"\n" +
-	"  path_add LD_LIBRARY_PATH \"$dir/lib\"\n" +
-	"  path_add LIBRARY_PATH \"$dir/lib\"\n" +
-	"  path_add PATH \"$dir/bin\"\n" +
-	"  path_add PKG_CONFIG_PATH \"$dir/lib/pkgconfig\"\n" +
+	"  local REPLY\n" +
+	"  realpath.absolute \"$1\"\n" +
+	"  MANPATH_add \"$REPLY/man\"\n" +
+	"  MANPATH_add \"$REPLY/share/man\"\n" +
+	"  path_add CPATH \"$REPLY/include\"\n" +
+	"  path_add LD_LIBRARY_PATH \"$REPLY/lib\"\n" +
+	"  path_add LIBRARY_PATH \"$REPLY/lib\"\n" +
+	"  path_add PATH \"$REPLY/bin\"\n" +
+	"  path_add PKG_CONFIG_PATH \"$REPLY/lib/pkgconfig\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: semver_search <directory> <folder_prefix> <partial_version>\n" +
@@ -668,12 +676,14 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  local env_name=$1\n" +
 	"  local env_loc\n" +
 	"  local conda\n" +
+	"  local REPLY\n" +
 	"  if [[ $# -gt 1 ]]; then\n" +
 	"    conda=${2}\n" +
 	"  else\n" +
 	"    conda=$(command -v conda)\n" +
 	"  fi\n" +
-	"  PATH_add \"$(dirname \"$conda\")\"\n" +
+	"  realpath.dirname \"$conda\"\n" +
+	"  PATH_add \"$REPLY/$conda\"\n" +
 	"  env_loc=$(\"$conda\" env list | grep -- '^'\"$env_name\"'\\s')\n" +
 	"  if [[ ! \"$env_loc\" == $env_name*$env_name ]]; then\n" +
 	"    if [[ -e environment.yml ]]; then\n" +
