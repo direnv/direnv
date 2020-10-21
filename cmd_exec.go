@@ -57,7 +57,7 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 			return
 		}
 	} else {
-		newEnv = env
+		newEnv = previousEnv
 	}
 
 	var commandPath string
