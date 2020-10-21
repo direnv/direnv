@@ -92,6 +92,8 @@ test_start base
   direnv_eval
   echo "${HELLO}"
   test -z "${HELLO}"
+
+  unset WATCHES
 test_stop
 
 test_start inherit
@@ -199,6 +201,21 @@ test_start "failure"
 
   test_neq "${DIRENV_DIFF:-}" ""
   test_neq "${DIRENV_WATCHES:-}" ""
+test_stop
+
+test_start "watch-dir"
+    echo "No watches by default"
+    test_eq "${DIRENV_WATCHES}" "${WATCHES}"
+
+    direnv_eval
+
+    if ! direnv show_dump "${DIRENV_WATCHES}" | grep -q "testfile"; then
+        echo "FAILED: testfile not added to DIRENV_WATCHES"
+        exit 1
+    fi
+
+    echo "After eval, watches have changed"
+    test_neq "${DIRENV_WATCHES}" "${WATCHES}"
 test_stop
 
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
