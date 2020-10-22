@@ -25,7 +25,12 @@ being moved to XDG_DATA_HOME.
 func cmdAllowAction(env Env, args []string, config *Config) (err error) {
 	var rcPath string
 	if len(args) > 1 {
-		rcPath = args[1]
+		if rcPath, err = filepath.Abs(args[1]); err != nil {
+			return err
+		}
+		if rcPath, err = filepath.EvalSymlinks(rcPath); err != nil {
+			return err
+		}
 	} else {
 		if rcPath, err = os.Getwd(); err != nil {
 			return err
