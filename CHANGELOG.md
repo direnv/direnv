@@ -1,4 +1,13 @@
 
+2.23.1 / 2020-10-22
+==================
+
+  * fix: handle links on Mac when using `allow` (#696)
+  * fix: use restored env in exec (#695)
+  * stdlib: add basename and dirname from realpath (#693)
+  * stdlib.sh: remove tabs
+  * dist: compile all the binaries statically
+
 2.23.0 / 2020-10-10
 ==================
 
