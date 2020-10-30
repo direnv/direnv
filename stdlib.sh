@@ -1001,7 +1001,7 @@ direnv_version() {
 on_branch() {
   if ! has git; then return 1; fi
   local git_dir
-  if git_dir=$(git rev-parse --git-dir 2> /dev/null); then
+  if git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
     [ -n "$1" ] && watch_file "$git_dir/HEAD"
   else
     return 1
