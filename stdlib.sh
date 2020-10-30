@@ -985,7 +985,7 @@ direnv_version() {
 # command to be installed.
 # Returns 1 otherwise.
 #
-# When a branch is specified, git's index is watched so that entering/exiting a
+# When a branch is specified, .git/HEAD is watched so that entering/exiting a
 # branch triggers a reload.
 #
 # Example:
@@ -1002,7 +1002,7 @@ on_branch() {
   if ! has git; then return 1; fi
   local git_dir
   if git_dir=$(git rev-parse --git-dir 2> /dev/null); then
-    [ -n "$1" ] && watch_file "$git_dir/index"
+    [ -n "$1" ] && watch_file "$git_dir/HEAD"
   else
     return 1
   fi
