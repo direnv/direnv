@@ -1025,7 +1025,7 @@ __main__() {
 # Example:
 #
 #    if on_branch develop; then
-#      echo "Remember to merge with upstream regularly!";
+#      echo "Remember to merge with upstream regularly!"
 #    fi
 #
 #    if on_branch; then
