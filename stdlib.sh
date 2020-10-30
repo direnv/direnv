@@ -978,6 +978,37 @@ direnv_version() {
   "$direnv" version "$@"
 }
 
+# Usage: on_branch [<branch_name>]
+#
+# Returns 0 if within a git repository with the given branch name. If no branch
+# name is provided, then returns 0 when within _any_ branch. Requires the git
+# command to be installed.
+# Returns 1 otherwise.
+#
+# When a branch is specified, git's index is watched so that entering/exiting a
+# branch triggers a reload.
+#
+# Example:
+#
+#    if on_branch develop; then
+#      echo "Remember to merge with upstream regularly!"
+#    fi
+#
+#    if on_branch; then
+#      echo "Thanks for contributing to a GitHub project!"
+#    fi
+#
+on_branch() {
+  if ! has git; then return 1; fi
+  local git_dir
+  if git_dir=$(git rev-parse --git-dir 2> /dev/null); then
+    [ -n "$1" ] && watch_file "$git_dir/index"
+  else
+    return 1
+  fi
+  [ -z "$1" ] || [ "$(git branch --show-current)" = "$1" ]
+}
+
 # Usage: __main__ <cmd> [...<args>]
 #
 # Used by rc.go
@@ -1011,34 +1042,4 @@ __main__() {
 
   # and finally load the .envrc
   "$@"
-}
-
-# Usage: on_branch [<branch_name>]
-#
-# Returns 0 if within a git repository with the given branch name. If no branch
-# name is provided, then returns 0 when within _any_ branch.
-# Returns 1 otherwise.
-#
-# When a branch is specified, git's index is watched so that entering/exiting
-# branches triggers a reload.
-#
-# Example:
-#
-#    if on_branch develop; then
-#      echo "Remember to merge with upstream regularly!"
-#    fi
-#
-#    if on_branch; then
-#      echo "Thanks for contributing to a GitHub project!"
-#    fi
-#
-on_branch() {
-  if ! has git; then return 1; fi
-  local git_dir
-  if git_dir=$(git rev-parse --git-dir 2> /dev/null); then
-    [ -n "$1" ] && watch_file "$git_dir/index"
-  else
-    return 1
-  fi
-  [ -z "$1" ] || [ "$(git branch --show-current)" = "$1" ]
 }
