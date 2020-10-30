@@ -1034,9 +1034,8 @@ __main__() {
 #
 on_branch() {
   local git_dir
-  git_dir=$(git rev-parse --git-dir 2> /dev/null)
-  if [[ $? -eq 0 ]] && [[ -f $git_dir/index ]]; then
-    [ ! -z "$1" ] && watch_file "$git_dir/index"
+  if git_dir=$(git rev-parse --git-dir 2> /dev/null); then
+    [ -n "$1" ] && watch_file "$git_dir/index"
   else
     return 1
   fi
