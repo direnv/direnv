@@ -334,7 +334,7 @@ source_env() {
     rcpath=$rcpath/.envrc
   fi
   if [[ ! -e $rcpath ]]; then
-    log_status "referenced $rcpath does not exist"
+    log_status "referenced $rcpath does not exist (1)"
     return 1
   fi
 
@@ -343,8 +343,9 @@ source_env() {
   realpath.basename "$rcpath"
   local rcpath_base=$REPLY
 
-  local rcfile
-  rcfile=$(user_rel_path "$rcpath")
+  echo "rcpath=$rcpath"
+  echo "rcpath_base=$rcpath_base"
+
   watch_file "$rcpath"
 
   pushd "$(pwd 2>/dev/null)" >/dev/null || return 1
@@ -354,7 +355,7 @@ source_env() {
     # shellcheck disable=SC1090
     . "./$rcpath_base"
   else
-    log_status "referenced $rcfile does not exist"
+    log_status "referenced ./$rcpath_base does not exist (2)"
   fi
   popd >/dev/null || return 1
   popd >/dev/null || return 1
@@ -1390,23 +1391,7 @@ on_git_branch() {
   fi
 }
 
-# Usage: __main__ <cmd> [...<args>]
-#
-# Used by rc.go
-__main__() {
-  # reserve stdout for dumping
-  exec 3>&1
-  exec 1>&2
-
-  # shellcheck disable=SC2317
-  __dump_at_exit() {
-    local ret=$?
-    "$direnv" dump json "" >&3
-    trap - EXIT
-    exit "$ret"
-  }
-  trap __dump_at_exit EXIT
-
+_load_libraries() {
   # load direnv libraries
   for lib in "$direnv_config_dir/lib/"*.sh; do
     # shellcheck disable=SC1090
@@ -1421,6 +1406,25 @@ __main__() {
     # shellcheck disable=SC1090,SC1091
     source "$HOME/.direnvrc" >&2
   fi
+}
+
+# Usage: __main__ <cmd> [...<args>]
+#
+# Used by rc.go
+__main__() {
+  # reserve stdout for dumping
+  # exec 3>&1
+  # exec 1>&2
+
+  # __dump_at_exit() {
+  #   local ret=$?
+  #   "$direnv" dump json "" >&3
+  #   trap - EXIT
+  #   exit "$ret"
+  # }
+  # trap __dump_at_exit EXIT
+
+  _load_libraries
 
   # and finally load the .envrc
   "$@"

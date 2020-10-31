@@ -34,6 +34,10 @@ The following sections are supported:
 
 ## [global]
 
+### `bash_builtin`
+
+If set to true, will load the `.envrc` with a Go implementation of Bash (mvdan.cc/sh). This option is useful for systems that don't ship with Bash (eg: Windows).
+
 ### `bash_path`
 
 This allows one to hard-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
