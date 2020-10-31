@@ -981,6 +981,37 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  \"$direnv\" version \"$@\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: on_branch [<branch_name>]\n" +
+	"#\n" +
+	"# Returns 0 if within a git repository with the given branch name. If no branch\n" +
+	"# name is provided, then returns 0 when within _any_ branch. Requires the git\n" +
+	"# command to be installed.\n" +
+	"# Returns 1 otherwise.\n" +
+	"#\n" +
+	"# When a branch is specified, .git/HEAD is watched so that entering/exiting a\n" +
+	"# branch triggers a reload.\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    if on_branch develop; then\n" +
+	"#      echo \"Remember to merge with upstream regularly!\"\n" +
+	"#    fi\n" +
+	"#\n" +
+	"#    if on_branch; then\n" +
+	"#      echo \"Thanks for contributing to a GitHub project!\"\n" +
+	"#    fi\n" +
+	"#\n" +
+	"on_branch() {\n" +
+	"  if ! has git; then return 1; fi\n" +
+	"  local git_dir\n" +
+	"  if git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then\n" +
+	"    [ -n \"$1\" ] && watch_file \"$git_dir/HEAD\"\n" +
+	"  else\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"  [ -z \"$1\" ] || [ \"$(git branch --show-current)\" = \"$1\" ]\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: __main__ <cmd> [...<args>]\n" +
 	"#\n" +
 	"# Used by rc.go\n" +
