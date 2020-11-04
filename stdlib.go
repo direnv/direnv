@@ -981,7 +981,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  \"$direnv\" version \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: on_branch [<branch_name>]\n" +
+	"# Usage: on_git_branch [<branch_name>]\n" +
 	"#\n" +
 	"# Returns 0 if within a git repository with the given branch name. If no branch\n" +
 	"# name is provided, then returns 0 when within _any_ branch. Requires the git\n" +
@@ -993,15 +993,15 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# Example:\n" +
 	"#\n" +
-	"#    if on_branch develop; then\n" +
+	"#    if on_git_branch develop; then\n" +
 	"#      echo \"Remember to merge with upstream regularly!\"\n" +
 	"#    fi\n" +
 	"#\n" +
-	"#    if on_branch; then\n" +
+	"#    if on_git_branch; then\n" +
 	"#      echo \"Thanks for contributing to a GitHub project!\"\n" +
 	"#    fi\n" +
 	"#\n" +
-	"on_branch() {\n" +
+	"on_git_branch() {\n" +
 	"  if ! has git; then return 1; fi\n" +
 	"  local git_dir\n" +
 	"  if git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then\n" +

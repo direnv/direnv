@@ -978,7 +978,7 @@ direnv_version() {
   "$direnv" version "$@"
 }
 
-# Usage: on_branch [<branch_name>]
+# Usage: on_git_branch [<branch_name>]
 #
 # Returns 0 if within a git repository with the given branch name. If no branch
 # name is provided, then returns 0 when within _any_ branch. Requires the git
@@ -990,15 +990,15 @@ direnv_version() {
 #
 # Example:
 #
-#    if on_branch develop; then
+#    if on_git_branch develop; then
 #      echo "Remember to merge with upstream regularly!"
 #    fi
 #
-#    if on_branch; then
+#    if on_git_branch; then
 #      echo "Thanks for contributing to a GitHub project!"
 #    fi
 #
-on_branch() {
+on_git_branch() {
   if ! has git; then return 1; fi
   local git_dir
   if git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
