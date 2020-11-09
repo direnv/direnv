@@ -36,7 +36,7 @@ func ConfigDir(env map[string]string, programName string) string {
 // CacheDir returns the cache directory for the application
 func CacheDir(env map[string]string, programName string) string {
 	if env["XDG_CACHE_HOME"] != "" {
-		return filepath.Join(env["XDG_CONFIG_HOME"], programName)
+		return filepath.Join(env["XDG_CACHE_HOME"], programName)
 	} else if env["HOME"] != "" {
 		return filepath.Join(env["HOME"], ".cache", programName)
 	}
