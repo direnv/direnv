@@ -251,6 +251,22 @@ source_env() {
   popd >/dev/null || return 1
 }
 
+# Usage: source_env_if_exists <filename>
+#
+# Loads another ".envrc", but only if it exists.
+#
+# NOTE: contrary to source_env, this only works when passing a path to a file,
+#       not a directory.
+#
+# Example:
+# 
+#    source_env_if_exists .envrc.private
+#
+source_env_if_exists() {
+  watch_file "$1"
+  if [[ -f "$1" ]]; then source_env "$1"; fi
+}
+
 # Usage: watch_file <filename> [<filename> ...]
 #
 # Adds each <filename> to the list of files that direnv will watch for changes -
