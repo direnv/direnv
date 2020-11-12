@@ -37,6 +37,7 @@ func GetEnv() Env {
 // about the previously-loaded environment.
 func (env Env) CleanContext() {
 	delete(env, DIRENV_DIR)
+	delete(env, DIRENV_RC_FILE)
 	delete(env, DIRENV_WATCHES)
 	delete(env, DIRENV_DIFF)
 }

@@ -21,6 +21,7 @@ set -gx PATH (dirname $TEST_DIR) $PATH
 set -x DIRENV_CONFIG $PWD
 set -e DIRENV_BASH
 set -e DIRENV_DIR
+set -e DIRENV_FILE
 set -e DIRENV_WATCHES
 set -e DIRENV_MTIME
 set -e DIRENV_DIFF
