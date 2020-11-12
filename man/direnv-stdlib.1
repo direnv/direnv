@@ -101,6 +101,26 @@ Loads another \fB\fC\&.envrc\fR either by specifying its path or filename.
 .PP
 NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.
 
+.SS \fB\fCsource\_env\_if\_exists <filename>\fR
+.PP
+Loads another ".envrc", but only if it exists.
+
+.PP
+NOTE: contrary to \fB\fCsource\_env\fR, this only works when passing a path to a file,
+      not a directory.
+
+.PP
+Example:
+
+.PP
+.RS
+
+.nf
+source\_env\_if\_exists .envrc.private
+
+.fi
+.RE
+
 .SS \fB\fCsource\_up [<filename>]\fR
 .PP
 Loads another \fB\fC\&.envrc\fR if found when searching from the parent directory up to /.

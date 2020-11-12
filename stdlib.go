@@ -254,6 +254,22 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  popd >/dev/null || return 1\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: source_env_if_exists <filename>\n" +
+	"#\n" +
+	"# Loads another \".envrc\", but only if it exists.\n" +
+	"#\n" +
+	"# NOTE: contrary to source_env, this only works when passing a path to a file,\n" +
+	"#       not a directory.\n" +
+	"#\n" +
+	"# Example:\n" +
+	"# \n" +
+	"#    source_env_if_exists .envrc.private\n" +
+	"#\n" +
+	"source_env_if_exists() {\n" +
+	"  watch_file \"$1\"\n" +
+	"  if [[ -f \"$1\" ]]; then source_env \"$1\"; fi\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: watch_file <filename> [<filename> ...]\n" +
 	"#\n" +
 	"# Adds each <filename> to the list of files that direnv will watch for changes -\n" +
