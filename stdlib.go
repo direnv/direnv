@@ -416,7 +416,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"direnv_load() {\n" +
 	"  # Backup watches in case of `nix-shell --pure`\n" +
 	"  local prev_watches=$DIRENV_WATCHES\n" +
-	"  local temp_dir output_file script_file exit_code\n" +
+	"  local temp_dir output_file script_file exit_code old_direnv_dump_file_path\n" +
 	"\n" +
 	"  # Prepare a temporary place for dumps and such.\n" +
 	"  temp_dir=$(mktemp -dt direnv.XXXXXX) || {\n" +
@@ -425,6 +425,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  }\n" +
 	"  output_file=\"$temp_dir/output\"\n" +
 	"  script_file=\"$temp_dir/script\"\n" +
+	"  old_direnv_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}\n" +
 	"\n" +
 	"  # Chain the following commands explicitly so that we can capture the exit code\n" +
 	"  # of the whole chain. Crucially this ensures that we don't return early (via\n" +
@@ -446,6 +447,13 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  # Restore watches if the dump wiped them\n" +
 	"  if [[ -z \"${DIRENV_WATCHES:-}\" ]]; then\n" +
 	"    export DIRENV_WATCHES=$prev_watches\n" +
+	"  fi\n" +
+	"\n" +
+	"  # Restore DIRENV_DUMP_FILE_PATH if needed\n" +
+	"  if [[ -n \"$old_direnv_dump_file_path\" ]]; then\n" +
+	"    export DIRENV_DUMP_FILE_PATH=$old_direnv_dump_file_path\n" +
+	"  else\n" +
+	"    unset DIRENV_DUMP_FILE_PATH\n" +
 	"  fi\n" +
 	"\n" +
 	"  # Exit accordingly\n" +
