@@ -330,7 +330,7 @@ source_url() {
 direnv_load() {
   # Backup watches in case of `nix-shell --pure`
   local prev_watches=$DIRENV_WATCHES
-  local temp_dir output_file script_file exit_code
+  local temp_dir output_file script_file exit_code old_direnv_dump_file_path
 
   # Prepare a temporary place for dumps and such.
   temp_dir=$(mktemp -dt direnv.XXXXXX) || {
@@ -339,6 +339,7 @@ direnv_load() {
   }
   output_file="$temp_dir/output"
   script_file="$temp_dir/script"
+  old_direnv_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}
 
   # Chain the following commands explicitly so that we can capture the exit code
   # of the whole chain. Crucially this ensures that we don't return early (via
@@ -360,6 +361,13 @@ direnv_load() {
   # Restore watches if the dump wiped them
   if [[ -z "${DIRENV_WATCHES:-}" ]]; then
     export DIRENV_WATCHES=$prev_watches
+  fi
+
+  # Restore DIRENV_DUMP_FILE_PATH if needed
+  if [[ -n "$old_direnv_dump_file_path" ]]; then
+    export DIRENV_DUMP_FILE_PATH=$old_direnv_dump_file_path
+  else
+    unset DIRENV_DUMP_FILE_PATH
   fi
 
   # Exit accordingly
