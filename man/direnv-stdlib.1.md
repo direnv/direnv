@@ -336,6 +336,45 @@ Checks that the direnv version is at least old as `version_at_least`. This can
 be useful when sharing an `.envrc` and to make sure that the users are up to
 date.
 
+### `strict_env [<command> ...]`
+
+Turns on shell execution strictness. This will force the .envrc
+evaluation context to exit immediately if:
+
+- any command in a pipeline returns a non-zero exit status that is not
+  otherwise handled as part of `if`, `while`, or `until` tests,
+  return value negation (`!`), or part of a boolean (`&&` or `||`)
+  chain.
+- any variable that has not explicitly been set or declared (with
+  either `declare` or `local`) is referenced.
+
+If followed by a command-line, the strictness applies for the duration
+of the command.
+
+Example (Whole Script):
+
+    strict_env
+    has curl
+
+Example (Command):
+
+    strict_env has curl
+
+#### `unstrict_env [<command> ...]`
+
+Turns off shell execution strictness. If followed by a command-line, the
+strictness applies for the duration of the command.
+
+Example (Whole Script):
+
+    unstrict_env
+    has curl
+
+Example (Command):
+
+    unstrict_env has curl
+
+
 COPYRIGHT
 ---------
 
