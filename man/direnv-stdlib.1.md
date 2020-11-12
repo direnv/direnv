@@ -314,6 +314,14 @@ Example (.envrc):
     set -e
     use node 4.2.2
 
+### `use vim [<vimrc_file>]`
+
+Prepends the specified vim script (or .vimrc.local by default) to the
+`DIRENV_EXTRA_VIMRC` environment variable.
+
+This variable is understood by the direnv/direnv.vim extension. When found,
+it will source it after opening files in the directory.
+
 ### `watch_file <path> [<path> ...]`
 
 Adds each file to direnv's watch-list. If the file changes direnv will reload the environment on the next prompt.

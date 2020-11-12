@@ -987,6 +987,18 @@ use_guix() {
   eval "$(guix environment "$@" --search-paths)"
 }
 
+# Usage: use_vim [<vimrc_file>]
+#
+# Prepends the specified vim script (or .vimrc.local by default) to the
+# `DIRENV_EXTRA_VIMRC` environment variable.
+#
+# This variable is understood by the direnv/direnv.vim extension. When found,
+# it will source it after opening files in the directory.
+use_vim() {
+  local extra_vimrc=${1:-.vimrc.local}
+  path_add DIRENV_EXTRA_VIMRC "$extra_vimrc"
+}
+
 # Usage: direnv_version <version_at_least>
 #
 # Checks that the direnv version is at least old as <version_at_least>.
