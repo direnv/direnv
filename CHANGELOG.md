@@ -1,4 +1,17 @@
 
+2.24.0 / 2020-11-15
+==================
+
+  * direnv_load: avoid leaking DIRENV_DUMP_FILE_PATH (#715)
+  * Add strict_env and unstrict_env (#572)
+  * stdlib: add `use_vim` to source local vimrc (#497)
+  * stdlib: add source_env_if_exists (#714)
+  * Wording (#713)
+  * build(deps): bump actions/checkout from v2.3.3 to v2.3.4 (#709)
+  * build(deps): bump cachix/install-nix-action from v11 to v12 (#710)
+  * Fix XDG_CACHE_HOME path (#711)
+  * rc: make file existence check more robust (#706)
+
 2.23.1 / 2020-10-22
 ==================
 
