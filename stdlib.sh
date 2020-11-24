@@ -1117,16 +1117,16 @@ direnv_version() {
 #    fi
 on_git_branch() {
   if ! has git; then
-    log_error "on_git_branch needs git, which was not found on your system"
+    log_error "on_git_branch needs git, which could not be found on your system"
     return 1
   fi
   local git_dir
-  if git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null); then
+  if git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
     if [ -n "$1" ]; then
       watch_file "$git_dir/HEAD"
     fi
   else
-    log_error "on_git_branch could not find the .git directory corresponding to the current working directory."
+    log_error "on_git_branch could not locate the .git directory corresponding to the current working directory."
     return 1
   fi
   [ -z "$1" ] || [ "$(git branch --show-current)" = "$1" ]
