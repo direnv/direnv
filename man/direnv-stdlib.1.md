@@ -393,6 +393,7 @@ Example (.envrc):
      echo "Thanks for contributing to a GitHub project!"
    fi
 
+
 COPYRIGHT
 ---------
 
