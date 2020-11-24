@@ -1102,15 +1102,14 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"# Usage: on_git_branch [<branch_name>]\n" +
 	"#\n" +
-	"# Returns 0 if within a git repository with the given branch name. If no branch\n" +
+	"# Returns 0 if within a git repository with given `branch_name`. If no branch\n" +
 	"# name is provided, then returns 0 when within _any_ branch. Requires the git\n" +
-	"# command to be installed.\n" +
-	"# Returns 1 otherwise.\n" +
+	"# command to be installed. Returns 1 otherwise.\n" +
 	"#\n" +
-	"# When a branch is specified, .git/HEAD is watched so that entering/exiting a\n" +
-	"# branch triggers a reload.\n" +
+	"# When a branch is specified, then `.git/HEAD` is watched so that\n" +
+	"# entering/exiting a branch triggers a reload.\n" +
 	"#\n" +
-	"# Example:\n" +
+	"# Example (.envrc):\n" +
 	"#\n" +
 	"#    if on_git_branch child_changes; then\n" +
 	"#      export MERGE_BASE_BRANCH=parent_changes\n" +
@@ -1119,7 +1118,6 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#    if on_git_branch; then\n" +
 	"#      echo \"Thanks for contributing to a GitHub project!\"\n" +
 	"#    fi\n" +
-	"#\n" +
 	"on_git_branch() {\n" +
 	"  if ! has git; then\n" +
 	"    log_error \"on_git_branch needs git, which was not found on your system\"\n" +
