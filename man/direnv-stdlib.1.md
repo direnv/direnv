@@ -317,6 +317,23 @@ Checks that the direnv version is at least old as `version_at_least`. This can
 be useful when sharing an `.envrc` and to make sure that the users are up to
 date.
 
+### `on_git_branch [<branch_name>]`
+
+Returns 0 if within a git repository with the given branch name. If no branch name is provided, then returns 0 when within _any_ branch. Requires the git command to be installed.
+Returns 1 otherwise.
+
+When a branch is specified, .git/HEAD is watched so that entering/exiting a branch triggers a reload.
+
+Example (.envrc):
+
+   if on_git_branch child_changes; then
+     export MERGE_BASE_BRANCH=parent_changes
+   fi
+
+   if on_git_branch; then
+     echo "Thanks for contributing to a GitHub project!"
+   fi
+
 COPYRIGHT
 ---------
 

@@ -993,8 +993,8 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"# Example:\n" +
 	"#\n" +
-	"#    if on_git_branch develop; then\n" +
-	"#      echo \"Remember to merge with upstream regularly!\"\n" +
+	"#    if on_git_branch child_changes; then\n" +
+	"#      export MERGE_BASE_BRANCH=parent_changes\n" +
 	"#    fi\n" +
 	"#\n" +
 	"#    if on_git_branch; then\n" +
@@ -1002,11 +1002,17 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#    fi\n" +
 	"#\n" +
 	"on_git_branch() {\n" +
-	"  if ! has git; then return 1; fi\n" +
+	"  if ! has git; then\n" +
+	"    log_error \"on_git_branch needs git, which was not found on your system\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
 	"  local git_dir\n" +
 	"  if git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then\n" +
-	"    [ -n \"$1\" ] && watch_file \"$git_dir/HEAD\"\n" +
+	"    if [ -n \"$1\" ]; then\n" +
+	"      watch_file \"$git_dir/HEAD\"\n" +
+	"    fi\n" +
 	"  else\n" +
+	"    log_error \"on_git_branch could not find the `.git` directory corresponding to the current working directory.\"\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"  [ -z \"$1\" ] || [ \"$(git branch --show-current)\" = \"$1\" ]\n" +

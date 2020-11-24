@@ -1,3 +1,4 @@
+.nh
 .TH DIRENV\-STDLIB 1 "2019" direnv "User Manuals"
 .SH NAME
 .PP
@@ -185,8 +186,7 @@ Removes directories that match any of the given shell patterns from the PATH env
 
 .PP
 Bash pattern syntax:
-  
-\[la]https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html\[ra]
+  https://www.gnu.org/software/bash/manual/html\_node/Pattern\-Matching.html
 
 .PP
 Example:
@@ -290,8 +290,7 @@ Adds "$PWD/vendor/bin" to the PATH environment variable.
 
 .SS \fB\fClayout perl\fR
 .PP
-Setup environment variables required by perl's local::lib See 
-\[la]http://search.cpan.org/dist/local-lib/lib/local/lib.pm\[ra] for more details.
+Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local\-lib/lib/local/lib.pm for more details.
 
 .SS \fB\fClayout python [<python\_exe>]\fR
 .PP
@@ -365,8 +364,7 @@ Load environment variables from \fB\fCnix\-shell\fR\&.
 If you have a \fB\fCdefault.nix\fR or \fB\fCshell.nix\fR these will be used by default, but you can also specify packages directly (e.g \fB\fCuse nix \-p ocaml\fR).
 
 .PP
-See 
-\[la]http://nixos.org/nix/manual/#sec-nix-shell\[ra]
+See http://nixos.org/nix/manual/#sec\-nix\-shell
 
 .SS \fB\fCuse guix [...]\fR
 .PP
@@ -376,8 +374,7 @@ Load environment variables from \fB\fCguix environment\fR\&.
 Any arguments given will be passed to guix environment. For example, \fB\fCuse guix hello\fR would setup an environment with the dependencies of the hello package. To create an environment including hello, the \fB\fC\-\-ad\-hoc\fR flag is used \fB\fCuse guix \-\-ad\-hoc hello\fR\&. Other options include \fB\fC\-\-load\fR which allows loading an environment from a file.
 
 .PP
-See 
-\[la]https://www.gnu.org/software/guix/manual/html_node/Invoking-guix-environment.html\[ra]
+See https://www.gnu.org/software/guix/manual/html\_node/Invoking\-guix\-environment.html
 
 .SS \fB\fCrvm [...]\fR
 .PP
@@ -453,6 +450,27 @@ watch\_file Gemfile
 Checks that the direnv version is at least old as \fB\fCversion\_at\_least\fR\&. This can
 be useful when sharing an \fB\fC\&.envrc\fR and to make sure that the users are up to
 date.
+
+.SS \fB\fCon\_git\_branch [<branch\_name>]\fR
+.PP
+Returns 0 if within a git repository with the given branch name. If no branch name is provided, then returns 0 when within \fIany\fP branch. Requires the git command to be installed.
+Returns 1 otherwise.
+
+.PP
+When a branch is specified, .git/HEAD is watched so that entering/exiting a branch triggers a reload.
+
+.PP
+Example (.envrc):
+
+.PP
+if on\_git\_branch child\_changes; then
+     export MERGE\_BASE\_BRANCH=parent\_changes
+   fi
+
+.PP
+if on\_git\_branch; then
+     echo "Thanks for contributing to a GitHub project!"
+   fi
 
 .SH COPYRIGHT
 .PP

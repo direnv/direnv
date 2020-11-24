@@ -990,8 +990,8 @@ direnv_version() {
 #
 # Example:
 #
-#    if on_git_branch develop; then
-#      echo "Remember to merge with upstream regularly!"
+#    if on_git_branch child_changes; then
+#      export MERGE_BASE_BRANCH=parent_changes
 #    fi
 #
 #    if on_git_branch; then
@@ -999,11 +999,17 @@ direnv_version() {
 #    fi
 #
 on_git_branch() {
-  if ! has git; then return 1; fi
+  if ! has git; then
+    log_error "on_git_branch needs git, which was not found on your system"
+    return 1
+  fi
   local git_dir
   if git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
-    [ -n "$1" ] && watch_file "$git_dir/HEAD"
+    if [ -n "$1" ]; then
+      watch_file "$git_dir/HEAD"
+    fi
   else
+    log_error "on_git_branch could not find the `.git` directory corresponding to the current working directory."
     return 1
   fi
   [ -z "$1" ] || [ "$(git branch --show-current)" = "$1" ]
