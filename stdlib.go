@@ -1129,7 +1129,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"      watch_file \"$git_dir/HEAD\"\n" +
 	"    fi\n" +
 	"  else\n" +
-	"    log_error \"on_git_branch could not find the $(.git) directory corresponding to the current working directory.\"\n" +
+	"    log_error \"on_git_branch could not find the .git directory corresponding to the current working directory.\"\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"  [ -z \"$1\" ] || [ \"$(git branch --show-current)\" = \"$1\" ]\n" +

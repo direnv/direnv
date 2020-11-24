@@ -1126,7 +1126,7 @@ on_git_branch() {
       watch_file "$git_dir/HEAD"
     fi
   else
-    log_error "on_git_branch could not find the $(.git) directory corresponding to the current working directory."
+    log_error "on_git_branch could not find the .git directory corresponding to the current working directory."
     return 1
   fi
   [ -z "$1" ] || [ "$(git branch --show-current)" = "$1" ]
