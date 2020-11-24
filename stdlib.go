@@ -38,8 +38,8 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  mode=\"$1\"\n" +
 	"  shift\n" +
 	"\n" +
-	"  set +o | grep 'pipefail\\|nounset\\|errexit' >\"$tmpfile\"\n" +
-	"  old_shell_options=$(<\"$tmpfile\")\n" +
+	"  set +o | grep 'pipefail\\|nounset\\|errexit' > \"$tmpfile\"\n" +
+	"  old_shell_options=$(< \"$tmpfile\")\n" +
 	"  rm -f tmpfile\n" +
 	"\n" +
 	"  case \"$mode\" in\n" +
@@ -202,48 +202,23 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#    # output: /usr/local/foo\n" +
 	"#\n" +
 	"expand_path() {\n" +
-	"  local REPLY\n" +
-	"  realpath.absolute \"${2+\"$2\"}\" \"${1+\"$1\"}\"\n" +
-	"  echo \"$REPLY\"\n" +
+	"  local REPLY; realpath.absolute \"${2+\"$2\"}\" \"${1+\"$1\"}\"; echo \"$REPLY\"\n" +
 	"}\n" +
 	"\n" +
 	"# --- vendored from https://github.com/bashup/realpaths\n" +
-	"realpath.dirname() {\n" +
-	"  REPLY=.\n" +
-	"  ! [[ $1 =~ /+[^/]+/*$|^//$ ]] || REPLY=\"${1%${BASH_REMATCH[0]}}\"\n" +
-	"  REPLY=${REPLY:-/}\n" +
-	"}\n" +
-	"realpath.basename() {\n" +
-	"  REPLY=/\n" +
-	"  ! [[ $1 =~ /*([^/]+)/*$ ]] || REPLY=\"${BASH_REMATCH[1]}\"\n" +
-	"}\n" +
+	"realpath.dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$|^//$ ]] || REPLY=\"${1%${BASH_REMATCH[0]}}\"; REPLY=${REPLY:-/}; }\n" +
+	"realpath.basename(){ REPLY=/; ! [[ $1 =~ /*([^/]+)/*$ ]] || REPLY=\"${BASH_REMATCH[1]}\"; }\n" +
 	"\n" +
 	"realpath.absolute() {\n" +
-	"  REPLY=$PWD\n" +
-	"  local eg=extglob\n" +
-	"  ! shopt -q $eg || eg=\n" +
-	"  ${eg:+shopt -s $eg}\n" +
+	"  REPLY=$PWD; local eg=extglob; ! shopt -q $eg || eg=; ${eg:+shopt -s $eg}\n" +
 	"  while (($#)); do case $1 in\n" +
-	"    // | //[^/]*)\n" +
-	"      REPLY=//\n" +
-	"      set -- \"${1:2}\" \"${@:2}\"\n" +
-	"      ;;\n" +
-	"    /*)\n" +
-	"      REPLY=/\n" +
-	"      set -- \"${1##+(/)}\" \"${@:2}\"\n" +
-	"      ;;\n" +
+	"    //|//[^/]*) REPLY=//; set -- \"${1:2}\" \"${@:2}\" ;;\n" +
+	"    /*) REPLY=/; set -- \"${1##+(/)}\" \"${@:2}\" ;;\n" +
 	"    */*) set -- \"${1%%/*}\" \"${1##${1%%/*}+(/)}\" \"${@:2}\" ;;\n" +
-	"    '' | .) shift ;;\n" +
-	"    ..)\n" +
-	"      realpath.dirname \"$REPLY\"\n" +
-	"      shift\n" +
-	"      ;;\n" +
-	"    *)\n" +
-	"      REPLY=\"${REPLY%/}/$1\"\n" +
-	"      shift\n" +
-	"      ;;\n" +
-	"    esac; done\n" +
-	"  ${eg:+shopt -u $eg}\n" +
+	"    ''|.) shift ;;\n" +
+	"    ..) realpath.dirname \"$REPLY\"; shift ;;\n" +
+	"    *) REPLY=\"${REPLY%/}/$1\"; shift ;;\n" +
+	"  esac; done; ${eg:+shopt -u $eg}\n" +
 	"}\n" +
 	"# ---\n" +
 	"\n" +
@@ -370,7 +345,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#       not a directory.\n" +
 	"#\n" +
 	"# Example:\n" +
-	"#\n" +
+	"# \n" +
 	"#    source_env_if_exists .envrc.private\n" +
 	"#\n" +
 	"source_env_if_exists() {\n" +
@@ -457,15 +432,14 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  # `set -e`, for example) and hence always remove the temporary directory.\n" +
 	"  touch \"$output_file\" &&\n" +
 	"    DIRENV_DUMP_FILE_PATH=\"$output_file\" \"$@\" &&\n" +
-	"    {\n" +
-	"      test -s \"$output_file\" || {\n" +
+	"    { test -s \"$output_file\" || {\n" +
 	"        log_error \"Environment not dumped; did you invoke 'direnv dump'?\"\n" +
 	"        false\n" +
 	"      }\n" +
 	"    } &&\n" +
-	"    \"$direnv\" apply_dump \"$output_file\" >\"$script_file\" &&\n" +
+	"    \"$direnv\" apply_dump \"$output_file\" > \"$script_file\" &&\n" +
 	"    source \"$script_file\" ||\n" +
-	"    exit_code=$?\n" +
+	"      exit_code=$?\n" +
 	"\n" +
 	"  # Scrub temporary directory\n" +
 	"  rm -rf \"$temp_dir\"\n" +
@@ -677,10 +651,10 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  # strip $version_dir/$prefix prefix from line.\n" +
 	"  # Sort by version: split by \".\" then reverse numeric sort for each piece of the version string\n" +
 	"  # The first one is the highest\n" +
-	"  find \"$version_dir\" -maxdepth 1 -mindepth 1 -type d -name \"${prefix}${partial_version}*\" |\n" +
-	"    while IFS= read -r line; do echo \"${line#${version_dir%/}/${prefix}}\"; done |\n" +
-	"    sort -t . -k 1,1rn -k 2,2rn -k 3,3rn |\n" +
-	"    head -1\n" +
+	"  find \"$version_dir\" -maxdepth 1 -mindepth 1 -type d -name \"${prefix}${partial_version}*\" \\\n" +
+	"    | while IFS= read -r line; do echo \"${line#${version_dir%/}/${prefix}}\"; done \\\n" +
+	"    | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \\\n" +
+	"    | head -1\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout <type>\n" +
@@ -762,20 +736,20 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version\n" +
 	"    case $ve in\n" +
-	"    \"venv\")\n" +
-	"      if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"        $python -m venv \"$@\" \"$VIRTUAL_ENV\"\n" +
-	"      fi\n" +
-	"      ;;\n" +
-	"    \"virtualenv\")\n" +
-	"      if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
-	"        $python -m virtualenv \"$@\" \"$VIRTUAL_ENV\"\n" +
-	"      fi\n" +
-	"      ;;\n" +
-	"    *)\n" +
-	"      log_error \"Error: neither venv nor virtualenv are available.\"\n" +
-	"      return 1\n" +
-	"      ;;\n" +
+	"      \"venv\")\n" +
+	"        if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
+	"          $python -m venv \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"        fi\n" +
+	"        ;;\n" +
+	"      \"virtualenv\")\n" +
+	"        if [[ ! -d $VIRTUAL_ENV ]]; then\n" +
+	"          $python -m virtualenv \"$@\" \"$VIRTUAL_ENV\"\n" +
+	"        fi\n" +
+	"        ;;\n" +
+	"      *)\n" +
+	"        log_error \"Error: neither venv nor virtualenv are available.\"\n" +
+	"        return 1\n" +
+	"        ;;\n" +
 	"    esac\n" +
 	"  fi\n" +
 	"  export VIRTUAL_ENV\n" +
@@ -844,10 +818,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"    exit 2\n" +
 	"  fi\n" +
 	"\n" +
-	"  VIRTUAL_ENV=$(\n" +
-	"    pipenv --venv 2>/dev/null\n" +
-	"    true\n" +
-	"  )\n" +
+	"  VIRTUAL_ENV=$(pipenv --venv 2>/dev/null ; true)\n" +
 	"\n" +
 	"  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then\n" +
 	"    pipenv install --dev\n" +
@@ -1127,41 +1098,6 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# Checks that the direnv version is at least old as <version_at_least>.\n" +
 	"direnv_version() {\n" +
 	"  \"$direnv\" version \"$@\"\n" +
-	"}\n" +
-	"\n" +
-	"# Usage: on_git_branch [<branch_name>]\n" +
-	"#\n" +
-	"# Returns 0 if within a git repository with given `branch_name`. If no branch\n" +
-	"# name is provided, then returns 0 when within _any_ branch. Requires the git\n" +
-	"# command to be installed. Returns 1 otherwise.\n" +
-	"#\n" +
-	"# When a branch is specified, then `.git/HEAD` is watched so that\n" +
-	"# entering/exiting a branch triggers a reload.\n" +
-	"#\n" +
-	"# Example (.envrc):\n" +
-	"#\n" +
-	"#    if on_git_branch child_changes; then\n" +
-	"#      export MERGE_BASE_BRANCH=parent_changes\n" +
-	"#    fi\n" +
-	"#\n" +
-	"#    if on_git_branch; then\n" +
-	"#      echo \"Thanks for contributing to a GitHub project!\"\n" +
-	"#    fi\n" +
-	"on_git_branch() {\n" +
-	"  if ! has git; then\n" +
-	"    log_error \"on_git_branch needs git, which was not found on your system\"\n" +
-	"    return 1\n" +
-	"  fi\n" +
-	"  local git_dir\n" +
-	"  if git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null); then\n" +
-	"    if [ -n \"$1\" ]; then\n" +
-	"      watch_file \"$git_dir/HEAD\"\n" +
-	"    fi\n" +
-	"  else\n" +
-	"    log_error \"on_git_branch could not find the $(.git) directory corresponding to the current working directory.\"\n" +
-	"    return 1\n" +
-	"  fi\n" +
-	"  [ -z \"$1\" ] || [ \"$(git branch --show-current)\" = \"$1\" ]\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: __main__ <cmd> [...<args>]\n" +
