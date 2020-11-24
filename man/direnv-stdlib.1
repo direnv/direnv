@@ -1,4 +1,3 @@
-.nh
 .TH DIRENV\-STDLIB 1 "2019" direnv "User Manuals"
 .SH NAME
 .PP
@@ -102,6 +101,26 @@ Loads another \fB\fC\&.envrc\fR either by specifying its path or filename.
 .PP
 NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.
 
+.SS \fB\fCsource\_env\_if\_exists <filename>\fR
+.PP
+Loads another ".envrc", but only if it exists.
+
+.PP
+NOTE: contrary to \fB\fCsource\_env\fR, this only works when passing a path to a file,
+      not a directory.
+
+.PP
+Example:
+
+.PP
+.RS
+
+.nf
+source\_env\_if\_exists .envrc.private
+
+.fi
+.RE
+
 .SS \fB\fCsource\_up [<filename>]\fR
 .PP
 Loads another \fB\fC\&.envrc\fR if found when searching from the parent directory up to /.
@@ -186,7 +205,8 @@ Removes directories that match any of the given shell patterns from the PATH env
 
 .PP
 Bash pattern syntax:
-  https://www.gnu.org/software/bash/manual/html\_node/Pattern\-Matching.html
+  
+\[la]https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html\[ra]
 
 .PP
 Example:
@@ -290,7 +310,8 @@ Adds "$PWD/vendor/bin" to the PATH environment variable.
 
 .SS \fB\fClayout perl\fR
 .PP
-Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local\-lib/lib/local/lib.pm for more details.
+Setup environment variables required by perl's local::lib See 
+\[la]http://search.cpan.org/dist/local-lib/lib/local/lib.pm\[ra] for more details.
 
 .SS \fB\fClayout python [<python\_exe>]\fR
 .PP
@@ -364,7 +385,8 @@ Load environment variables from \fB\fCnix\-shell\fR\&.
 If you have a \fB\fCdefault.nix\fR or \fB\fCshell.nix\fR these will be used by default, but you can also specify packages directly (e.g \fB\fCuse nix \-p ocaml\fR).
 
 .PP
-See http://nixos.org/nix/manual/#sec\-nix\-shell
+See 
+\[la]http://nixos.org/nix/manual/#sec-nix-shell\[ra]
 
 .SS \fB\fCuse guix [...]\fR
 .PP
@@ -374,7 +396,8 @@ Load environment variables from \fB\fCguix environment\fR\&.
 Any arguments given will be passed to guix environment. For example, \fB\fCuse guix hello\fR would setup an environment with the dependencies of the hello package. To create an environment including hello, the \fB\fC\-\-ad\-hoc\fR flag is used \fB\fCuse guix \-\-ad\-hoc hello\fR\&. Other options include \fB\fC\-\-load\fR which allows loading an environment from a file.
 
 .PP
-See https://www.gnu.org/software/guix/manual/html\_node/Invoking\-guix\-environment.html
+See 
+\[la]https://www.gnu.org/software/guix/manual/html_node/Invoking-guix-environment.html\[ra]
 
 .SS \fB\fCrvm [...]\fR
 .PP
@@ -429,6 +452,15 @@ use node 4.2.2
 .fi
 .RE
 
+.SS \fB\fCuse vim [<vimrc\_file>]\fR
+.PP
+Prepends the specified vim script (or .vimrc.local by default) to the
+\fB\fCDIRENV\_EXTRA\_VIMRC\fR environment variable.
+
+.PP
+This variable is understood by the direnv/direnv.vim extension. When found,
+it will source it after opening files in the directory.
+
 .SS \fB\fCwatch\_file <path> [<path> ...]\fR
 .PP
 Adds each file to direnv's watch\-list. If the file changes direnv will reload the environment on the next prompt.
@@ -451,26 +483,77 @@ Checks that the direnv version is at least old as \fB\fCversion\_at\_least\fR\&.
 be useful when sharing an \fB\fC\&.envrc\fR and to make sure that the users are up to
 date.
 
-.SS \fB\fCon\_git\_branch [<branch\_name>]\fR
+.SS \fB\fCstrict\_env [<command> ...]\fR
 .PP
-Returns 0 if within a git repository with the given branch name. If no branch name is provided, then returns 0 when within \fIany\fP branch. Requires the git command to be installed.
-Returns 1 otherwise.
+Turns on shell execution strictness. This will force the .envrc
+evaluation context to exit immediately if:
+.IP \(bu 2
+any command in a pipeline returns a non\-zero exit status that is not
+otherwise handled as part of \fB\fCif\fR, \fB\fCwhile\fR, or \fB\fCuntil\fR tests,
+return value negation (\fB\fC!\fR), or part of a boolean (\fB\fC\&\&\fR or \fB\fC||\fR)
+chain.
+.IP \(bu 2
+any variable that has not explicitly been set or declared (with
+either \fB\fCdeclare\fR or \fB\fClocal\fR) is referenced.
 
 .PP
-When a branch is specified, .git/HEAD is watched so that entering/exiting a branch triggers a reload.
+If followed by a command\-line, the strictness applies for the duration
+of the command.
 
 .PP
-Example (.envrc):
+Example (Whole Script):
 
 .PP
-if on\_git\_branch child\_changes; then
-     export MERGE\_BASE\_BRANCH=parent\_changes
-   fi
+.RS
+
+.nf
+strict\_env
+has curl
+
+.fi
+.RE
 
 .PP
-if on\_git\_branch; then
-     echo "Thanks for contributing to a GitHub project!"
-   fi
+Example (Command):
+
+.PP
+.RS
+
+.nf
+strict\_env has curl
+
+.fi
+.RE
+
+.SS \fB\fCunstrict\_env [<command> ...]\fR
+.PP
+Turns off shell execution strictness. If followed by a command\-line, the
+strictness applies for the duration of the command.
+
+.PP
+Example (Whole Script):
+
+.PP
+.RS
+
+.nf
+unstrict\_env
+has curl
+
+.fi
+.RE
+
+.PP
+Example (Command):
+
+.PP
+.RS
+
+.nf
+unstrict\_env has curl
+
+.fi
+.RE
 
 .SH COPYRIGHT
 .PP

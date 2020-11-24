@@ -75,6 +75,17 @@ Loads another `.envrc` either by specifying its path or filename.
 
 NOTE: the other `.envrc` is not checked by the security framework.
 
+### `source_env_if_exists <filename>`
+
+Loads another ".envrc", but only if it exists.
+
+NOTE: contrary to `source_env`, this only works when passing a path to a file,
+      not a directory.
+
+Example:
+
+    source_env_if_exists .envrc.private
+
 ### `source_up [<filename>]`
 
 Loads another `.envrc` if found when searching from the parent directory up to /.
@@ -303,6 +314,14 @@ Example (.envrc):
     set -e
     use node 4.2.2
 
+### `use vim [<vimrc_file>]`
+
+Prepends the specified vim script (or .vimrc.local by default) to the
+`DIRENV_EXTRA_VIMRC` environment variable.
+
+This variable is understood by the direnv/direnv.vim extension. When found,
+it will source it after opening files in the directory.
+
 ### `watch_file <path> [<path> ...]`
 
 Adds each file to direnv's watch-list. If the file changes direnv will reload the environment on the next prompt.
@@ -317,12 +336,52 @@ Checks that the direnv version is at least old as `version_at_least`. This can
 be useful when sharing an `.envrc` and to make sure that the users are up to
 date.
 
+### `strict_env [<command> ...]`
+
+Turns on shell execution strictness. This will force the .envrc
+evaluation context to exit immediately if:
+
+- any command in a pipeline returns a non-zero exit status that is not
+  otherwise handled as part of `if`, `while`, or `until` tests,
+  return value negation (`!`), or part of a boolean (`&&` or `||`)
+  chain.
+- any variable that has not explicitly been set or declared (with
+  either `declare` or `local`) is referenced.
+
+If followed by a command-line, the strictness applies for the duration
+of the command.
+
+Example (Whole Script):
+
+    strict_env
+    has curl
+
+Example (Command):
+
+    strict_env has curl
+
+#### `unstrict_env [<command> ...]`
+
+Turns off shell execution strictness. If followed by a command-line, the
+strictness applies for the duration of the command.
+
+Example (Whole Script):
+
+    unstrict_env
+    has curl
+
+Example (Command):
+
+    unstrict_env has curl
+
 ### `on_git_branch [<branch_name>]`
 
-Returns 0 if within a git repository with the given branch name. If no branch name is provided, then returns 0 when within _any_ branch. Requires the git command to be installed.
-Returns 1 otherwise.
+Returns 0 if within a git repository with given `branch_name`. If no branch name
+is provided, then returns 0 when within _any_ branch. Requires the git command
+to be installed. Returns 1 otherwise.
 
-When a branch is specified, .git/HEAD is watched so that entering/exiting a branch triggers a reload.
+When a branch is specified, then `.git/HEAD` is watched so that entering/exiting
+a branch triggers a reload.
 
 Example (.envrc):
 

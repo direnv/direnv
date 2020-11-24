@@ -12,7 +12,6 @@ shopt -s gnu_errfmt
 shopt -s nullglob
 shopt -s extglob
 
-
 # NOTE: don't touch the RHS, it gets replaced at runtime
 direnv="$(command -v direnv)"
 
@@ -26,6 +25,90 @@ direnv_config_dir="${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}"
 # of a .envrc evaluation context. It is ignored by the direnv diffing
 # algorithm and so it won't be re-exported.
 export DIRENV_IN_ENVRC=1
+
+__env_strictness() {
+  local mode tmpfile old_shell_options
+  local -i res
+
+  tmpfile=$(mktemp)
+  res=0
+  mode="$1"
+  shift
+
+  set +o | grep 'pipefail\|nounset\|errexit' > "$tmpfile"
+  old_shell_options=$(< "$tmpfile")
+  rm -f tmpfile
+
+  case "$mode" in
+  strict)
+    set -o errexit -o nounset -o pipefail
+    ;;
+  unstrict)
+    set +o errexit +o nounset +o pipefail
+    ;;
+  *)
+    log_error "Unknown strictness mode '${mode}'."
+    exit 1
+    ;;
+  esac
+
+  if (($#)); then
+    "${@}"
+    res=$?
+    eval "$old_shell_options"
+  fi
+
+  # Force failure if the inner script has failed and the mode is strict
+  if [[ $mode = strict && $res -gt 0 ]]; then
+    exit 1
+  fi
+
+  return $res
+}
+
+# Usage: strict_env [<command> ...]
+#
+# Turns on shell execution strictness. This will force the .envrc
+# evaluation context to exit immediately if:
+#
+# - any command in a pipeline returns a non-zero exit status that is
+#   not otherwise handled as part of `if`, `while`, or `until` tests,
+#   return value negation (`!`), or part of a boolean (`&&` or `||`)
+#   chain.
+# - any variable that has not explicitly been set or declared (with
+#   either `declare` or `local`) is referenced.
+#
+# If followed by a command-line, the strictness applies for the duration
+# of the command.
+#
+# Example:
+#
+#    strict_env
+#    has curl
+#
+#    strict_env has curl
+strict_env() {
+  __env_strictness strict "$@"
+}
+
+# Usage: unstrict_env [<command> ...]
+#
+# Turns off shell execution strictness. If followed by a command-line, the
+# strictness applies for the duration of the command.
+#
+# Example:
+#
+#    unstrict_env
+#    has curl
+#
+#    unstrict_env has curl
+unstrict_env() {
+  if (($#)); then
+    __env_strictness unstrict "$@"
+  else
+    set +o errexit +o nounset +o pipefail
+  fi
+}
 
 # Usage: direnv_layout_dir
 #
@@ -251,6 +334,22 @@ source_env() {
   popd >/dev/null || return 1
 }
 
+# Usage: source_env_if_exists <filename>
+#
+# Loads another ".envrc", but only if it exists.
+#
+# NOTE: contrary to source_env, this only works when passing a path to a file,
+#       not a directory.
+#
+# Example:
+# 
+#    source_env_if_exists .envrc.private
+#
+source_env_if_exists() {
+  watch_file "$1"
+  if [[ -f "$1" ]]; then source_env "$1"; fi
+}
+
 # Usage: watch_file <filename> [<filename> ...]
 #
 # Adds each <filename> to the list of files that direnv will watch for changes -
@@ -314,7 +413,7 @@ source_url() {
 direnv_load() {
   # Backup watches in case of `nix-shell --pure`
   local prev_watches=$DIRENV_WATCHES
-  local temp_dir output_file script_file exit_code
+  local temp_dir output_file script_file exit_code old_direnv_dump_file_path
 
   # Prepare a temporary place for dumps and such.
   temp_dir=$(mktemp -dt direnv.XXXXXX) || {
@@ -323,6 +422,7 @@ direnv_load() {
   }
   output_file="$temp_dir/output"
   script_file="$temp_dir/script"
+  old_direnv_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}
 
   # Chain the following commands explicitly so that we can capture the exit code
   # of the whole chain. Crucially this ensures that we don't return early (via
@@ -344,6 +444,13 @@ direnv_load() {
   # Restore watches if the dump wiped them
   if [[ -z "${DIRENV_WATCHES:-}" ]]; then
     export DIRENV_WATCHES=$prev_watches
+  fi
+
+  # Restore DIRENV_DUMP_FILE_PATH if needed
+  if [[ -n "$old_direnv_dump_file_path" ]]; then
+    export DIRENV_DUMP_FILE_PATH=$old_direnv_dump_file_path
+  else
+    unset DIRENV_DUMP_FILE_PATH
   fi
 
   # Exit accordingly
@@ -969,6 +1076,18 @@ use_nix() {
 # `guix environment` command.
 use_guix() {
   eval "$(guix environment "$@" --search-paths)"
+}
+
+# Usage: use_vim [<vimrc_file>]
+#
+# Prepends the specified vim script (or .vimrc.local by default) to the
+# `DIRENV_EXTRA_VIMRC` environment variable.
+#
+# This variable is understood by the direnv/direnv.vim extension. When found,
+# it will source it after opening files in the directory.
+use_vim() {
+  local extra_vimrc=${1:-.vimrc.local}
+  path_add DIRENV_EXTRA_VIMRC "$extra_vimrc"
 }
 
 # Usage: direnv_version <version_at_least>

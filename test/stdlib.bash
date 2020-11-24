@@ -137,4 +137,25 @@ test_name use_julia
   test_julia ""    "1.5"
 )
 
+test_name source_env_if_exists
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  cd "$workdir"
+
+  # Try to source a file that doesn't exist
+  source_env_if_exists non_existing_file
+
+  # Try to source a file that exists
+  echo "export FOO=bar" > existing_file
+  source_env_if_exists existing_file
+  [[ $FOO = bar ]]
+)
+
+# test strict_env and unstrict_env
+./strict_env_test.bash
+
 echo OK

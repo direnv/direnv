@@ -15,7 +15,6 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"shopt -s nullglob\n" +
 	"shopt -s extglob\n" +
 	"\n" +
-	"\n" +
 	"# NOTE: don't touch the RHS, it gets replaced at runtime\n" +
 	"direnv=\"$(command -v direnv)\"\n" +
 	"\n" +
@@ -29,6 +28,90 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# of a .envrc evaluation context. It is ignored by the direnv diffing\n" +
 	"# algorithm and so it won't be re-exported.\n" +
 	"export DIRENV_IN_ENVRC=1\n" +
+	"\n" +
+	"__env_strictness() {\n" +
+	"  local mode tmpfile old_shell_options\n" +
+	"  local -i res\n" +
+	"\n" +
+	"  tmpfile=$(mktemp)\n" +
+	"  res=0\n" +
+	"  mode=\"$1\"\n" +
+	"  shift\n" +
+	"\n" +
+	"  set +o | grep 'pipefail\\|nounset\\|errexit' > \"$tmpfile\"\n" +
+	"  old_shell_options=$(< \"$tmpfile\")\n" +
+	"  rm -f tmpfile\n" +
+	"\n" +
+	"  case \"$mode\" in\n" +
+	"  strict)\n" +
+	"    set -o errexit -o nounset -o pipefail\n" +
+	"    ;;\n" +
+	"  unstrict)\n" +
+	"    set +o errexit +o nounset +o pipefail\n" +
+	"    ;;\n" +
+	"  *)\n" +
+	"    log_error \"Unknown strictness mode '${mode}'.\"\n" +
+	"    exit 1\n" +
+	"    ;;\n" +
+	"  esac\n" +
+	"\n" +
+	"  if (($#)); then\n" +
+	"    \"${@}\"\n" +
+	"    res=$?\n" +
+	"    eval \"$old_shell_options\"\n" +
+	"  fi\n" +
+	"\n" +
+	"  # Force failure if the inner script has failed and the mode is strict\n" +
+	"  if [[ $mode = strict && $res -gt 0 ]]; then\n" +
+	"    exit 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  return $res\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: strict_env [<command> ...]\n" +
+	"#\n" +
+	"# Turns on shell execution strictness. This will force the .envrc\n" +
+	"# evaluation context to exit immediately if:\n" +
+	"#\n" +
+	"# - any command in a pipeline returns a non-zero exit status that is\n" +
+	"#   not otherwise handled as part of `if`, `while`, or `until` tests,\n" +
+	"#   return value negation (`!`), or part of a boolean (`&&` or `||`)\n" +
+	"#   chain.\n" +
+	"# - any variable that has not explicitly been set or declared (with\n" +
+	"#   either `declare` or `local`) is referenced.\n" +
+	"#\n" +
+	"# If followed by a command-line, the strictness applies for the duration\n" +
+	"# of the command.\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    strict_env\n" +
+	"#    has curl\n" +
+	"#\n" +
+	"#    strict_env has curl\n" +
+	"strict_env() {\n" +
+	"  __env_strictness strict \"$@\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: unstrict_env [<command> ...]\n" +
+	"#\n" +
+	"# Turns off shell execution strictness. If followed by a command-line, the\n" +
+	"# strictness applies for the duration of the command.\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    unstrict_env\n" +
+	"#    has curl\n" +
+	"#\n" +
+	"#    unstrict_env has curl\n" +
+	"unstrict_env() {\n" +
+	"  if (($#)); then\n" +
+	"    __env_strictness unstrict \"$@\"\n" +
+	"  else\n" +
+	"    set +o errexit +o nounset +o pipefail\n" +
+	"  fi\n" +
+	"}\n" +
 	"\n" +
 	"# Usage: direnv_layout_dir\n" +
 	"#\n" +
@@ -254,6 +337,22 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  popd >/dev/null || return 1\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: source_env_if_exists <filename>\n" +
+	"#\n" +
+	"# Loads another \".envrc\", but only if it exists.\n" +
+	"#\n" +
+	"# NOTE: contrary to source_env, this only works when passing a path to a file,\n" +
+	"#       not a directory.\n" +
+	"#\n" +
+	"# Example:\n" +
+	"# \n" +
+	"#    source_env_if_exists .envrc.private\n" +
+	"#\n" +
+	"source_env_if_exists() {\n" +
+	"  watch_file \"$1\"\n" +
+	"  if [[ -f \"$1\" ]]; then source_env \"$1\"; fi\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: watch_file <filename> [<filename> ...]\n" +
 	"#\n" +
 	"# Adds each <filename> to the list of files that direnv will watch for changes -\n" +
@@ -317,7 +416,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"direnv_load() {\n" +
 	"  # Backup watches in case of `nix-shell --pure`\n" +
 	"  local prev_watches=$DIRENV_WATCHES\n" +
-	"  local temp_dir output_file script_file exit_code\n" +
+	"  local temp_dir output_file script_file exit_code old_direnv_dump_file_path\n" +
 	"\n" +
 	"  # Prepare a temporary place for dumps and such.\n" +
 	"  temp_dir=$(mktemp -dt direnv.XXXXXX) || {\n" +
@@ -326,6 +425,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  }\n" +
 	"  output_file=\"$temp_dir/output\"\n" +
 	"  script_file=\"$temp_dir/script\"\n" +
+	"  old_direnv_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}\n" +
 	"\n" +
 	"  # Chain the following commands explicitly so that we can capture the exit code\n" +
 	"  # of the whole chain. Crucially this ensures that we don't return early (via\n" +
@@ -347,6 +447,13 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  # Restore watches if the dump wiped them\n" +
 	"  if [[ -z \"${DIRENV_WATCHES:-}\" ]]; then\n" +
 	"    export DIRENV_WATCHES=$prev_watches\n" +
+	"  fi\n" +
+	"\n" +
+	"  # Restore DIRENV_DUMP_FILE_PATH if needed\n" +
+	"  if [[ -n \"$old_direnv_dump_file_path\" ]]; then\n" +
+	"    export DIRENV_DUMP_FILE_PATH=$old_direnv_dump_file_path\n" +
+	"  else\n" +
+	"    unset DIRENV_DUMP_FILE_PATH\n" +
 	"  fi\n" +
 	"\n" +
 	"  # Exit accordingly\n" +
@@ -972,6 +1079,18 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# `guix environment` command.\n" +
 	"use_guix() {\n" +
 	"  eval \"$(guix environment \"$@\" --search-paths)\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: use_vim [<vimrc_file>]\n" +
+	"#\n" +
+	"# Prepends the specified vim script (or .vimrc.local by default) to the\n" +
+	"# `DIRENV_EXTRA_VIMRC` environment variable.\n" +
+	"#\n" +
+	"# This variable is understood by the direnv/direnv.vim extension. When found,\n" +
+	"# it will source it after opening files in the directory.\n" +
+	"use_vim() {\n" +
+	"  local extra_vimrc=${1:-.vimrc.local}\n" +
+	"  path_add DIRENV_EXTRA_VIMRC \"$extra_vimrc\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: direnv_version <version_at_least>\n" +

@@ -118,7 +118,7 @@ unpack, would be able to wipe your hard drive once you `cd` into it.
 
 So here we are pretty sure that it won't do anything bad. Type `direnv allow .`
 and watch direnv loading your new environment. Note that `direnv edit .` is a
-handy shortcut that open the file in your $EDITOR and automatically allows it
+handy shortcut that opens the file in your $EDITOR and automatically reloads it
 if the file's modification time has changed.
 
 Now that the environment is loaded you can notice that once you `cd` out

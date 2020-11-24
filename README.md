@@ -147,7 +147,14 @@ Or drop by on [IRC (#direnv on freenode)](irc://irc.freenode.net/#direnv) to
 have a chat. If you ask a question make sure to stay around as not everyone is
 active all day.
 
-## Similar projects
+## Complementary projects
+
+Here is a list of projects you might want to look into if you are using direnv.
+
+* [starship](https://starship.rs/) - A cross-shell prompt.
+* [nix-direnv](https://github.com/nix-community/nix-direnv) - A fast, persistent use_nix implementation for direnv.
+
+## Related projects
 
 Here is a list of other projects found in the same design space. Feel free to
 submit new ones.
