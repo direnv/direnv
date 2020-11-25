@@ -385,13 +385,13 @@ a branch triggers a reload.
 
 Example (.envrc):
 
-   if on_git_branch child_changes; then
-     export MERGE_BASE_BRANCH=parent_changes
-   fi
+    if on_git_branch child_changes; then
+      export MERGE_BASE_BRANCH=parent_changes
+    fi
 
-   if on_git_branch; then
-     echo "Thanks for contributing to a GitHub project!"
-   fi
+    if on_git_branch; then
+      echo "Thanks for contributing to a GitHub project!"
+    fi
 
 
 COPYRIGHT

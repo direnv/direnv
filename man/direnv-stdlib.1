@@ -570,14 +570,19 @@ a branch triggers a reload.
 Example (.envrc):
 
 .PP
-if on\_git\_branch child\_changes; then
-     export MERGE\_BASE\_BRANCH=parent\_changes
-   fi
+.RS
 
-.PP
+.nf
+if on\_git\_branch child\_changes; then
+  export MERGE\_BASE\_BRANCH=parent\_changes
+fi
+
 if on\_git\_branch; then
-     echo "Thanks for contributing to a GitHub project!"
-   fi
+  echo "Thanks for contributing to a GitHub project!"
+fi
+
+.fi
+.RE
 
 .SH COPYRIGHT
 .PP
