@@ -1119,10 +1119,11 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#      echo \"Thanks for contributing to a GitHub project!\"\n" +
 	"#    fi\n" +
 	"on_git_branch() {\n" +
+	"  local git_dir\n" +
 	"  if ! has git; then\n" +
 	"    log_error \"on_git_branch needs git, which could not be found on your system\"\n" +
 	"    return 1\n" +
-	"  elif ! local git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then\n" +
+	"  elif ! git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then\n" +
 	"    log_error \"on_git_branch could not locate the .git directory corresponding to the current working directory.\"\n" +
 	"    return 1\n" +
 	"  elif [ -z \"$1\" ]; then\n" +

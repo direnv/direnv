@@ -1116,10 +1116,11 @@ direnv_version() {
 #      echo "Thanks for contributing to a GitHub project!"
 #    fi
 on_git_branch() {
+  local git_dir
   if ! has git; then
     log_error "on_git_branch needs git, which could not be found on your system"
     return 1
-  elif ! local git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
+  elif ! git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
     log_error "on_git_branch could not locate the .git directory corresponding to the current working directory."
     return 1
   elif [ -z "$1" ]; then
