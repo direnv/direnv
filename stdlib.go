@@ -1120,19 +1120,16 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#    fi\n" +
 	"on_git_branch() {\n" +
 	"  if ! has git; then\n" +
-	"    log_error \"on_git_branch needs git, which was not found on your system\"\n" +
+	"    log_error \"on_git_branch needs git, which could not be found on your system\"\n" +
 	"    return 1\n" +
-	"  fi\n" +
-	"  local git_dir\n" +
-	"  if git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null); then\n" +
-	"    if [ -n \"$1\" ]; then\n" +
-	"      watch_file \"$git_dir/HEAD\"\n" +
-	"    fi\n" +
-	"  else\n" +
-	"    log_error \"on_git_branch could not find the .git directory corresponding to the current working directory.\"\n" +
+	"  elif ! local git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then\n" +
+	"    log_error \"on_git_branch could not locate the .git directory corresponding to the current working directory.\"\n" +
 	"    return 1\n" +
+	"  elif [ -z \"$1\" ]; then\n" +
+	"    return 0\n" +
 	"  fi\n" +
-	"  [ -z \"$1\" ] || [ \"$(git branch --show-current)\" = \"$1\" ]\n" +
+	"  watch_file \"$git_dir/HEAD\"\n" +
+	"  [ \"$(git branch --show-current)\" = \"$1\" ]\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: __main__ <cmd> [...<args>]\n" +
