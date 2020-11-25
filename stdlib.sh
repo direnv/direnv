@@ -1119,17 +1119,14 @@ on_git_branch() {
   if ! has git; then
     log_error "on_git_branch needs git, which could not be found on your system"
     return 1
-  fi
-  local git_dir
-  if git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
-    if [ -n "$1" ]; then
-      watch_file "$git_dir/HEAD"
-    fi
-  else
+  elif ! local git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
     log_error "on_git_branch could not locate the .git directory corresponding to the current working directory."
     return 1
+  elif [ -z "$1" ]; then
+    return 0
   fi
-  [ -z "$1" ] || [ "$(git branch --show-current)" = "$1" ]
+  watch_file "$git_dir/HEAD"
+  [ "$(git branch --show-current)" = "$1" ]
 }
 
 # Usage: __main__ <cmd> [...<args>]
