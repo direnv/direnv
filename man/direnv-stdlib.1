@@ -1,4 +1,3 @@
-.nh
 .TH DIRENV\-STDLIB 1 "2019" direnv "User Manuals"
 .SH NAME
 .PP
@@ -206,7 +205,8 @@ Removes directories that match any of the given shell patterns from the PATH env
 
 .PP
 Bash pattern syntax:
-  https://www.gnu.org/software/bash/manual/html\_node/Pattern\-Matching.html
+  
+\[la]https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html\[ra]
 
 .PP
 Example:
@@ -310,7 +310,8 @@ Adds "$PWD/vendor/bin" to the PATH environment variable.
 
 .SS \fB\fClayout perl\fR
 .PP
-Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local\-lib/lib/local/lib.pm for more details.
+Setup environment variables required by perl's local::lib See 
+\[la]http://search.cpan.org/dist/local-lib/lib/local/lib.pm\[ra] for more details.
 
 .SS \fB\fClayout python [<python\_exe>]\fR
 .PP
@@ -384,7 +385,8 @@ Load environment variables from \fB\fCnix\-shell\fR\&.
 If you have a \fB\fCdefault.nix\fR or \fB\fCshell.nix\fR these will be used by default, but you can also specify packages directly (e.g \fB\fCuse nix \-p ocaml\fR).
 
 .PP
-See http://nixos.org/nix/manual/#sec\-nix\-shell
+See 
+\[la]http://nixos.org/nix/manual/#sec-nix-shell\[ra]
 
 .SS \fB\fCuse guix [...]\fR
 .PP
@@ -394,7 +396,8 @@ Load environment variables from \fB\fCguix environment\fR\&.
 Any arguments given will be passed to guix environment. For example, \fB\fCuse guix hello\fR would setup an environment with the dependencies of the hello package. To create an environment including hello, the \fB\fC\-\-ad\-hoc\fR flag is used \fB\fCuse guix \-\-ad\-hoc hello\fR\&. Other options include \fB\fC\-\-load\fR which allows loading an environment from a file.
 
 .PP
-See https://www.gnu.org/software/guix/manual/html\_node/Invoking\-guix\-environment.html
+See 
+\[la]https://www.gnu.org/software/guix/manual/html_node/Invoking-guix-environment.html\[ra]
 
 .SS \fB\fCrvm [...]\fR
 .PP
@@ -484,8 +487,6 @@ date.
 .PP
 Turns on shell execution strictness. This will force the .envrc
 evaluation context to exit immediately if:
-
-.RS
 .IP \(bu 2
 any command in a pipeline returns a non\-zero exit status that is not
 otherwise handled as part of \fB\fCif\fR, \fB\fCwhile\fR, or \fB\fCuntil\fR tests,
@@ -494,8 +495,6 @@ chain.
 .IP \(bu 2
 any variable that has not explicitly been set or declared (with
 either \fB\fCdeclare\fR or \fB\fClocal\fR) is referenced.
-
-.RE
 
 .PP
 If followed by a command\-line, the strictness applies for the duration
