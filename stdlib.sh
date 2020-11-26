@@ -302,7 +302,15 @@ find_up() {
 #
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_env() {
-  local rcpath=${1/#\~/$HOME}
+  local rcpath
+
+  if [[ "$1" =~ ^[a-zA-Z]:.* ]]; then
+    # Go will pass native windows path when executed under Git Bash/Git for Windows
+    rcpath=$(type cygpath > /dev/null 2>&1 && cygpath -u "${1/#\~/$HOME}" 2> /dev/null)
+  else
+    rcpath=${1/#\~/$HOME}
+  fi
+
   local REPLY
   if [[ -d $rcpath ]]; then
     rcpath=$rcpath/.envrc
@@ -562,8 +570,10 @@ path_rm() {
   results=()
 
   # iterate over path entries, discard entries that match any of the patterns
+  # shellcheck disable=SC2068
   for path in ${path_array[@]+"${path_array[@]}"}; do
     discard=false
+    # shellcheck disable=SC2068
     for pattern in ${patterns[@]+"${patterns[@]}"}; do
       if [[ "$path" == +($pattern) ]]; then
         discard=true
