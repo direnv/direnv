@@ -1097,6 +1097,39 @@ direnv_version() {
   "$direnv" version "$@"
 }
 
+# Usage: on_git_branch [<branch_name>]
+#
+# Returns 0 if within a git repository with given `branch_name`. If no branch
+# name is provided, then returns 0 when within _any_ branch. Requires the git
+# command to be installed. Returns 1 otherwise.
+#
+# When a branch is specified, then `.git/HEAD` is watched so that
+# entering/exiting a branch triggers a reload.
+#
+# Example (.envrc):
+#
+#    if on_git_branch child_changes; then
+#      export MERGE_BASE_BRANCH=parent_changes
+#    fi
+#
+#    if on_git_branch; then
+#      echo "Thanks for contributing to a GitHub project!"
+#    fi
+on_git_branch() {
+  local git_dir
+  if ! has git; then
+    log_error "on_git_branch needs git, which could not be found on your system"
+    return 1
+  elif ! git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
+    log_error "on_git_branch could not locate the .git directory corresponding to the current working directory"
+    return 1
+  elif [ -z "$1" ]; then
+    return 0
+  fi
+  watch_file "$git_dir/HEAD"
+  [ "$(git branch --show-current)" = "$1" ]
+}
+
 # Usage: __main__ <cmd> [...<args>]
 #
 # Used by rc.go

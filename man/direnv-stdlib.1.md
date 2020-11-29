@@ -374,6 +374,25 @@ Example (Command):
 
     unstrict_env has curl
 
+### `on_git_branch [<branch_name>]`
+
+Returns 0 if within a git repository with given `branch_name`. If no branch name
+is provided, then returns 0 when within _any_ branch. Requires the git command
+to be installed. Returns 1 otherwise.
+
+When a branch is specified, then `.git/HEAD` is watched so that entering/exiting
+a branch triggers a reload.
+
+Example (.envrc):
+
+    if on_git_branch child_changes; then
+      export MERGE_BASE_BRANCH=parent_changes
+    fi
+
+    if on_git_branch; then
+      echo "Thanks for contributing to a GitHub project!"
+    fi
+
 
 COPYRIGHT
 ---------

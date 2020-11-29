@@ -555,6 +555,34 @@ unstrict\_env has curl
 .fi
 .RE
 
+.SS \fB\fCon\_git\_branch [<branch\_name>]\fR
+.PP
+Returns 0 if within a git repository with given \fB\fCbranch\_name\fR\&. If no branch name
+is provided, then returns 0 when within \fIany\fP branch. Requires the git command
+to be installed. Returns 1 otherwise.
+
+.PP
+When a branch is specified, then \fB\fC\&.git/HEAD\fR is watched so that entering/exiting
+a branch triggers a reload.
+
+.PP
+Example (.envrc):
+
+.PP
+.RS
+
+.nf
+if on\_git\_branch child\_changes; then
+  export MERGE\_BASE\_BRANCH=parent\_changes
+fi
+
+if on\_git\_branch; then
+  echo "Thanks for contributing to a GitHub project!"
+fi
+
+.fi
+.RE
+
 .SH COPYRIGHT
 .PP
 MIT licence \- Copyright (C) 2019 @zimbatm and contributors
