@@ -769,15 +769,16 @@ layout_python3() {
   layout_python python3 "$@"
 }
 
-# Usage: layout anaconda <environment_name> [<conda_exe>]
+# Usage: layout anaconda <env_name_or_prefix> [<conda_exe>]
 #
-# Activates anaconda for the named environment. If the environment
+# Activates anaconda for the named environment or prefix. If the environment
 # hasn't been created, it will be using the environment.yml file in
 # the current directory. <conda_exe> is optional and will default to
 # the one found in the system environment.
 #
 layout_anaconda() {
-  local env_name=$1
+  local env_name_or_prefix=$1
+  local env_name
   local env_loc
   local conda
   local REPLY
@@ -787,20 +788,37 @@ layout_anaconda() {
     conda=$(command -v conda)
   fi
   realpath.dirname "$conda"
-  PATH_add "$REPLY/$conda"
-  env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
-  if [[ ! "$env_loc" == $env_name*$env_name ]]; then
+  PATH_add "$REPLY"
+  if [[ "${env_name_or_prefix%%/*}" == "." ]]; then
+    # "./foo" relative prefix
+    realpath.absolute "$env_name_or_prefix"
+    env_loc="$REPLY"
+  elif [[ ! "$env_name_or_prefix" == "${env_name_or_prefix#/}" ]]; then
+    # "/foo" absolute prefix
+    env_loc="$env_name_or_prefix"
+  else
+    # "foo" name
+    env_name="$env_name_or_prefix"
+    env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
+    env_loc="${env_loc##* }"
+  fi
+  if [[ ! -d "$env_loc" ]]; then
     if [[ -e environment.yml ]]; then
       log_status "creating conda environment"
-      "$conda" env create
+      if [[ -n "$env_name" ]]; then
+        "$conda" env create --name "$env_name"
+        env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
+        env_loc="/${env_loc##* /}"
+      else
+        "$conda" env create --prefix "$env_loc"
+      fi
     else
       log_error "Could not find environment.yml"
       return 1
     fi
   fi
 
-  # shellcheck disable=SC1091
-  source activate "$env_name"
+  eval "$( "$conda" shell.bash activate "$env_loc" )"
 }
 
 # Usage: layout pipenv
