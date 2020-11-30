@@ -303,6 +303,10 @@ find_up() {
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_env() {
   local rcpath=${1/#\~/$HOME}
+  if has cygpath ; then
+    rcpath=$(cygpath -u "$rcpath")
+  fi
+
   local REPLY
   if [[ -d $rcpath ]]; then
     rcpath=$rcpath/.envrc
@@ -562,8 +566,10 @@ path_rm() {
   results=()
 
   # iterate over path entries, discard entries that match any of the patterns
+  # shellcheck disable=SC2068
   for path in ${path_array[@]+"${path_array[@]}"}; do
     discard=false
+    # shellcheck disable=SC2068
     for pattern in ${patterns[@]+"${patterns[@]}"}; do
       if [[ "$path" == +($pattern) ]]; then
         discard=true
