@@ -684,6 +684,30 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  PATH_add node_modules/.bin\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: layout nodenv <node version number>\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    layout nodenv 15.2.1\n" +
+	"#\n" +
+	"# Uses use_node and layout_node to add the chosen node version and \n" +
+	"# \"$PWD/node_modules/.bin\" to the PATH\n" +
+	"#\n" +
+	"layout_nodenv() {\n" +
+	"  local node_version=\"${1}\"\n" +
+	"  local node_versions=\"$(nodenv root)/versions\"\n" +
+	"  local nodenv_version=${node_versions}/${node_version}\n" +
+	"  if [[ -e \"$nodenv_version\" ]]; then\n" +
+	"  	  # Put the selected node version in the PATH\n" +
+	"      NODE_VERSIONS=\"${node_versions}\" NODE_VERSION_PREFIX=\"\" use_node $node_version\n" +
+	"      # Add $PWD/node_modules/.bin to the PATH\n" +
+	"      layout_node\n" +
+	"  else\n" +
+	"    log_error \"nodenv: version '$node_version' not installed\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: layout perl\n" +
 	"#\n" +
 	"# Setup environment variables required by perl's local::lib\n" +

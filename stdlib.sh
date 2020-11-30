@@ -687,6 +687,30 @@ layout_node() {
   PATH_add node_modules/.bin
 }
 
+# Usage: layout nodenv <node version number>
+#
+# Example:
+#
+#    layout nodenv 15.2.1
+#
+# Uses use_node and layout_node to add the chosen node version and 
+# "$PWD/node_modules/.bin" to the PATH
+#
+layout_nodenv() {
+  local node_version="${1}"
+  local node_versions="$(nodenv root)/versions"
+  local nodenv_version=${node_versions}/${node_version}
+  if [[ -e "$nodenv_version" ]]; then
+      # Put the selected node version in the PATH
+      NODE_VERSIONS="${node_versions}" NODE_VERSION_PREFIX="" use_node $node_version
+      # Add $PWD/node_modules/.bin to the PATH
+      layout_node
+  else
+    log_error "nodenv: version '$node_version' not installed"
+    return 1
+  fi
+}
+
 # Usage: layout perl
 #
 # Setup environment variables required by perl's local::lib
