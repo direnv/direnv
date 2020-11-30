@@ -698,11 +698,13 @@ layout_node() {
 #
 layout_nodenv() {
   local node_version="${1}"
-  local node_versions="$(nodenv root)/versions"
-  local nodenv_version=${node_versions}/${node_version}
+  local node_versions
+  local nodenv_version
+  node_versions="$(nodenv root)/versions"
+  nodenv_version=${node_versions}/${node_version}
   if [[ -e "$nodenv_version" ]]; then
       # Put the selected node version in the PATH
-      NODE_VERSIONS="${node_versions}" NODE_VERSION_PREFIX="" use_node $node_version
+      NODE_VERSIONS="${node_versions}" NODE_VERSION_PREFIX="" use_node "${node_version}"
       # Add $PWD/node_modules/.bin to the PATH
       layout_node
   else
