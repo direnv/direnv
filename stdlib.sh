@@ -302,13 +302,9 @@ find_up() {
 #
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_env() {
-  local rcpath
-
-  if [[ "$1" =~ ^[a-zA-Z]:.* ]]; then
-    # Go will pass native windows path when executed under Git Bash/Git for Windows
-    rcpath=$(type cygpath > /dev/null 2>&1 && cygpath -u "${1/#\~/$HOME}" 2> /dev/null)
-  else
-    rcpath=${1/#\~/$HOME}
+  local rcpath=${1/#\~/$HOME}
+  if has cygpath ; then
+    rcpath=$(cygpath -u "$rcpath")
   fi
 
   local REPLY
