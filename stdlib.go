@@ -684,15 +684,6 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  PATH_add node_modules/.bin\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: layout nodenv <node version number>\n" +
-	"#\n" +
-	"# Example:\n" +
-	"#\n" +
-	"#    layout nodenv 15.2.1\n" +
-	"#\n" +
-	"# Uses use_node and layout_node to add the chosen node version and \n" +
-	"# \"$PWD/node_modules/.bin\" to the PATH\n" +
-	"\n" +
 	"# Usage: layout perl\n" +
 	"#\n" +
 	"# Setup environment variables required by perl's local::lib\n" +
