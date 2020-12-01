@@ -1071,6 +1071,32 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use nodenv <node version number>\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    use nodenv 15.2.1\n" +
+	"#\n" +
+	"# Uses nodenv, use_node and layout_node to add the chosen node version and \n" +
+	"# \"$PWD/node_modules/.bin\" to the PATH\n" +
+	"#\n" +
+	"use_nodenv() {\n" +
+	"  local node_version=\"${1}\"\n" +
+	"  local node_versions_dir\n" +
+	"  local nodenv_version\n" +
+	"  node_versions_dir=\"$(nodenv root)/versions\"\n" +
+	"  nodenv_version=\"${node_versions_dir}/${node_version}\"\n" +
+	"  if [[ -e \"$nodenv_version\" ]]; then\n" +
+	"      # Put the selected node version in the PATH\n" +
+	"      NODE_VERSIONS=\"${node_versions_dir}\" NODE_VERSION_PREFIX=\"\" use_node \"${node_version}\"\n" +
+	"      # Add $PWD/node_modules/.bin to the PATH\n" +
+	"      layout_node\n" +
+	"  else\n" +
+	"    log_error \"nodenv: version '$node_version' not installed.  Use \\`nodenv install ${node_version}\\` to install it first.\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: use_nix [...]\n" +
 	"#\n" +
 	"# Load environment variables from `nix-shell`.\n" +
