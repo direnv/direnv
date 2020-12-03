@@ -162,5 +162,6 @@ install: all
 .PHONY: dist
 dist:
 	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
+	CGO_ENABLED=0 gox -osarch "linux/arm64" -osarch "linux/ppc64" -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}"
 	CGO_ENABLED=0 gox -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}"
 
