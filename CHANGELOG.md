@@ -1,4 +1,13 @@
 
+2.25.0 / 2020-12-03
+==================
+
+  * dist: add linux/arm64 and linux/ppc64
+  * Added use_nodenv to stdlib (#727)
+  * Fix proposal for  #707, broken direnv compatibility under Windows (#723)
+  * fix: layout anaconda <env_name_or_prefix> (#717)
+  * Add on_git_branch command to detect whether a specific git branch is checked out (#702)
+
 2.24.0 / 2020-11-15
 ==================
 
