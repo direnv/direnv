@@ -25,5 +25,6 @@ mkShell {
 
   shellHook = ''
     unset GOPATH GOROOT
+    export GO111MODULE=on
   '';
 }
