@@ -306,6 +306,10 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# NOTE: the other \".envrc\" is not checked by the security framework.\n" +
 	"source_env() {\n" +
 	"  local rcpath=${1/#\\~/$HOME}\n" +
+	"  if has cygpath ; then\n" +
+	"    rcpath=$(cygpath -u \"$rcpath\")\n" +
+	"  fi\n" +
+	"\n" +
 	"  local REPLY\n" +
 	"  if [[ -d $rcpath ]]; then\n" +
 	"    rcpath=$rcpath/.envrc\n" +
@@ -565,8 +569,10 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  results=()\n" +
 	"\n" +
 	"  # iterate over path entries, discard entries that match any of the patterns\n" +
+	"  # shellcheck disable=SC2068\n" +
 	"  for path in ${path_array[@]+\"${path_array[@]}\"}; do\n" +
 	"    discard=false\n" +
+	"    # shellcheck disable=SC2068\n" +
 	"    for pattern in ${patterns[@]+\"${patterns[@]}\"}; do\n" +
 	"      if [[ \"$path\" == +($pattern) ]]; then\n" +
 	"        discard=true\n" +
