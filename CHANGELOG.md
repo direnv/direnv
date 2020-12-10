@@ -1,4 +1,11 @@
 
+2.25.1 / 2020-12-11
+==================
+
+  * stdlib.go: re-generate (fixes #707)
+  * README: remove old Azure badge
+  * build(deps): bump golang.org/x/mod from 0.3.0 to 0.4.0 (#730)
+
 2.25.0 / 2020-12-03
 ==================
 
