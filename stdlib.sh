@@ -364,6 +364,13 @@ watch_file() {
   eval "$("$direnv" watch bash "$@")"
 }
 
+# Usage: watch_dir <dir>
+#
+# Adds <dir> to the list of dirs that direnv will recursively watch for changes
+watch_dir() {
+  eval "$("$direnv" watch-dir bash "$1")"
+}
+
 # Usage: source_up [<filename>]
 #
 # Loads another ".envrc" if found with the find_up command.

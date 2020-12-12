@@ -367,6 +367,13 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  eval \"$(\"$direnv\" watch bash \"$@\")\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: watch_dir <dir>\n" +
+	"#\n" +
+	"# Adds <dir> to the list of dirs that direnv will recursively watch for changes\n" +
+	"watch_dir() {\n" +
+	"  eval \"$(\"$direnv\" watch-dir bash \"$1\")\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: source_up [<filename>]\n" +
 	"#\n" +
 	"# Loads another \".envrc\" if found with the find_up command.\n" +
