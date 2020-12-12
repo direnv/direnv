@@ -1,4 +1,10 @@
 
+2.25.2 / 2020-12-12
+==================
+
+There was a generation issue in 2.25.1. This release only bumps the version
+to do another release.
+
 2.25.1 / 2020-12-11
 ==================
 
