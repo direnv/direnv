@@ -21,7 +21,7 @@ const fishHook = `
                 if test "$direnv_fish_mode" = "eval_after_arrow"
                     set -g __direnv_export_again 0
                 else
-                    # default mode (eval_on_pwd)
+                    # default mode (eval_on_arrow)
                     command direnv export fish | source
                 end
             end
