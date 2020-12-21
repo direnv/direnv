@@ -24,6 +24,42 @@ test_name() {
   echo "--- $*"
 }
 
+test_name dotenv
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  cd "$workdir"
+
+  # Try to source a file that doesn't exist - should not succeed
+  dotenv .env.non_existing_file && return 1
+
+  # Try to source a file that exists
+  echo "export FOO=bar" > .env
+  dotenv .env
+  [[ $FOO = bar ]]
+)
+
+test_name dotenv_if_exists
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  cd "$workdir"
+
+  # Try to source a file that doesn't exist - should succeed
+  dotenv_if_exists .env.non_existing_file  || return 1
+
+  # Try to source a file that exists
+  echo "export FOO=bar" > .env
+  dotenv_if_exists .env
+  [[ $FOO = bar ]]
+)
+
 test_name find_up
 (
   load_stdlib
