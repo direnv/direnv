@@ -41,7 +41,11 @@ Example:
 
 ### `dotenv [<dotenv_path>]`
 
-Loads a ".env" file into the current environment
+Loads a ".env" file into the current environment.
+
+### `dotenv_if_exists [<dotenv_path>]`
+
+Loads a ".env" file into the current environment, but only if it exists.
 
 ### `user_rel_path <abs_path>`
 
