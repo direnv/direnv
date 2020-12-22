@@ -141,7 +141,7 @@ test_name semver_search
 test_name use_julia
 (
   load_stdlib
-  JULIA_VERSIONS=$(mktemp -d)
+  JULIA_VERSIONS=$(TMPDIR=. mktemp -d -t tmp.XXXXXXXXXX)
   trap 'rm -rf $JULIA_VERSIONS' EXIT
 
   test_julia() {
