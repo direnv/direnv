@@ -122,6 +122,7 @@ test: build $(tests)
 
 test-shellcheck:
 	shellcheck stdlib.sh
+	shellcheck ./test/stdlib.bash
 
 test-stdlib: build
 	./test/stdlib.bash
