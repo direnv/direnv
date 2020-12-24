@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
 	toml "github.com/BurntSushi/toml"
 	"github.com/direnv/direnv/xdg"
+	"github.com/direnv/go-lpenv"
 )
 
 // Config represents the direnv configuration and state.
@@ -148,7 +148,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 			config.BashPath = env[DIRENV_BASH]
 		} else if bashPath != "" {
 			config.BashPath = bashPath
-		} else if config.BashPath, err = exec.LookPath("bash"); err != nil {
+		} else if config.BashPath, err = lpenv.LookPathEnv("bash", config.WorkDir, env.ToGoEnv()); err != nil {
 			err = fmt.Errorf("can't find bash: %q", err)
 			return
 		}

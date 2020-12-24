@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
+
+	"github.com/direnv/go-lpenv"
 )
 
 // CmdExec is `direnv exec DIR <COMMAND> ...`
@@ -60,8 +62,13 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 		newEnv = previousEnv
 	}
 
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("could not find current directory: %v", err)
+	}
+
 	var commandPath string
-	commandPath, err = lookPath(command, newEnv["PATH"])
+	commandPath, err = lpenv.LookPathEnv(command, cwd, newEnv.ToGoEnv())
 	if err != nil {
 		err = fmt.Errorf("command '%s' not found on PATH '%s'", command, newEnv["PATH"])
 		return

@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/direnv/go-lpenv"
 )
 
 // CmdEdit is `direnv edit [PATH_TO_RC]`
@@ -47,10 +49,15 @@ func cmdEditAction(env Env, args []string, config *Config) (err error) {
 		rcPath = foundRC.path
 	}
 
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("could not find current directory: %v", err)
+	}
+
 	editor := env["EDITOR"]
 	if editor == "" {
 		logError("$EDITOR not found.")
-		editor = detectEditor(env["PATH"])
+		editor = detectEditor(cwd, env)
 		if editor == "" {
 			err = fmt.Errorf("could not find a default editor in the PATH")
 			return
@@ -92,9 +99,9 @@ var Editors = [][]string{
 	{"emacs"},
 }
 
-func detectEditor(pathenv string) string {
+func detectEditor(cwd string, env Env) string {
 	for _, editor := range Editors {
-		if _, err := lookPath(editor[0], pathenv); err == nil {
+		if _, err := lpenv.LookPathEnv(editor[0], cwd, env.ToGoEnv()); err == nil {
 			return strings.Join(editor, " ")
 		}
 	}
