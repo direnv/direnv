@@ -30,7 +30,6 @@ SHELL = bash
 all: build man
 
 export GO111MODULE=on
-export GOFLAGS=-mod=vendor
 
 ############################################################################
 # Build
