@@ -19,10 +19,7 @@ buildGoPackage rec {
   ];
 
   installPhase = ''
-    mkdir -p $out
-    make install DESTDIR=$bin
-    mkdir -p $bin/share/fish/vendor_conf.d
-    echo "eval ($bin/bin/direnv hook fish)" > $bin/share/fish/vendor_conf.d/direnv.fish
+    make install PREFIX=$bin
   '';
 
   meta = with stdenv.lib; {

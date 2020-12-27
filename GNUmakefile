@@ -3,9 +3,10 @@
 ############################################################################
 
 # Set this to change the target installation path
-DESTDIR ?= /usr/local
-BINDIR   = ${DESTDIR}/bin
-MANDIR   = ${DESTDIR}/share/man
+PREFIX   = /usr/local
+BINDIR   = ${PREFIX}/bin
+SHAREDIR = ${PREFIX}/share
+MANDIR   = ${SHAREDIR}/man
 DISTDIR ?= dist
 
 # filename of the executable
@@ -155,10 +156,12 @@ test-zsh:
 
 .PHONY: install
 install: all
-	install -d $(BINDIR)
-	install $(exe) $(BINDIR)
-	install -d $(MANDIR)/man1
-	cp -R man/*.1 $(MANDIR)/man1
+	install -d $(DESTDIR)$(BINDIR)
+	install $(exe) $(DESTDIR)$(BINDIR)
+	install -d $(DESTDIR)$(MANDIR)/man1
+	cp -R man/*.1 $(DESTDIR)$(MANDIR)/man1
+	install -d $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d
+	echo "$(BINDIR)/direnv hook fish | source" > $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d/direnv.fish
 
 .PHONY: dist
 dist:
