@@ -19,7 +19,7 @@ buildGoPackage rec {
   ];
 
   installPhase = ''
-    make install PREFIX=$bin
+    make install PREFIX=$out
   '';
 
   meta = with stdenv.lib; {
