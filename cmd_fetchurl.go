@@ -67,7 +67,8 @@ func cmdFetchURL(env Env, args []string, config *Config) (err error) {
 	defer os.Remove(tmpfile.Name()) // clean up
 
 	// Get the URL
-	// /* #nosec */
+	// G107: Potential HTTP request made with variable url
+	// #nosec
 	resp, err := http.Get(url)
 	if err != nil {
 		return err

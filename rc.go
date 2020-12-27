@@ -171,6 +171,8 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		cancel()
 	}()
 
+	// G204: Subprocess launched with function call as argument or cmd arguments
+	// #nosec
 	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
@@ -267,6 +269,8 @@ func touch(path string) (err error) {
 }
 
 func allow(path string, allowPath string) (err error) {
+	// G306: Expect WriteFile permissions to be 0600 or less
+	// #nosec
 	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
 }
 
