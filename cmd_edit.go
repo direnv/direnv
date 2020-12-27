@@ -59,6 +59,8 @@ func cmdEditAction(env Env, args []string, config *Config) (err error) {
 
 	run := fmt.Sprintf("%s %s", editor, BashEscape(rcPath))
 
+	// G204: Subprocess launched with function call as argument or cmd arguments
+	// #nosec
 	cmd := exec.Command(config.BashPath, "-c", run)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

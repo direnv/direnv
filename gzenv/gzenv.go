@@ -47,6 +47,8 @@ func Unmarshal(gzenv string, obj interface{}) error {
 	}
 
 	envData := bytes.NewBuffer([]byte{})
+	// G110: Potential DoS vulnerability via decompression bomb (gosec)
+	// #nosec
 	_, err = io.Copy(envData, w)
 	if err != nil {
 		return fmt.Errorf("unmarshal() zlib decoding: %v", err)
