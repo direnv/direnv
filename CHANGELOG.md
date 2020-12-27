@@ -1,4 +1,16 @@
 
+2.26.0 / 2020-12-27
+==================
+
+  * updated fish hook support issue (#732)
+  * ci: add basic windows CI (#737)
+  * test: fix shellcheck usage in ./test/stdlib.bash
+  * test: fix use_julia test for NixOS
+  * remove dead code: rootDir
+  * fix: create temp dir in current working dir for one test (#735)
+  * Add `dotenv_if_exists` (#734)
+  * stdlib: add watch_dir command (#697)
+
 2.25.2 / 2020-12-12
 ==================
 
