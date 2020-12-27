@@ -5,7 +5,6 @@ url: "https://direnv.net"
 
 exclude:
   - test
-  - vendor
 
 # see https://github.com/github/pages-gem/blob/754a725e4766d4329bb1dd0e07c638a045ad2c04/lib/github-pages/plugins.rb#L6-L42
 plugins:

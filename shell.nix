@@ -3,6 +3,7 @@ with pkgs;
 mkShell {
   buildInputs = [
     # Build
+    gitAndTools.git
     gitAndTools.git-extras # for git-changelog
     gnumake
     go
@@ -26,5 +27,6 @@ mkShell {
   shellHook = ''
     unset GOPATH GOROOT
     export GO111MODULE=on
+    export SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
   '';
 }
