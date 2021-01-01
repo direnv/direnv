@@ -1,4 +1,13 @@
 
+2.27.0 / 2021-01-01
+==================
+
+  * fixed fish shell hook to work with eval (#743)
+  * dist: remove darwin/386
+  * nix: update to nixpkgs@nixos-20.09
+  * packaging: stop vendoring the Go code (#739)
+  * packaging: change packaging. DESTDIR -> PREFIX, fish hook (#741)
+
 2.26.0 / 2020-12-27
 ==================
 
