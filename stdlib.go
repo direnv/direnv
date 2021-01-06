@@ -1035,19 +1035,21 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  rvm \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: use node\n" +
-	"# Loads NodeJS version from a `.node-version` or `.nvmrc` file.\n" +
-	"#\n" +
 	"# Usage: use node [<version>]\n" +
-	"# Loads specified NodeJS version.\n" +
 	"#\n" +
-	"# If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match\n" +
+	"# Loads the specified NodeJS version into the environment.\n" +
+	"#\n" +
+	"# If a partial NodeJS version is passed (i.e. `4.2`), a fuzzy match\n" +
 	"# is performed and the highest matching version installed is selected.\n" +
+	"#\n" +
+	"# If no version is passed, it will look at the '.nvmrc' or '.node-version'\n" +
+	"# files in the current directory if they exist.\n" +
 	"#\n" +
 	"# Environment Variables:\n" +
 	"#\n" +
 	"# - $NODE_VERSIONS (required)\n" +
-	"#   You must specify a path to your installed NodeJS versions via the `$NODE_VERSIONS` variable.\n" +
+	"#   Points to a folder that contains all the installed Node versions. That\n" +
+	"#   folder must exist.\n" +
 	"#\n" +
 	"# - $NODE_VERSION_PREFIX (optional) [default=\"node-v\"]\n" +
 	"#   Overrides the default version prefix.\n" +

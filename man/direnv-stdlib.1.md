@@ -296,27 +296,22 @@ Should work just like in the shell if you have rvm installed.
 
 ### `use node [<version>]`:
 
-Loads NodeJS version from a `.node-version` or `.nvmrc` file.
+Loads the specified NodeJS version into the environment.
 
-If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match is performed and the highest matching version installed is selected.
+If a partial NodeJS version is passed (i.e. `4.2`), a fuzzy match
+is performed and the highest matching version installed is selected.
 
-Example (.envrc):
+If no version is passed, it will look at the '.nvmrc' or '.node-version'
+files in the current directory if they exist.
 
-    set -e
-    use node
+Environment Variables:
 
-Example (.node-version):
+- $NODE_VERSIONS (required)
+  Points to a folder that contains all the installed Node versions. That
+  folder must exist.
 
-    4.2
-
-### `use node <version>`
-
-Loads specified NodeJS version.
-
-Example (.envrc):
-
-    set -e
-    use node 4.2.2
+- $NODE_VERSION_PREFIX (optional) [default="node-v"]
+  Overrides the default version prefix.
 
 ### `use vim [<vimrc_file>]`
 

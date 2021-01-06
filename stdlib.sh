@@ -1032,19 +1032,21 @@ rvm() {
   rvm "$@"
 }
 
-# Usage: use node
-# Loads NodeJS version from a `.node-version` or `.nvmrc` file.
-#
 # Usage: use node [<version>]
-# Loads specified NodeJS version.
 #
-# If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match
+# Loads the specified NodeJS version into the environment.
+#
+# If a partial NodeJS version is passed (i.e. `4.2`), a fuzzy match
 # is performed and the highest matching version installed is selected.
+#
+# If no version is passed, it will look at the '.nvmrc' or '.node-version'
+# files in the current directory if they exist.
 #
 # Environment Variables:
 #
 # - $NODE_VERSIONS (required)
-#   You must specify a path to your installed NodeJS versions via the `$NODE_VERSIONS` variable.
+#   Points to a folder that contains all the installed Node versions. That
+#   folder must exist.
 #
 # - $NODE_VERSION_PREFIX (optional) [default="node-v"]
 #   Overrides the default version prefix.
