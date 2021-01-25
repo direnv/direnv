@@ -1,12 +1,12 @@
-{ pkgs ? import ./nix {} }:
+{ pkgs ? import ./nix { } }:
 with pkgs;
 
 buildGoModule rec {
   name = "direnv-${version}";
   version = lib.fileContents ./version.txt;
-  subPackages = ["."];
+  subPackages = [ "." ];
 
-  vendorSha256 = "084x7d7sshcsyim76d6pl6127nlqacgwwnm965srl9y5w5nqzba6";
+  vendorSha256 = "0yhppxrippxayqqs3m7imi0zr7y9zln1krnc7drsi3p2a66xwlwq";
 
   src = lib.cleanSource ./.;
 
