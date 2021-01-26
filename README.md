@@ -48,7 +48,7 @@ Now restart your shell.
 
 To follow along in your shell once direnv is installed.
 
-```
+```shell
 # Create a new folder for demo purposes.
 $ mkdir ~/my-project
 $ cd ~/my-project
