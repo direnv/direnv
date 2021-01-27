@@ -1,5 +1,5 @@
 #!/usr/bin/env fish
-function eq --argument-names a b
+function test_eq --argument-names a b
     if not test (count $argv) = 2
         echo "Error: " (count $argv) " arguments passed to `eq`: $argv"
         exit 1
@@ -34,11 +34,10 @@ function test_start -a name
     cd "$TEST_DIR/scenarios/$name"
     direnv allow
     echo "## Testing $name ##"
-    pwd
 end
 
 function test_stop
-    cd $TEST_DIR
+    cd /
     direnv_eval
 end
 
@@ -51,9 +50,9 @@ test_start dump
 begin
     set -e LS_COLORS
     direnv_eval
-    eq "$LS_COLORS" "*.ogg=38;5;45:*.wav=38;5;45"
-    eq "$LESSOPEN" "||/usr/bin/lesspipe.sh %s"
-    eq "$THREE_BACKSLASHES" "\\\\\\"
+    test_eq "$LS_COLORS" "*.ogg=38;5;45:*.wav=38;5;45"
+    test_eq "$LESSOPEN" "||/usr/bin/lesspipe.sh %s"
+    test_eq "$THREE_BACKSLASHES" "\\\\\\"
 end
 test_stop
 
@@ -61,6 +60,6 @@ test_stop
 # test_start utf-8
 # begin
 #     direnv_eval
-#     eq "$UTFSTUFF" "♀♂"
+#     test_eq "$UTFSTUFF" "♀♂"
 # end
 # test_stop
