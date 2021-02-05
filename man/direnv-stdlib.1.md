@@ -41,7 +41,11 @@ Example:
 
 ### `dotenv [<dotenv_path>]`
 
-Loads a ".env" file into the current environment
+Loads a ".env" file into the current environment.
+
+### `dotenv_if_exists [<dotenv_path>]`
+
+Loads a ".env" file into the current environment, but only if it exists.
 
 ### `user_rel_path <abs_path>`
 
@@ -292,27 +296,30 @@ Should work just like in the shell if you have rvm installed.
 
 ### `use node [<version>]`:
 
-Loads NodeJS version from a `.node-version` or `.nvmrc` file.
+Loads the specified NodeJS version into the environment.
 
-If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match is performed and the highest matching version installed is selected.
+If a partial NodeJS version is passed (i.e. `4.2`), a fuzzy match
+is performed and the highest matching version installed is selected.
 
-Example (.envrc):
+If no version is passed, it will look at the '.nvmrc' or '.node-version'
+files in the current directory if they exist.
 
-    set -e
-    use node
+Environment Variables:
 
-Example (.node-version):
+- $NODE_VERSIONS (required)
+  Points to a folder that contains all the installed Node versions. That
+  folder must exist.
 
-    4.2
+- $NODE_VERSION_PREFIX (optional) [default="node-v"]
+  Overrides the default version prefix.
 
-### `use node <version>`
+### `use vim [<vimrc_file>]`
 
-Loads specified NodeJS version.
+Prepends the specified vim script (or .vimrc.local by default) to the
+`DIRENV_EXTRA_VIMRC` environment variable.
 
-Example (.envrc):
-
-    set -e
-    use node 4.2.2
+This variable is understood by the direnv/direnv.vim extension. When found,
+it will source it after opening files in the directory.
 
 ### `watch_file <path> [<path> ...]`
 
@@ -327,6 +334,64 @@ Example (.envrc):
 Checks that the direnv version is at least old as `version_at_least`. This can
 be useful when sharing an `.envrc` and to make sure that the users are up to
 date.
+
+### `strict_env [<command> ...]`
+
+Turns on shell execution strictness. This will force the .envrc
+evaluation context to exit immediately if:
+
+- any command in a pipeline returns a non-zero exit status that is not
+  otherwise handled as part of `if`, `while`, or `until` tests,
+  return value negation (`!`), or part of a boolean (`&&` or `||`)
+  chain.
+- any variable that has not explicitly been set or declared (with
+  either `declare` or `local`) is referenced.
+
+If followed by a command-line, the strictness applies for the duration
+of the command.
+
+Example (Whole Script):
+
+    strict_env
+    has curl
+
+Example (Command):
+
+    strict_env has curl
+
+#### `unstrict_env [<command> ...]`
+
+Turns off shell execution strictness. If followed by a command-line, the
+strictness applies for the duration of the command.
+
+Example (Whole Script):
+
+    unstrict_env
+    has curl
+
+Example (Command):
+
+    unstrict_env has curl
+
+### `on_git_branch [<branch_name>]`
+
+Returns 0 if within a git repository with given `branch_name`. If no branch name
+is provided, then returns 0 when within _any_ branch. Requires the git command
+to be installed. Returns 1 otherwise.
+
+When a branch is specified, then `.git/HEAD` is watched so that entering/exiting
+a branch triggers a reload.
+
+Example (.envrc):
+
+    if on_git_branch child_changes; then
+      export MERGE_BASE_BRANCH=parent_changes
+    fi
+
+    if on_git_branch; then
+      echo "Thanks for contributing to a GitHub project!"
+    fi
+
 
 COPYRIGHT
 ---------

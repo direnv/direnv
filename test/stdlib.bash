@@ -24,6 +24,42 @@ test_name() {
   echo "--- $*"
 }
 
+test_name dotenv
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  cd "$workdir"
+
+  # Try to source a file that doesn't exist - should not succeed
+  dotenv .env.non_existing_file && return 1
+
+  # Try to source a file that exists
+  echo "export FOO=bar" > .env
+  dotenv .env
+  [[ $FOO = bar ]]
+)
+
+test_name dotenv_if_exists
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  cd "$workdir"
+
+  # Try to source a file that doesn't exist - should succeed
+  dotenv_if_exists .env.non_existing_file  || return 1
+
+  # Try to source a file that exists
+  echo "export FOO=bar" > .env
+  dotenv_if_exists .env
+  [[ $FOO = bar ]]
+)
+
 test_name find_up
 (
   load_stdlib
@@ -88,10 +124,10 @@ test_name semver_search
   versions=$(mktemp -d)
   trap 'rm -rf $versions' EXIT
 
-  mkdir $versions/program-1.4.0
-  mkdir $versions/program-1.4.1
-  mkdir $versions/program-1.5.0
-  mkdir $versions/1.6.0
+  mkdir "$versions/program-1.4.0"
+  mkdir "$versions/program-1.4.1"
+  mkdir "$versions/program-1.5.0"
+  mkdir "$versions/1.6.0"
 
   assert_eq "$(semver_search "$versions" "program-" "1.4.0")" "1.4.0"
   assert_eq "$(semver_search "$versions" "program-" "1.4")"   "1.4.1"
@@ -105,7 +141,7 @@ test_name semver_search
 test_name use_julia
 (
   load_stdlib
-  JULIA_VERSIONS=$(mktemp -d)
+  JULIA_VERSIONS=$(TMPDIR=. mktemp -d -t tmp.XXXXXXXXXX)
   trap 'rm -rf $JULIA_VERSIONS' EXIT
 
   test_julia() {
@@ -113,12 +149,12 @@ test_name use_julia
     version="$2"
     # Fake the existence of a julia binary
     julia=$JULIA_VERSIONS/$version_prefix$version/bin/julia
-    mkdir -p $(dirname $julia)
-    echo "#!/bin/bash
-    echo \"test-julia $version\"" > $julia
-    chmod +x $julia
+    mkdir -p "$(dirname "$julia")"
+    echo "#!/usr/bin/env bash
+    echo \"test-julia $version\"" > "$julia"
+    chmod +x "$julia"
     # Locally disable set -u (see https://github.com/direnv/direnv/pull/667)
-    if ! [[ "$(set +u; use julia $version 2>&1)" =~ "Successfully loaded test-julia $version" ]]; then
+    if ! [[ "$(set +u; use julia "$version" 2>&1)" =~ Successfully\ loaded\ test-julia\ $version ]]; then
       return 1
     fi
   }
@@ -132,6 +168,7 @@ test_name use_julia
   test_julia "jl-"    "1.2.0"
   test_julia "jl-"    "1.3"
   # Empty JULIA_VERSION_PREFIX
+  # shellcheck disable=SC2034
   JULIA_VERSION_PREFIX=
   test_julia ""    "1.4.0"
   test_julia ""    "1.5"
@@ -154,5 +191,8 @@ test_name source_env_if_exists
   source_env_if_exists existing_file
   [[ $FOO = bar ]]
 )
+
+# test strict_env and unstrict_env
+./strict_env_test.bash
 
 echo OK

@@ -2,7 +2,6 @@ direnv -- unclutter your .profile
 =================================
 
 [![Built with Nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
-[![Build Status](https://dev.azure.com/direnv/direnv/_apis/build/status/direnv.direnv?branchName=master)](https://dev.azure.com/direnv/direnv/_build/latest?definitionId=1&branchName=master)
 [![Packaging status](https://repology.org/badge/tiny-repos/direnv.svg)](https://repology.org/project/direnv/versions)
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/direnv.svg)](https://repology.org/project/direnv/versions)
 
@@ -147,7 +146,14 @@ Or drop by on [IRC (#direnv on freenode)](irc://irc.freenode.net/#direnv) to
 have a chat. If you ask a question make sure to stay around as not everyone is
 active all day.
 
-## Similar projects
+## Complementary projects
+
+Here is a list of projects you might want to look into if you are using direnv.
+
+* [starship](https://starship.rs/) - A cross-shell prompt.
+* [nix-direnv](https://github.com/nix-community/nix-direnv) - A fast, persistent use_nix implementation for direnv.
+
+## Related projects
 
 Here is a list of other projects found in the same design space. Feel free to
 submit new ones.

@@ -182,6 +182,8 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		cancel()
 	}()
 
+	// G204: Subprocess launched with function call as argument or cmd arguments
+	// #nosec
 	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
@@ -217,18 +219,6 @@ func (rc *RC) RecordState(env Env, newEnv Env) {
 }
 
 /// Utils
-
-func rootDir(path string) string {
-	path, err := filepath.Abs(path)
-	if err != nil {
-		panic(err)
-	}
-	i := strings.Index(path[1:], "/")
-	if i < 0 {
-		return path
-	}
-	return path[:i+1]
-}
 
 func eachDir(path string) (paths []string) {
 	path, err := filepath.Abs(path)
@@ -296,6 +286,8 @@ func touch(path string) (err error) {
 }
 
 func allow(path string, allowPath string) (err error) {
+	// G306: Expect WriteFile permissions to be 0600 or less
+	// #nosec
 	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
 }
 

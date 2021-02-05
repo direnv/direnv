@@ -15,7 +15,6 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"shopt -s nullglob\n" +
 	"shopt -s extglob\n" +
 	"\n" +
-	"\n" +
 	"# NOTE: don't touch the RHS, it gets replaced at runtime\n" +
 	"direnv=\"$(command -v direnv)\"\n" +
 	"\n" +
@@ -29,6 +28,90 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# of a .envrc evaluation context. It is ignored by the direnv diffing\n" +
 	"# algorithm and so it won't be re-exported.\n" +
 	"export DIRENV_IN_ENVRC=1\n" +
+	"\n" +
+	"__env_strictness() {\n" +
+	"  local mode tmpfile old_shell_options\n" +
+	"  local -i res\n" +
+	"\n" +
+	"  tmpfile=$(mktemp)\n" +
+	"  res=0\n" +
+	"  mode=\"$1\"\n" +
+	"  shift\n" +
+	"\n" +
+	"  set +o | grep 'pipefail\\|nounset\\|errexit' > \"$tmpfile\"\n" +
+	"  old_shell_options=$(< \"$tmpfile\")\n" +
+	"  rm -f tmpfile\n" +
+	"\n" +
+	"  case \"$mode\" in\n" +
+	"  strict)\n" +
+	"    set -o errexit -o nounset -o pipefail\n" +
+	"    ;;\n" +
+	"  unstrict)\n" +
+	"    set +o errexit +o nounset +o pipefail\n" +
+	"    ;;\n" +
+	"  *)\n" +
+	"    log_error \"Unknown strictness mode '${mode}'.\"\n" +
+	"    exit 1\n" +
+	"    ;;\n" +
+	"  esac\n" +
+	"\n" +
+	"  if (($#)); then\n" +
+	"    \"${@}\"\n" +
+	"    res=$?\n" +
+	"    eval \"$old_shell_options\"\n" +
+	"  fi\n" +
+	"\n" +
+	"  # Force failure if the inner script has failed and the mode is strict\n" +
+	"  if [[ $mode = strict && $res -gt 0 ]]; then\n" +
+	"    exit 1\n" +
+	"  fi\n" +
+	"\n" +
+	"  return $res\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: strict_env [<command> ...]\n" +
+	"#\n" +
+	"# Turns on shell execution strictness. This will force the .envrc\n" +
+	"# evaluation context to exit immediately if:\n" +
+	"#\n" +
+	"# - any command in a pipeline returns a non-zero exit status that is\n" +
+	"#   not otherwise handled as part of `if`, `while`, or `until` tests,\n" +
+	"#   return value negation (`!`), or part of a boolean (`&&` or `||`)\n" +
+	"#   chain.\n" +
+	"# - any variable that has not explicitly been set or declared (with\n" +
+	"#   either `declare` or `local`) is referenced.\n" +
+	"#\n" +
+	"# If followed by a command-line, the strictness applies for the duration\n" +
+	"# of the command.\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    strict_env\n" +
+	"#    has curl\n" +
+	"#\n" +
+	"#    strict_env has curl\n" +
+	"strict_env() {\n" +
+	"  __env_strictness strict \"$@\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: unstrict_env [<command> ...]\n" +
+	"#\n" +
+	"# Turns off shell execution strictness. If followed by a command-line, the\n" +
+	"# strictness applies for the duration of the command.\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    unstrict_env\n" +
+	"#    has curl\n" +
+	"#\n" +
+	"#    unstrict_env has curl\n" +
+	"unstrict_env() {\n" +
+	"  if (($#)); then\n" +
+	"    __env_strictness unstrict \"$@\"\n" +
+	"  else\n" +
+	"    set +o errexit +o nounset +o pipefail\n" +
+	"  fi\n" +
+	"}\n" +
 	"\n" +
 	"# Usage: direnv_layout_dir\n" +
 	"#\n" +
@@ -150,12 +233,30 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  elif [[ -d $path ]]; then\n" +
 	"    path=$path/.env\n" +
 	"  fi\n" +
+	"  watch_file \"$path\"\n" +
 	"  if ! [[ -f $path ]]; then\n" +
 	"    log_error \".env at $path not found\"\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"  eval \"$(\"$direnv\" dotenv bash \"$@\")\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: dotenv_if_exists [<filename>]\n" +
+	"#\n" +
+	"# Loads a \".env\" file into the current environment, but only if it exists.\n" +
+	"#\n" +
+	"dotenv_if_exists() {\n" +
+	"  local path=${1:-}\n" +
+	"  if [[ -z $path ]]; then\n" +
+	"    path=$PWD/.env\n" +
+	"  elif [[ -d $path ]]; then\n" +
+	"    path=$path/.env\n" +
+	"  fi\n" +
 	"  watch_file \"$path\"\n" +
+	"  if ! [[ -f $path ]]; then\n" +
+	"    return\n" +
+	"  fi\n" +
+	"  eval \"$(\"$direnv\" dotenv bash \"$@\")\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: user_rel_path <abs_path>\n" +
@@ -223,6 +324,10 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# NOTE: the other \".envrc\" is not checked by the security framework.\n" +
 	"source_env() {\n" +
 	"  local rcpath=${1/#\\~/$HOME}\n" +
+	"  if has cygpath ; then\n" +
+	"    rcpath=$(cygpath -u \"$rcpath\")\n" +
+	"  fi\n" +
+	"\n" +
 	"  local REPLY\n" +
 	"  if [[ -d $rcpath ]]; then\n" +
 	"    rcpath=$rcpath/.envrc\n" +
@@ -280,6 +385,13 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  eval \"$(\"$direnv\" watch bash \"$@\")\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: watch_dir <dir>\n" +
+	"#\n" +
+	"# Adds <dir> to the list of dirs that direnv will recursively watch for changes\n" +
+	"watch_dir() {\n" +
+	"  eval \"$(\"$direnv\" watch-dir bash \"$1\")\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: source_up [<filename>]\n" +
 	"#\n" +
 	"# Loads another \".envrc\" if found with the find_up command.\n" +
@@ -333,7 +445,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"direnv_load() {\n" +
 	"  # Backup watches in case of `nix-shell --pure`\n" +
 	"  local prev_watches=$DIRENV_WATCHES\n" +
-	"  local temp_dir output_file script_file exit_code\n" +
+	"  local temp_dir output_file script_file exit_code old_direnv_dump_file_path\n" +
 	"\n" +
 	"  # Prepare a temporary place for dumps and such.\n" +
 	"  temp_dir=$(mktemp -dt direnv.XXXXXX) || {\n" +
@@ -342,6 +454,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  }\n" +
 	"  output_file=\"$temp_dir/output\"\n" +
 	"  script_file=\"$temp_dir/script\"\n" +
+	"  old_direnv_dump_file_path=${DIRENV_DUMP_FILE_PATH:-}\n" +
 	"\n" +
 	"  # Chain the following commands explicitly so that we can capture the exit code\n" +
 	"  # of the whole chain. Crucially this ensures that we don't return early (via\n" +
@@ -363,6 +476,13 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  # Restore watches if the dump wiped them\n" +
 	"  if [[ -z \"${DIRENV_WATCHES:-}\" ]]; then\n" +
 	"    export DIRENV_WATCHES=$prev_watches\n" +
+	"  fi\n" +
+	"\n" +
+	"  # Restore DIRENV_DUMP_FILE_PATH if needed\n" +
+	"  if [[ -n \"$old_direnv_dump_file_path\" ]]; then\n" +
+	"    export DIRENV_DUMP_FILE_PATH=$old_direnv_dump_file_path\n" +
+	"  else\n" +
+	"    unset DIRENV_DUMP_FILE_PATH\n" +
 	"  fi\n" +
 	"\n" +
 	"  # Exit accordingly\n" +
@@ -474,8 +594,10 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  results=()\n" +
 	"\n" +
 	"  # iterate over path entries, discard entries that match any of the patterns\n" +
+	"  # shellcheck disable=SC2068\n" +
 	"  for path in ${path_array[@]+\"${path_array[@]}\"}; do\n" +
 	"    discard=false\n" +
+	"    # shellcheck disable=SC2068\n" +
 	"    for pattern in ${patterns[@]+\"${patterns[@]}\"}; do\n" +
 	"      if [[ \"$path\" == +($pattern) ]]; then\n" +
 	"        discard=true\n" +
@@ -681,15 +803,16 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  layout_python python3 \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: layout anaconda <environment_name> [<conda_exe>]\n" +
+	"# Usage: layout anaconda <env_name_or_prefix> [<conda_exe>]\n" +
 	"#\n" +
-	"# Activates anaconda for the named environment. If the environment\n" +
+	"# Activates anaconda for the named environment or prefix. If the environment\n" +
 	"# hasn't been created, it will be using the environment.yml file in\n" +
 	"# the current directory. <conda_exe> is optional and will default to\n" +
 	"# the one found in the system environment.\n" +
 	"#\n" +
 	"layout_anaconda() {\n" +
-	"  local env_name=$1\n" +
+	"  local env_name_or_prefix=$1\n" +
+	"  local env_name\n" +
 	"  local env_loc\n" +
 	"  local conda\n" +
 	"  local REPLY\n" +
@@ -699,20 +822,37 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"    conda=$(command -v conda)\n" +
 	"  fi\n" +
 	"  realpath.dirname \"$conda\"\n" +
-	"  PATH_add \"$REPLY/$conda\"\n" +
-	"  env_loc=$(\"$conda\" env list | grep -- '^'\"$env_name\"'\\s')\n" +
-	"  if [[ ! \"$env_loc\" == $env_name*$env_name ]]; then\n" +
+	"  PATH_add \"$REPLY\"\n" +
+	"  if [[ \"${env_name_or_prefix%%/*}\" == \".\" ]]; then\n" +
+	"    # \"./foo\" relative prefix\n" +
+	"    realpath.absolute \"$env_name_or_prefix\"\n" +
+	"    env_loc=\"$REPLY\"\n" +
+	"  elif [[ ! \"$env_name_or_prefix\" == \"${env_name_or_prefix#/}\" ]]; then\n" +
+	"    # \"/foo\" absolute prefix\n" +
+	"    env_loc=\"$env_name_or_prefix\"\n" +
+	"  else\n" +
+	"    # \"foo\" name\n" +
+	"    env_name=\"$env_name_or_prefix\"\n" +
+	"    env_loc=$(\"$conda\" env list | grep -- '^'\"$env_name\"'\\s')\n" +
+	"    env_loc=\"${env_loc##* }\"\n" +
+	"  fi\n" +
+	"  if [[ ! -d \"$env_loc\" ]]; then\n" +
 	"    if [[ -e environment.yml ]]; then\n" +
 	"      log_status \"creating conda environment\"\n" +
-	"      \"$conda\" env create\n" +
+	"      if [[ -n \"$env_name\" ]]; then\n" +
+	"        \"$conda\" env create --name \"$env_name\"\n" +
+	"        env_loc=$(\"$conda\" env list | grep -- '^'\"$env_name\"'\\s')\n" +
+	"        env_loc=\"/${env_loc##* /}\"\n" +
+	"      else\n" +
+	"        \"$conda\" env create --prefix \"$env_loc\"\n" +
+	"      fi\n" +
 	"    else\n" +
 	"      log_error \"Could not find environment.yml\"\n" +
 	"      return 1\n" +
 	"    fi\n" +
 	"  fi\n" +
 	"\n" +
-	"  # shellcheck disable=SC1091\n" +
-	"  source activate \"$env_name\"\n" +
+	"  eval \"$( \"$conda\" shell.bash activate \"$env_loc\" )\"\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: layout pipenv\n" +
@@ -895,19 +1035,21 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  rvm \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: use node\n" +
-	"# Loads NodeJS version from a `.node-version` or `.nvmrc` file.\n" +
-	"#\n" +
 	"# Usage: use node [<version>]\n" +
-	"# Loads specified NodeJS version.\n" +
 	"#\n" +
-	"# If you specify a partial NodeJS version (i.e. `4.2`), a fuzzy match\n" +
+	"# Loads the specified NodeJS version into the environment.\n" +
+	"#\n" +
+	"# If a partial NodeJS version is passed (i.e. `4.2`), a fuzzy match\n" +
 	"# is performed and the highest matching version installed is selected.\n" +
+	"#\n" +
+	"# If no version is passed, it will look at the '.nvmrc' or '.node-version'\n" +
+	"# files in the current directory if they exist.\n" +
 	"#\n" +
 	"# Environment Variables:\n" +
 	"#\n" +
 	"# - $NODE_VERSIONS (required)\n" +
-	"#   You must specify a path to your installed NodeJS versions via the `$NODE_VERSIONS` variable.\n" +
+	"#   Points to a folder that contains all the installed Node versions. That\n" +
+	"#   folder must exist.\n" +
 	"#\n" +
 	"# - $NODE_VERSION_PREFIX (optional) [default=\"node-v\"]\n" +
 	"#   Overrides the default version prefix.\n" +
@@ -962,6 +1104,32 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use nodenv <node version number>\n" +
+	"#\n" +
+	"# Example:\n" +
+	"#\n" +
+	"#    use nodenv 15.2.1\n" +
+	"#\n" +
+	"# Uses nodenv, use_node and layout_node to add the chosen node version and \n" +
+	"# \"$PWD/node_modules/.bin\" to the PATH\n" +
+	"#\n" +
+	"use_nodenv() {\n" +
+	"  local node_version=\"${1}\"\n" +
+	"  local node_versions_dir\n" +
+	"  local nodenv_version\n" +
+	"  node_versions_dir=\"$(nodenv root)/versions\"\n" +
+	"  nodenv_version=\"${node_versions_dir}/${node_version}\"\n" +
+	"  if [[ -e \"$nodenv_version\" ]]; then\n" +
+	"      # Put the selected node version in the PATH\n" +
+	"      NODE_VERSIONS=\"${node_versions_dir}\" NODE_VERSION_PREFIX=\"\" use_node \"${node_version}\"\n" +
+	"      # Add $PWD/node_modules/.bin to the PATH\n" +
+	"      layout_node\n" +
+	"  else\n" +
+	"    log_error \"nodenv: version '$node_version' not installed.  Use \\`nodenv install ${node_version}\\` to install it first.\"\n" +
+	"    return 1\n" +
+	"  fi\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: use_nix [...]\n" +
 	"#\n" +
 	"# Load environment variables from `nix-shell`.\n" +
@@ -990,11 +1158,56 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  eval \"$(guix environment \"$@\" --search-paths)\"\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use_vim [<vimrc_file>]\n" +
+	"#\n" +
+	"# Prepends the specified vim script (or .vimrc.local by default) to the\n" +
+	"# `DIRENV_EXTRA_VIMRC` environment variable.\n" +
+	"#\n" +
+	"# This variable is understood by the direnv/direnv.vim extension. When found,\n" +
+	"# it will source it after opening files in the directory.\n" +
+	"use_vim() {\n" +
+	"  local extra_vimrc=${1:-.vimrc.local}\n" +
+	"  path_add DIRENV_EXTRA_VIMRC \"$extra_vimrc\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: direnv_version <version_at_least>\n" +
 	"#\n" +
 	"# Checks that the direnv version is at least old as <version_at_least>.\n" +
 	"direnv_version() {\n" +
 	"  \"$direnv\" version \"$@\"\n" +
+	"}\n" +
+	"\n" +
+	"# Usage: on_git_branch [<branch_name>]\n" +
+	"#\n" +
+	"# Returns 0 if within a git repository with given `branch_name`. If no branch\n" +
+	"# name is provided, then returns 0 when within _any_ branch. Requires the git\n" +
+	"# command to be installed. Returns 1 otherwise.\n" +
+	"#\n" +
+	"# When a branch is specified, then `.git/HEAD` is watched so that\n" +
+	"# entering/exiting a branch triggers a reload.\n" +
+	"#\n" +
+	"# Example (.envrc):\n" +
+	"#\n" +
+	"#    if on_git_branch child_changes; then\n" +
+	"#      export MERGE_BASE_BRANCH=parent_changes\n" +
+	"#    fi\n" +
+	"#\n" +
+	"#    if on_git_branch; then\n" +
+	"#      echo \"Thanks for contributing to a GitHub project!\"\n" +
+	"#    fi\n" +
+	"on_git_branch() {\n" +
+	"  local git_dir\n" +
+	"  if ! has git; then\n" +
+	"    log_error \"on_git_branch needs git, which could not be found on your system\"\n" +
+	"    return 1\n" +
+	"  elif ! git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then\n" +
+	"    log_error \"on_git_branch could not locate the .git directory corresponding to the current working directory\"\n" +
+	"    return 1\n" +
+	"  elif [ -z \"$1\" ]; then\n" +
+	"    return 0\n" +
+	"  fi\n" +
+	"  watch_file \"$git_dir/HEAD\"\n" +
+	"  [ \"$(git branch --show-current)\" = \"$1\" ]\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: __main__ <cmd> [...<args>]\n" +

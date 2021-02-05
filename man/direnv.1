@@ -93,7 +93,21 @@ Add the following line at the end of the \fB\fC\~/.config/fish/config.fish\fR fi
 .RS
 
 .nf
-eval (direnv hook fish)
+direnv hook fish | source
+
+.fi
+.RE
+
+.PP
+Fish supports 3 modes you can set with with the global environment variable \fB\fCdirenv\_fish\_mode\fR:
+
+.PP
+.RS
+
+.nf
+set \-g direnv\_fish\_mode eval\_on\_arrow    # trigger direnv at prompt, and on every arrow\-based directory change (default)
+set \-g direnv\_fish\_mode eval\_after\_arrow # trigger direnv at prompt, and only after arrow\-based directory changes before executing command
+set \-g direnv\_fish\_mode disable\_arrow    # trigger direnv at prompt only, this is similar functionality to the original behavior
 
 .fi
 .RE

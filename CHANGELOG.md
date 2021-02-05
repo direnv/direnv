@@ -1,4 +1,51 @@
 
+2.26.0 / 2020-12-27
+==================
+
+  * updated fish hook support issue (#732)
+  * ci: add basic windows CI (#737)
+  * test: fix shellcheck usage in ./test/stdlib.bash
+  * test: fix use_julia test for NixOS
+  * remove dead code: rootDir
+  * fix: create temp dir in current working dir for one test (#735)
+  * Add `dotenv_if_exists` (#734)
+  * stdlib: add watch_dir command (#697)
+
+2.25.2 / 2020-12-12
+==================
+
+There was a generation issue in 2.25.1. This release only bumps the version
+to do another release.
+
+2.25.1 / 2020-12-11
+==================
+
+  * stdlib.go: re-generate (fixes #707)
+  * README: remove old Azure badge
+  * build(deps): bump golang.org/x/mod from 0.3.0 to 0.4.0 (#730)
+
+2.25.0 / 2020-12-03
+==================
+
+  * dist: add linux/arm64 and linux/ppc64
+  * Added use_nodenv to stdlib (#727)
+  * Fix proposal for  #707, broken direnv compatibility under Windows (#723)
+  * fix: layout anaconda <env_name_or_prefix> (#717)
+  * Add on_git_branch command to detect whether a specific git branch is checked out (#702)
+
+2.24.0 / 2020-11-15
+==================
+
+  * direnv_load: avoid leaking DIRENV_DUMP_FILE_PATH (#715)
+  * Add strict_env and unstrict_env (#572)
+  * stdlib: add `use_vim` to source local vimrc (#497)
+  * stdlib: add source_env_if_exists (#714)
+  * Wording (#713)
+  * build(deps): bump actions/checkout from v2.3.3 to v2.3.4 (#709)
+  * build(deps): bump cachix/install-nix-action from v11 to v12 (#710)
+  * Fix XDG_CACHE_HOME path (#711)
+  * rc: make file existence check more robust (#706)
+
 2.23.1 / 2020-10-22
 ==================
 

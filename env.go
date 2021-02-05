@@ -36,10 +36,11 @@ func GetEnv() Env {
 // this after reverting the environment, otherwise direnv will just be amnesic
 // about the previously-loaded environment.
 func (env Env) CleanContext() {
+	delete(env, DIRENV_DIFF)
 	delete(env, DIRENV_DIR)
+	delete(env, DIRENV_DUMP_FILE_PATH)
 	delete(env, DIRENV_RC_FILE)
 	delete(env, DIRENV_WATCHES)
-	delete(env, DIRENV_DIFF)
 }
 
 // LoadEnv unmarshals the env back from a gzenv string

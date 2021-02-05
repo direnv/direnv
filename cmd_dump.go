@@ -27,7 +27,7 @@ func cmdDumpAction(env Env, args []string) (err error) {
 	if len(args) > 2 {
 		filePath = args[2]
 	} else {
-		filePath = os.Getenv("DIRENV_DUMP_FILE_PATH")
+		filePath = os.Getenv(DIRENV_DUMP_FILE_PATH)
 	}
 
 	if filePath != "" {

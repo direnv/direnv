@@ -74,7 +74,7 @@ set -euo pipefail
 
   cat <<DONE
 
-The direnv binary is now avaible in:
+The direnv binary is now available in:
 
     $bin_path/direnv
 

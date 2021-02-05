@@ -3,9 +3,10 @@
 ############################################################################
 
 # Set this to change the target installation path
-DESTDIR ?= /usr/local
-BINDIR   = ${DESTDIR}/bin
-MANDIR   = ${DESTDIR}/share/man
+PREFIX   = /usr/local
+BINDIR   = ${PREFIX}/bin
+SHAREDIR = ${PREFIX}/share
+MANDIR   = ${SHAREDIR}/man
 DISTDIR ?= dist
 
 # filename of the executable
@@ -29,7 +30,6 @@ SHELL = bash
 all: build man
 
 export GO111MODULE=on
-export GOFLAGS=-mod=vendor
 
 ############################################################################
 # Build
@@ -122,6 +122,7 @@ test: build $(tests)
 
 test-shellcheck:
 	shellcheck stdlib.sh
+	shellcheck ./test/stdlib.bash
 
 test-stdlib: build
 	./test/stdlib.bash
@@ -154,13 +155,36 @@ test-zsh:
 
 .PHONY: install
 install: all
-	install -d $(BINDIR)
-	install $(exe) $(BINDIR)
-	install -d $(MANDIR)/man1
-	cp -R man/*.1 $(MANDIR)/man1
+	install -d $(DESTDIR)$(BINDIR)
+	install $(exe) $(DESTDIR)$(BINDIR)
+	install -d $(DESTDIR)$(MANDIR)/man1
+	cp -R man/*.1 $(DESTDIR)$(MANDIR)/man1
+	install -d $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d
+	echo "$(BINDIR)/direnv hook fish | source" > $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d/direnv.fish
 
 .PHONY: dist
 dist:
 	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
-	CGO_ENABLED=0 gox -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}"
-
+	CGO_ENABLED=0 gox -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}" \
+		-osarch darwin/amd64 \
+		-osarch freebsd/386 \
+		-osarch freebsd/amd64 \
+		-osarch freebsd/arm \
+		-osarch linux/386 \
+		-osarch linux/amd64 \
+		-osarch linux/arm \
+		-osarch linux/arm64 \
+		-osarch linux/mips \
+		-osarch linux/mips64 \
+		-osarch linux/mips64le \
+		-osarch linux/mipsle \
+		-osarch linux/ppc64 \
+		-osarch linux/s390x \
+		-osarch netbsd/386 \
+		-osarch netbsd/amd64 \
+		-osarch netbsd/arm \
+		-osarch openbsd/386 \
+		-osarch openbsd/amd64 \
+		-osarch windows/386 \
+		-osarch windows/amd64 \
+		&& true
