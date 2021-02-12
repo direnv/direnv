@@ -1,3 +1,4 @@
+.nh
 .TH DIRENV 1 "2019" direnv "User Manuals"
 .SH NAME
 .PP
@@ -87,7 +88,7 @@ eval "$(direnv hook zsh)"
 
 .SS FISH
 .PP
-Add the following line at the end of the \fB\fC\~/.config/fish/config.fish\fR file:
+Add the following line at the end of the \fB\fC$XDG\_CONFIG\_HOME/fish/config.fish\fR file:
 
 .PP
 .RS
@@ -177,11 +178,24 @@ things.
 Exporting variables by hand is a bit repetitive so direnv provides a set of
 utility functions that are made available in the context of the \fB\fC\&.envrc\fR file.
 Check the direnv\-stdlib(1) man page for more details. You can also define your
-own extensions inside \fB\fC\~/.config/direnv/direnvrc\fR or
-\fB\fC\~/.config/direnv/lib/*.sh\fR files.
+own extensions inside \fB\fC$XDG\_CONFIG\_HOME/direnv/direnvrc\fR or
+\fB\fC$XDG\_CONFIG\_HOME/direnv/lib/*.sh\fR files.
 
 .PP
 Hopefully this is enough to get you started.
+
+.SH FILES
+.TP
+$XDG\_CONFIG\_HOME/direnv/direnvrc
+\fB\fCdirenv\fR configuration
+
+.TP
+$XDG\_CONFIG\_HOME/direnv/lib/*.sh
+Third\-party extensions to direnv\-stdlib.
+
+.TP
+$XDG\_DATA\_HOME/direnv/allow
+Records which \fB\fC\&.envrc\fR files have been \fB\fCdirenv allow\fRed.
 
 .SH CONTRIBUTE
 .PP
@@ -189,12 +203,12 @@ Bug reports, contributions and forks are welcome.
 
 .PP
 All bugs or other forms of discussion happen on
-
+http://github.com/direnv/direnv/issues
 \[la]http://github.com/direnv/direnv/issues\[ra]
 
 .PP
 There is also a wiki available where you can share your usage patterns or
-other tips and tricks 
+other tips and tricks https://github.com/direnv/direnv/wiki
 \[la]https://github.com/direnv/direnv/wiki\[ra]
 
 .PP
