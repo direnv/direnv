@@ -77,7 +77,7 @@ eval "$(direnv hook zsh)"
 
 ### FISH
 
-Add the following line at the end of the `~/.config/fish/config.fish` file:
+Add the following line at the end of the `$XDG_CONFIG_HOME/fish/config.fish` file:
 
 ```fish
 direnv hook fish | source
@@ -138,10 +138,22 @@ things.
 Exporting variables by hand is a bit repetitive so direnv provides a set of
 utility functions that are made available in the context of the `.envrc` file.
 Check the direnv-stdlib(1) man page for more details. You can also define your
-own extensions inside `~/.config/direnv/direnvrc` or
-`~/.config/direnv/lib/*.sh` files.
+own extensions inside `$XDG_CONFIG_HOME/direnv/direnvrc` or
+`$XDG_CONFIG_HOME/direnv/lib/*.sh` files.
 
 Hopefully this is enough to get you started.
+
+FILES
+-----
+
+$XDG_CONFIG_HOME/direnv/direnvrc
+: `direnv` configuration
+
+$XDG_CONFIG_HOME/direnv/lib/*.sh
+: Third-party extensions to direnv-stdlib.
+
+$XDG_DATA_HOME/direnv/allow
+: Records which `.envrc` files have been `direnv allow`ed.
 
 CONTRIBUTE
 ----------
