@@ -96,7 +96,7 @@ roffs = $(man_md:.md=)
 man: $(roffs)
 
 %.1: %.1.md
-	@command -v go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing. Run: go get -u github.com/cpuguy83/go-md2man"; false)
+	@command -v go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing. Run: go get -u github.com/cpuguy83/go-md2man/v2"; false)
 	go-md2man -in $< -out $@
 
 ############################################################################
