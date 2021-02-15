@@ -151,7 +151,7 @@ active all day.
 Here is a list of projects you might want to look into if you are using direnv.
 
 * [starship](https://starship.rs/) - A cross-shell prompt.
-* [nix-direnv](https://github.com/nix-community/nix-direnv) - A fast, persistent use_nix implementation for direnv.
+* [Projects for Nix integration](https://github.com/direnv/direnv/wiki/Nix) - choose from one of a variety of projects offering improvements over Direnv's built-in `use_nix` implementation.
 
 ## Related projects
 
