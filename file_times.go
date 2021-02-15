@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/direnv/direnv/gzenv"
+	"github.com/direnv/direnv/v2/gzenv"
 )
 
 // FileTime represents a single recorded file status

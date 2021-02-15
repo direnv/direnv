@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/direnv/direnv/sri"
+	"github.com/direnv/direnv/v2/sri"
 	"github.com/mattn/go-isatty"
 )
 
