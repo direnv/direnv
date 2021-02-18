@@ -9,7 +9,7 @@ import (
 	"time"
 
 	toml "github.com/BurntSushi/toml"
-	"github.com/direnv/direnv/xdg"
+	"github.com/direnv/direnv/v2/xdg"
 )
 
 // Config represents the direnv configuration and state.

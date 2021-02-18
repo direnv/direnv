@@ -15,9 +15,6 @@ exe = direnv$(shell go env GOEXE)
 # Override the go executable
 GO = go
 
-# Change if you want to fork direnv
-PACKAGE = github.com/direnv/direnv
-
 # BASH_PATH can also be passed to hard-code the path to bash at build time
 
 SHELL = bash

@@ -3,7 +3,7 @@ package main
 import (
 	"strings"
 
-	"github.com/direnv/direnv/gzenv"
+	"github.com/direnv/direnv/v2/gzenv"
 )
 
 // IgnoredKeys is list of keys we don't want to deal with

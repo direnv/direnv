@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 
-	"github.com/direnv/direnv/gzenv"
+	"github.com/direnv/direnv/v2/gzenv"
 )
 
 type gzenvShell int

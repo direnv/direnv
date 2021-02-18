@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/direnv/direnv/gzenv"
+	"github.com/direnv/direnv/v2/gzenv"
 )
 
 // CmdShowDump is `direnv show_dump`

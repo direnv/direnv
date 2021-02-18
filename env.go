@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/direnv/direnv/gzenv"
+	"github.com/direnv/direnv/v2/gzenv"
 )
 
 // Env is a map representation of environment variables.
