@@ -864,9 +864,13 @@ layout_pipenv() {
     exit 2
   fi
 
+  PYTHON_VERSION=$(python --version | cut -d" " -f2)
   VIRTUAL_ENV=$(pipenv --venv 2>/dev/null ; true)
 
   if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
+    if [[ $PYTHON_VERSION ]]; then
+      pipenv --python $PYTHON_VERSION
+    fi
     pipenv install --dev
     VIRTUAL_ENV=$(pipenv --venv)
   fi
