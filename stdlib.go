@@ -871,8 +871,8 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  VIRTUAL_ENV=$(pipenv --venv 2>/dev/null ; true)\n" +
 	"\n" +
 	"  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then\n" +
-	"    if [[ $PYTHON_VERSION ]]; then\n" +
-	"      pipenv --python $PYTHON_VERSION\n" +
+	"    if [[ \"$PYTHON_VERSION\" ]]; then\n" +
+	"      pipenv --python \"$PYTHON_VERSION\"\n" +
 	"    fi\n" +
 	"    pipenv install --dev\n" +
 	"    VIRTUAL_ENV=$(pipenv --venv)\n" +
