@@ -23,4 +23,4 @@ To install to /usr/local:
 
 Or to a different location like `~/.local`:
 
-    $ make install DESTDIR=~/.local
+    $ make install PREFIX=~/.local
