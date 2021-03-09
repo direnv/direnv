@@ -69,7 +69,7 @@ func (sh tcsh) escape(str string) string {
 	}
 
 	quoted := func(char byte) {
-		out += string([]byte{char})
+		out += `"` + string([]byte{char}) + `"`
 	}
 
 	literal := func(char byte) {
