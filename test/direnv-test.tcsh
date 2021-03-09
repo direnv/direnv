@@ -120,6 +120,14 @@ cd $TEST_DIR/scenarios/"empty-var-unset"
   unsetenv FOO
 cd $TEST_DIR ; direnv_eval
 
+cd $TEST_DIR/scenarios/"parenthesis"
+  direnv allow
+  echo "Testing parenthesis"
+  direnv_eval
+  test "$FOO" = "aaa(bbb)ccc"
+  unsetenv FOO
+cd $TEST_DIR ; direnv_eval
+
 # Currently broken
 # cd $TEST_DIR/scenarios/"utf-8"
 #   direnv allow
