@@ -64,7 +64,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	var previousEnv, newEnv Env
 
 	if previousEnv, err = config.Revert(currentEnv); err != nil {
-		err = fmt.Errorf("Revert() failed: %q", err)
+		err = fmt.Errorf("Revert() failed: %w", err)
 		logDebug("err: %v", err)
 		return
 	}
