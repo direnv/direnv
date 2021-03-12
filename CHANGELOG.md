@@ -1,4 +1,21 @@
 
+2.28.0 / 2021-03-12
+==================
+
+  * Merge pull request #779 from wingrunr21/go_1_16
+  * Build for darwin/arm64. Resolves #738
+  * Update to go 1.16
+  * test: Fix errors for elvish test (#767)
+  * tcsh: fix variable escaping (#778)
+  * Change DESTDIR to PREFIX in development.md (#774)
+  * go: use the /v2 prefix (#765)
+  * Relax README's recommendation for nix-direnv (#763)
+  * man/direnv.1.md: add FILES section (fix #758) (#759)
+  * Add/update fish tests (#754)
+  * build(deps): bump golang.org/x/mod from 0.4.0 to 0.4.1 (#749)
+  * Fix typo "avaible" in install.sh (#750)
+  * docs: improve the use_node documentation
+
 2.27.0 / 2021-01-01
 ==================
 
