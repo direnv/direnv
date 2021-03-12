@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -55,7 +56,7 @@ func watchListCommand(env Env, args []string) (err error) {
 			}
 			mtime, err := strconv.Atoi(elems[0])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", i, err)
+				return fmt.Errorf("line %d: %w", i, err)
 			}
 			path := elems[1][:len(elems[1])-1]
 
@@ -64,10 +65,10 @@ func watchListCommand(env Env, args []string) (err error) {
 			if err != nil {
 				return err
 			}
-		} else if err == io.EOF {
+		} else if errors.Is(err, io.EOF) {
 			break
 		} else {
-			return fmt.Errorf("line %d: %s", i, err)
+			return fmt.Errorf("line %d: %w", i, err)
 		}
 		i++
 	}

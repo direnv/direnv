@@ -75,7 +75,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 	var exePath string
 	if exePath, err = os.Executable(); err != nil {
-		err = fmt.Errorf("LoadConfig() os.Executable() failed: %q", err)
+		err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
 		return
 	}
 	// Fix for mingsys
@@ -83,7 +83,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 	config.SelfPath = exePath
 
 	if config.WorkDir, err = os.Getwd(); err != nil {
-		err = fmt.Errorf("LoadConfig() Getwd failed: %q", err)
+		err = fmt.Errorf("LoadConfig() Getwd failed: %w", err)
 		return
 	}
 
@@ -114,7 +114,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 			Global:     &global,
 		}
 		if _, err = toml.DecodeFile(config.TomlPath, &tomlConf); err != nil {
-			err = fmt.Errorf("LoadConfig() failed to parse %s: %q", config.TomlPath, err)
+			err = fmt.Errorf("LoadConfig() failed to parse %s: %w", config.TomlPath, err)
 			return
 		}
 
@@ -149,7 +149,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		} else if bashPath != "" {
 			config.BashPath = bashPath
 		} else if config.BashPath, err = exec.LookPath("bash"); err != nil {
-			err = fmt.Errorf("can't find bash: %q", err)
+			err = fmt.Errorf("can't find bash: %w", err)
 			return
 		}
 	}
