@@ -1,9 +1,11 @@
 #!/usr/bin/env elvish
 
-E:TEST_DIR = (path-dir (src)[path])
+use path
+
+E:TEST_DIR = (path:dir (src)[name])
 set-env XDG_CONFIG_HOME $E:TEST_DIR/config
 set-env XDG_DATA_HOME $E:TEST_DIR/data
-E:PATH = (path-dir $E:TEST_DIR):$E:PATH
+E:PATH = (path:dir $E:TEST_DIR):$E:PATH
 
 cd $E:TEST_DIR
 
@@ -80,7 +82,7 @@ test-scenario base {
 	direnv-eval
 	test-eq $E:HELLO "world"
 
-	E:WATCHES=$E:DIRENV_WATCHES
+	set E:WATCHES = $E:DIRENV_WATCHES
 
 	echo "Reloading (should be no-op)"
 	direnv-eval

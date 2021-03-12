@@ -49,7 +49,7 @@ func watchDirCommand(env Env, args []string) (err error) {
 		return watches.NewTime(path, info.ModTime().Unix(), true)
 	})
 	if err != nil {
-		return fmt.Errorf("failed to recursively watch dir '%s': %v", dir, err)
+		return fmt.Errorf("failed to recursively watch dir '%s': %w", dir, err)
 	}
 
 	e := make(ShellExport)
