@@ -193,9 +193,6 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		if err == nil {
 			newEnv = newEnv2
 		}
-		if newEnv2["PS1"] != "" {
-			logError("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
-		}
 	}
 
 	return
