@@ -101,13 +101,15 @@ func (sh tcsh) escape(str string) string {
 			literal(char)
 		case char <= QUESTION:
 			quoted(char)
-		case char <= LOWERCASE_Z:
+		case char <= UPPERCASE_Z:
 			literal(char)
 		case char == OPEN_BRACKET:
 			quoted(char)
 		case char == BACKSLASH:
 			backslash(char)
 		case char == UNDERSCORE:
+			literal(char)
+		case char <= LOWERCASE_Z:
 			literal(char)
 		case char <= CLOSE_BRACKET:
 			quoted(char)

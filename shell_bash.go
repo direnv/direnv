@@ -71,12 +71,13 @@ const (
 	PLUS          = 43
 	NINE          = 57
 	QUESTION      = 63
-	LOWERCASE_Z   = 90
+	UPPERCASE_Z   = 90
 	OPEN_BRACKET  = 91
 	BACKSLASH     = 92
 	UNDERSCORE    = 95
 	CLOSE_BRACKET = 93
 	BACKTICK      = 96
+	LOWERCASE_Z   = 122
 	TILDA         = 126
 	DEL           = 127
 )
@@ -146,7 +147,7 @@ func BashEscape(str string) string {
 			literal(char)
 		case char <= QUESTION:
 			quoted(char)
-		case char <= LOWERCASE_Z:
+		case char <= UPPERCASE_Z:
 			literal(char)
 		case char == OPEN_BRACKET:
 			quoted(char)
