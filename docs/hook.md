@@ -61,3 +61,4 @@ and add the following line to your `~/.elvish/rc.elv` file:
 ```
 use direnv
 ```
+
