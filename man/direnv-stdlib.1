@@ -320,6 +320,9 @@ Setup environment variables required by perl's local::lib See http://search.cpan
 .PP
 Similar to \fB\fClayout python\fR, but uses Pipenv to build a virtualenv from the \fB\fCPipfile\fR located in the same directory. The path can be overridden by the \fB\fCPIPENV\_PIPFILE\fR environment variable.
 
+.PP
+Note that unlike invoking Pipenv manually, this does not load environment variables from a \fB\fC\&.env\fR file automatically. You may want to add \fB\fCdotenv .env\fR to copy that behavior.
+
 .SS \fB\fClayout python [<python\_exe>]\fR
 .PP
 Creates and loads a virtualenv environment under \fB\fC$PWD/.direnv/python\-$python\_version\fR\&. This forces the installation of any egg into the project's sub\-\&folder.
