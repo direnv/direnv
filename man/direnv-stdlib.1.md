@@ -228,6 +228,12 @@ Adds "$PWD/vendor/bin" to the PATH environment variable.
 
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
 
+### `layout pipenv`
+
+Similar to `layout python`, but uses Pipenv to build a virtualenv from the `Pipfile` located in the same directory. The path can be overridden by the `PIPENV_PIPFILE` environment variable.
+
+Note that unlike invoking Pipenv manually, this does not load environment variables from a `.env` file automatically. You may want to add `dotenv .env` to copy that behavior.
+
 ### `layout python [<python_exe>]`
 
 Creates and loads a virtualenv environment under `$PWD/.direnv/python-$python_version`. This forces the installation of any egg into the project's sub-folder.
