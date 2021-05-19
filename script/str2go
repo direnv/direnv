@@ -1,5 +1,0 @@
-#!/bin/sh
-#
-# Usage: str2go <package_name> <constant_name>
-#
-exec go run "$0.go" -- "$@"

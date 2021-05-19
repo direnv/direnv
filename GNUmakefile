@@ -57,11 +57,8 @@ ifneq ($(strip $(GO_LDFLAGS)),)
 	GO_BUILD_FLAGS = -ldflags '$(GO_LDFLAGS)'
 endif
 
-direnv: stdlib.go *.go
+direnv: *.go
 	$(GO) build $(GO_BUILD_FLAGS) -o $(exe)
-
-stdlib.go: stdlib.sh
-	cat $< | ./script/str2go main StdLib $< > $@
 
 version.go: version.txt
 	echo package main > $@
