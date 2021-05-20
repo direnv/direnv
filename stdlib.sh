@@ -1211,7 +1211,7 @@ on_git_branch() {
     return 1
   elif [ -z "$1" ]; then
     return 0
-  elif [ "$1" = "-r" ] && [ -z "$2" ]; then
+  elif [[ "$1" = "-r"  &&  -z "$2" ]]; then
     log_error "missing regexp pattern after \`-r\` flag"
     return 1
   fi
