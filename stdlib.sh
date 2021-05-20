@@ -1218,7 +1218,11 @@ on_git_branch() {
   watch_file "$git_dir/HEAD"
   local git_branch
   git_branch=$(git branch --show-current)
-  [ "$1" = "$git_branch" ] || [ "$1" = '-r' ] && [[ "$git_branch" =~ $2 ]]
+  if [ "$1" = '-r' ]; then
+    [[ "$git_branch" =~ $2 ]]
+  else
+    [ "$1" = "$git_branch" ]
+  fi
 }
 
 # Usage: __main__ <cmd> [...<args>]

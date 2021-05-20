@@ -1221,7 +1221,11 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  watch_file \"$git_dir/HEAD\"\n" +
 	"  local git_branch\n" +
 	"  git_branch=$(git branch --show-current)\n" +
-	"  [ \"$1\" = \"$git_branch\" ] || [ \"$1\" = '-r' ] && [[ \"$git_branch\" =~ $2 ]]\n" +
+	"  if [ \"$1\" = '-r' ]; then\n" +
+	"    [[ \"$git_branch\" =~ $2 ]]\n" +
+	"  else\n" +
+	"    [ \"$1\" = \"$git_branch\" ]\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: __main__ <cmd> [...<args>]\n" +
