@@ -1212,7 +1212,7 @@ on_git_branch() {
   elif [ -z "$1" ]; then
     return 0
   elif [ "$1" = "-r" ] && [ -z "$2" ]; then
-    log_error "missing regexp pattern after `-r` flag"
+    log_error "missing regexp pattern after \`-r\` flag"
     return 1
   fi
   watch_file "$git_dir/HEAD"

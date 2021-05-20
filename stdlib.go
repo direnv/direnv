@@ -1215,7 +1215,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  elif [ -z \"$1\" ]; then\n" +
 	"    return 0\n" +
 	"  elif [ \"$1\" = \"-r\" ] && [ -z \"$2\" ]; then\n" +
-	"    log_error \"missing regexp pattern after `-r` flag\"\n" +
+	"    log_error \"missing regexp pattern after \\`-r\\` flag\"\n" +
 	"    return 1\n" +
 	"  fi\n" +
 	"  watch_file \"$git_dir/HEAD\"\n" +
