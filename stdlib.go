@@ -1177,23 +1177,32 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  \"$direnv\" version \"$@\"\n" +
 	"}\n" +
 	"\n" +
-	"# Usage: on_git_branch [<branch_name>]\n" +
+	"# Usage: on_git_branch [<branch_name>] OR on_git_branch -r [<regexp>]\n" +
 	"#\n" +
 	"# Returns 0 if within a git repository with given `branch_name`. If no branch\n" +
 	"# name is provided, then returns 0 when within _any_ branch. Requires the git\n" +
 	"# command to be installed. Returns 1 otherwise.\n" +
 	"#\n" +
-	"# When a branch is specified, then `.git/HEAD` is watched so that\n" +
+	"# When the `-r` flag is specified, then the second argument is interpreted as a\n" +
+	"# regexp pattern for matching a branch name.\n" +
+	"#\n" +
+	"# Regardless, when a branch is specified, then `.git/HEAD` is watched so that\n" +
 	"# entering/exiting a branch triggers a reload.\n" +
 	"#\n" +
 	"# Example (.envrc):\n" +
+	"#\n" +
+	"#    if on_git_branch; then\n" +
+	"#      echo \"Thanks for contributing to a GitHub project!\"\n" +
+	"#    fi\n" +
 	"#\n" +
 	"#    if on_git_branch child_changes; then\n" +
 	"#      export MERGE_BASE_BRANCH=parent_changes\n" +
 	"#    fi\n" +
 	"#\n" +
-	"#    if on_git_branch; then\n" +
-	"#      echo \"Thanks for contributing to a GitHub project!\"\n" +
+	"#    if on_git_branch -r '.*py2'; then\n" +
+	"#      layout python2\n" +
+	"#    else\n" +
+	"#      layout python\n" +
 	"#    fi\n" +
 	"on_git_branch() {\n" +
 	"  local git_dir\n" +
@@ -1205,9 +1214,18 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"    return 1\n" +
 	"  elif [ -z \"$1\" ]; then\n" +
 	"    return 0\n" +
+	"  elif [[ \"$1\" = \"-r\"  &&  -z \"$2\" ]]; then\n" +
+	"    log_error \"missing regexp pattern after \\`-r\\` flag\"\n" +
+	"    return 1\n" +
 	"  fi\n" +
 	"  watch_file \"$git_dir/HEAD\"\n" +
-	"  [ \"$(git branch --show-current)\" = \"$1\" ]\n" +
+	"  local git_branch\n" +
+	"  git_branch=$(git branch --show-current)\n" +
+	"  if [ \"$1\" = '-r' ]; then\n" +
+	"    [[ \"$git_branch\" =~ $2 ]]\n" +
+	"  else\n" +
+	"    [ \"$1\" = \"$git_branch\" ]\n" +
+	"  fi\n" +
 	"}\n" +
 	"\n" +
 	"# Usage: __main__ <cmd> [...<args>]\n" +

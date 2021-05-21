@@ -1174,23 +1174,32 @@ direnv_version() {
   "$direnv" version "$@"
 }
 
-# Usage: on_git_branch [<branch_name>]
+# Usage: on_git_branch [<branch_name>] OR on_git_branch -r [<regexp>]
 #
 # Returns 0 if within a git repository with given `branch_name`. If no branch
 # name is provided, then returns 0 when within _any_ branch. Requires the git
 # command to be installed. Returns 1 otherwise.
 #
-# When a branch is specified, then `.git/HEAD` is watched so that
+# When the `-r` flag is specified, then the second argument is interpreted as a
+# regexp pattern for matching a branch name.
+#
+# Regardless, when a branch is specified, then `.git/HEAD` is watched so that
 # entering/exiting a branch triggers a reload.
 #
 # Example (.envrc):
+#
+#    if on_git_branch; then
+#      echo "Thanks for contributing to a GitHub project!"
+#    fi
 #
 #    if on_git_branch child_changes; then
 #      export MERGE_BASE_BRANCH=parent_changes
 #    fi
 #
-#    if on_git_branch; then
-#      echo "Thanks for contributing to a GitHub project!"
+#    if on_git_branch -r '.*py2'; then
+#      layout python2
+#    else
+#      layout python
 #    fi
 on_git_branch() {
   local git_dir
@@ -1202,9 +1211,18 @@ on_git_branch() {
     return 1
   elif [ -z "$1" ]; then
     return 0
+  elif [[ "$1" = "-r"  &&  -z "$2" ]]; then
+    log_error "missing regexp pattern after \`-r\` flag"
+    return 1
   fi
   watch_file "$git_dir/HEAD"
-  [ "$(git branch --show-current)" = "$1" ]
+  local git_branch
+  git_branch=$(git branch --show-current)
+  if [ "$1" = '-r' ]; then
+    [[ "$git_branch" =~ $2 ]]
+  else
+    [ "$1" = "$git_branch" ]
+  fi
 }
 
 # Usage: __main__ <cmd> [...<args>]
