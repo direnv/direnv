@@ -4,6 +4,7 @@ direnv -- unclutter your .profile
 [![Built with Nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 [![Packaging status](https://repology.org/badge/tiny-repos/direnv.svg)](https://repology.org/project/direnv/versions)
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/direnv.svg)](https://repology.org/project/direnv/versions)
+[![Support room on Matrix](https://img.shields.io/matrix/direnv:numtide.com.svg?label=%23direnv%3Anumtide.com&logo=matrix&server_fqdn=matrix.numtide.com)](https://matrix.to/#/#direnv:numtide.com)
 
 `direnv` is an extension for your shell. It augments existing shells with a
 new feature that can load and unload environment variables depending on the
@@ -142,7 +143,7 @@ confusing for users:
 Bug reports, contributions and forks are welcome. All bugs or other forms of
 discussion happen on http://github.com/direnv/direnv/issues .
 
-Or drop by on [IRC (#direnv on freenode)](irc://irc.freenode.net/#direnv) to
+Or drop by on [Matrix](https://matrix.to/#/#direnv:numtide.com) to
 have a chat. If you ask a question make sure to stay around as not everyone is
 active all day.
 
