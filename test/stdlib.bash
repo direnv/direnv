@@ -60,6 +60,38 @@ test_name dotenv_if_exists
   [[ $FOO = bar ]]
 )
 
+test_name dotenv_flow
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  # Succeeds with no files
+  dotenv_flow || return 1
+
+  # Loads with dotenv flow files for development by default
+  echo "A=1" > .env
+  echo "B=2" > .env.local
+  dotenv_flow
+  assert_eq "${A-}" "1"
+  assert_eq "${B-}" "2"
+
+  # Loads development dotenvs by default
+  echo "C=3" > .env.development
+  echo "D=4" > .env.development.local
+  dotenv_flow
+  assert_eq "${C-}" "3"
+  assert_eq "${D-}" "4"
+
+  # Loads other environments' dotenv if requested
+  echo "C=5" > .env.test
+  echo "D=6" > .env.test.local
+  dotenv_flow "test"
+  assert_eq "${C-}" "5"
+  assert_eq "${D-}" "6"
+)
+
 test_name find_up
 (
   load_stdlib

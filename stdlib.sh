@@ -256,6 +256,25 @@ dotenv_if_exists() {
   eval "$("$direnv" dotenv bash "$@")"
 }
 
+# Usage: dotenv_flow [<environment>]
+#
+# Loads the following dotenv files if they exist:
+#
+#    .env
+#    .env.<environment>
+#    .env.local
+#    .env.<environment>.local
+#
+# Environment defaults to "development".
+#
+dotenv_flow() {
+  local environment=${1:-development}
+  dotenv_if_exists ".env"
+  dotenv_if_exists ".env.${environment}"
+  dotenv_if_exists ".env.local"
+  dotenv_if_exists ".env.${environment}.local"
+}
+
 # Usage: user_rel_path <abs_path>
 #
 # Transforms an absolute path <abs_path> into a user-relative path if
