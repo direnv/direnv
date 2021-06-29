@@ -6,12 +6,12 @@ buildGoModule rec {
   version = lib.fileContents ./version.txt;
   subPackages = [ "." ];
 
-  vendorSha256 = "1kmgl3wkbyirqkf7rwlcss8ml7incxclsb36nskwx1w6b1ilphrz";
+  vendorSha256 = "0ig0vijmfqjbi6i4fv0b8vaglwnczq0kpk2ifx0q3byv8k4v2j2b";
 
   src = lib.cleanSource ./.;
 
   # we have no bash at the moment for windows
-  makeFlags = stdenv.lib.optional (!stdenv.hostPlatform.isWindows) [
+  makeFlags = lib.optional (!stdenv.hostPlatform.isWindows) [
     "BASH_PATH=${bash}/bin/bash"
   ];
 
@@ -19,10 +19,10 @@ buildGoModule rec {
     make install PREFIX=$out
   '';
 
-  meta = with stdenv.lib; {
+  meta = {
     description = "A shell extension that manages your environment";
     homepage = https://direnv.net;
-    license = licenses.mit;
-    maintainers = with maintainers; [ zimbatm ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ zimbatm ];
   };
 }

@@ -12,6 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"mvdan.cc/sh/v3/expand"
+	"mvdan.cc/sh/v3/interp"
+	"mvdan.cc/sh/v3/syntax"
 )
 
 // RC represents the .envrc file
@@ -150,6 +154,82 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		return
 	}
 
+	// Allow RC loads to be canceled with SIGINT
+	ctx, cancel := context.WithCancel(context.Background())
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		cancel()
+	}()
+
+	var stdin *os.File
+	if config.DisableStdin {
+		stdin, err = os.Open(os.DevNull)
+		if err != nil {
+			return
+		}
+	} else {
+		stdin = os.Stdin
+	}
+
+	if config.BashBuiltin == true || true {
+		var r *interp.Runner
+		var prog *syntax.File
+		// Create a new interpreter
+		r, err = interp.New(
+			interp.Env(expand.ListEnviron(newEnv.ToGoEnv()...)),
+			interp.StdIO(stdin, os.Stdout, os.Stderr),
+		)
+		if err != nil {
+			return
+		}
+
+		// Load the stdlib.sh in the interpreter
+
+		// FIXME: is the stdlib.sh name good here?
+		prog, err = syntax.NewParser().Parse(strings.NewReader(getStdlib(config)), "stdlib.sh")
+		if err != nil {
+			return
+		}
+		err = r.Run(ctx, prog)
+		if err != nil {
+			return
+		}
+
+		// Load the rc file
+
+		// TODO: re-implement some of the __main__ logic
+		prog, err = syntax.NewParser().Parse(
+			strings.NewReader(fmt.Sprintf(`set -euo pipefail; __main__ source_env "%s"`, rc.Path())),
+			"(source)",
+		)
+		if err != nil {
+			return
+		}
+		err = r.Run(ctx, prog)
+		if err != nil {
+			return
+		}
+
+		// Extract the new environment variables
+		// TODO: re-implement the PS1 check
+		newEnv2 := Env{}
+		for name, vr := range r.Vars {
+			if vr.Exported {
+				fmt.Fprintf(os.Stderr, "newEnv: %s=%s\n", name, vr.String())
+				newEnv2[name] = vr.String()
+			}
+		}
+		if newEnv2["PS1"] != "" {
+			logError("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
+		}
+		newEnv = newEnv2
+
+		return
+	}
+
+	// Otherwise is the system Bash like before
 	prelude := ""
 	if config.StrictEnv {
 		prelude = "set -euo pipefail && "
@@ -162,32 +242,16 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		rc.Path(),
 	)
 
-	// Allow RC loads to be canceled with SIGINT
-	ctx, cancel := context.WithCancel(context.Background())
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		<-c
-		cancel()
-	}()
-
 	// G204: Subprocess launched with function call as argument or cmd arguments
 	// #nosec
-	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
+	cmd := exec.CommandContext(ctx, config.BashPath, "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
+	cmd.Stdin = stdin
 	cmd.Stderr = os.Stderr
 
-	if config.DisableStdin {
-		cmd.Stdin, err = os.Open(os.DevNull)
-		if err != nil {
-			return
-		}
-	} else {
-		cmd.Stdin = os.Stdin
-	}
-
-	if out, err := cmd.Output(); err == nil && len(out) > 0 {
+	var out []byte
+	if out, err = cmd.Output(); err == nil && len(out) > 0 {
 		var newEnv2 Env
 		newEnv2, err = LoadEnvJSON(out)
 		if err == nil {

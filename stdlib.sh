@@ -8,9 +8,11 @@
 # SC1091: Not following: (file missing)
 # SC1117: Backslash is literal in "\n". Prefer explicit escaping: "\\n".
 # SC2059: Don't use variables in the printf format string. Use printf "..%s.." "$foo".
-shopt -s gnu_errfmt
-shopt -s nullglob
-shopt -s extglob
+
+# FIXME: not supported by gosu
+# shopt -s gnu_errfmt
+# shopt -s nullglob
+# shopt -s extglob
 
 # NOTE: don't touch the RHS, it gets replaced at runtime
 direnv="$(command -v direnv)"
@@ -1243,8 +1245,10 @@ __main__() {
 
   # load direnv libraries
   for lib in "$direnv_config_dir/lib/"*.sh; do
-    # shellcheck disable=SC1090
-    source "$lib"
+    if [[ -f "$lib" ]]; then
+      # shellcheck disable=SC1090
+      source "$lib"
+    fi
   done
 
   # load the global ~/.direnvrc if present

@@ -11,9 +11,11 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"# SC1091: Not following: (file missing)\n" +
 	"# SC1117: Backslash is literal in \"\\n\". Prefer explicit escaping: \"\\\\n\".\n" +
 	"# SC2059: Don't use variables in the printf format string. Use printf \"..%s..\" \"$foo\".\n" +
-	"shopt -s gnu_errfmt\n" +
-	"shopt -s nullglob\n" +
-	"shopt -s extglob\n" +
+	"\n" +
+	"# FIXME: not supported by gosu\n" +
+	"# shopt -s gnu_errfmt\n" +
+	"# shopt -s nullglob\n" +
+	"# shopt -s extglob\n" +
 	"\n" +
 	"# NOTE: don't touch the RHS, it gets replaced at runtime\n" +
 	"direnv=\"$(command -v direnv)\"\n" +
@@ -1246,8 +1248,10 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"  # load direnv libraries\n" +
 	"  for lib in \"$direnv_config_dir/lib/\"*.sh; do\n" +
-	"    # shellcheck disable=SC1090\n" +
-	"    source \"$lib\"\n" +
+	"    if [[ -f \"$lib\" ]]; then\n" +
+	"      # shellcheck disable=SC1090\n" +
+	"      source \"$lib\"\n" +
+	"    fi\n" +
 	"  done\n" +
 	"\n" +
 	"  # load the global ~/.direnvrc if present\n" +
