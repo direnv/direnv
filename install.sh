@@ -35,6 +35,9 @@ set -euo pipefail
     i686 | i386)
       machine=386
       ;;
+    aarch64)
+      machine=arm64
+      ;;
     *)
       die "Machine $(uname -m) not supported by the installer.\n" \
         "Go to https://direnv for alternate installation methods."
