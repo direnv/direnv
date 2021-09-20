@@ -30,14 +30,14 @@ __env_strictness() {
   local mode tmpfile old_shell_options
   local -i res
 
-  tmpfile=$(mktemp)
+  tmpfile="$(mktemp)"
   res=0
   mode="$1"
   shift
 
   set +o | grep 'pipefail\|nounset\|errexit' > "$tmpfile"
   old_shell_options=$(< "$tmpfile")
-  rm -f tmpfile
+  rm -f "$tmpfile"
 
   case "$mode" in
   strict)
@@ -364,7 +364,7 @@ source_env() {
 #       not a directory.
 #
 # Example:
-# 
+#
 #    source_env_if_exists .envrc.private
 #
 source_env_if_exists() {
@@ -1107,7 +1107,7 @@ use_node() {
 #
 #    use nodenv 15.2.1
 #
-# Uses nodenv, use_node and layout_node to add the chosen node version and 
+# Uses nodenv, use_node and layout_node to add the chosen node version and
 # "$PWD/node_modules/.bin" to the PATH
 #
 use_nodenv() {
