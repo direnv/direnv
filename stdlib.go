@@ -1073,6 +1073,8 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"  if [[ -z $version && -f .node-version ]]; then\n" +
 	"    version=$(<.node-version)\n" +
+    "    # Remove optional leading v\n" +
+    "    version=${version#v}\n" +
 	"    via=\".node-version\"\n" +
 	"  fi\n" +
 	"\n" +

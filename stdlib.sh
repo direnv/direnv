@@ -1070,6 +1070,8 @@ use_node() {
 
   if [[ -z $version && -f .node-version ]]; then
     version=$(<.node-version)
+    # Remove optional leading v
+    version=${version#v}
     via=".node-version"
   fi
 
