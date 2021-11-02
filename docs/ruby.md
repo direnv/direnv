@@ -60,7 +60,7 @@ select the right ruby version when you enter the project's folder.
 ## A bit of explanation
 
 The last part probably needs a bit more explanation. We make use of a couple
-of commands that are part of the [stdlib](/stdlib.html) which is availabe in
+of commands that are part of the [stdlib](/man/direnv-stdlib.1.md) which is availabe in
 the execution context of an envrc.
 
 `use` is a command dispatch that's just there to build the
