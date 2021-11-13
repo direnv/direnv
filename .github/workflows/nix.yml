@@ -8,10 +8,10 @@ jobs:
     name: Build
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.4.0
         with:
           fetch-depth: 1
-      - uses: cachix/install-nix-action@v14
+      - uses: cachix/install-nix-action@v15
 
       - name: Build
         run: nix-build
