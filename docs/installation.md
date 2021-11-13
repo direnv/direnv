@@ -15,9 +15,9 @@ direnv is packaged for a variety of systems:
 * [Gentoo go-overlay](https://github.com/Dr-Terrible/go-overlay)
 * [NetBSD pkgsrc-wip](http://www.pkgsrc.org/wip/)
 * [NixOS](https://nixos.org/nixos/packages.html?query=direnv)
-* [macOS Homebrew](http://brew.sh/)
+* [macOS Homebrew](https://formulae.brew.sh/formula/direnv#default)
 * [openSUSE](https://build.opensuse.org/package/show/openSUSE%3AFactory/direnv)
-* [MacPorts](https://www.macports.org/)
+* [MacPorts](https://ports.macports.org/port/direnv/)
 * [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [GNU Guix](https://www.gnu.org/software/guix/)
 
@@ -29,14 +29,14 @@ See also:
 
 To install binary builds you can run this bash installer:
 
-```
+```sh
 curl -sfL https://direnv.net/install.sh | bash
 ```
 
 Binary builds for a variety of architectures are also available for
 [each release](https://github.com/direnv/direnv/releases).
 
-Fetch the binary, `chmod +x direnv` and put it somewhere in your PATH.
+Fetch the binary, `chmod +x direnv` and put it somewhere in your `PATH`.
 
 ## Compile from source
 
