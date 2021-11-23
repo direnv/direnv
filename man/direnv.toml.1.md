@@ -11,6 +11,8 @@ DESCRIPTION
 
 A configuration file in [TOML](https://github.com/toml-lang/toml) format to specify a variety of configuration options for direnv. Read from at CONFIGURATION_DIR/direnv.toml or $DIRENV_CONFIG/direnv.toml. For many users, CONFIGURATION_DIR will be located at $HOME/.config/direnv/direnv.toml.
 
+> For versions v2.21.0 and below use config.toml instead of direnv.toml
+
 FORMAT
 ------
 
@@ -52,7 +54,7 @@ too long to execute. Defaults to "5s".
 
 A duration string is a possibly signed sequence of decimal numbers, each with
 optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
-Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". 
+Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 
 ## [whitelist]
 
