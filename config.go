@@ -22,6 +22,7 @@ type Config struct {
 	SelfPath        string
 	BashPath        string
 	RCDir           string
+	RCFile          string
 	TomlPath        string
 	DisableStdin    bool
 	StrictEnv       bool
@@ -92,6 +93,11 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.RCDir = config.RCDir[1:]
 	}
 
+	config.RCFile = env[DIRENV_FILE]
+	if len(config.RCFile) > 0 && config.RCFile[0:1] == "-" {
+		config.RCFile = config.RCFile[1:]
+	}
+
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
 
@@ -121,7 +127,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.WhitelistPrefix = append(config.WhitelistPrefix, tomlConf.Whitelist.Prefix...)
 
 		for _, path := range tomlConf.Whitelist.Exact {
-			if !strings.HasSuffix(path, "/.envrc") {
+			if !strings.HasSuffix(path, "/.envrc") || !strings.HasSuffix(path, "/.env") {
 				path = filepath.Join(path, ".envrc")
 			}
 
@@ -180,11 +186,11 @@ func (config *Config) AllowDir() string {
 
 // LoadedRC returns a RC file if any has been loaded
 func (config *Config) LoadedRC() *RC {
-	if config.RCDir == "" {
-		logDebug("RCDir is blank - loadedRC is nil")
+	if config.RCFile == "" {
+		logDebug("RCFile is blank - loadedRC is nil")
 		return nil
 	}
-	rcPath := filepath.Join(config.RCDir, ".envrc")
+	rcPath := config.RCFile
 
 	timesString := config.Env[DIRENV_WATCHES]
 

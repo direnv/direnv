@@ -18,10 +18,14 @@ current directory.
 
 ## How it works
 
-Before each prompt, direnv checks for the existence of a `.envrc` file in the
-current and parent directories. If the file exists (and is authorized), it is
-loaded into a **bash** sub-shell and all exported variables are then captured
-by direnv and then made available to the current shell.
+Before each prompt, direnv checks for the existence of a `.envrc` or `.env`
+file in the current and parent directories. If the file exists (and is
+authorized), it is loaded into a **bash** sub-shell and all exported
+variables are then captured by direnv and then made available to the current
+shell.
+
+If both `.envrc` and `.env` files exists, the `.envrc` will always be chosen
+first.
 
 It supports hooks for all the common shells like bash, zsh, tcsh and fish.
 This allows project-specific environment variables without cluttering the
@@ -100,6 +104,11 @@ It's also possible to create your own extensions by creating a bash file at
 `~/.config/direnv/direnvrc` or `~/.config/direnv/lib/*.sh`. This file is
 loaded before your `.envrc` and thus allows you to make your own extensions to
 direnv.
+
+Note that this functionality is not supported in `.env` files. If the
+coexistence of both is needed, one can use `.envrc` for leveraging stdlib and
+append `dotenv` at the end of it to instruct direnv to also read the `.env`
+file next.
 
 ## Docs
 

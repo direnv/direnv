@@ -10,7 +10,7 @@ import (
 // CmdExec is `direnv exec DIR <COMMAND> ...`
 var CmdExec = &Cmd{
 	Name:   "exec",
-	Desc:   "Executes a command after loading the first .envrc found in DIR",
+	Desc:   "Executes a command after loading the first .envrc or .env found in DIR",
 	Args:   []string{"DIR", "COMMAND", "[...ARGS]"},
 	Action: actionWithConfig(cmdExecAction),
 }
@@ -52,7 +52,7 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 	previousEnv.CleanContext()
 
 	// Load the rc
-	if toLoad := findUp(rcPath, ".envrc"); toLoad != "" {
+	if toLoad := findUp(rcPath, ".envrc", ".env"); toLoad != "" {
 		if newEnv, err = config.EnvFromRC(toLoad, previousEnv); err != nil {
 			return
 		}

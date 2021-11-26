@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-// RC represents the .envrc file
+// RC represents the .envrc or .env file
 type RC struct {
 	path      string
 	allowPath string
@@ -22,9 +22,9 @@ type RC struct {
 	config    *Config
 }
 
-// FindRC looks the RC file from the wd, up to the root
+// FindRC looks for ".envrc" and ".env" files up in the file hierarchy.
 func FindRC(wd string, config *Config) (*RC, error) {
-	rcPath := findUp(wd, ".envrc")
+	rcPath := findUp(wd, ".envrc", ".env")
 	if rcPath == "" {
 		return nil, nil
 	}
@@ -142,6 +142,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	defer func() {
 		// Record directory changes even if load is disallowed or fails
 		newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
+		newEnv[DIRENV_FILE] = "-" + rc.path
 		newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
 	}()
 
@@ -150,15 +151,23 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		return
 	}
 
+	// check what type of RC we're processing
+	// use different exec method for each
+	fn := "source_env"
+	if filepath.Base(rc.path) == ".env" {
+		fn = "dotenv"
+	}
+
 	prelude := ""
 	if config.StrictEnv {
 		prelude = "set -euo pipefail && "
 	}
 
 	arg := fmt.Sprintf(
-		`%seval "$("%s" stdlib)" && __main__ source_env "%s"`,
+		`%seval "$("%s" stdlib)" && __main__ %s "%s"`,
 		prelude,
 		direnv,
+		fn,
 		rc.Path(),
 	)
 
@@ -271,11 +280,13 @@ func allow(path string, allowPath string) (err error) {
 	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
 }
 
-func findUp(searchDir string, fileName string) (path string) {
+func findUp(searchDir string, fileNames ...string) (path string) {
 	for _, dir := range eachDir(searchDir) {
-		path = filepath.Join(dir, fileName)
-		if fileExists(path) {
-			return
+		for _, fileName := range fileNames {
+			path := filepath.Join(dir, fileName)
+			if fileExists(path) {
+				return path
+			}
 		}
 	}
 	return ""

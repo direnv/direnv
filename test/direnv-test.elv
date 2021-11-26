@@ -13,6 +13,7 @@ cd $E:TEST_DIR
 set-env DIRENV_CONFIG $pwd
 unset-env DIRENV_BASH
 unset-env DIRENV_DIR
+unset-env DIRENV_FILE
 unset-env DIRENV_MTIME
 unset-env DIRENV_WATCHES
 unset-env DIRENV_DIFF

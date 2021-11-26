@@ -9,7 +9,7 @@ import (
 // CmdAllow is `direnv allow [PATH_TO_RC]`
 var CmdAllow = &Cmd{
 	Name:   "allow",
-	Desc:   "Grants direnv to load the given .envrc",
+	Desc:   "Grants direnv to load the given .envrc or .env",
 	Args:   []string{"[PATH_TO_RC]"},
 	Action: actionWithConfig(cmdAllowAction),
 }
@@ -17,7 +17,7 @@ var CmdAllow = &Cmd{
 var migrationMessage = `
 Migrating the allow data to the new location
 
-The allowed .envrc permissions used to be stored in the XDG_CONFIG_HOME. It's
+The allowed .envrc or .env permissions used to be stored in the XDG_CONFIG_HOME. It's
 better to keep that folder for user-editable configuration so the data is
 being moved to XDG_DATA_HOME.
 `
@@ -64,7 +64,7 @@ func cmdAllowAction(env Env, args []string, config *Config) (err error) {
 	if err != nil {
 		return err
 	} else if rc == nil {
-		return fmt.Errorf(".envrc file not found")
+		return fmt.Errorf(".envrc or .env file not found")
 	}
 	return rc.Allow()
 }
