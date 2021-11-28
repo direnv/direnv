@@ -98,7 +98,10 @@ let
       saneName = stringAsChars (c: if isNull (builtins.match "[a-zA-Z0-9]" c) then "_" else c) name;
       ersatz = builtins.getEnv "NIV_OVERRIDE_${saneName}";
     in
-      if ersatz == "" then drv else ersatz;
+      if ersatz == "" then drv else
+        # this turns the string into an actual Nix path (for both absolute and
+        # relative paths)
+        if builtins.substring 0 1 ersatz == "/" then /. + ersatz else /. + builtins.getEnv "PWD" + "/${ersatz}";
 
   # Ports of functions for older nix versions
 

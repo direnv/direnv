@@ -4,8 +4,8 @@ linters:
     - unused
   enable:
     - gofmt
-    - golint
     - misspell
+    - revive
     - stylecheck
   disable:
     # direnv is not a web server, context is not strictly necessary.

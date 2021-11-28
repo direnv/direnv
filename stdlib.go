@@ -33,14 +33,14 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  local mode tmpfile old_shell_options\n" +
 	"  local -i res\n" +
 	"\n" +
-	"  tmpfile=$(mktemp)\n" +
+	"  tmpfile=\"$(mktemp)\"\n" +
 	"  res=0\n" +
 	"  mode=\"$1\"\n" +
 	"  shift\n" +
 	"\n" +
 	"  set +o | grep 'pipefail\\|nounset\\|errexit' > \"$tmpfile\"\n" +
 	"  old_shell_options=$(< \"$tmpfile\")\n" +
-	"  rm -f tmpfile\n" +
+	"  rm -f \"$tmpfile\"\n" +
 	"\n" +
 	"  case \"$mode\" in\n" +
 	"  strict)\n" +
@@ -367,7 +367,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#       not a directory.\n" +
 	"#\n" +
 	"# Example:\n" +
-	"# \n" +
+	"#\n" +
 	"#    source_env_if_exists .envrc.private\n" +
 	"#\n" +
 	"source_env_if_exists() {\n" +
@@ -1023,13 +1023,13 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"rvm() {\n" +
 	"  unset rvm\n" +
 	"  if [[ -n ${rvm_scripts_path:-} ]]; then\n" +
-	"    # shellcheck disable=SC1090\n" +
+	"    # shellcheck disable=SC1090,SC1091\n" +
 	"    source \"${rvm_scripts_path}/rvm\"\n" +
 	"  elif [[ -n ${rvm_path:-} ]]; then\n" +
-	"    # shellcheck disable=SC1090\n" +
+	"    # shellcheck disable=SC1090,SC1091\n" +
 	"    source \"${rvm_path}/scripts/rvm\"\n" +
 	"  else\n" +
-	"    # shellcheck disable=SC1090\n" +
+	"    # shellcheck disable=SC1090,SC1091\n" +
 	"    source \"$HOME/.rvm/scripts/rvm\"\n" +
 	"  fi\n" +
 	"  rvm \"$@\"\n" +
@@ -1110,7 +1110,7 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"#\n" +
 	"#    use nodenv 15.2.1\n" +
 	"#\n" +
-	"# Uses nodenv, use_node and layout_node to add the chosen node version and \n" +
+	"# Uses nodenv, use_node and layout_node to add the chosen node version and\n" +
 	"# \"$PWD/node_modules/.bin\" to the PATH\n" +
 	"#\n" +
 	"use_nodenv() {\n" +
@@ -1252,10 +1252,10 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"\n" +
 	"  # load the global ~/.direnvrc if present\n" +
 	"  if [[ -f $direnv_config_dir/direnvrc ]]; then\n" +
-	"    # shellcheck disable=SC1090\n" +
+	"    # shellcheck disable=SC1090,SC1091\n" +
 	"    source \"$direnv_config_dir/direnvrc\" >&2\n" +
 	"  elif [[ -f $HOME/.direnvrc ]]; then\n" +
-	"    # shellcheck disable=SC1090\n" +
+	"    # shellcheck disable=SC1090,SC1091\n" +
 	"    source \"$HOME/.direnvrc\" >&2\n" +
 	"  fi\n" +
 	"\n" +
