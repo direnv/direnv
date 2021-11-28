@@ -1141,6 +1141,22 @@ use_nix() {
   fi
 }
 
+# Usage: use_flake [<installable>]
+#
+# Load the build environment of a derivation similar to `nix develop`.
+#
+# By default it will load the current folder flake.nix devShell attribute. Or
+# pass an "installable" like "nixpkgs#hello" to load all the build
+# dependencies of the hello package from the latest nixpkgs.
+#
+# Note that the flakes feature is hidden behind an experimental flag, which
+# you will have to enable on your own. Flakes is not considered stable yet.
+use_flake() {
+  watch_file flake.nix
+  watch_file flake.lock
+  eval "$(nix print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
+}
+
 # Usage: use_guix [...]
 #
 # Load environment variables from `guix environment`.

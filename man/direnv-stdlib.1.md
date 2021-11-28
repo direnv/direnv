@@ -288,6 +288,17 @@ If you have a `default.nix` or `shell.nix` these will be used by default, but yo
 
 See http://nixos.org/nix/manual/#sec-nix-shell
 
+### `use flake [<installable>]`
+
+Load the build environment of a derivation similar to `nix develop`.
+
+By default it will load the current folder flake.nix devShell attribute. Or
+pass an "installable" like "nixpkgs#hello" to load all the build dependencies
+of the hello package from the latest nixpkgs.
+
+Note that the flakes feature is hidden behind an experimental flag, which you
+will have to enable on your own. Flakes is not considered stable yet.
+
 ### `use guix [...]`
 
 Load environment variables from `guix environment`.
