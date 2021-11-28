@@ -397,6 +397,19 @@ If you have a \fB\fCdefault.nix\fR or \fB\fCshell.nix\fR these will be used by d
 .PP
 See http://nixos.org/nix/manual/#sec-nix-shell
 
+.SS \fB\fCuse flake [<installable>]\fR
+.PP
+Load the build environment of a derivation similar to \fB\fCnix develop\fR\&.
+
+.PP
+By default it will load the current folder flake.nix devShell attribute. Or
+pass an "installable" like "nixpkgs#hello" to load all the build dependencies
+of the hello package from the latest nixpkgs.
+
+.PP
+Note that the flakes feature is hidden behind an experimental flag, which you
+will have to enable on your own. Flakes is not considered stable yet.
+
 .SS \fB\fCuse guix [...]\fR
 .PP
 Load environment variables from \fB\fCguix environment\fR\&.

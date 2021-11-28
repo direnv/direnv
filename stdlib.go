@@ -1144,6 +1144,22 @@ const StdLib = "#!/usr/bin/env bash\n" +
 	"  fi\n" +
 	"}\n" +
 	"\n" +
+	"# Usage: use_flake [<installable>]\n" +
+	"#\n" +
+	"# Load the build environment of a derivation similar to `nix develop`.\n" +
+	"#\n" +
+	"# By default it will load the current folder flake.nix devShell attribute. Or\n" +
+	"# pass an \"installable\" like \"nixpkgs#hello\" to load all the build\n" +
+	"# dependencies of the hello package from the latest nixpkgs.\n" +
+	"#\n" +
+	"# Note that the flakes feature is hidden behind an experimental flag, which\n" +
+	"# you will have to enable on your own. Flakes is not considered stable yet.\n" +
+	"use_flake() {\n" +
+	"  watch_file flake.nix\n" +
+	"  watch_file flake.lock\n" +
+	"  eval \"$(nix print-dev-env --profile \"$(direnv_layout_dir)/flake-profile\" \"$@\")\"\n" +
+	"}\n" +
+	"\n" +
 	"# Usage: use_guix [...]\n" +
 	"#\n" +
 	"# Load environment variables from `guix environment`.\n" +
