@@ -2,7 +2,7 @@
 .TH DIRENV 1 "2019" direnv "User Manuals"
 .SH NAME
 .PP
-direnv \- unclutter your .profile
+direnv - unclutter your .profile
 
 .SH SYNOPSIS
 .PP
@@ -12,13 +12,13 @@ direnv \- unclutter your .profile
 .PP
 \fB\fCdirenv\fR is an environment variable manager for your shell. It knows how to
 hook into bash, zsh and fish shell to load or unload environment variables
-depending on your current directory. This allows you to have project\-specific
-environment variables and not clutter the "\~/.profile" file.
+depending on your current directory. This allows you to have project-specific
+environment variables and not clutter the "~/.profile" file.
 
 .PP
 Before each prompt it checks for the existence of an \fB\fC\&.envrc\fR file in the
 current and parent directories. If the file exists, it is loaded into a bash
-sub\-shell and all exported variables are then captured by direnv and then made
+sub-shell and all exported variables are then captured by direnv and then made
 available to your current shell, while unset variables are removed.
 
 .PP
@@ -31,8 +31,8 @@ used to build solutions similar to rbenv, pyenv, phpenv, ...
 .RS
 
 .nf
-$ cd \~/my\_project
-$ echo ${FOO\-nope}
+$ cd ~/my_project
+$ echo ${FOO-nope}
 nope
 $ echo export FOO=foo > .envrc
 \\.envrc is not allowed
@@ -40,12 +40,12 @@ $ direnv allow .
 direnv: reloading
 direnv: loading .envrc
 direnv export: +FOO
-$ echo ${FOO\-nope}
+$ echo ${FOO-nope}
 foo
 $ cd ..
 direnv: unloading
-direnv export: \~PATH
-$ echo ${FOO\-nope}
+direnv export: ~PATH
+$ echo ${FOO-nope}
 nope
 
 .fi
@@ -58,7 +58,7 @@ has it's own extension mechanism:
 
 .SS BASH
 .PP
-Add the following line at the end of the \fB\fC\~/.bashrc\fR file:
+Add the following line at the end of the \fB\fC~/.bashrc\fR file:
 
 .PP
 .RS
@@ -70,12 +70,12 @@ eval "$(direnv hook bash)"
 .RE
 
 .PP
-Make sure it appears even after rvm, git\-prompt and other shell extensions
+Make sure it appears even after rvm, git-prompt and other shell extensions
 that manipulate the prompt.
 
 .SS ZSH
 .PP
-Add the following line at the end of the \fB\fC\~/.zshrc\fR file:
+Add the following line at the end of the \fB\fC~/.zshrc\fR file:
 
 .PP
 .RS
@@ -88,7 +88,7 @@ eval "$(direnv hook zsh)"
 
 .SS FISH
 .PP
-Add the following line at the end of the \fB\fC$XDG\_CONFIG\_HOME/fish/config.fish\fR file:
+Add the following line at the end of the \fB\fC$XDG_CONFIG_HOME/fish/config.fish\fR file:
 
 .PP
 .RS
@@ -100,22 +100,22 @@ direnv hook fish | source
 .RE
 
 .PP
-Fish supports 3 modes you can set with with the global environment variable \fB\fCdirenv\_fish\_mode\fR:
+Fish supports 3 modes you can set with with the global environment variable \fB\fCdirenv_fish_mode\fR:
 
 .PP
 .RS
 
 .nf
-set \-g direnv\_fish\_mode eval\_on\_arrow    # trigger direnv at prompt, and on every arrow\-based directory change (default)
-set \-g direnv\_fish\_mode eval\_after\_arrow # trigger direnv at prompt, and only after arrow\-based directory changes before executing command
-set \-g direnv\_fish\_mode disable\_arrow    # trigger direnv at prompt only, this is similar functionality to the original behavior
+set -g direnv_fish_mode eval_on_arrow    # trigger direnv at prompt, and on every arrow-based directory change (default)
+set -g direnv_fish_mode eval_after_arrow # trigger direnv at prompt, and only after arrow-based directory changes before executing command
+set -g direnv_fish_mode disable_arrow    # trigger direnv at prompt only, this is similar functionality to the original behavior
 
 .fi
 .RE
 
 .SS TCSH
 .PP
-Add the following line at the end of the \fB\fC\~/.cshrc\fR file:
+Add the following line at the end of the \fB\fC~/.cshrc\fR file:
 
 .PP
 .RS
@@ -134,13 +134,13 @@ Run:
 .RS
 
 .nf
-$> direnv hook elvish > \~/.elvish/lib/direnv.elv
+$> direnv hook elvish > ~/.elvish/lib/direnv.elv
 
 .fi
 .RE
 
 .PP
-and add the following line to your \fB\fC\~/.elvish/rc.elv\fR file:
+and add the following line to your \fB\fC~/.elvish/rc.elv\fR file:
 
 .PP
 .RS
@@ -177,24 +177,24 @@ things.
 .PP
 Exporting variables by hand is a bit repetitive so direnv provides a set of
 utility functions that are made available in the context of the \fB\fC\&.envrc\fR file.
-Check the direnv\-stdlib(1) man page for more details. You can also define your
-own extensions inside \fB\fC$XDG\_CONFIG\_HOME/direnv/direnvrc\fR or
-\fB\fC$XDG\_CONFIG\_HOME/direnv/lib/*.sh\fR files.
+Check the direnv-stdlib(1) man page for more details. You can also define your
+own extensions inside \fB\fC$XDG_CONFIG_HOME/direnv/direnvrc\fR or
+\fB\fC$XDG_CONFIG_HOME/direnv/lib/*.sh\fR files.
 
 .PP
 Hopefully this is enough to get you started.
 
 .SH FILES
 .TP
-$XDG\_CONFIG\_HOME/direnv/direnvrc
+$XDG_CONFIG_HOME/direnv/direnvrc
 \fB\fCdirenv\fR configuration
 
 .TP
-$XDG\_CONFIG\_HOME/direnv/lib/*.sh
-Third\-party extensions to direnv\-stdlib.
+$XDG_CONFIG_HOME/direnv/lib/*.sh
+Third-party extensions to direnv-stdlib.
 
 .TP
-$XDG\_DATA\_HOME/direnv/allow
+$XDG_DATA_HOME/direnv/allow
 Records which \fB\fC\&.envrc\fR files have been \fB\fCdirenv allow\fRed.
 
 .SH CONTRIBUTE
@@ -218,8 +218,8 @@ have a chat.
 
 .SH COPYRIGHT
 .PP
-MIT licence \- Copyright (C) 2019 @zimbatm and contributors
+MIT licence - Copyright (C) 2019 @zimbatm and contributors
 
 .SH SEE ALSO
 .PP
-direnv\-stdlib(1), direnv.toml(1), direnv\-fetchurl(1)
+direnv-stdlib(1), direnv.toml(1), direnv-fetchurl(1)

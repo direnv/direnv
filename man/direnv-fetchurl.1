@@ -1,11 +1,12 @@
-.TH DIRENV\-FETCHURL 1 "2019" direnv "User Manuals"
+.nh
+.TH DIRENV-FETCHURL 1 "2019" direnv "User Manuals"
 .SH NAME
 .PP
-direnv fetchurl \- Fetch a URL to disk
+direnv fetchurl - Fetch a URL to disk
 
 .SH SYNOPSIS
 .PP
-\fIdirenv fetchurl\fP <url> [<integrity-hash>]
+\fIdirenv fetchurl\fP  []
 
 .SH DESCRIPTION
 .PP
@@ -19,44 +20,47 @@ of \fB\fCcurl <url> | sh\fR\&.
 
 .PP
 This command has two modes of operation:
+
+.RS
 .IP "  1." 5
 Just pass the URL to discover the integrity hash.
 .IP "  2." 5
-Pass the URL \fIand\fP the integrity hash to get back the on\-disk location.
+Pass the URL \fIand\fP the integrity hash to get back the on-disk location.
+
+.RE
 
 .PP
-Since the on\-disk location is based on the hash, it also acts as a cache. One
+Since the on-disk location is based on the hash, it also acts as a cache. One
 implication of this design is that URLs must be stable and always return the
 same content.
 
 .PP
-Downloaded files are marked as read\-only and executable so it can also be used
+Downloaded files are marked as read-only and executable so it can also be used
 to fetch and execute static binaries.
 
 .SH OPTIONS
 .PP
-<url>
+
     A HTTP URL that returns content on HTTP GET requests. 301 and other
     redirects are followed.
 
 .PP
-<integrity-hash>
+
     When passed, the integrity of the retrieved content will be validated
     against the given hash. The hash encoding is based on the SRI W3C
-    specificiation (see 
-\[la]https://www.w3.org/TR/SRI/\[ra] ).
+    specificiation (see https://www.w3.org/TR/SRI/ ).
 
 .SH OUTPUT
 .PP
 \fIdirenv fetchurl\fP outputs different content based on the argument.
 
 .PP
-If the \fB\fCintegrity\-hash\fR is being passed, it will output the path to the
-on\-disk location, if the retrieval was successful.
+If the \fB\fCintegrity-hash\fR is being passed, it will output the path to the
+on-disk location, if the retrieval was successful.
 
 .PP
 If only the \fB\fCurl\fR is being passed, it will output the hash as well as some
-human\-readable instruction. If stdout is not a tty, only the hash will be
+human-readable instruction. If stdout is not a tty, only the hash will be
 displayed.
 
 .SH EXAMPLE
@@ -64,28 +68,28 @@ displayed.
 .RS
 
 .nf
-$ ./direnv fetchurl https://releases.nixos.org/nix/nix\-2.3.7/install
-Found hash: sha256\-7Gxl5GzI9juc/U30Igh/pY+p6+gj5Waohfwql3jHIds=
+$ ./direnv fetchurl https://releases.nixos.org/nix/nix-2.3.7/install
+Found hash: sha256-7Gxl5GzI9juc/U30Igh/pY+p6+gj5Waohfwql3jHIds=
 
 Invoke fetchurl again with the hash as an argument to get the disk location:
 
-  direnv fetchurl "https://releases.nixos.org/nix/nix\-2.3.7/install" "sha256\-7Gxl5GzI9juc/U30Igh/pY+p6+gj5Waohfwql3jHIds="
-  #=> /home/zimbatm/.cache/direnv/cas/sha256\-7Gxl5GzI9juc\_U30Igh\_pY+p6+gj5Waohfwql3jHIds=
+  direnv fetchurl "https://releases.nixos.org/nix/nix-2.3.7/install" "sha256-7Gxl5GzI9juc/U30Igh/pY+p6+gj5Waohfwql3jHIds="
+  #=> /home/zimbatm/.cache/direnv/cas/sha256-7Gxl5GzI9juc_U30Igh_pY+p6+gj5Waohfwql3jHIds=
 
 .fi
 .RE
 
 .SH ENVIRONMENT VARIABLES
 .PP
-\fBXDG\_CACHE\_HOME\fP
-    This variable is used to select the on\-disk location of the fetched URLs
-    as \fB\fC$XDG\_CACHE\_HOME/direnv/cas\fR\&. If \fBXDG\_CACHE\_HOME\fP is unset or empty,
+\fBXDG_CACHE_HOME\fP
+    This variable is used to select the on-disk location of the fetched URLs
+    as \fB\fC$XDG_CACHE_HOME/direnv/cas\fR\&. If \fBXDG_CACHE_HOME\fP is unset or empty,
     defaults to \fB\fC$HOME/.cache\fR\&.
 
 .SH COPYRIGHT
 .PP
-MIT licence \- Copyright (C) 2019 @zimbatm and contributors
+MIT licence - Copyright (C) 2019 @zimbatm and contributors
 
 .SH SEE ALSO
 .PP
-direnv\-stdlib(1)
+direnv-stdlib(1)
