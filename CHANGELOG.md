@@ -1,4 +1,20 @@
 
+2.29.0 / 2021-11-28
+==================
+
+  * stdlib: add use_flake function (#847)
+  * docs(direnv.toml) Add config.toml clarification (#831)
+  * docs(install): fix macos links (#841)
+  * Corrects stdlib link in Ruby docs (#837)
+  * stdlib.sh: Fix removal of temp file (#830)
+  * install.sh: add aarch64 support
+  * Updated conditional for zsh hook to be more forgiving (#808)
+  * Add -r flag for matching Git branches with a regexp (#800)
+  * Add docs about pipenv (#797)
+  * Enable syntax hilights to the quick demo code (#752)
+  * Fixed extra quotes for lower alpha characters (#783)
+  * Remove noisy warning about PS1 again (#781)
+
 2.28.0 / 2021-03-12
 ==================
 
