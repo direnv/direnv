@@ -9,7 +9,7 @@ root=$(cd .. && pwd -P)
 export PATH=$root:$PATH
 
 load_stdlib() {
-  # shellcheck disable=SC1090
+  # shellcheck disable=SC1090,SC1091
   source "$root/stdlib.sh"
 }
 

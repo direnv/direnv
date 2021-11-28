@@ -1020,13 +1020,13 @@ use_rbenv() {
 rvm() {
   unset rvm
   if [[ -n ${rvm_scripts_path:-} ]]; then
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1090,SC1091
     source "${rvm_scripts_path}/rvm"
   elif [[ -n ${rvm_path:-} ]]; then
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1090,SC1091
     source "${rvm_path}/scripts/rvm"
   else
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1090,SC1091
     source "$HOME/.rvm/scripts/rvm"
   fi
   rvm "$@"
@@ -1249,10 +1249,10 @@ __main__() {
 
   # load the global ~/.direnvrc if present
   if [[ -f $direnv_config_dir/direnvrc ]]; then
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1090,SC1091
     source "$direnv_config_dir/direnvrc" >&2
   elif [[ -f $HOME/.direnvrc ]]; then
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1090,SC1091
     source "$HOME/.direnvrc" >&2
   fi
 

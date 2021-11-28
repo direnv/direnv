@@ -67,6 +67,7 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 		return
 	}
 
+	// #nosec G204
 	err = syscall.Exec(commandPath, args, newEnv.ToGoEnv())
 	return
 }
