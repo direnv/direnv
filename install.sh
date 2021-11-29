@@ -35,7 +35,7 @@ set -euo pipefail
     i686 | i386)
       machine=386
       ;;
-    aarch64)
+    aarch64 | arm64)
       machine=arm64
       ;;
     *)
