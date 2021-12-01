@@ -184,6 +184,15 @@ test_start "symlink-changed"
   test_eq "${STATE}" "B"
 test_stop
 
+test_start "symlink-dir"
+  # we can allow and deny the target
+  direnv allow foo
+  direnv deny foo
+  # we can allow and deny the symlink
+  direnv allow bar
+  direnv deny bar
+test_stop
+
 test_start "utf-8"
   direnv_eval
   test_eq "${UTFSTUFF}" "♀♂"
