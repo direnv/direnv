@@ -57,6 +57,7 @@ func init() {
 		CmdFetchURL,
 		CmdHelp,
 		CmdHook,
+		CmdComplete,
 		CmdPrune,
 		CmdReload,
 		CmdStatus,
