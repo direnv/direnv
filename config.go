@@ -21,7 +21,6 @@ type Config struct {
 	DataDir         string
 	SelfPath        string
 	BashPath        string
-	RCDir           string
 	RCFile          string
 	TomlPath        string
 	DisableStdin    bool
@@ -86,11 +85,6 @@ func LoadConfig(env Env) (config *Config, err error) {
 	if config.WorkDir, err = os.Getwd(); err != nil {
 		err = fmt.Errorf("LoadConfig() Getwd failed: %w", err)
 		return
-	}
-
-	config.RCDir = env[DIRENV_DIR]
-	if len(config.RCDir) > 0 && config.RCDir[0:1] == "-" {
-		config.RCDir = config.RCDir[1:]
 	}
 
 	config.RCFile = env[DIRENV_FILE]
