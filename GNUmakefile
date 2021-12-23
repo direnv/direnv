@@ -60,12 +60,6 @@ endif
 direnv: *.go
 	$(GO) build $(GO_BUILD_FLAGS) -o $(exe)
 
-version.go: version.txt
-	echo package main > $@
-	echo >> $@
-	echo "// Version is direnv's version"
-	echo 'const Version = "$(shell cat $<)"' >> $@
-
 ############################################################################
 # Format all the things
 ############################################################################

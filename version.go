@@ -1,3 +1,7 @@
 package main
 
-const Version = "2.29.0"
+import _ "embed"
+
+//Version ...
+//go:embed version.txt
+var Version string
