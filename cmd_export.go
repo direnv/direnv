@@ -10,7 +10,7 @@ import (
 // CmdExport is `direnv export $0`
 var CmdExport = &Cmd{
 	Name:    "export",
-	Desc:    "loads an .envrc and prints the diff in terms of exports",
+	Desc:    "loads an .envrc or .env and prints the diff in terms of exports",
 	Args:    []string{"SHELL"},
 	Private: true,
 	Action:  cmdWithWarnTimeout(actionWithConfig(exportCommand)),
@@ -34,7 +34,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 
 	logDebug("loading RCs")
 	loadedRC := config.LoadedRC()
-	toLoad := findUp(config.WorkDir, ".envrc")
+	toLoad := findEnvUp(config.WorkDir)
 
 	if loadedRC == nil && toLoad == "" {
 		return

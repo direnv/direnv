@@ -12,7 +12,7 @@ var IgnoredKeys = map[string]bool{
 	"DIRENV_CONFIG": true,
 	"DIRENV_BASH":   true,
 
-	// should only be available inside of the .envrc
+	// should only be available inside of the .envrc or .env
 	"DIRENV_IN_ENVRC": true,
 
 	"COMP_WORDBREAKS": true, // Avoids segfaults in bash

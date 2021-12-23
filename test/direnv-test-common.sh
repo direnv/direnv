@@ -18,6 +18,7 @@ export PATH
 export DIRENV_CONFIG=$PWD
 unset DIRENV_BASH
 unset DIRENV_DIR
+unset DIRENV_FILE
 unset DIRENV_MTIME
 unset DIRENV_WATCHES
 unset DIRENV_DIFF
@@ -225,6 +226,16 @@ test_start "watch-dir"
 
     echo "After eval, watches have changed"
     test_neq "${DIRENV_WATCHES}" "${WATCHES}"
+test_stop
+
+test_start "load-envrc-before-env"
+  direnv_eval
+  test_eq "${HELLO}" "bar"
+test_stop
+
+test_start "load-env"
+  direnv_eval
+  test_eq "${HELLO}" "world"
 test_stop
 
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file

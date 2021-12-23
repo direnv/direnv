@@ -12,7 +12,7 @@ import (
 // CmdEdit is `direnv edit [PATH_TO_RC]`
 var CmdEdit = &Cmd{
 	Name: "edit",
-	Desc: `Opens PATH_TO_RC or the current .envrc into an $EDITOR and allow
+	Desc: `Opens PATH_TO_RC or the current .envrc or .env into an $EDITOR and allow
   the file to be loaded afterwards.`,
 	Args:   []string{"[PATH_TO_RC]"},
 	Action: actionWithConfig(cmdEditAction),
@@ -42,7 +42,7 @@ func cmdEditAction(env Env, args []string, config *Config) (err error) {
 		}
 	} else {
 		if foundRC == nil {
-			return fmt.Errorf(".envrc not found. Use `direnv edit .` to create a new envrc in the current directory")
+			return fmt.Errorf(".envrc or .env not found. Use `direnv edit .` to create a new .envrc in the current directory")
 		}
 		rcPath = foundRC.path
 	}
