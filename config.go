@@ -118,7 +118,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.WhitelistPrefix = append(config.WhitelistPrefix, tomlConf.Whitelist.Prefix...)
 
 		for _, path := range tomlConf.Whitelist.Exact {
-			if !strings.HasSuffix(path, "/.envrc") || !strings.HasSuffix(path, "/.env") {
+			if !(strings.HasSuffix(path, "/.envrc") || strings.HasSuffix(path, "/.env")) {
 				path = filepath.Join(path, ".envrc")
 			}
 
