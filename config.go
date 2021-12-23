@@ -94,9 +94,6 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 
 	config.RCFile = env[DIRENV_FILE]
-	if len(config.RCFile) > 0 && config.RCFile[0:1] == "-" {
-		config.RCFile = config.RCFile[1:]
-	}
 
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
