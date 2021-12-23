@@ -24,7 +24,7 @@ type RC struct {
 
 // FindRC looks for ".envrc" and ".env" files up in the file hierarchy.
 func FindRC(wd string, config *Config) (*RC, error) {
-	rcPath := findUp(wd, ".envrc", ".env")
+	rcPath := findEnvUp(wd)
 	if rcPath == "" {
 		return nil, nil
 	}
@@ -278,6 +278,10 @@ func allow(path string, allowPath string) (err error) {
 	// G306: Expect WriteFile permissions to be 0600 or less
 	// #nosec
 	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
+}
+
+func findEnvUp(searchDir string) (path string) {
+	return findUp(searchDir, ".envrc", ".env")
 }
 
 func findUp(searchDir string, fileNames ...string) (path string) {

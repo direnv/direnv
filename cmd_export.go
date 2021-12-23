@@ -34,7 +34,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 
 	logDebug("loading RCs")
 	loadedRC := config.LoadedRC()
-	toLoad := findUp(config.WorkDir, ".envrc", ".env")
+	toLoad := findEnvUp(config.WorkDir)
 
 	if loadedRC == nil && toLoad == "" {
 		return
