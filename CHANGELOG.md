@@ -1,4 +1,16 @@
 
+2.30.0 / 2021-12-23
+==================
+
+  * Add automatic `.env` load (#845)
+  * Resolve symlinks during `direnv deny` (#851)
+  * update installer for Apple Silicon (#849)
+  * stdlib: use_flake handle no layout dir (#861)
+  * embed stdlib.sh (#782)
+  * embed version.txt
+  * go mod update
+  * make dist: remove references to Go
+
 2.29.0 / 2021-11-28
 ==================
 
