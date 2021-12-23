@@ -12,7 +12,7 @@ buildGoModule rec {
   version = lib.fileContents ./version.txt;
   subPackages = [ "." ];
 
-  vendorSha256 = "1kmgl3wkbyirqkf7rwlcss8ml7incxclsb36nskwx1w6b1ilphrz";
+  vendorSha256 = "sha256-YhgQUl9fdictEtz6J88vEzznGd8Ipeb9AYo/p1ZLz5k=";
 
   src = lib.cleanSource ./.;
 
