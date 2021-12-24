@@ -182,9 +182,7 @@ join_args() {
 #    # output: /usr/local/foo
 #
 expand_path() {
-  local REPLY
-  realpath.absolute "${2+"$2"}" "${1+"$1"}"
-  echo "$REPLY"
+  "$direnv" expand_path "$@"
 }
 
 # --- vendored from https://github.com/bashup/realpaths
