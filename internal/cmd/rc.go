@@ -151,6 +151,15 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		return
 	}
 
+	// Allow RC loads to be canceled with SIGINT
+	ctx, cancel := context.WithCancel(context.Background())
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		cancel()
+	}()
+
 	// check what type of RC we're processing
 	// use different exec method for each
 	fn := "source_env"
@@ -170,15 +179,6 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		fn,
 		rc.Path(),
 	)
-
-	// Allow RC loads to be canceled with SIGINT
-	ctx, cancel := context.WithCancel(context.Background())
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		<-c
-		cancel()
-	}()
 
 	// G204: Subprocess launched with function call as argument or cmd arguments
 	// #nosec
