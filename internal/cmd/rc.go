@@ -194,7 +194,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 
 	// G204: Subprocess launched with function call as argument or cmd arguments
 	// #nosec
-	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
+	cmd := exec.CommandContext(ctx, config.BashPath, "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
 	cmd.Stdin = stdin
