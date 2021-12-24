@@ -236,13 +236,20 @@ func eachDir(path string) (paths []string) {
 
 func fileExists(path string) bool {
 	// Some broken filesystems like SSHFS return file information on stat() but
-	// then cannot open the file. So we use os.Open instead.
+	// then cannot open the file. So we use os.Open.
 	f, err := os.Open(path)
-	if err == nil {
-		f.Close()
-		return true
+	if err != nil {
+		return false
 	}
-	return false
+	f.Close()
+
+	// Next, check that the file is a regular file.
+	fi, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return fi.Mode().IsRegular()
 }
 
 func fileHash(path string) (hash string, err error) {
