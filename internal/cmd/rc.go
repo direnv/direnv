@@ -146,6 +146,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
 	}()
 
+	// Abort if the file is not allowed
 	if !rc.Allowed() {
 		err = fmt.Errorf(notAllowed, rc.Path())
 		return
@@ -167,6 +168,17 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		fn = "dotenv"
 	}
 
+	// Set stdin based on the config
+	var stdin *os.File
+	if config.DisableStdin {
+		stdin, err = os.Open(os.DevNull)
+		if err != nil {
+			return
+		}
+	} else {
+		stdin = os.Stdin
+	}
+
 	prelude := ""
 	if config.StrictEnv {
 		prelude = "set -euo pipefail && "
@@ -185,18 +197,11 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
+	cmd.Stdin = stdin
 	cmd.Stderr = os.Stderr
 
-	if config.DisableStdin {
-		cmd.Stdin, err = os.Open(os.DevNull)
-		if err != nil {
-			return
-		}
-	} else {
-		cmd.Stdin = os.Stdin
-	}
-
-	if out, err := cmd.Output(); err == nil && len(out) > 0 {
+	var out []byte
+	if out, err = cmd.Output(); err == nil && len(out) > 0 {
 		var newEnv2 Env
 		newEnv2, err = LoadEnvJSON(out)
 		if err == nil {
