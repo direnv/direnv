@@ -1,4 +1,11 @@
 
+2.30.2 / 2021-12-28
+==================
+
+  * FIX: version: trim surrounding spaces (#869)
+  * build(deps): bump actions/setup-go from 2.1.4 to 2.1.5 (#866)
+  * move most code under internal/cmd (#865)
+
 2.30.1 / 2021-12-24
 ==================
 
