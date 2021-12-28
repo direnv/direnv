@@ -14,12 +14,9 @@ var CmdVersion = &Cmd{
 	Args:    []string{"[VERSION_AT_LEAST]"},
 	Aliases: []string{"--version"},
 	Action: actionSimple(func(env Env, args []string) error {
-		semVersion := "v" + version
+		semVersion := ensureVPrefixed(version)
 		if len(args) > 1 {
-			atLeast := args[1]
-			if !strings.HasPrefix(atLeast, "v") {
-				atLeast = "v" + atLeast
-			}
+			atLeast := ensureVPrefixed(args[1])
 			if !semver.IsValid(atLeast) {
 				return fmt.Errorf("%s is not a valid semver version", atLeast)
 			}
@@ -32,4 +29,11 @@ var CmdVersion = &Cmd{
 		}
 		return nil
 	}),
+}
+
+func ensureVPrefixed(version string) string {
+	if !strings.HasPrefix(version, "v") {
+		return "v" + version
+	}
+	return version
 }
