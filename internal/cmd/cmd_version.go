@@ -14,7 +14,7 @@ var CmdVersion = &Cmd{
 	Args:    []string{"[VERSION_AT_LEAST]"},
 	Aliases: []string{"--version"},
 	Action: actionSimple(func(env Env, args []string) error {
-		semVersion := "v" + version
+		semVersion := "v" + strings.TrimSpace(version)
 		if len(args) > 1 {
 			atLeast := args[1]
 			if !strings.HasPrefix(atLeast, "v") {
