@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"github.com/direnv/direnv/v2/internal/cmd"
 	"os"
+	"strings"
 )
 
 var (
@@ -20,7 +21,7 @@ func main() {
 		env  = cmd.GetEnv()
 		args = os.Args
 	)
-	err := cmd.Main(env, args, bashPath, stdlib, version)
+	err := cmd.Main(env, args, bashPath, stdlib, strings.TrimSpace(version))
 	if err != nil {
 		os.Exit(1)
 	}
