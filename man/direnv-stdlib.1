@@ -126,6 +126,27 @@ source_env_if_exists .envrc.private
 .fi
 .RE
 
+.SS \fB\fCenv_vars_required <varname> [<varname> ...]\fR
+.PP
+Logs error for every variable not present in the environment or having an empty value.
+.br
+Typically this is used in combination with source_env and source_env_if_exists.
+
+.PP
+Example:
+
+.PP
+.RS
+
+.nf
+# expect .envrc.private to provide tokens
+source_env .envrc.private
+# check presence of tokens
+env_vars_required GITHUB_TOKEN OTHER_TOKEN
+
+.fi
+.RE
+
 .SS \fB\fCsource_up [<filename>]\fR
 .PP
 Loads another \fB\fC\&.envrc\fR if found when searching from the parent directory up to /.
