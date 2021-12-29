@@ -90,6 +90,19 @@ Example:
 
     source_env_if_exists .envrc.private
 
+### `env_vars_required <varname> [<varname> ...]`
+
+Logs error for every variable not present in the environment or having an empty value.  
+Typically this is used in combination with source_env and source_env_if_exists.
+
+Example:
+
+    # expect .envrc.private to provide tokens
+    source_env .envrc.private
+    # check presence of tokens
+    env_vars_required GITHUB_TOKEN OTHER_TOKEN
+
+
 ### `source_up [<filename>]`
 
 Loads another `.envrc` if found when searching from the parent directory up to /.

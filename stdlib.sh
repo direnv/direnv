@@ -372,6 +372,33 @@ source_env_if_exists() {
   if [[ -f "$1" ]]; then source_env "$1"; fi
 }
 
+# Usage: env_vars_required <varname> [<varname> ...]
+#
+# Logs error for every variable not present in the environment or having an empty value.  
+# Typically this is used in combination with source_env and source_env_if_exists.
+#
+# Example:
+#
+#     # expect .envrc.private to provide tokens
+#     source_env .envrc.private
+#     # check presence of tokens
+#     env_vars_required GITHUB_TOKEN OTHER_TOKEN
+#
+env_vars_required() {
+  local environment
+  local -i ret
+  environment=$(env)
+  ret=0
+
+  for var in "$@"; do
+    if [[ "$environment" != *"$var="* || -z ${!var:-}  ]]; then
+      log_error "env var $var is required but missing/empty"
+      ret=1
+    fi
+  done
+  return "$ret"
+}
+
 # Usage: watch_file <filename> [<filename> ...]
 #
 # Adds each <filename> to the list of files that direnv will watch for changes -

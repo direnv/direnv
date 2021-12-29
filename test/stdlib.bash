@@ -192,6 +192,26 @@ test_name source_env_if_exists
   [[ $FOO = bar ]]
 )
 
+test_name env_vars_required
+(
+  load_stdlib
+
+  export FOO=1
+  env_vars_required FOO
+
+  # these should all fail
+  # shellcheck disable=SC2034
+  BAR=1
+  export BAZ=
+  output="$(env_vars_required BAR BAZ MISSING 2>&1 > /dev/null || echo "--- result: $?")"
+
+  [[ "${output#*'--- result: 1'}" != "$output" ]]
+  [[ "${output#*'BAR is required'}" != "$output" ]]
+  [[ "${output#*'BAZ is required'}" != "$output" ]]
+  [[ "${output#*'MISSING is required'}" != "$output" ]]
+)
+
+
 # test strict_env and unstrict_env
 ./strict_env_test.bash
 
