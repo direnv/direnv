@@ -42,6 +42,10 @@ This allows one to hard-code the position of bash. It maybe be useful to set thi
 
 If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc` evaluation.
 
+### `skip_dotenv`
+
+Don't look for `.env` files, only `.envrc` files.
+
 ### `strict_env`
 
 If set to true, the `.envrc` will be loaded with `set -euo pipefail`. This
