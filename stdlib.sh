@@ -764,9 +764,10 @@ layout_php() {
 
 # Usage: layout python <python_exe>
 #
-# Creates and loads a virtual environment under
+# Creates and loads a virtual environment.
+# You can specify the path of the virtual environment through VIRTUAL_ENV
+# environment variable, otherwise it will be set to
 # "$direnv_layout_dir/python-$python_version".
-# This forces the installation of any egg into the project's sub-folder.
 # For python older then 3.3 this requires virtualenv to be installed.
 #
 # It's possible to specify the python executable if you want to use different
@@ -789,7 +790,11 @@ layout_python() {
       return 1
     fi
 
-    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
+    if [[ -n $VIRTUAL_ENV ]]; then
+      VIRTUAL_ENV=$(realpath "${VIRTUAL_ENV}")
+    else
+      VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
+    fi
     case $ve in
       "venv")
         if [[ ! -d $VIRTUAL_ENV ]]; then
@@ -909,7 +914,9 @@ layout_pipenv() {
 #
 #    layout pyenv 3.6.7
 #
-# Uses pyenv and layout_python to create and load a virtual environment under
+# Uses pyenv and layout_python to create and load a virtual environment.
+# You can specify the path of the virtual environment through VIRTUAL_ENV
+# environment variable, otherwise it will be set to
 # "$direnv_layout_dir/python-$python_version".
 #
 layout_pyenv() {
