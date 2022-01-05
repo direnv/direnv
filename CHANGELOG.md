@@ -1,4 +1,11 @@
 
+2.30.3 / 2022-01-05
+==================
+
+  * Allow skipping `.env` autoload (#878)
+  * stdlib: add `env_vars_required` (#872) (#872)
+  * Test whether version.txt contains semantic version (#871)
+
 2.30.2 / 2021-12-28
 ==================
 
