@@ -238,6 +238,30 @@ test_start "load-env"
   test_eq "${HELLO}" "world"
 test_stop
 
+if has python; then
+  test_start "python-layout"
+    rm -rf .direnv
+
+    direnv_eval
+    test -n "${VIRTUAL_ENV:-}"
+
+    if [[ ":$PATH:" != *":${VIRTUAL_ENV}/bin:"* ]]; then
+      echo "FAILED: VIRTUAL_ENV/bin not added to PATH"
+      exit 1
+    fi
+  test_stop
+
+  test_start "python-custom-virtual-env"
+    direnv_eval
+    test "${VIRTUAL_ENV:-}" -ef ./foo
+
+    if [[ ":$PATH:" != *":${PWD}/foo/bin:"* ]]; then
+      echo "FAILED: VIRTUAL_ENV/bin not added to PATH"
+      exit 1
+    fi
+  test_stop
+fi
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.
