@@ -25,6 +25,7 @@ type Config struct {
 	TomlPath        string
 	DisableStdin    bool
 	StrictEnv       bool
+	SkipDotenv      bool
 	WarnTimeout     time.Duration
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
@@ -50,6 +51,7 @@ type tomlGlobal struct {
 	BashPath     string       `toml:"bash_path"`
 	DisableStdin bool         `toml:"disable_stdin"`
 	StrictEnv    bool         `toml:"strict_env"`
+	SkipDotenv   bool         `toml:"skip_dotenv"`
 	WarnTimeout  tomlDuration `toml:"warn_timeout"`
 }
 
@@ -105,6 +107,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		// Declare global once and then share it between the top-level and Global
 		// keys. The goal here is to let the decoder fill global regardless of if
 		// the values are in the [global] section or not. The reason we do that is
+		// to keep backward-compatibility with the old top-level notation.
 		var global tomlGlobal
 		tomlConf := tomlConfig{
 			tomlGlobal: &global,
@@ -128,6 +131,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.BashPath = tomlConf.BashPath
 		config.DisableStdin = tomlConf.DisableStdin
 		config.StrictEnv = tomlConf.StrictEnv
+		config.SkipDotenv = tomlConf.SkipDotenv
 		config.WarnTimeout = tomlConf.WarnTimeout.Duration
 	}
 
