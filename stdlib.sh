@@ -957,8 +957,13 @@ layout_ruby() {
   export BUNDLE_BIN
   export GEM_HOME
 
+  mkdir -p "$GEM_HOME/bin"
+  mkdir -p "$BUNDLE_BIN"
+
   PATH_add "$GEM_HOME/bin"
   PATH_add "$BUNDLE_BIN"
+  
+  path_add GEM_PATH "$GEM_HOME"
 }
 
 # Usage: layout julia
