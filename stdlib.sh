@@ -135,8 +135,9 @@ direnv_layout_dir() {
 log_status() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
     local msg=$*
+    local color_normal="\e[m"
     # shellcheck disable=SC2059,SC1117
-    printf "${DIRENV_LOG_FORMAT}\n" "$msg" >&2
+    printf "${color_normal}${DIRENV_LOG_FORMAT}\n" "$msg" >&2
   fi
 }
 
