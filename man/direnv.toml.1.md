@@ -38,6 +38,10 @@ The following sections are supported:
 
 This allows one to hard-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
 
+### `color_stderr`
+
+If set to `true`, everything printed in stderr is colored as red during the `.envrc` evaluation.
+
 ### `disable_stdin`
 
 If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc` evaluation.

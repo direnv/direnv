@@ -24,6 +24,7 @@ type Config struct {
 	RCFile          string
 	TomlPath        string
 	DisableStdin    bool
+	ColorStderr     bool
 	StrictEnv       bool
 	SkipDotenv      bool
 	WarnTimeout     time.Duration
@@ -50,6 +51,7 @@ type tomlConfig struct {
 type tomlGlobal struct {
 	BashPath     string       `toml:"bash_path"`
 	DisableStdin bool         `toml:"disable_stdin"`
+	ColorStderr  bool         `toml:"color_stderr"`
 	StrictEnv    bool         `toml:"strict_env"`
 	SkipDotenv   bool         `toml:"skip_dotenv"`
 	WarnTimeout  tomlDuration `toml:"warn_timeout"`
@@ -130,6 +132,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 		config.BashPath = tomlConf.BashPath
 		config.DisableStdin = tomlConf.DisableStdin
+		config.ColorStderr = tomlConf.ColorStderr
 		config.StrictEnv = tomlConf.StrictEnv
 		config.SkipDotenv = tomlConf.SkipDotenv
 		config.WarnTimeout = tomlConf.WarnTimeout.Duration
