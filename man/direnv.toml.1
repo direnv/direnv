@@ -158,6 +158,24 @@ In this example, the following .envrc files will not be implicitly allowed (alth
 
 .RE
 
+.SH [env]
+.SS \fB\fCignore_keys\fR
+.PP
+List of environment variable names which should be ignored, in addition to some default ones.
+
+.PP
+Example:
+
+.PP
+.RS
+
+.nf
+[env]
+ignore_keys = ["TMUX_PANE", "SSH_AUTH_SOCK"]
+
+.fi
+.RE
+
 .SH COPYRIGHT
 .PP
 MIT licence - Copyright (C) 2019 @zimbatm and contributors

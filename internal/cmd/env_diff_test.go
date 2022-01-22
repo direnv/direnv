@@ -37,20 +37,33 @@ func TestEnvDiffEmptyValue(t *testing.T) {
 	}
 }
 
-func TestIgnoredEnv(t *testing.T) {
-	if !IgnoredEnv(DIRENV_BASH) {
+func TestIgnoredKeysv(t *testing.T) {
+	env := Env{"DIRENV_IGNORE_KEYS": "FOO,BAR"}
+	ignoredKeys := NewIgnoredKeys(env)
+
+	if !ignoredKeys.IsIgnored(DIRENV_BASH) {
 		t.Fail()
 	}
-	if IgnoredEnv(DIRENV_DIFF) {
+	if ignoredKeys.IsIgnored(DIRENV_DIFF) {
 		t.Fail()
 	}
-	if !IgnoredEnv("_") {
+	if !ignoredKeys.IsIgnored("_") {
 		t.Fail()
 	}
-	if !IgnoredEnv("__fish_foo") {
+	if !ignoredKeys.IsIgnored("__fish_foo") {
 		t.Fail()
 	}
-	if !IgnoredEnv("__fishx") {
+	if !ignoredKeys.IsIgnored("__fishx") {
+		t.Fail()
+	}
+	if !ignoredKeys.IsIgnored("FOO") {
+		t.Fail()
+	}
+	if !ignoredKeys.IsIgnored("BAR") {
+		t.Fail()
+	}
+
+	if ignoredKeys.IsIgnored("BAZ") {
 		t.Fail()
 	}
 }

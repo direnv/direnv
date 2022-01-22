@@ -6,11 +6,12 @@ import (
 	"github.com/direnv/direnv/v2/gzenv"
 )
 
-// IgnoredKeys is list of keys we don't want to deal with
-var IgnoredKeys = map[string]bool{
+// DefaultIgnoredKeys is list of keys we don't want to deal with
+var DefaultIgnoredKeys = map[string]bool{
 	// direnv env config
-	"DIRENV_CONFIG": true,
-	"DIRENV_BASH":   true,
+	"DIRENV_CONFIG":      true,
+	"DIRENV_BASH":        true,
+	"DIRENV_IGNORE_KEYS": true,
 
 	// should only be available inside of the .envrc or .env
 	"DIRENV_IN_ENVRC": true,
@@ -25,6 +26,11 @@ var IgnoredKeys = map[string]bool{
 	"SHELLOPTS": true,
 	"SHLVL":     true,
 	"_":         true,
+}
+
+// IgnoredKeys represents all the keys we don't want to deal with
+type IgnoredKeys struct {
+	keys map[string]bool
 }
 
 // EnvDiff represents the diff between two environments
@@ -43,13 +49,15 @@ func NewEnvDiff() *EnvDiff {
 func BuildEnvDiff(e1, e2 Env) *EnvDiff {
 	diff := NewEnvDiff()
 
+	ignoredKeys := NewIgnoredKeys(e2)
+
 	in := func(key string, e Env) bool {
 		_, ok := e[key]
 		return ok
 	}
 
 	for key := range e1 {
-		if IgnoredEnv(key) {
+		if ignoredKeys.IsIgnored(key) {
 			continue
 		}
 		if e2[key] != e1[key] || !in(key, e2) {
@@ -58,7 +66,7 @@ func BuildEnvDiff(e1, e2 Env) *EnvDiff {
 	}
 
 	for key := range e2 {
-		if IgnoredEnv(key) {
+		if ignoredKeys.IsIgnored(key) {
 			continue
 		}
 		if e2[key] != e1[key] || !in(key, e1) {
@@ -131,16 +139,29 @@ func (diff *EnvDiff) Serialize() string {
 	return gzenv.Marshal(diff)
 }
 
-//// Utils
+//// IgnoredKeys
 
-// IgnoredEnv returns true if the key should be ignored in environment diffs.
-func IgnoredEnv(key string) bool {
+// NewIgnoredKeys creates a NewIgnoredKeys including all keys to ignore
+func NewIgnoredKeys(env Env) *IgnoredKeys {
+	ignoredKeys := make(map[string]bool)
+
+	for key, value := range DefaultIgnoredKeys {
+		ignoredKeys[key] = value
+	}
+	for _, key := range strings.Split(env[DIRENV_IGNORE_KEYS], ",") {
+		ignoredKeys[key] = true
+	}
+	return &IgnoredKeys{ignoredKeys}
+}
+
+// IsIgnored returns true if the key should be ignored in environment diffs.
+func (ignoredKeys *IgnoredKeys) IsIgnored(key string) bool {
 	if strings.HasPrefix(key, "__fish") {
 		return true
 	}
 	if strings.HasPrefix(key, "BASH_FUNC_") {
 		return true
 	}
-	_, found := IgnoredKeys[key]
+	_, found := ignoredKeys.keys[key]
 	return found
 }
