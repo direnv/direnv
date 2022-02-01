@@ -1277,6 +1277,11 @@ __main__() {
   exec 3>&1
   exec 1>&2
 
+  # Print everything in stderr in red
+  if [[ "$DIRENV_COLOR_STDERR" = "true" ]]; then
+    exec 2> >( sed $'s,.*,\e[31m&\e[m,' >&2 )
+  fi
+
   __dump_at_exit() {
     local ret=$?
     "$direnv" dump json "" >&3
