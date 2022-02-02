@@ -31,6 +31,8 @@ type Config struct {
 	WhitelistExact  map[string]bool
 }
 
+const defaultSkipDotenv = true
+
 type tomlDuration struct {
 	time.Duration
 }
@@ -103,12 +105,16 @@ func LoadConfig(env Env) (config *Config, err error) {
 		}
 	}
 
+	config.SkipDotenv = defaultSkipDotenv
+
+	fmt.Printf("config.SkipDotenv is: %v\n", config.SkipDotenv)
 	if config.TomlPath != "" {
 		// Declare global once and then share it between the top-level and Global
 		// keys. The goal here is to let the decoder fill global regardless of if
 		// the values are in the [global] section or not. The reason we do that is
 		// to keep backward-compatibility with the old top-level notation.
 		var global tomlGlobal
+		global.SkipDotenv = defaultSkipDotenv
 		tomlConf := tomlConfig{
 			tomlGlobal: &global,
 			Global:     &global,
@@ -131,6 +137,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.BashPath = tomlConf.BashPath
 		config.DisableStdin = tomlConf.DisableStdin
 		config.StrictEnv = tomlConf.StrictEnv
+		fmt.Printf("tomlConf.SkipDotenv is: %v\n", tomlConf.SkipDotenv)
 		config.SkipDotenv = tomlConf.SkipDotenv
 		config.WarnTimeout = tomlConf.WarnTimeout.Duration
 	}
@@ -170,6 +177,8 @@ func LoadConfig(env Env) (config *Config, err error) {
 		err = fmt.Errorf("couldn't find a data directory for direnv")
 		return
 	}
+
+	fmt.Printf("config.SkipDotenv is: %v\n", config.SkipDotenv)
 
 	return
 }
