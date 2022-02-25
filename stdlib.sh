@@ -1004,6 +1004,7 @@ use_julia() {
   local julia_version_prefix=${JULIA_VERSION_PREFIX-julia-}
   local search_version
   local julia_prefix
+  local REPLY
 
   if [[ -z ${JULIA_VERSIONS:-} || -z $version ]]; then
     log_error "Must specify the \$JULIA_VERSIONS environment variable and a Julia version!"
@@ -1027,7 +1028,10 @@ use_julia() {
     return 1
   fi
 
-  load_prefix "$julia_prefix"
+  # Note: Julia should not set LD_LIBRARY_PATH (messes up compiling, etc.)
+  realpath.absolute "$1"
+  PATH_add "$REPLY/bin"
+  MANPATH_add "$REPLY/share/man"
 
   log_status "Successfully loaded $(julia --version), from prefix ($julia_prefix)"
 }
