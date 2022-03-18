@@ -856,7 +856,19 @@ layout_anaconda() {
     env_loc="$env_name_or_prefix"
   else
     # "foo" name
-    env_name="$env_name_or_prefix"
+    # if no name was passed, try to parse it from local environment.yml
+    if [[ -n "$env_name_or_prefix" ]]; then
+      env_name="$env_name_or_prefix"
+    elif [[ -e environment.yml ]]; then
+      env_name_grep_match="$(grep -- '^name:' environment.yml)"
+      env_name="${env_name_grep_match/#name:*([[:space:]])}"
+    fi
+
+    if [[ -z "$env_name" ]]; then
+      log_error "Could not determine conda env name (set in environment.yml or pass explicitly)"
+      return 1
+    fi
+
     env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
     env_loc="${env_loc##* }"
   fi
