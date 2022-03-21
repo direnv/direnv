@@ -48,6 +48,8 @@ func DetectShell(target string) Shell {
 		return Elvish
 	case "fish":
 		return Fish
+	case "gha":
+		return GitHubActions
 	case "gzenv":
 		return GzEnv
 	case "json":
