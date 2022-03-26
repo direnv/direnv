@@ -25,7 +25,7 @@ type Config struct {
 	TomlPath        string
 	DisableStdin    bool
 	StrictEnv       bool
-	SkipDotenv      bool
+	LoadDotenv      bool
 	WarnTimeout     time.Duration
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
@@ -51,7 +51,8 @@ type tomlGlobal struct {
 	BashPath     string       `toml:"bash_path"`
 	DisableStdin bool         `toml:"disable_stdin"`
 	StrictEnv    bool         `toml:"strict_env"`
-	SkipDotenv   bool         `toml:"skip_dotenv"`
+	SkipDotenv   bool         `toml:"skip_dotenv"` // deprecated, use load_dotenv
+	LoadDotenv   bool         `toml:"load_dotenv"`
 	WarnTimeout  tomlDuration `toml:"warn_timeout"`
 }
 
@@ -128,10 +129,14 @@ func LoadConfig(env Env) (config *Config, err error) {
 			config.WhitelistExact[path] = true
 		}
 
+		if tomlConf.SkipDotenv {
+			logError("skip_dotenv has been inverted to load_dotenv.")
+		}
+
 		config.BashPath = tomlConf.BashPath
 		config.DisableStdin = tomlConf.DisableStdin
+		config.LoadDotenv = tomlConf.LoadDotenv
 		config.StrictEnv = tomlConf.StrictEnv
-		config.SkipDotenv = tomlConf.SkipDotenv
 		config.WarnTimeout = tomlConf.WarnTimeout.Duration
 	}
 

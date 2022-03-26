@@ -52,7 +52,7 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 	previousEnv.CleanContext()
 
 	// Load the rc
-	if toLoad := findEnvUp(rcPath, config.SkipDotenv); toLoad != "" {
+	if toLoad := findEnvUp(rcPath, config.LoadDotenv); toLoad != "" {
 		if newEnv, err = config.EnvFromRC(toLoad, previousEnv); err != nil {
 			return
 		}
