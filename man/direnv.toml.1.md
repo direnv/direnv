@@ -42,9 +42,9 @@ This allows one to hard-code the position of bash. It maybe be useful to set thi
 
 If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc` evaluation.
 
-### `skip_dotenv`
+### `load_dotenv`
 
-Don't look for `.env` files, only `.envrc` files.
+Also look for and load `.env` files on top of the `.envrc` files.
 
 ### `strict_env`
 
