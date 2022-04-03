@@ -42,3 +42,19 @@ jobs:
         GO111MODULE: on
       run: make test-stdlib test-bash
 
+    - name: GitHub Actions Env Test Setup
+      # FIXME: make this work on Windows as well
+      if: runner.os != 'Windows'
+      run: |
+        cd test/scenarios/github-actions/
+        ../../../direnv allow
+        ../../../direnv export gha >> "$GITHUB_ENV"
+
+    - name: GitHub Actions Env Test Verification
+      # FIXME: make this work on Windows as well
+      if: runner.os != 'Windows'
+      run: |
+        [[ -z ${TEST_EXPORT_DIRENV_GITHUB_ACTIONS:-} ]] && echo "TEST_EXPORT_DIRENV_GITHUB_ACTIONS is unset or empty" >&2 && exit 1
+        tee TEST_EXPORT_DIRENV_GITHUB_ACTIONS.got <<<"$TEST_EXPORT_DIRENV_GITHUB_ACTIONS"
+        echo "${GITHUB_SHA}"$'\n'"${GITHUB_RUN_ID}"$'\n'"${GITHUB_RUN_NUMBER}" | tee TEST_EXPORT_DIRENV_GITHUB_ACTIONS.want
+        diff -u TEST_EXPORT_DIRENV_GITHUB_ACTIONS.want TEST_EXPORT_DIRENV_GITHUB_ACTIONS.got
