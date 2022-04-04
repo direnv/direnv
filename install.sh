@@ -28,6 +28,11 @@ set -euo pipefail
   trap at_exit EXIT
 
   kernel=$(uname -s | tr "[:upper:]" "[:lower:]")
+  case "${kernel}" in
+    mingw*)
+      kernel=windows
+      ;;
+  esac
   case "$(uname -m)" in
     x86_64)
       machine=amd64
