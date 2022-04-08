@@ -418,14 +418,32 @@ watch_dir() {
 
 # Usage: source_up [<filename>]
 #
-# Loads another ".envrc" if found with the find_up command.
+# Loads another ".envrc" if found with the find_up command. Returns 1 if no
+# file is found.
 #
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_up() {
-  local dir file=${1:-.envrc}
-  dir=$(cd .. && find_up "$file")
-  if [[ -n $dir ]]; then
-    source_env "$dir"
+  local envrc file=${1:-.envrc}
+  envrc=$(cd .. && (find_up "$file" || true))
+  if [[ -n $envrc ]]; then
+    source_env "$envrc"
+  else
+    log_error "No ancestor $file found"
+    exit 1
+  fi
+}
+
+# Usage: source_up_if_exists [<filename>]
+#
+# Loads another ".envrc" if found with the find_up command. If one is not
+# found, nothing happens.
+#
+# NOTE: the other ".envrc" is not checked by the security framework.
+source_up_if_exists() {
+  local envrc file=${1:-.envrc}
+  envrc=$(cd .. && (find_up "$file" || true))
+  if [[ -n $envrc ]]; then
+    source_env "$envrc"
   fi
 }
 
