@@ -190,6 +190,11 @@ test_name source_env_if_exists
   echo "export FOO=bar" > existing_file
   source_env_if_exists existing_file
   [[ $FOO = bar ]]
+
+  # Expect correct path being logged
+  export HOME=$workdir
+  output="$(source_env_if_exists existing_file 2>&1 > /dev/null)"
+  [[ "${output#*'loading ~/existing_file'}" != "$output" ]]
 )
 
 test_name env_vars_required

@@ -346,7 +346,7 @@ source_env() {
   pushd "$(pwd 2>/dev/null)" >/dev/null || return 1
   pushd "$rcpath_dir" >/dev/null || return 1
   if [[ -f ./$rcpath_base ]]; then
-    log_status "loading $rcfile"
+    log_status "loading $(user_rel_path "$(expand_path "$rcpath")")"
     # shellcheck disable=SC1090
     . "./$rcpath_base"
   else
