@@ -41,6 +41,7 @@ func (env Env) CleanContext() {
 	delete(env, DIRENV_FILE)
 	delete(env, DIRENV_DUMP_FILE_PATH)
 	delete(env, DIRENV_WATCHES)
+	delete(env, DIRENV_IGNORE_KEYS)
 }
 
 // LoadEnv unmarshals the env back from a gzenv string

@@ -139,6 +139,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	direnv := config.SelfPath
 	newEnv = previousEnv.Copy()
 	newEnv[DIRENV_WATCHES] = rc.times.Marshal()
+	newEnv[DIRENV_IGNORE_KEYS] = strings.Join(config.EnvIgnoreKeys, ",")
 	defer func() {
 		// Record directory changes even if load is disallowed or fails
 		newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)

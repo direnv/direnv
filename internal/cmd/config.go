@@ -29,6 +29,7 @@ type Config struct {
 	WarnTimeout     time.Duration
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
+	EnvIgnoreKeys   []string
 }
 
 type tomlDuration struct {
@@ -45,6 +46,7 @@ type tomlConfig struct {
 	*tomlGlobal               // For backward-compatibility
 	Global      *tomlGlobal   `toml:"global"`
 	Whitelist   tomlWhitelist `toml:"whitelist"`
+	Env         tomlEnv       `toml:"env"`
 }
 
 type tomlGlobal struct {
@@ -59,6 +61,10 @@ type tomlGlobal struct {
 type tomlWhitelist struct {
 	Prefix []string
 	Exact  []string
+}
+
+type tomlEnv struct {
+	IgnoreKeys []string `toml:"ignore_keys"`
 }
 
 // LoadConfig opens up the direnv configuration from the Env.
@@ -95,6 +101,8 @@ func LoadConfig(env Env) (config *Config, err error) {
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
 
+	config.EnvIgnoreKeys = make([]string, 0)
+
 	// Load the TOML config
 	config.TomlPath = filepath.Join(config.ConfDir, "direnv.toml")
 	if _, statErr := os.Stat(config.TomlPath); statErr != nil {
@@ -117,6 +125,12 @@ func LoadConfig(env Env) (config *Config, err error) {
 		if _, err = toml.DecodeFile(config.TomlPath, &tomlConf); err != nil {
 			err = fmt.Errorf("LoadConfig() failed to parse %s: %w", config.TomlPath, err)
 			return
+		}
+
+		if env[DIRENV_IGNORE_KEYS] != "" {
+			config.EnvIgnoreKeys = strings.Split(env[DIRENV_IGNORE_KEYS], ",")
+		} else {
+			config.EnvIgnoreKeys = append(config.EnvIgnoreKeys, tomlConf.Env.IgnoreKeys...)
 		}
 
 		config.WhitelistPrefix = append(config.WhitelistPrefix, tomlConf.Whitelist.Prefix...)

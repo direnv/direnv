@@ -109,6 +109,19 @@ In this example, the following .envrc files will not be implicitly allowed (alth
 * `/home/user/code/project-b/subproject-c/.envrc`
 * `/home/user/code/.envrc`
 
+## [env]
+
+### `ignore_keys`
+
+List of environment variable names which should be ignored, in addition to some default ones.
+
+Example:
+
+```toml
+[env]
+ignore_keys = ["TMUX_PANE", "SSH_AUTH_SOCK"]
+```
+
 COPYRIGHT
 ---------
 
