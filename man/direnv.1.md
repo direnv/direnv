@@ -143,16 +143,25 @@ own extensions inside `$XDG_CONFIG_HOME/direnv/direnvrc` or
 
 Hopefully this is enough to get you started.
 
+ENVIRONMENT
+-----------
+
+`XDG_CONFIG_HOME`
+: Defaults to `$HOME/.config`.
+
 FILES
 -----
 
-$XDG_CONFIG_HOME/direnv/direnvrc
-: `direnv` configuration
+`$XDG_CONFIG_HOME/direnv/direnv.toml`
+: Direnv configuration. See direnv.toml(1).
 
-$XDG_CONFIG_HOME/direnv/lib/*.sh
-: Third-party extensions to direnv-stdlib.
+`$XDG_CONFIG_HOME/direnv/direnvrc`
+: Bash code loaded before every `.envrc`. Good for personal extensions.
 
-$XDG_DATA_HOME/direnv/allow
+`$XDG_CONFIG_HOME/direnv/lib/*.sh`
+: Bash code loaded before every `.envrc`. Good for third-party extensions.
+
+`$XDG_DATA_HOME/direnv/allow`
 : Records which `.envrc` files have been `direnv allow`ed.
 
 CONTRIBUTE

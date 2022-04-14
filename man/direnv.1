@@ -184,17 +184,26 @@ own extensions inside \fB\fC$XDG_CONFIG_HOME/direnv/direnvrc\fR or
 .PP
 Hopefully this is enough to get you started.
 
+.SH ENVIRONMENT
+.TP
+\fB\fCXDG_CONFIG_HOME\fR
+Defaults to \fB\fC$HOME/.config\fR\&.
+
 .SH FILES
 .TP
-$XDG_CONFIG_HOME/direnv/direnvrc
-\fB\fCdirenv\fR configuration
+\fB\fC$XDG_CONFIG_HOME/direnv/direnv.toml\fR
+Direnv configuration. See direnv.toml(1).
 
 .TP
-$XDG_CONFIG_HOME/direnv/lib/*.sh
-Third-party extensions to direnv-stdlib.
+\fB\fC$XDG_CONFIG_HOME/direnv/direnvrc\fR
+Bash code loaded before every \fB\fC\&.envrc\fR\&. Good for personal extensions.
 
 .TP
-$XDG_DATA_HOME/direnv/allow
+\fB\fC$XDG_CONFIG_HOME/direnv/lib/*.sh\fR
+Bash code loaded before every \fB\fC\&.envrc\fR\&. Good for third-party extensions.
+
+.TP
+\fB\fC$XDG_DATA_HOME/direnv/allow\fR
 Records which \fB\fC\&.envrc\fR files have been \fB\fCdirenv allow\fRed.
 
 .SH CONTRIBUTE
