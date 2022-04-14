@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestSRIHasher(t *testing.T) {
+func TestWriter(t *testing.T) {
 	var b strings.Builder
 
 	s := "testdata"
@@ -29,8 +29,21 @@ func TestSRIHasher(t *testing.T) {
 	}
 
 	// Check that the hash has been calculated properly
-	x := w.Sum()
+	x := w.Sum().String()
 	if x != expectedHash {
+		t.Fatal("hash mismatch")
+	}
+}
+
+func TestParser(t *testing.T) {
+	expectedHash := "sha256-gQ/y+yQqXe5CIPLLDmpRmJH7Z/L4KKbKtO+IlGM7H1A="
+
+	hash, err := Parse(expectedHash)
+	if err != nil {
+		t.Fatalf("parse error: %v", err)
+	}
+
+	if hash.String() != expectedHash {
 		t.Fatal("hash mismatch")
 	}
 }
