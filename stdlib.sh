@@ -418,21 +418,20 @@ watch_dir() {
 
 # Usage: _source_up [<filename>] [true|false]
 #
-# Helper function for source_up and source_up_if_exists. The second parameter
-# determines if it's an error for the file we're searching for to not exist.
+# Private helper function for source_up and source_up_if_exists. The second
+# parameter determines if it's an error for the file we're searching for to
+# not exist.
 _source_up() {
   local envrc file=${1:-.envrc}
   local ok_if_not_exist=${2}
   envrc=$(cd .. && (find_up "$file" || true))
   if [[ -n $envrc ]]; then
     source_env "$envrc"
+  elif $ok_if_not_exist; then
+    return 0
   else
-    if $ok_if_not_exist; then
-      return 0
-    else
-      log_error "No ancestor $file found"
-      return 1
-    fi
+    log_error "No ancestor $file found"
+    return 1
   fi
 }
 
@@ -443,7 +442,7 @@ _source_up() {
 #
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_up() {
-  _source_up "${1:-1}" false
+  _source_up "${1:-}" false
 }
 
 # Usage: source_up_if_exists [<filename>]
@@ -453,7 +452,7 @@ source_up() {
 #
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_up_if_exists() {
-  _source_up "${1:-1}" true
+  _source_up "${1:-}" true
 }
 
 # Usage: fetchurl <url> [<integrity-hash>]
