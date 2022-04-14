@@ -149,7 +149,16 @@ env_vars_required GITHUB_TOKEN OTHER_TOKEN
 
 .SS \fB\fCsource_up [<filename>]\fR
 .PP
-Loads another \fB\fC\&.envrc\fR if found when searching from the parent directory up to /.
+Loads another \fB\fC\&.envrc\fR if found with the find_up command. Returns 1 if no file
+is found.
+
+.PP
+NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.
+
+.SS \fB\fCsource_up_if_exists [<filename>]\fR
+.PP
+Loads another \fB\fC\&.envrc\fR if found with the find_up command. If one is not
+found, nothing happens.
 
 .PP
 NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.

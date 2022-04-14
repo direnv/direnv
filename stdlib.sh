@@ -416,17 +416,43 @@ watch_dir() {
   eval "$("$direnv" watch-dir bash "$1")"
 }
 
+# Usage: _source_up [<filename>] [true|false]
+#
+# Private helper function for source_up and source_up_if_exists. The second
+# parameter determines if it's an error for the file we're searching for to
+# not exist.
+_source_up() {
+  local envrc file=${1:-.envrc}
+  local ok_if_not_exist=${2}
+  envrc=$(cd .. && (find_up "$file" || true))
+  if [[ -n $envrc ]]; then
+    source_env "$envrc"
+  elif $ok_if_not_exist; then
+    return 0
+  else
+    log_error "No ancestor $file found"
+    return 1
+  fi
+}
+
 # Usage: source_up [<filename>]
 #
-# Loads another ".envrc" if found with the find_up command.
+# Loads another ".envrc" if found with the find_up command. Returns 1 if no
+# file is found.
 #
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_up() {
-  local dir file=${1:-.envrc}
-  dir=$(cd .. && find_up "$file")
-  if [[ -n $dir ]]; then
-    source_env "$dir"
-  fi
+  _source_up "${1:-}" false
+}
+
+# Usage: source_up_if_exists [<filename>]
+#
+# Loads another ".envrc" if found with the find_up command. If one is not
+# found, nothing happens.
+#
+# NOTE: the other ".envrc" is not checked by the security framework.
+source_up_if_exists() {
+  _source_up "${1:-}" true
 }
 
 # Usage: fetchurl <url> [<integrity-hash>]
