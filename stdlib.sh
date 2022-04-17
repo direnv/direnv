@@ -152,10 +152,8 @@ log_status() {
 #    log_error "Unable to find specified directory!"
 
 log_error() {
-  local color_normal
-  local color_error
-  color_normal=$(tput sgr0)
-  color_error=$(tput setaf 1)
+  local color_normal="\e[m"
+  local color_error="\e[38;5;1m"
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
     local msg=$*
     # shellcheck disable=SC2059,SC1117
@@ -346,7 +344,7 @@ source_env() {
   pushd "$(pwd 2>/dev/null)" >/dev/null || return 1
   pushd "$rcpath_dir" >/dev/null || return 1
   if [[ -f ./$rcpath_base ]]; then
-    log_status "loading $rcfile"
+    log_status "loading $(user_rel_path "$(expand_path "$rcpath")")"
     # shellcheck disable=SC1090
     . "./$rcpath_base"
   else
@@ -416,17 +414,43 @@ watch_dir() {
   eval "$("$direnv" watch-dir bash "$1")"
 }
 
+# Usage: _source_up [<filename>] [true|false]
+#
+# Private helper function for source_up and source_up_if_exists. The second
+# parameter determines if it's an error for the file we're searching for to
+# not exist.
+_source_up() {
+  local envrc file=${1:-.envrc}
+  local ok_if_not_exist=${2}
+  envrc=$(cd .. && (find_up "$file" || true))
+  if [[ -n $envrc ]]; then
+    source_env "$envrc"
+  elif $ok_if_not_exist; then
+    return 0
+  else
+    log_error "No ancestor $file found"
+    return 1
+  fi
+}
+
 # Usage: source_up [<filename>]
 #
-# Loads another ".envrc" if found with the find_up command.
+# Loads another ".envrc" if found with the find_up command. Returns 1 if no
+# file is found.
 #
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_up() {
-  local dir file=${1:-.envrc}
-  dir=$(cd .. && find_up "$file")
-  if [[ -n $dir ]]; then
-    source_env "$dir"
-  fi
+  _source_up "${1:-}" false
+}
+
+# Usage: source_up_if_exists [<filename>]
+#
+# Loads another ".envrc" if found with the find_up command. If one is not
+# found, nothing happens.
+#
+# NOTE: the other ".envrc" is not checked by the security framework.
+source_up_if_exists() {
+  _source_up "${1:-}" true
 }
 
 # Usage: fetchurl <url> [<integrity-hash>]
@@ -856,7 +880,19 @@ layout_anaconda() {
     env_loc="$env_name_or_prefix"
   else
     # "foo" name
-    env_name="$env_name_or_prefix"
+    # if no name was passed, try to parse it from local environment.yml
+    if [[ -n "$env_name_or_prefix" ]]; then
+      env_name="$env_name_or_prefix"
+    elif [[ -e environment.yml ]]; then
+      env_name_grep_match="$(grep -- '^name:' environment.yml)"
+      env_name="${env_name_grep_match/#name:*([[:space:]])}"
+    fi
+
+    if [[ -z "$env_name" ]]; then
+      log_error "Could not determine conda env name (set in environment.yml or pass explicitly)"
+      return 1
+    fi
+
     env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
     env_loc="${env_loc##* }"
   fi

@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/direnv/direnv/v2/sri"
+	"github.com/direnv/direnv/v2/pkg/sri"
 	"github.com/mattn/go-isatty"
 )
 
@@ -40,13 +40,13 @@ func cmdFetchURL(env Env, args []string, config *Config) (err error) {
 		// Support Base64 where '/' have been replaced by '_'
 		integrityHash = strings.ReplaceAll(args[2], "_", "/")
 
-		algo, err = sri.GetAlgo(integrityHash)
+		hash, err := sri.Parse(integrityHash)
 		if err != nil {
 			return err
 		}
 
 		// Shortcut if the cache already has the file
-		casFile := casPath(casDir, integrityHash)
+		casFile := casPath(casDir, hash)
 		if fileExists(casFile) {
 			fmt.Println(casFile)
 			return nil
@@ -91,8 +91,8 @@ func cmdFetchURL(env Env, args []string, config *Config) (err error) {
 	}
 
 	// Validate if a comparison hash was given
-	if integrityHash != "" && calculatedHash != integrityHash {
-		return fmt.Errorf("hash mismatch. Expected '%s' but got '%s'", integrityHash, calculatedHash)
+	if integrityHash != "" && calculatedHash.String() != integrityHash {
+		return fmt.Errorf("hash mismatch. Expected '%s' but got '%s'", integrityHash, calculatedHash.String())
 	}
 
 	// Derive the CAS file location from the SRI hash
@@ -115,7 +115,7 @@ Invoke fetchurl again with the hash as an argument to get the disk location:
 
   direnv fetchurl "%s" "%s"
   #=> %s
-`, calculatedHash, url, calculatedHash, casFile)
+`, calculatedHash, url, calculatedHash.String(), casFile)
 		} else {
 			// Only print the hash in scripting mode. Add one extra hurdle on
 			// purpose to use fetchurl without the SRI hash.
@@ -133,8 +133,8 @@ func casDir(c *Config) string {
 }
 
 // casPath returns filesystem path for SRI hashes
-func casPath(dir string, integrityHash string) string {
-	// avoid / in the filename
-	sriFile := strings.ReplaceAll(integrityHash, "/", "_")
+func casPath(dir string, integrityHash *sri.Hash) string {
+	// Use Hex encoding for the filesystem to avoid issues
+	sriFile := integrityHash.Hex()
 	return filepath.Join(dir, sriFile)
 }

@@ -33,16 +33,16 @@ func (sh vim) Dump(env Env) (out string) {
 }
 
 func (sh vim) export(key, value string) string {
-	return "let $" + sh.escapeKey(key) + " = " + sh.escapeValue(value) + "\n"
+	return "call setenv(" + sh.escapeKey(key) + "," + sh.escapeValue(value) + ")\n"
 }
 
 func (sh vim) unset(key string) string {
-	return "let $" + sh.escapeKey(key) + " = ''\n"
+	return "call setenv(" + sh.escapeKey(key) + ",v:null)\n"
 }
 
 // TODO: support keys with special chars or fail
 func (sh vim) escapeKey(str string) string {
-	return str
+	return sh.escapeValue(str)
 }
 
 // TODO: Make sure this escaping is valid

@@ -28,6 +28,11 @@ set -euo pipefail
   trap at_exit EXIT
 
   kernel=$(uname -s | tr "[:upper:]" "[:lower:]")
+  case "${kernel}" in
+    mingw*)
+      kernel=windows
+      ;;
+  esac
   case "$(uname -m)" in
     x86_64)
       machine=amd64
@@ -49,7 +54,9 @@ set -euo pipefail
   : "${bin_path:=}"
 
   if [[ -z "$bin_path" ]]; then
-    log "looking for a writeable PATH"
+    log "bin_path is not set, you can set bin_path to specify the installation path"
+    log "e.g. export bin_path=/path/to/installation before installing"
+    log "looking for a writeable path from PATH environment variable"
     for path in $(echo "$PATH" | tr ':' '\n'); do
       if [[ -w $path ]]; then
         bin_path=$path
