@@ -152,10 +152,8 @@ log_status() {
 #    log_error "Unable to find specified directory!"
 
 log_error() {
-  local color_normal
-  local color_error
-  color_normal=$(tput sgr0)
-  color_error=$(tput setaf 1)
+  local color_normal="\e[m"
+  local color_error="\e[38;5;1m"
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
     local msg=$*
     # shellcheck disable=SC2059,SC1117
