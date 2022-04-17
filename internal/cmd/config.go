@@ -61,6 +61,22 @@ type tomlWhitelist struct {
 	Exact  []string
 }
 
+// Expand a path string prefixed with ~/ to the current user's home directory.
+// Example: if current user is user1 with home directory in /home/user1, then
+// ~/project -> /home/user1/project
+// It's useful to allow paths with ~/, so that direnv.toml can be reused via
+// dotfiles repos across systems with different standard home paths
+// (compare Linux /home and macOS /Users).
+func expandTildePath(path string) (pathExpanded string) {
+	pathExpanded = path
+	if strings.HasPrefix(path, "~/") {
+		if homedir, homedirErr := os.UserHomeDir(); homedirErr == nil {
+			pathExpanded = filepath.Join(homedir, path[2:])
+		}
+	}
+	return pathExpanded
+}
+
 // LoadConfig opens up the direnv configuration from the Env.
 func LoadConfig(env Env) (config *Config, err error) {
 	config = &Config{
@@ -119,14 +135,16 @@ func LoadConfig(env Env) (config *Config, err error) {
 			return
 		}
 
-		config.WhitelistPrefix = append(config.WhitelistPrefix, tomlConf.Whitelist.Prefix...)
+		for _, path := range tomlConf.Whitelist.Prefix {
+			config.WhitelistPrefix = append(config.WhitelistPrefix, expandTildePath(path))
+		}
 
 		for _, path := range tomlConf.Whitelist.Exact {
 			if !(strings.HasSuffix(path, "/.envrc") || strings.HasSuffix(path, "/.env")) {
 				path = filepath.Join(path, ".envrc")
 			}
 
-			config.WhitelistExact[path] = true
+			config.WhitelistExact[expandTildePath(path)] = true
 		}
 
 		if tomlConf.SkipDotenv {
