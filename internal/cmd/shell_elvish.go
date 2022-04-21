@@ -12,12 +12,12 @@ var Elvish Shell = elvish{}
 
 func (elvish) Hook() (string, error) {
 	return `## hook for direnv
-@edit:before-readline = $@edit:before-readline {
+set @edit:before-readline = $@edit:before-readline {
 	try {
-		m = [("{{.SelfPath}}" export elvish | from-json)]
+		var m = [("{{.SelfPath}}" export elvish | from-json)]
 		if (> (count $m) 0) {
-			m = (all $m)
-			keys $m | each [k]{
+			set m = (all $m)
+			keys $m | each { |k|
 				if $m[$k] {
 					set-env $k $m[$k]
 				} else {
