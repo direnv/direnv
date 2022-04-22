@@ -8,10 +8,11 @@ import (
 
 // CmdDeny is `direnv deny [PATH_TO_RC]`
 var CmdDeny = &Cmd{
-	Name:   "deny",
-	Desc:   "Revokes the authorization of a given .envrc or .env",
-	Args:   []string{"[PATH_TO_RC]"},
-	Action: actionWithConfig(cmdDenyAction),
+	Name:    "block",
+	Desc:    "Revokes the authorization of a given .envrc or .env file.",
+	Args:    []string{"[PATH_TO_RC]"},
+	Aliases: []string{"deny", "revoke"},
+	Action:  actionWithConfig(cmdDenyAction),
 }
 
 func cmdDenyAction(env Env, args []string, config *Config) (err error) {

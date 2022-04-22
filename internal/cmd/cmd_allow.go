@@ -8,10 +8,11 @@ import (
 
 // CmdAllow is `direnv allow [PATH_TO_RC]`
 var CmdAllow = &Cmd{
-	Name:   "allow",
-	Desc:   "Grants direnv to load the given .envrc or .env",
-	Args:   []string{"[PATH_TO_RC]"},
-	Action: actionWithConfig(cmdAllowAction),
+	Name:    "allow",
+	Desc:    "Grants direnv permission to load the given .envrc or .env file.",
+	Args:    []string{"[PATH_TO_RC]"},
+	Aliases: []string{"permit", "grant"},
+	Action:  actionWithConfig(cmdAllowAction),
 }
 
 var migrationMessage = `
