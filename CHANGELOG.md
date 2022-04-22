@@ -1,3 +1,7 @@
+UNRELEASED / 2022-04-??
+==================
+  * Add "block" and "revoke" as aliases of the "deny" command (#935)
+  * Add "permit" and "grant" as aliases of the "allow" command (#935)
 
 2.31.0 / 2022-03-26
 ==================
