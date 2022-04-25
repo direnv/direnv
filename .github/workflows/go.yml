@@ -23,7 +23,7 @@ jobs:
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v3.0.1
+      uses: actions/checkout@v3.0.2
 
     - name: Build
       env:
