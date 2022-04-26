@@ -7,8 +7,13 @@ on:
 # TODO: also publish the dist
 name: Create Release
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    permissions:
+      contents: write  # for actions/create-release to create a release
     name: Create Release
     runs-on: ubuntu-latest
     steps:
