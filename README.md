@@ -18,14 +18,11 @@ current directory.
 
 ## How it works
 
-Before each prompt, direnv checks for the existence of a `.envrc` or `.env`
-file in the current and parent directories. If the file exists (and is
-authorized), it is loaded into a **bash** sub-shell and all exported
-variables are then captured by direnv and then made available to the current
-shell.
-
-If both `.envrc` and `.env` files exists, the `.envrc` will always be chosen
-first.
+Before each prompt, direnv checks for the existence of a `.envrc` file (and
+[optionally](man/direnv.toml.1.md#load_dotenv) a `.env` file) in the current
+and parent directories. If the file exists (and is authorized), it is loaded
+into a **bash** sub-shell and all exported variables are then captured by
+direnv and then made available to the current shell.
 
 It supports hooks for all the common shells like bash, zsh, tcsh and fish.
 This allows project-specific environment variables without cluttering the
