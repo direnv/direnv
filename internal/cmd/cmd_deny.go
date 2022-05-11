@@ -8,10 +8,11 @@ import (
 
 // CmdDeny is `direnv deny [PATH_TO_RC]`
 var CmdDeny = &Cmd{
-	Name:   "deny",
-	Desc:   "Revokes the authorization of a given .envrc or .env",
-	Args:   []string{"[PATH_TO_RC]"},
-	Action: actionWithConfig(cmdDenyAction),
+	Name:    "block",
+	Desc:    "Revokes the authorization of a given .envrc or .env file.",
+	Args:    []string{"[PATH_TO_RC]"},
+	Aliases: []string{"deny", "revoke"},
+	Action:  actionWithConfig(cmdDenyAction),
 }
 
 func cmdDenyAction(env Env, args []string, config *Config) (err error) {
@@ -34,7 +35,10 @@ func cmdDenyAction(env Env, args []string, config *Config) (err error) {
 	if err != nil {
 		return err
 	} else if rc == nil {
-		return fmt.Errorf(".envrc or .env file not found")
+		if config.LoadDotenv {
+			return fmt.Errorf(".envrc or .env file not found")
+		}
+		return fmt.Errorf(".envrc file not found")
 	}
 	return rc.Deny()
 }

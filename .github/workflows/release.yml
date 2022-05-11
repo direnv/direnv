@@ -7,17 +7,22 @@ on:
 # TODO: also publish the dist
 name: Create Release
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    permissions:
+      contents: write  # for actions/create-release to create a release
     name: Create Release
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.16
-        uses: actions/setup-go@v2.1.5
+        uses: actions/setup-go@v3.0.0
         with:
           go-version: 1.16
       - name: Checkout code
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
       - name: Get release notes
         id: release-notes
         run: |

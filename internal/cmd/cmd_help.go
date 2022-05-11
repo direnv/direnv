@@ -29,7 +29,13 @@ Available commands
 					fmt.Printf("*%s%s:\n  %s\n", cmd.Name, opts, cmd.Desc)
 				}
 			} else {
-				fmt.Printf("%s%s:\n  %s\n", cmd.Name, opts, cmd.Desc)
+				fmt.Printf("%s%s:\n", cmd.Name, opts)
+				for _, alias := range cmd.Aliases {
+					if alias[0:1] != "-" {
+						fmt.Printf("%s%s:\n", alias, opts)
+					}
+				}
+				fmt.Printf("  %s\n", cmd.Desc)
 			}
 		}
 

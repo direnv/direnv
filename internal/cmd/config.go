@@ -25,7 +25,7 @@ type Config struct {
 	TomlPath        string
 	DisableStdin    bool
 	StrictEnv       bool
-	SkipDotenv      bool
+	LoadDotenv      bool
 	WarnTimeout     time.Duration
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
@@ -51,13 +51,30 @@ type tomlGlobal struct {
 	BashPath     string       `toml:"bash_path"`
 	DisableStdin bool         `toml:"disable_stdin"`
 	StrictEnv    bool         `toml:"strict_env"`
-	SkipDotenv   bool         `toml:"skip_dotenv"`
+	SkipDotenv   bool         `toml:"skip_dotenv"` // deprecated, use load_dotenv
+	LoadDotenv   bool         `toml:"load_dotenv"`
 	WarnTimeout  tomlDuration `toml:"warn_timeout"`
 }
 
 type tomlWhitelist struct {
 	Prefix []string
 	Exact  []string
+}
+
+// Expand a path string prefixed with ~/ to the current user's home directory.
+// Example: if current user is user1 with home directory in /home/user1, then
+// ~/project -> /home/user1/project
+// It's useful to allow paths with ~/, so that direnv.toml can be reused via
+// dotfiles repos across systems with different standard home paths
+// (compare Linux /home and macOS /Users).
+func expandTildePath(path string) (pathExpanded string) {
+	pathExpanded = path
+	if strings.HasPrefix(path, "~/") {
+		if homedir, homedirErr := os.UserHomeDir(); homedirErr == nil {
+			pathExpanded = filepath.Join(homedir, path[2:])
+		}
+	}
+	return pathExpanded
 }
 
 // LoadConfig opens up the direnv configuration from the Env.
@@ -118,20 +135,26 @@ func LoadConfig(env Env) (config *Config, err error) {
 			return
 		}
 
-		config.WhitelistPrefix = append(config.WhitelistPrefix, tomlConf.Whitelist.Prefix...)
+		for _, path := range tomlConf.Whitelist.Prefix {
+			config.WhitelistPrefix = append(config.WhitelistPrefix, expandTildePath(path))
+		}
 
 		for _, path := range tomlConf.Whitelist.Exact {
 			if !(strings.HasSuffix(path, "/.envrc") || strings.HasSuffix(path, "/.env")) {
 				path = filepath.Join(path, ".envrc")
 			}
 
-			config.WhitelistExact[path] = true
+			config.WhitelistExact[expandTildePath(path)] = true
+		}
+
+		if tomlConf.SkipDotenv {
+			logError("skip_dotenv has been inverted to load_dotenv.")
 		}
 
 		config.BashPath = tomlConf.BashPath
 		config.DisableStdin = tomlConf.DisableStdin
+		config.LoadDotenv = tomlConf.LoadDotenv
 		config.StrictEnv = tomlConf.StrictEnv
-		config.SkipDotenv = tomlConf.SkipDotenv
 		config.WarnTimeout = tomlConf.WarnTimeout.Duration
 	}
 

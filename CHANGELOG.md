@@ -1,3 +1,16 @@
+UNRELEASED / 2022-04-??
+==================
+  * Add "block" and "revoke" as aliases of the "deny" command (#935)
+  * Add "permit" and "grant" as aliases of the "allow" command (#935)
+
+2.31.0 / 2022-03-26
+==================
+
+  * Don't load .env files by default (#911)
+  * doc: `~/.config/direnv/direnvrc` is the default
+  * doc: fix the broken link to arch linux (#892)
+  * Re-add accidentally deleted comment line (#881)
+  * fix version test
 
 2.30.3 / 2022-01-05
 ==================

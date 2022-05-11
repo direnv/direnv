@@ -44,20 +44,22 @@ func DetectShell(target string) Shell {
 	switch target {
 	case "bash":
 		return Bash
-	case "zsh":
-		return Zsh
-	case "fish":
-		return Fish
-	case "gzenv":
-		return GzEnv
-	case "vim":
-		return Vim
-	case "tcsh":
-		return Tcsh
-	case "json":
-		return JSON
 	case "elvish":
 		return Elvish
+	case "fish":
+		return Fish
+	case "gha":
+		return GitHubActions
+	case "gzenv":
+		return GzEnv
+	case "json":
+		return JSON
+	case "tcsh":
+		return Tcsh
+	case "vim":
+		return Vim
+	case "zsh":
+		return Zsh
 	}
 
 	return nil
