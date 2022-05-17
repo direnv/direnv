@@ -75,6 +75,11 @@ func cmdFetchURL(env Env, args []string, config *Config) (err error) {
 	}
 	defer resp.Body.Close()
 
+	// Abort if we don't get a 200 back
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("expected status code 200 but got %d", resp.StatusCode)
+	}
+
 	// While copying the content into the temporary location, also calculate the
 	// SRI hash.
 	w := sri.NewWriter(tmpfile, algo)
