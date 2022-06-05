@@ -8,9 +8,7 @@
 # SC1091: Not following: (file missing)
 # SC1117: Backslash is literal in "\n". Prefer explicit escaping: "\\n".
 # SC2059: Don't use variables in the printf format string. Use printf "..%s.." "$foo".
-shopt -s gnu_errfmt
 shopt -s nullglob
-shopt -s extglob
 
 # NOTE: don't touch the RHS, it gets replaced at runtime
 direnv="$(command -v direnv)"
