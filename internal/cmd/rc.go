@@ -12,6 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"mvdan.cc/sh/v3/expand"
+	"mvdan.cc/sh/v3/interp"
+	"mvdan.cc/sh/v3/syntax"
 )
 
 // RC represents the .envrc or .env file
@@ -179,11 +183,78 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		stdin = os.Stdin
 	}
 
+	// Enable strict mode or not
 	prelude := ""
 	if config.StrictEnv {
 		prelude = "set -euo pipefail && "
 	}
 
+	// Use the builtin Bash interpreter
+	if config.BashBuiltin == true || true {
+		var r *interp.Runner
+		var prog *syntax.File
+
+		exec := func(ctx context.Context, args []string) error {
+			// TODO: route direnv calls internally
+			// if args[0] == "direnv" {
+			//  hc := interp.HandlerCtx(ctx)
+			// 	fmt.Fprintln(hc.Stdout, strings.Join(args[2:], args[1]))
+			// 	return nil
+			// }
+
+			return interp.DefaultExecHandler(2*time.Second)(ctx, args)
+		}
+
+		// Create a new interpreter
+		r, err = interp.New(
+			interp.Env(expand.ListEnviron(newEnv.ToGoEnv()...)),
+			interp.StdIO(stdin, os.Stderr, os.Stderr),
+			interp.ExecHandler(exec),
+		)
+		if err != nil {
+			return
+		}
+
+		// Load the stdlib.sh in the interpreter
+		prog, err = syntax.NewParser().Parse(strings.NewReader(getStdlib(config)), "stdlib.sh")
+		if err != nil {
+			return
+		}
+		err = r.Run(ctx, prog)
+		if err != nil {
+			return
+		}
+
+		// Load the rc file
+		// TODO: load the prelude as well
+		prog, err = syntax.NewParser().Parse(
+			strings.NewReader(fmt.Sprintf(`__main__ "%s" "%s"`, fn, rc.Path())),
+			"(source)",
+		)
+		if err != nil {
+			return
+		}
+		err = r.Run(ctx, prog)
+		if err != nil {
+			return
+		}
+
+		// Extract the new environment variables
+		newEnv2 := Env{}
+		for name, vr := range r.Vars {
+			if vr.Exported {
+				newEnv2[name] = vr.String()
+			}
+		}
+		if newEnv2["PS1"] != "" {
+			logError("PS1 cannot be exported. For more information see https://github.com/direnv/direnv/wiki/PS1")
+		}
+		newEnv = newEnv2
+
+		return
+	}
+
+	// Use the system bash interpreter
 	arg := fmt.Sprintf(
 		`%seval "$("%s" stdlib)" && __main__ %s "%s"`,
 		prelude,
@@ -204,9 +275,10 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	if out, err = cmd.Output(); err == nil && len(out) > 0 {
 		var newEnv2 Env
 		newEnv2, err = LoadEnvJSON(out)
-		if err == nil {
-			newEnv = newEnv2
+		if err != nil {
+			return
 		}
+		newEnv = newEnv2
 	}
 
 	return

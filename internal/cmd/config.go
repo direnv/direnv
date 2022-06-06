@@ -20,6 +20,7 @@ type Config struct {
 	CacheDir        string
 	DataDir         string
 	SelfPath        string
+	BashBuiltin     bool
 	BashPath        string
 	RCFile          string
 	TomlPath        string
@@ -48,6 +49,7 @@ type tomlConfig struct {
 }
 
 type tomlGlobal struct {
+	BashBuiltin  bool         `toml:"bash_builtin"`
 	BashPath     string       `toml:"bash_path"`
 	DisableStdin bool         `toml:"disable_stdin"`
 	StrictEnv    bool         `toml:"strict_env"`
@@ -151,6 +153,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 			logError("skip_dotenv has been inverted to load_dotenv.")
 		}
 
+		config.BashBuiltin = tomlConf.BashBuiltin
 		config.BashPath = tomlConf.BashPath
 		config.DisableStdin = tomlConf.DisableStdin
 		config.LoadDotenv = tomlConf.LoadDotenv
