@@ -12,7 +12,7 @@ buildGoModule rec {
   version = lib.fileContents ./version.txt;
   subPackages = [ "." ];
 
-  vendorSha256 = "sha256-20CQ9NtqKHnth1jNzi6OfQAX/W6vuVF0Gaz9N44kgSg=";
+  vendorSha256 = "sha256-gFGGnnR1UNT4MYC411X8NwIqVJZqhnmUlVR+XAnrKY8=";
 
   src = builtins.fetchGit ./.;
 
