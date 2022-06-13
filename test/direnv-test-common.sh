@@ -247,15 +247,6 @@ test_start "skip-env"
   test -z "${SKIPPED}"
 test_stop
 
-test_start "aliases"
-  direnv deny
-  # check that allow/deny aliases work
-  direnv permit && direnv_eval && test -n "${HELLO}"
-  direnv block  && direnv_eval && test -z "${HELLO}"
-  direnv grant  && direnv_eval && test -n "${HELLO}"
-  direnv revoke && direnv_eval && test -z "${HELLO}"
-test_stop
-
 if has python; then
   test_start "python-layout"
     rm -rf .direnv
@@ -279,6 +270,15 @@ if has python; then
     fi
   test_stop
 fi
+
+test_start "aliases"
+  direnv deny
+  # check that allow/deny aliases work
+  direnv permit && direnv_eval && test -n "${HELLO}"
+  direnv block  && direnv_eval && test -z "${HELLO}"
+  direnv grant  && direnv_eval && test -n "${HELLO}"
+  direnv revoke && direnv_eval && test -z "${HELLO}"
+test_stop
 
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
