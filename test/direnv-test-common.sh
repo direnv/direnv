@@ -235,15 +235,25 @@ test_start "load-envrc-before-env"
 test_stop
 
 test_start "load-env"
+  echo "[global]
+load_dotenv = true" > "${XDG_CONFIG_HOME}/direnv/direnv.toml"
+  direnv allow
   direnv_eval
   test_eq "${HELLO}" "world"
 test_stop
 
 test_start "skip-env"
-  echo "[global]
-skip_dotenv = true" > "${XDG_CONFIG_HOME}/direnv/direnv.toml"
   direnv_eval
   test -z "${SKIPPED}"
+test_stop
+
+test_start "aliases"
+  direnv deny
+  # check that allow/deny aliases work
+  direnv permit && direnv_eval && test -n "${HELLO}"
+  direnv block  && direnv_eval && test -z "${HELLO}"
+  direnv grant  && direnv_eval && test -n "${HELLO}"
+  direnv revoke && direnv_eval && test -z "${HELLO}"
 test_stop
 
 if has python; then

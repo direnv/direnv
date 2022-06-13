@@ -12,9 +12,9 @@ buildGoModule rec {
   version = lib.fileContents ./version.txt;
   subPackages = [ "." ];
 
-  vendorSha256 = "sha256-YhgQUl9fdictEtz6J88vEzznGd8Ipeb9AYo/p1ZLz5k=";
+  vendorSha256 = "sha256-gFGGnnR1UNT4MYC411X8NwIqVJZqhnmUlVR+XAnrKY8=";
 
-  src = lib.cleanSource ./.;
+  src = builtins.fetchGit ./.;
 
   # FIXME: find out why there is a Go reference lingering
   allowGoReference = true;

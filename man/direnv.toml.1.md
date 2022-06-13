@@ -9,7 +9,7 @@ direnv.toml - the direnv configuration file
 DESCRIPTION
 -----------
 
-A configuration file in [TOML](https://github.com/toml-lang/toml) format to specify a variety of configuration options for direnv. Read from at CONFIGURATION_DIR/direnv.toml or $DIRENV_CONFIG/direnv.toml. For many users, CONFIGURATION_DIR will be located at $HOME/.config/direnv/direnv.toml.
+A configuration file in [TOML](https://github.com/toml-lang/toml) format to specify a variety of configuration options for direnv. The file is read from `$XDG_CONFIG_HOME/direnv/direnv.toml`.
 
 > For versions v2.21.0 and below use config.toml instead of direnv.toml
 
@@ -42,9 +42,9 @@ This allows one to hard-code the position of bash. It maybe be useful to set thi
 
 If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc` evaluation.
 
-### `skip_dotenv`
+### `load_dotenv`
 
-Don't look for `.env` files, only `.envrc` files.
+Also look for and load `.env` files on top of the `.envrc` files. If both `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
 
 ### `strict_env`
 

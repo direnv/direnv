@@ -1,4 +1,55 @@
 
+2.32.0 / 2022-06-13
+==================
+
+  * feat: Add gha shell for GitHub Actions (#910)
+  * feat: Enable ppc64le builds (#947)
+  * feat: allow conda environment names to be detected from environment.yml (#909)
+  * feat: source_up_if_exists: A strict_env compatible version of source_up (#921)
+  * feat: Expand ~/ in whitelist paths (#931)
+  * feat: Add "block" and "revoke" as aliases of the "deny" command (#935)
+  * feat: Add "permit" and "grant" as aliases of the "allow" command (#935)
+  * fix: update go-dotenv
+  * fix: fetchurl: store files as hex (#930)
+  * fix: fetchurl: only store 200 responses (#944)
+  * fix: Ensure status log messages are printed with normal color (#884)
+  * fix: Clarify handling of .env files (#941)
+  * fix: Update shell_elvish.go (#896)
+  * fix: stdlib.sh: remove dependency on tput (#932)
+  * fix: Use setenv in vim to allow non alphanumeric vars (#901)
+  * fix: install.sh: add information about bin_path (#920)
+  * fix: Treat `mingw*` as windows (direnv/direnv#918) (#919)
+  * fix: man: clarify paths (#929)
+  * fix: installation.md: Fix Fedora package link (#915)
+  * Merge pull request #874 from direnv/refactor
+  * chore: rc: stop using --noprofile --norc
+  * chore: rc: prepare stdin earlier
+  * chore: rc: install interrupt handler earlier
+  * chore: stdlib: factor out stdlib preparation
+  * chore: fix CI
+  * chore: source_env: show full path (#870)
+  * chore: Sort shells in DetectShell
+  * chore: Enable codeql action (#938)
+  * chore: Set permissions for GitHub actions (#937)
+  * go: bump golang.org/x/sys for linux/loong64 support (#946)
+  * build(deps): bump actions/checkout from 2.4.0 to 3.0.0 (#922)
+  * build(deps): bump actions/checkout from 3.0.0 to 3.0.1 (#933)
+  * build(deps): bump actions/checkout from 3.0.1 to 3.0.2 (#936)
+  * build(deps): bump actions/setup-go from 2.1.5 to 3.0.0 (#923)
+  * build(deps): bump actions/setup-go from 3.0.0 to 3.1.0 (#943)
+  * build(deps): bump actions/setup-go from 3.1.0 to 3.2.0 (#950)
+  * build(deps): bump cachix/install-nix-action from 16 to 17 (#925)
+  * build(deps): bump github.com/BurntSushi/toml from 0.4.1 to 1.1.0 (#924)
+
+2.31.0 / 2022-03-26
+==================
+
+  * Don't load .env files by default (#911)
+  * doc: `~/.config/direnv/direnvrc` is the default
+  * doc: fix the broken link to arch linux (#892)
+  * Re-add accidentally deleted comment line (#881)
+  * fix version test
+
 2.30.3 / 2022-01-05
 ==================
 

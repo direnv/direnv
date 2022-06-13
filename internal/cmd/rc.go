@@ -24,7 +24,7 @@ type RC struct {
 
 // FindRC looks for ".envrc" and ".env" files up in the file hierarchy.
 func FindRC(wd string, config *Config) (*RC, error) {
-	rcPath := findEnvUp(wd, config.SkipDotenv)
+	rcPath := findEnvUp(wd, config.LoadDotenv)
 	if rcPath == "" {
 		return nil, nil
 	}
@@ -146,16 +146,37 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
 	}()
 
+	// Abort if the file is not allowed
 	if !rc.Allowed() {
 		err = fmt.Errorf(notAllowed, rc.Path())
 		return
 	}
+
+	// Allow RC loads to be canceled with SIGINT
+	ctx, cancel := context.WithCancel(context.Background())
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		cancel()
+	}()
 
 	// check what type of RC we're processing
 	// use different exec method for each
 	fn := "source_env"
 	if filepath.Base(rc.path) == ".env" {
 		fn = "dotenv"
+	}
+
+	// Set stdin based on the config
+	var stdin *os.File
+	if config.DisableStdin {
+		stdin, err = os.Open(os.DevNull)
+		if err != nil {
+			return
+		}
+	} else {
+		stdin = os.Stdin
 	}
 
 	prelude := ""
@@ -171,32 +192,16 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		rc.Path(),
 	)
 
-	// Allow RC loads to be canceled with SIGINT
-	ctx, cancel := context.WithCancel(context.Background())
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		<-c
-		cancel()
-	}()
-
 	// G204: Subprocess launched with function call as argument or cmd arguments
 	// #nosec
-	cmd := exec.CommandContext(ctx, config.BashPath, "--noprofile", "--norc", "-c", arg)
+	cmd := exec.CommandContext(ctx, config.BashPath, "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
+	cmd.Stdin = stdin
 	cmd.Stderr = os.Stderr
 
-	if config.DisableStdin {
-		cmd.Stdin, err = os.Open(os.DevNull)
-		if err != nil {
-			return
-		}
-	} else {
-		cmd.Stdin = os.Stdin
-	}
-
-	if out, err := cmd.Output(); err == nil && len(out) > 0 {
+	var out []byte
+	if out, err = cmd.Output(); err == nil && len(out) > 0 {
 		var newEnv2 Env
 		newEnv2, err = LoadEnvJSON(out)
 		if err == nil {
@@ -287,12 +292,11 @@ func allow(path string, allowPath string) (err error) {
 	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
 }
 
-func findEnvUp(searchDir string, skipDotenv bool) (path string) {
-	if skipDotenv {
-		return findUp(searchDir, ".envrc")
+func findEnvUp(searchDir string, loadDotenv bool) (path string) {
+	if loadDotenv {
+		return findUp(searchDir, ".envrc", ".env")
 	}
-
-	return findUp(searchDir, ".envrc", ".env")
+	return findUp(searchDir, ".envrc")
 }
 
 func findUp(searchDir string, fileNames ...string) (path string) {
