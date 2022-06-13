@@ -816,7 +816,9 @@ layout_python() {
     fi
 
     if [[ -n $VIRTUAL_ENV ]]; then
-      VIRTUAL_ENV=$(realpath "${VIRTUAL_ENV}")
+      local REPLY
+      realpath.absolute "$VIRTUAL_ENV"
+      VIRTUAL_ENV=$REPLY
     else
       VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
     fi
