@@ -25,6 +25,13 @@ jobs:
         go-version: 1.16
       id: go
 
+    - name: Set up Python
+      if: runner.os != 'Windows'
+      uses: actions/setup-python@v4.0.0
+      with:
+        python-version: "3.9"
+      id: python
+
     - name: Check out code into the Go module directory
       uses: actions/checkout@v3.0.2
 

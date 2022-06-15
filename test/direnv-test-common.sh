@@ -247,6 +247,30 @@ test_start "skip-env"
   test -z "${SKIPPED}"
 test_stop
 
+if has python; then
+  test_start "python-layout"
+    rm -rf .direnv
+
+    direnv_eval
+    test -n "${VIRTUAL_ENV:-}"
+
+    if [[ ":$PATH:" != *":${VIRTUAL_ENV}/bin:"* ]]; then
+      echo "FAILED: VIRTUAL_ENV/bin not added to PATH"
+      exit 1
+    fi
+  test_stop
+
+  test_start "python-custom-virtual-env"
+    direnv_eval
+    test "${VIRTUAL_ENV:-}" -ef ./foo
+
+    if [[ ":$PATH:" != *":${PWD}/foo/bin:"* ]]; then
+      echo "FAILED: VIRTUAL_ENV/bin not added to PATH"
+      exit 1
+    fi
+  test_stop
+fi
+
 test_start "aliases"
   direnv deny
   # check that allow/deny aliases work
