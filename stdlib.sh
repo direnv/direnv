@@ -815,7 +815,7 @@ layout_python() {
       return 1
     fi
 
-    if [[ -n $VIRTUAL_ENV ]]; then
+    if [[ -n "${VIRTUAL_ENV:-}" ]]; then
       local REPLY
       realpath.absolute "$VIRTUAL_ENV"
       VIRTUAL_ENV=$REPLY
