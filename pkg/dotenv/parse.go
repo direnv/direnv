@@ -60,11 +60,7 @@ func Parse(data string) (map[string]string, error) {
 		key := match[1]
 		value := match[2]
 
-		err := parseValue(key, value, dotenv)
-
-		if err != nil {
-			return nil, fmt.Errorf("unable to parse %s, %s: %s", key, value, err)
-		}
+		parseValue(key, value, dotenv)
 	}
 
 	return dotenv, nil
@@ -79,10 +75,10 @@ func MustParse(data string) map[string]string {
 	return env
 }
 
-func parseValue(key string, value string, dotenv map[string]string) error {
+func parseValue(key string, value string, dotenv map[string]string) {
 	if len(value) <= 1 {
 		dotenv[key] = value
-		return nil
+		return
 	}
 
 	singleQuoted := false
@@ -102,7 +98,6 @@ func parseValue(key string, value string, dotenv map[string]string) error {
 	}
 
 	dotenv[key] = value
-	return nil
 }
 
 var escRe = regexp.MustCompile("\\\\([^$])")
@@ -124,9 +119,8 @@ func expandEnv(value string, dotenv map[string]string) string {
 
 		if found {
 			return expanded
-		} else {
-			return getFromEnvOrDefault(envKey, defaultValue, hasDefault)
 		}
+		return getFromEnvOrDefault(envKey, defaultValue, hasDefault)
 	}
 
 	return os.Expand(value, expander)
@@ -137,9 +131,8 @@ func splitKeyAndDefault(value string, sep string) (string, string, bool) {
 
 	if i == -1 {
 		return value, "", false
-	} else {
-		return value[0:i], value[i+len(sep):], true
 	}
+	return value[0:i], value[i+len(sep):], true
 }
 
 func lookupDotenv(value string, dotenv map[string]string) (string, bool) {
@@ -152,7 +145,6 @@ func getFromEnvOrDefault(envKey string, defaultValue string, hasDefault bool) st
 
 	if len(envValue) == 0 && hasDefault {
 		return defaultValue
-	} else {
-		return envValue
 	}
+	return envValue
 }

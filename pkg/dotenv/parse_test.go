@@ -23,7 +23,7 @@ func envShouldContain(t *testing.T, env map[string]string, key string, value str
 //   https://github.com/bkeepers/dotenv/blob/master/lib/dotenv/environment.rb
 // TODO: support shell variable expansions
 
-const TEST_EXPORTED = `export OPTION_A=2
+const TestExportedEnv = `export OPTION_A=2
 export OPTION_B='\n' # foo
 #export OPTION_C=3
 export OPTION_D=
@@ -31,7 +31,7 @@ export OPTION_E="foo"
 `
 
 func TestDotEnvExported(t *testing.T) {
-	env := dotenv.MustParse(TEST_EXPORTED)
+	env := dotenv.MustParse(TestExportedEnv)
 	shouldNotHaveEmptyKey(t, env)
 
 	if env["OPTION_A"] != "2" {
@@ -51,7 +51,7 @@ func TestDotEnvExported(t *testing.T) {
 	}
 }
 
-const TEST_PLAIN = `OPTION_A=1
+const TestPlainEnv = `OPTION_A=1
 OPTION_B=2
 OPTION_C= 3
 OPTION_D =4
@@ -62,7 +62,7 @@ SMTP_ADDRESS=smtp    # This is a comment
 `
 
 func TestDotEnvPlain(t *testing.T) {
-	env := dotenv.MustParse(TEST_PLAIN)
+	env := dotenv.MustParse(TestPlainEnv)
 	shouldNotHaveEmptyKey(t, env)
 
 	if env["OPTION_A"] != "1" {
@@ -91,10 +91,10 @@ func TestDotEnvPlain(t *testing.T) {
 	}
 }
 
-const TEST_SOLO_EMPTY = "SOME_VAR="
+const TestSoloEmptyEnv = "SOME_VAR="
 
 func TestSoloEmpty(t *testing.T) {
-	env := dotenv.MustParse(TEST_SOLO_EMPTY)
+	env := dotenv.MustParse(TestSoloEmptyEnv)
 	shouldNotHaveEmptyKey(t, env)
 
 	v, ok := env["SOME_VAR"]
@@ -106,7 +106,7 @@ func TestSoloEmpty(t *testing.T) {
 	}
 }
 
-const TEST_QUOTED = `OPTION_A='1'
+const TestQuotedEnv = `OPTION_A='1'
 OPTION_B='2'
 OPTION_C=''
 OPTION_D='\n'
@@ -118,7 +118,7 @@ OPTION_H="\n"
 `
 
 func TestDotEnvQuoted(t *testing.T) {
-	env := dotenv.MustParse(TEST_QUOTED)
+	env := dotenv.MustParse(TestQuotedEnv)
 	shouldNotHaveEmptyKey(t, env)
 
 	if env["OPTION_A"] != "1" {
@@ -150,7 +150,7 @@ func TestDotEnvQuoted(t *testing.T) {
 	}
 }
 
-const TEST_YAML = `OPTION_A: 1
+const TestYAMLEnv = `OPTION_A: 1
 OPTION_B: '2'
 OPTION_C: ''
 OPTION_D: '\n'
@@ -159,7 +159,7 @@ OPTION_F:
 `
 
 func TestDotEnvYAML(t *testing.T) {
-	env := dotenv.MustParse(TEST_YAML)
+	env := dotenv.MustParse(TestYAMLEnv)
 	shouldNotHaveEmptyKey(t, env)
 
 	if env["OPTION_A"] != "1" {
@@ -192,13 +192,13 @@ func TestFailingMustParse(t *testing.T) {
 	dotenv.MustParse("...")
 }
 
-const TEST_COMMENT_OVERRIDE = `
+const TestCommentOverrideEnv = `
 VARIABLE=value
 #VARIABLE=disabled_value
 `
 
 func TestCommentOverride(t *testing.T) {
-	env := dotenv.MustParse(TEST_COMMENT_OVERRIDE)
+	env := dotenv.MustParse(TestCommentOverrideEnv)
 	shouldNotHaveEmptyKey(t, env)
 
 	if env["VARIABLE"] != "value" {
@@ -206,7 +206,7 @@ func TestCommentOverride(t *testing.T) {
 	}
 }
 
-const TEST_VARIABLE_EXPANSION = `
+const TestVariableExpansionEnv = `
 OPTION_A=$FOO
 OPTION_B="$FOO"
 OPTION_C=${FOO}
@@ -242,7 +242,7 @@ func TestVariableExpansion(t *testing.T) {
 		t.Fatalf("unable to set environment variable for testing: %s", err)
 	}
 
-	env := dotenv.MustParse(TEST_VARIABLE_EXPANSION)
+	env := dotenv.MustParse(TestVariableExpansionEnv)
 	shouldNotHaveEmptyKey(t, env)
 
 	envShouldContain(t, env, "OPTION_A", "foo")
@@ -274,7 +274,7 @@ func TestVariableExpansion(t *testing.T) {
 	envShouldContain(t, env, "OPTION_A1", "foo/bar/foo/bar/foo")
 }
 
-const TEST_VARIABLE_EXPANSION_WITH_DEFAULTS = `
+const TestVariableExpansionWithDefaultsEnv = `
 OPTION_A="${FOO:-}"
 OPTION_B="${FOO:-default}"
 OPTION_C='${FOO:-default}'
@@ -302,7 +302,7 @@ func TestVariableExpansionWithDefaults(t *testing.T) {
 		t.Fatalf("unable to set environment variable for testing: %s", err)
 	}
 
-	env := dotenv.MustParse(TEST_VARIABLE_EXPANSION_WITH_DEFAULTS)
+	env := dotenv.MustParse(TestVariableExpansionWithDefaultsEnv)
 	shouldNotHaveEmptyKey(t, env)
 
 	envShouldContain(t, env, "OPTION_A", "foo")
