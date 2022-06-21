@@ -1,4 +1,10 @@
 
+2.32.1 / 2022-06-21
+==================
+
+  * feat: Support custom VIRTUAL_ENV for layout_python (#876)
+  * fix: vendor go-dotenv (#955)
+
 2.32.0 / 2022-06-13
 ==================
 
