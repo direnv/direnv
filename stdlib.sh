@@ -134,8 +134,10 @@ direnv_layout_dir() {
 #
 log_status() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg=$*
-    local color_normal="\e[m"
+    local msg=$* color_normal=''
+    if [[ -t 2 ]]; then
+      color_normal="\e[m"
+    fi
     # shellcheck disable=SC2059,SC1117
     printf "${color_normal}${DIRENV_LOG_FORMAT}\n" "$msg" >&2
   fi
@@ -154,9 +156,11 @@ log_status() {
 
 log_error() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg=$*
-    local color_normal="\e[m"
-    local color_error="\e[38;5;1m"
+    local msg=$* color_normal='' color_error=''
+    if [[ -t 2 ]]; then
+      color_normal="\e[m"
+      color_error="\e[38;5;1m"
+    fi
     # shellcheck disable=SC2059,SC1117
     printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
   fi
