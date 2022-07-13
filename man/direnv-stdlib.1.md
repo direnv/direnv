@@ -255,6 +255,12 @@ Similar to `layout python`, but uses Pipenv to build a virtualenv from the `Pipf
 
 Note that unlike invoking Pipenv manually, this does not load environment variables from a `.env` file automatically. You may want to add `dotenv .env` to copy that behavior.
 
+### `layout pyenv [<version> ...]`
+
+Similar to `layout python`, but uses pyenv to build a virtualenv with the specified Python interpreter version.
+
+Multiple versions may be specified separated by spaces; please refer to the pyenv documentation for more information.
+
 ### `layout python [<python_exe>]`
 
 Creates and loads a virtualenv environment under `$PWD/.direnv/python-$python_version`. This forces the installation of any egg into the project's sub-folder.
