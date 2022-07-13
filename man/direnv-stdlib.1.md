@@ -105,7 +105,15 @@ Example:
 
 ### `source_up [<filename>]`
 
-Loads another `.envrc` if found when searching from the parent directory up to /.
+Loads another `.envrc` if found with the find_up command. Returns 1 if no file
+is found.
+
+NOTE: the other `.envrc` is not checked by the security framework.
+
+### `source_up_if_exists [<filename>]`
+
+Loads another `.envrc` if found with the find_up command. If one is not
+found, nothing happens.
 
 NOTE: the other `.envrc` is not checked by the security framework.
 
