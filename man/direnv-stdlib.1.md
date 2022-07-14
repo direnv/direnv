@@ -105,7 +105,15 @@ Example:
 
 ### `source_up [<filename>]`
 
-Loads another `.envrc` if found when searching from the parent directory up to /.
+Loads another `.envrc` if found with the find_up command. Returns 1 if no file
+is found.
+
+NOTE: the other `.envrc` is not checked by the security framework.
+
+### `source_up_if_exists [<filename>]`
+
+Loads another `.envrc` if found with the find_up command. If one is not
+found, nothing happens.
 
 NOTE: the other `.envrc` is not checked by the security framework.
 
@@ -246,6 +254,12 @@ Setup environment variables required by perl's local::lib See http://search.cpan
 Similar to `layout python`, but uses Pipenv to build a virtualenv from the `Pipfile` located in the same directory. The path can be overridden by the `PIPENV_PIPFILE` environment variable.
 
 Note that unlike invoking Pipenv manually, this does not load environment variables from a `.env` file automatically. You may want to add `dotenv .env` to copy that behavior.
+
+### `layout pyenv [<version> ...]`
+
+Similar to `layout python`, but uses pyenv to build a virtualenv with the specified Python interpreter version.
+
+Multiple versions may be specified separated by spaces; please refer to the pyenv documentation for more information.
 
 ### `layout python [<python_exe>]`
 
