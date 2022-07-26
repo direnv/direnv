@@ -280,6 +280,12 @@ test_start "aliases"
   direnv revoke && direnv_eval && test -z "${HELLO}"
 test_stop
 
+# shellcheck disable=SC2016
+test_start '$test'
+  direnv_eval
+  [[ $FOO = bar ]]
+test_stop
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.
