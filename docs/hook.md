@@ -40,6 +40,16 @@ set -g direnv_fish_mode eval_after_arrow # trigger direnv at prompt, and only af
 set -g direnv_fish_mode disable_arrow    # trigger direnv at prompt only, this is similar functionality to the original behavior
 ```
 
+## Autocomplete
+
+You can get IDE-style autocompletions for direnv with <a href="https://fig.io/" target="_blank"><img src="https://fig.io/badges/Logo.svg" width="15" height="15"/></a> [Fig](https://fig.io/). It works in bash, zsh, and fish.
+
+To install, run:
+
+```shell
+brew install fig
+```
+
 ## TCSH
 
 Add the following line at the end of the `~/.cshrc` file:
