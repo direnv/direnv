@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - name: Set up Go
-      uses: actions/setup-go@v3.2.1
+      uses: actions/setup-go@v3.3.0
       with:
         go-version: 1.16
       id: go
