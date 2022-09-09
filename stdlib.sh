@@ -134,9 +134,12 @@ direnv_layout_dir() {
 #
 log_status() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg=$*
+    local msg=$* color_normal=''
+    if [[ -t 2 ]]; then
+      color_normal="\e[m"
+    fi
     # shellcheck disable=SC2059,SC1117
-    printf "${DIRENV_LOG_FORMAT}\n" "$msg" >&2
+    printf "${color_normal}${DIRENV_LOG_FORMAT}\n" "$msg" >&2
   fi
 }
 
@@ -152,10 +155,12 @@ log_status() {
 #    log_error "Unable to find specified directory!"
 
 log_error() {
-  local color_normal="\e[m"
-  local color_error="\e[38;5;1m"
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg=$*
+    local msg=$* color_normal='' color_error=''
+    if [[ -t 2 ]]; then
+      color_normal="\e[m"
+      color_error="\e[38;5;1m"
+    fi
     # shellcheck disable=SC2059,SC1117
     printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
   fi
@@ -788,9 +793,10 @@ layout_php() {
 
 # Usage: layout python <python_exe>
 #
-# Creates and loads a virtual environment under
+# Creates and loads a virtual environment.
+# You can specify the path of the virtual environment through VIRTUAL_ENV
+# environment variable, otherwise it will be set to
 # "$direnv_layout_dir/python-$python_version".
-# This forces the installation of any egg into the project's sub-folder.
 # For python older then 3.3 this requires virtualenv to be installed.
 #
 # It's possible to specify the python executable if you want to use different
@@ -813,7 +819,13 @@ layout_python() {
       return 1
     fi
 
-    VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
+    if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+      local REPLY
+      realpath.absolute "$VIRTUAL_ENV"
+      VIRTUAL_ENV=$REPLY
+    else
+      VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
+    fi
     case $ve in
       "venv")
         if [[ ! -d $VIRTUAL_ENV ]]; then
@@ -851,17 +863,26 @@ layout_python3() {
   layout_python python3 "$@"
 }
 
-# Usage: layout anaconda <env_name_or_prefix> [<conda_exe>]
+# Usage: layout anaconda <env_spec> [<conda_exe>]
 #
-# Activates anaconda for the named environment or prefix. If the environment
-# hasn't been created, it will be using the environment.yml file in
-# the current directory. <conda_exe> is optional and will default to
-# the one found in the system environment.
+# Activates anaconda for the provided environment.
+# The <env_spec> can be one of the following:
+#   1. Name of an environment
+#   2. Prefix path to an environment
+#   3. Path to a yml-formatted file specifying the environment
+#
+# Environment creation will use environment.yml, if
+# available, when a name or prefix is provided. Otherwise,
+# an empty environment will be created.
+#
+# <conda_exe> is optional and will default to the one
+# found in the system environment.
 #
 layout_anaconda() {
-  local env_name_or_prefix=$1
+  local env_spec=$1
   local env_name
   local env_loc
+  local env_config
   local conda
   local REPLY
   if [[ $# -gt 1 ]]; then
@@ -871,44 +892,70 @@ layout_anaconda() {
   fi
   realpath.dirname "$conda"
   PATH_add "$REPLY"
-  if [[ "${env_name_or_prefix%%/*}" == "." ]]; then
-    # "./foo" relative prefix
-    realpath.absolute "$env_name_or_prefix"
-    env_loc="$REPLY"
-  elif [[ ! "$env_name_or_prefix" == "${env_name_or_prefix#/}" ]]; then
-    # "/foo" absolute prefix
-    env_loc="$env_name_or_prefix"
-  else
-    # "foo" name
-    # if no name was passed, try to parse it from local environment.yml
-    if [[ -n "$env_name_or_prefix" ]]; then
-      env_name="$env_name_or_prefix"
-    elif [[ -e environment.yml ]]; then
-      env_name_grep_match="$(grep -- '^name:' environment.yml)"
-      env_name="${env_name_grep_match/#name:*([[:space:]])}"
-    fi
 
-    if [[ -z "$env_name" ]]; then
-      log_error "Could not determine conda env name (set in environment.yml or pass explicitly)"
+  if [[ "${env_spec##*.}" == "yml" ]]; then
+    env_config=$env_spec
+  elif [[ "${env_spec%%/*}" == "." ]]; then
+    # "./foo" relative prefix
+    realpath.absolute "$env_spec"
+    env_loc="$REPLY"
+  elif [[ ! "$env_spec" == "${env_spec#/}" ]]; then
+    # "/foo" absolute prefix
+    env_loc="$env_spec"
+  elif [[ -n "$env_spec" ]]; then
+    # "name" specified
+    env_name="$env_spec"
+  else
+    # Need at least one
+    env_config=environment.yml
+  fi
+
+  # If only config, it needs a name field
+  if [[ -n "$env_config" ]]; then
+    if [[ -e "$env_config" ]]; then
+      env_name="$(grep -- '^name:' $env_config)"
+      env_name="${env_name/#name:*([[:space:]])}"
+      if [[ -z "$env_name" ]]; then
+        log_error "Unable to find 'name' in '$env_config'"
+        return 1
+      fi
+    else
+      log_error "Unable to find config '$env_config'"
       return 1
     fi
+  fi
 
+  # Try to find location based on name
+  if [[ -z "$env_loc" ]]; then
+    # Update location if already created
     env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
     env_loc="${env_loc##* }"
   fi
+
+  # Check for environment existence
   if [[ ! -d "$env_loc" ]]; then
-    if [[ -e environment.yml ]]; then
-      log_status "creating conda environment"
-      if [[ -n "$env_name" ]]; then
-        "$conda" env create --name "$env_name"
-        env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
-        env_loc="/${env_loc##* /}"
+
+    # Create if necessary
+    if [[ -z "$env_config" ]] && [[ -n "$env_name" ]]; then
+      if [[ -e environment.yml ]]; then
+        "$conda" env create --file environment.yml --name "$env_name"
       else
-        "$conda" env create --prefix "$env_loc"
+        "$conda" create -y --name "$env_name"
       fi
-    else
-      log_error "Could not find environment.yml"
-      return 1
+    elif [[ -n "$env_config" ]]; then
+      "$conda" env create --file "$env_config"
+    elif [[ -n "$env_loc" ]]; then
+      if [[ -e environment.yml ]]; then
+        "$conda" env create --file environment.yml --prefix "$env_loc"
+      else
+        "$conda" create -y --prefix "$env_loc"
+      fi
+    fi
+
+    if [[ -z "$env_loc" ]]; then
+      # Update location if already created
+      env_loc=$("$conda" env list | grep -- '^'"$env_name"'\s')
+      env_loc="${env_loc##* }"
     fi
   fi
 
@@ -945,7 +992,9 @@ layout_pipenv() {
 #
 #    layout pyenv 3.6.7
 #
-# Uses pyenv and layout_python to create and load a virtual environment under
+# Uses pyenv and layout_python to create and load a virtual environment.
+# You can specify the path of the virtual environment through VIRTUAL_ENV
+# environment variable, otherwise it will be set to
 # "$direnv_layout_dir/python-$python_version".
 #
 layout_pyenv() {

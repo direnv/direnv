@@ -185,11 +185,11 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	}
 
 	arg := fmt.Sprintf(
-		`%seval "$("%s" stdlib)" && __main__ %s "%s"`,
+		`%seval "$("%s" stdlib)" && __main__ %s %s`,
 		prelude,
 		direnv,
 		fn,
-		rc.Path(),
+		BashEscape(rc.Path()),
 	)
 
 	// G204: Subprocess launched with function call as argument or cmd arguments

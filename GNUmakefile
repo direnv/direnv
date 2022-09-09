@@ -169,6 +169,7 @@ dist:
 		-osarch linux/mips64le \
 		-osarch linux/mipsle \
 		-osarch linux/ppc64 \
+		-osarch linux/ppc64le \
 		-osarch linux/s390x \
 		-osarch netbsd/386 \
 		-osarch netbsd/amd64 \

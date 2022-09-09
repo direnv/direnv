@@ -171,6 +171,7 @@ submit new ones.
 * [asdf](https://github.com/asdf-vm/asdf) - a pure bash solution that has a plugin system. The [asdf-direnv](https://github.com/asdf-community/asdf-direnv) plugin allows using asdf managed tools with direnv.
 * [ondir](https://github.com/alecthomas/ondir) - OnDir is a small program to automate tasks specific to certain directories
 * [shadowenv](https://shopify.github.io/shadowenv/) - uses an s-expression format to define environment changes that should be executed
+* [quickenv](https://github.com/untitaker/quickenv) - an alternative loader for `.envrc` files that does not hook into your shell and favors speed over convenience.
 
 ## COPYRIGHT
 
