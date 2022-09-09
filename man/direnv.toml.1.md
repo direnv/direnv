@@ -9,7 +9,7 @@ direnv.toml - the direnv configuration file
 DESCRIPTION
 -----------
 
-A configuration file in [TOML](https://github.com/toml-lang/toml) format to specify a variety of configuration options for direnv. The file is read from `$XDG_CONFIG_HOME/direnv/direnv.toml`.
+A configuration file in [TOML](https://github.com/toml-lang/toml) format to specify a variety of configuration options for direnv. The file is read from `$XDG_CONFIG_HOME/direnv/direnv.toml` (typically ~/.config/direnv/direnv.toml).
 
 > For versions v2.21.0 and below use config.toml instead of direnv.toml
 
