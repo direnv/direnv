@@ -1387,16 +1387,21 @@ __main__() {
     done
   done
 
+  # By default load the legacy ~/.direnvrc
+  local load_legacy=1
+
   # load global direnvrc's if present
   for direnv_config_dir in "${direnv_config_dirs[@]}"; do
     if [[ -f $direnv_config_dir/direnvrc ]]; then
       # shellcheck disable=SC1090,SC1091
       source "$direnv_config_dir/direnvrc" >&2
+      # Don't load legacy ~/.direnvrc if a new-style direnvrc exists
+      load_legacy=
     fi
   done
 
   # Legacy .direnvrc
-  if [[ -f $HOME/.direnvrc ]]; then
+  if [[ -n "$load_legacy" && -f $HOME/.direnvrc ]]; then
     # shellcheck disable=SC1090,SC1091
     source "$HOME/.direnvrc" >&2
   fi
