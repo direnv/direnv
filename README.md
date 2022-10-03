@@ -19,7 +19,7 @@ current directory.
 ## How it works
 
 Before each prompt, direnv checks for the existence of a `.envrc` file (and
-[optionally](man/direnv.toml.1.md#load_dotenv) a `.env` file) in the current
+[optionally](man/direnv.toml.1.md#codeloaddotenvcode) a `.env` file) in the current
 and parent directories. If the file exists (and is authorized), it is loaded
 into a **bash** sub-shell and all exported variables are then captured by
 direnv and then made available to the current shell.
