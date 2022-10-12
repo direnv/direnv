@@ -20,15 +20,12 @@ DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
 
 # Where direnv configuration should be stored
 IFS=: xdg_config_dirs=( ${XDG_CONFIG_DIRS:-/etc/xdg} )
-xdg_config_dirs+=( "${XDG_CONFIG_HOME:-$HOME/.config}" )
 
 declare -a direnv_config_dirs
 for dir in "${xdg_config_dirs[@]}"; do
   direnv_config_dirs+=( "$dir/direnv" )
 done
-if [[ -n "$DIRENV_CONFIG" ]]; then
-  direnv_config_dirs+=( "$DIRENV_CONFIG" )
-fi
+direnv_config_dirs+=( "${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}" )
 
 # This variable can be used by programs to detect when they are running inside
 # of a .envrc evaluation context. It is ignored by the direnv diffing
