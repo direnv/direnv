@@ -986,6 +986,42 @@ layout_pipenv() {
   export VIRTUAL_ENV
 }
 
+# Usage: layout poetry
+#
+# Similar to layout_python, but uses Poetry [1] to build a virtualenv from the
+# pyproject.toml [2] located in the same directory.
+#
+# Poetry by default will create a virtual environment under
+# {cache-dir}/virtualenvs where cache-dir equates to $XDG_CACHE_HOME/pypoetry
+# or use the {project-dir}/.venv directory when one is available.
+#
+# [1]: https://python-poetry.org/
+# [2]: https://peps.python.org/pep-0518/
+#
+layout_poetry() {
+    PYPROJECT_TOML="${PYPROJECT_TOML:-pyproject.toml}"
+    if [[ ! -f "$PYPROJECT_TOML" ]]; then
+        log_status "No pyproject.toml found. Executing \`poetry init\` to create a \`$PYPROJECT_TOML\` first."
+        poetry init
+    fi
+
+    if [[ -d ".venv" ]]; then
+        VIRTUAL_ENV="$(pwd)/.venv"
+    else
+        VIRTUAL_ENV=$(poetry env info --path 2>/dev/null ; true)
+    fi
+
+    if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
+        log_status "No virtual environment exists. Executing \`poetry install\` to create one."
+        poetry install
+        VIRTUAL_ENV=$(poetry env info --path)
+    fi
+
+    PATH_add "$VIRTUAL_ENV/bin"
+    export POETRY_ACTIVE=1
+    export VIRTUAL_ENV
+}
+
 # Usage: layout pyenv <python version number> [<python version number> ...]
 #
 # Example:

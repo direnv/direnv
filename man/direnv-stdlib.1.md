@@ -255,6 +255,10 @@ Similar to `layout python`, but uses Pipenv to build a virtualenv from the `Pipf
 
 Note that unlike invoking Pipenv manually, this does not load environment variables from a `.env` file automatically. You may want to add `dotenv .env` to copy that behavior.
 
+### `layout poetry`
+
+Similar to `layout python`, but uses Poetry to build a virtualenv from the `pyproject.toml` located in the same directory.
+
 ### `layout pyenv [<version> ...]`
 
 Similar to `layout python`, but uses pyenv to build a virtualenv with the specified Python interpreter version.
