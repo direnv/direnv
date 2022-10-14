@@ -5,4 +5,4 @@
 
 GZIP_HEADER="\x1f\x8b\x08\x00\x00\x00\x00\x00"
 
-(printf $GZIP_HEADER; echo $DIRENV_DIFF | base64 -D) | gzip -dc | python -mjson.tool
+(printf $GZIP_HEADER; echo $DIRENV_DIFF | base64 -d) | gzip -dc | python -mjson.tool
