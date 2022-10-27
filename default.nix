@@ -16,13 +16,15 @@ buildGoModule rec {
 
   src = builtins.fetchGit ./.;
 
-  # FIXME: find out why there is a Go reference lingering
-  allowGoReference = true;
-
   # we have no bash at the moment for windows
-  makeFlags = lib.optional (!stdenv.hostPlatform.isWindows) [
-    "BASH_PATH=${bash}/bin/bash"
-  ];
+  BASH_PATH =
+    lib.optionalString (!stdenv.hostPlatform.isWindows)
+    "${bash}/bin/bash";
+
+  # replace the build phase to use the GNUMakefile instead
+  buildPhase = ''
+    make BASH_PATH=$BASH_PATH
+  '';
 
   installPhase = ''
     make install PREFIX=$out
