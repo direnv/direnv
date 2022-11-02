@@ -13,6 +13,7 @@ unsetenv DIRENV_DIR
 unsetenv DIRENV_FILE
 unsetenv DIRENV_WATCHES
 unsetenv DIRENV_DIFF
+unsetenv DIRENV_STATUS
 
 alias direnv_eval 'eval `direnv export tcsh`'
 
