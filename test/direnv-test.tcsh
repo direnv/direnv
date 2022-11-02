@@ -11,7 +11,6 @@ setenv DIRENV_CONFIG $PWD
 unsetenv DIRENV_BASH
 unsetenv DIRENV_DIR
 unsetenv DIRENV_FILE
-unsetenv DIRENV_MTIME
 unsetenv DIRENV_WATCHES
 unsetenv DIRENV_DIFF
 

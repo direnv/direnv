@@ -39,7 +39,6 @@ set -e DIRENV_BASH
 set -e DIRENV_DIR
 set -e DIRENV_FILE
 set -e DIRENV_WATCHES
-set -e DIRENV_MTIME
 set -e DIRENV_DIFF
 
 function direnv_eval
