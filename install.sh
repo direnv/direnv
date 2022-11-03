@@ -69,11 +69,12 @@ set -euo pipefail
   fi
   echo "bin_path=$bin_path"
 
-  if [[ -n "$version" ]]; then
+  if [[ -n "${version:-}" ]]; then
     release="tags/${version}"
   else
     release="latest"
   fi
+  echo "release=$release"
 
   log "looking for a download URL"
   download_url=$(
