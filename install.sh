@@ -87,7 +87,7 @@ set -euo pipefail
 
   log "downloading"
   curl -o "$bin_path/direnv" -fL "$download_url"
-  chmod +x "$bin_path/direnv"
+  chmod a+x "$bin_path/direnv"
 
   cat <<DONE
 
