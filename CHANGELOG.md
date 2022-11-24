@@ -1,4 +1,22 @@
 
+2.32.2 / 2022-11-24
+==================
+
+  * doc: Add stdlib's layout_pyenv to docs (#969)
+  * doc: Fix broken link (#991)
+  * doc: Minor typo fix (#1013)
+  * doc: `$XDG_CONFIG_HOME/direnv/direnv.toml` => add (typically ~/.config/direnv/direnv.toml) (#985)
+  * doc: add quickenv to Related projects (#970)
+  * feat: Update layout anaconda to accept a path to a yml file (#962)
+  * feat: install.sh: can specify direnv version (#1012)
+  * fix: elvish: replace deprecated `except` with `catch` (#987)
+  * fix: installer.sh: make direnv executable for all
+  * fix: path escaping (#975)
+  * fix: stdlib: only use ANSI escape on TTY (#958)
+  * fix: test: remove mentions of DIRENV_MTIME (#1009)
+  * fix: test: use lowercase -d flag for base64 decoding of DIRENV_DIFF (#996)
+  * update: build(deps): bump github.com/BurntSushi/toml from 1.1.0 to 1.2.0 (#974)
+
 2.32.1 / 2022-06-21
 ==================
 
