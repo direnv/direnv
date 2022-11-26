@@ -1037,7 +1037,7 @@ layout_pdm() {
 
     if [ -z "$VIRTUAL_ENV" ] || [ ! -d "$VIRTUAL_ENV" ]; then
         log_status "No virtual environment exists. Executing \`pdm info\` to create one."
-	      pdm info
+	pdm info
         VIRTUAL_ENV=$(pdm venv list | grep "^\*"  | awk -F" " '{print $3}')
     fi
 
