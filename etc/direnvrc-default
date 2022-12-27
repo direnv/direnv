@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# ---------------------------------------------------------------------------
+# This is the system-wide direnv runtime configuration file
+# Remove the '-default' suffix to activate!
+# ---------------------------------------------------------------------------

@@ -178,8 +178,10 @@ things.
 Exporting variables by hand is a bit repetitive so direnv provides a set of
 utility functions that are made available in the context of the \fB\fC\&.envrc\fR file.
 Check the direnv-stdlib(1) man page for more details. You can also define your
-own extensions inside \fB\fC$XDG_CONFIG_HOME/direnv/direnvrc\fR or
-\fB\fC$XDG_CONFIG_HOME/direnv/lib/*.sh\fR files.
+user-specific extensions inside \fB\fC$DIRENV_CONFIG/direnvrc\fR or
+\fB\fC$DIRENV_CONFIG/lib/*.sh\fR files. Additionally system-wide extensions can be
+placed in  \fB\fC$DIRENV_SYSCONFIG/direnvrc\fR, which in turn loads system-wide
+extensions from  \fB\fC$DIRENV_SYSCONFIG/direnv.d/*.sh\fR\&.
 
 .PP
 Hopefully this is enough to get you started.
@@ -189,22 +191,42 @@ Hopefully this is enough to get you started.
 \fB\fCXDG_CONFIG_HOME\fR
 Defaults to \fB\fC$HOME/.config\fR\&.
 
-.SH FILES
 .TP
-\fB\fC$XDG_CONFIG_HOME/direnv/direnv.toml\fR
-Direnv configuration. See direnv.toml(1).
+\fB\fCDIRENV_CONFIG\fR
+Defaults to \fB\fC$XDG_CONFIG_HOME/direnv\fR\&.
 
 .TP
-\fB\fC$XDG_CONFIG_HOME/direnv/direnvrc\fR
+\fB\fCDIRENV_SYSCONFIG\fR
+Defaults to \fB\fC/etc/direnv\fR\&.
+
+.SH FILES
+.TP
+\fB\fC$DIRENV_CONFIG/direnv.toml\fR
+Direnv user-specific configuration. See direnv.toml(1).
+
+.TP
+\fB\fC$DIRENV_CONFIG/direnvrc\fR
 Bash code loaded before every \fB\fC\&.envrc\fR\&. Good for personal extensions.
 
 .TP
-\fB\fC$XDG_CONFIG_HOME/direnv/lib/*.sh\fR
-Bash code loaded before every \fB\fC\&.envrc\fR\&. Good for third-party extensions.
+\fB\fC$DIRENV_CONFIG/lib/*.sh\fR
+Bash code loaded before every \fB\fC\&.envrc\fR\&. Good for personal third-party extensions.
 
 .TP
-\fB\fC$XDG_DATA_HOME/direnv/allow\fR
+\fB\fC$DIRENV_CONFIG/allow\fR
 Records which \fB\fC\&.envrc\fR files have been \fB\fCdirenv allow\fRed.
+
+.TP
+\fB\fC$DIRENV_SYSCONFIG/direnv.toml\fR
+Direnv system-wide configuration loaded before user-specific configuration. See direnv.toml(1).
+
+.TP
+\fB\fC$DIRENV_SYSCONFIG/direnvrc\fR
+Bash code loaded before every \fB\fC\&.envrc\fR\&. Good for system-wide extensions.
+
+.TP
+\fB\fC$DIRENV_SYSCONFIG/direnv.d/*.sh\fR
+Bash code loaded before every \fB\fC\&.envrc\fR\&. Good for system-wide third-party extensions.
 
 .SH CONTRIBUTE
 .PP

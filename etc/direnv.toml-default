@@ -1,0 +1,45 @@
+[global]
+
+# ---------------------------------------------------------------------------
+# This is the system-wide direnv configuration file.
+# Remove the '-default' suffix to activate!
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# This allows one to hard-code the position of bash. It maybe be useful
+# to set this to avoid having direnv to fail when PATH is being mutated
+# ---------------------------------------------------------------------------
+
+# bash_path = ""
+
+# ---------------------------------------------------------------------------
+# If set to `true`, stdin is disabled (redirected to /dev/null)
+# during the `.envrc` evaluation
+# ---------------------------------------------------------------------------
+
+# disable_stdin = false
+
+# ---------------------------------------------------------------------------
+# Also look for and load `.env` files on top of the `.envrc` files. If both
+# `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
+# ---------------------------------------------------------------------------
+
+# load_dotenv = false
+
+# ---------------------------------------------------------------------------
+# If set to true, the `.envrc` will be loaded with `set -euo pipefail`. This
+# option will be the default in the future.
+# ---------------------------------------------------------------------------
+
+# strict_env = false
+
+# ---------------------------------------------------------------------------
+# Specify how long to wait before warning the user that the command is taking
+# too long to execute. Defaults to "5s".
+#
+# A duration string is a possibly signed sequence of decimal numbers, each
+# with optional fraction and a unit suffix, such as "300ms", "-1.5h" or 
+# "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+# ---------------------------------------------------------------------------
+
+# warn_timeout = "5s"

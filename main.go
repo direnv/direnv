@@ -12,6 +12,8 @@ var (
 	bashPath string
 	//go:embed stdlib.sh
 	stdlib string
+	// Configured at compile time
+	sysConfDir string
 	//go:embed version.txt
 	version string
 )
@@ -21,7 +23,7 @@ func main() {
 		env  = cmd.GetEnv()
 		args = os.Args
 	)
-	err := cmd.Main(env, args, bashPath, stdlib, strings.TrimSpace(version))
+	err := cmd.Main(env, args, bashPath, sysConfDir, stdlib, strings.TrimSpace(version))
 	if err != nil {
 		os.Exit(1)
 	}

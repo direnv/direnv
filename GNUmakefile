@@ -5,6 +5,7 @@
 # Set this to change the target installation path
 PREFIX   = /usr/local
 BINDIR   = ${PREFIX}/bin
+SYSCONFDIR = ${PREFIX}/etc/direnv
 SHAREDIR = ${PREFIX}/share
 MANDIR   = ${SHAREDIR}/man
 DISTDIR ?= dist
@@ -51,6 +52,12 @@ endif
 
 ifdef BASH_PATH
 	GO_LDFLAGS += -X main.bashPath=$(BASH_PATH)
+else
+	BASH_PATH=
+endif
+
+ifdef SYSCONFDIR
+	GO_LDFLAGS += -X main.sysConfDir=$(SYSCONFDIR)
 endif
 
 ifneq ($(strip $(GO_LDFLAGS)),)
@@ -154,8 +161,13 @@ test-zsh:
 install: all
 	install -d $(DESTDIR)$(BINDIR)
 	install $(exe) $(DESTDIR)$(BINDIR)
+	install -d $(DESTDIR)$(SYSCONFDIR)
+	cp -R etc/* $(DESTDIR)$(SYSCONFDIR)
+	sed -i -e 's|bash_path = ""|bash_path = "$(BASH_PATH)"|' $(DESTDIR)$(SYSCONFDIR)/direnv.toml-default
 	install -d $(DESTDIR)$(MANDIR)/man1
 	cp -R man/*.1 $(DESTDIR)$(MANDIR)/man1
+	sed -i -e 's|/etc/direnv|$(SYSCONFDIR)|' $(DESTDIR)$(MANDIR)/man1/direnv.1
+	sed -i -e 's|/etc/direnv|$(SYSCONFDIR)|' $(DESTDIR)$(MANDIR)/man1/direnv-stdlib.1
 	install -d $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d
 	echo "$(BINDIR)/direnv hook fish | source" > $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d/direnv.fish
 
