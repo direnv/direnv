@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -60,7 +59,7 @@ func cmdFetchURL(env Env, args []string, config *Config) (err error) {
 
 	// Create a temporary file to copy the content into, before the CAS file
 	// location can be calculated.
-	tmpfile, err := ioutil.TempFile(casDir, "tmp")
+	tmpfile, err := os.CreateTemp(casDir, "tmp")
 	if err != nil {
 		return err
 	}

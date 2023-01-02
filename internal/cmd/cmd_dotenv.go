@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/direnv/direnv/v2/pkg/dotenv"
 )
@@ -40,7 +40,7 @@ func cmdDotEnvAction(env Env, args []string) (err error) {
 	}
 
 	var data []byte
-	if data, err = ioutil.ReadFile(target); err != nil {
+	if data, err = os.ReadFile(target); err != nil {
 		return
 	}
 
