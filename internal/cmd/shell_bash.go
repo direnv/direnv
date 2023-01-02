@@ -15,7 +15,7 @@ _direnv_hook() {
   trap - SIGINT;
   return $previous_exit_status;
 };
-if ! [[ "${PROMPT_COMMAND[*]:-}" =~ _direnv_hook ]]; then
+if [[ ";${PROMPT_COMMAND[*]:-};" != *";_direnv_hook;"* ]]; then
   if [[ "$(declare -p PROMPT_COMMAND 2>&1)" == "declare -a"* ]]; then
     PROMPT_COMMAND=(_direnv_hook "${PROMPT_COMMAND[@]}")
   else
