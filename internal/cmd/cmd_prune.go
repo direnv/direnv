@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -37,7 +36,7 @@ func cmdPruneAction(env Env, args []string, config *Config) (err error) {
 		}
 
 		if !fi.IsDir() {
-			if envrc, err = ioutil.ReadFile(filename); err != nil {
+			if envrc, err = os.ReadFile(filename); err != nil {
 				return err
 			}
 			envrcStr := strings.TrimSpace(string(envrc))

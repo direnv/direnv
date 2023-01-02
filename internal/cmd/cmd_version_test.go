@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"golang.org/x/mod/semver"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
 
 func TestVersionDotTxt(t *testing.T) {
-	bs, err := ioutil.ReadFile("../../version.txt")
+	bs, err := os.ReadFile("../../version.txt")
 	if err != nil {
 		t.Fatalf("failed to read ../../version.txt: %v", err)
 	}

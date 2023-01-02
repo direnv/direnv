@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -289,7 +288,7 @@ func touch(path string) (err error) {
 func allow(path string, allowPath string) (err error) {
 	// G306: Expect WriteFile permissions to be 0600 or less
 	// #nosec
-	return ioutil.WriteFile(allowPath, []byte(path+"\n"), 0644)
+	return os.WriteFile(allowPath, []byte(path+"\n"), 0644)
 }
 
 func findEnvUp(searchDir string, loadDotenv bool) (path string) {

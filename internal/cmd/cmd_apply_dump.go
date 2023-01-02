@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 )
 
 // CmdApplyDump is `direnv apply_dump FILE`
@@ -24,7 +24,7 @@ func cmdApplyDumpAction(env Env, args []string) (err error) {
 	}
 	filename := args[1]
 
-	dumped, err := ioutil.ReadFile(filename)
+	dumped, err := os.ReadFile(filename)
 	if err != nil {
 		return err
 	}
