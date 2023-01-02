@@ -10,8 +10,7 @@ import (
 // CmdDotEnv is `direnv dotenv [SHELL [PATH_TO_DOTENV]]`
 // Transforms a .env file to evaluatable `export KEY=PAIR` statements.
 //
-// See: https://github.com/bkeepers/dotenv and
-//   https://github.com/ddollar/foreman
+// See: https://github.com/bkeepers/dotenv and https://github.com/ddollar/foreman
 var CmdDotEnv = &Cmd{
 	Name:    "dotenv",
 	Desc:    "Transforms a .env file to evaluatable `export KEY=PAIR` statements",
