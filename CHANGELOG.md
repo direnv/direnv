@@ -349,7 +349,7 @@ expose issues with existing `.envrc` files.
   * Handle failing pipenv on empty file and avoid an extra pipenv execution (#510)
   * fix `source_env` behaviour when the file doesn't exists (#487)
   * `watch_file` can now watch multiple files in a single invocation (#524)
-  * `layout_python`: prefer venv over virtualenv. Do not export VIRUAL_ENV if $python_version is unavailable or a virtual environment does not exist/can't be created
+  * `layout_python`: prefer venv over virtualenv. Do not export VIRTUAL_ENV if $python_version is unavailable or a virtual environment does not exist/can't be created
   * Adds layout_pyenv (#505)
   * Fix `source_up` docs to explain that search starts in parent directory (#518)
   * fix `path_add` to not leak local variables
@@ -646,7 +646,7 @@ Thanks @bbense @vially and @dadooda for corrections in the docs
  * CHANGE: Allow arbitrary number of args in `log_status`
  * CHANGE: Bump command timeout to 5 seconds
  * FIX: Adds selected bash executable in `direnv status`
- * FIX: man changes, replaced abandonned ronn by md2man
+ * FIX: man changes, replaced abandoned ronn by md2man
  * FIX: `make install` was creating a ./bin directory
  * FIX: issue #114 - work for blank envs. Thanks @pwaller !
  * FIX: man pages warning. Thanks @punitagrawal !

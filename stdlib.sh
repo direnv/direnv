@@ -468,7 +468,7 @@ fetchurl() {
 
 # Usage: source_url <url> <integrity-hash>
 #
-# Fetches a URL and evalutes its content.
+# Fetches a URL and evaluates its content.
 source_url() {
   local url=$1 integrity_hash=${2:-} path
   if [[ -z $url ]]; then
@@ -1190,7 +1190,7 @@ use_node() {
     return 1
   fi
 
-  # Search for the highest version matchin $version in the folder
+  # Search for the highest version matching $version in the folder
   search_version=$(semver_search "$NODE_VERSIONS" "${node_version_prefix}" "${version}")
   node_prefix="${NODE_VERSIONS}/${node_version_prefix}${search_version}"
 
