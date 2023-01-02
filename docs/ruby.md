@@ -44,7 +44,7 @@ Add this to the `~/.config/direnv/direnvrc` file (you have to create it if it do
 ```bash
 # Usage: use ruby <version>
 #
-# Loads the specified ruby version into the environent
+# Loads the specified ruby version into the environment
 #
 use_ruby() {
   local ruby_dir=$HOME/.rubies/$1
@@ -60,7 +60,7 @@ select the right ruby version when you enter the project's folder.
 ## A bit of explanation
 
 The last part probably needs a bit more explanation. We make use of a couple
-of commands that are part of the [stdlib](/man/direnv-stdlib.1.md) which is availabe in
+of commands that are part of the [stdlib](/man/direnv-stdlib.1.md) which is available in
 the execution context of an envrc.
 
 `use` is a command dispatch that's just there to build the
@@ -71,7 +71,7 @@ the execution context of an envrc.
 `<prefix>/bin` into the PATH. This is what makes the specified ruby available.
 
 And finally `layout ruby` who like `use` translates into the `layout_ruby`
-function call. It's used to decribe common project layouts. In the stdlib, the
+function call. It's used to describe common project layouts. In the stdlib, the
 ruby layout will configure rubygems (with the `GEM_HOME` environment variable)
 to install all the gems into the .direnv/ruby/RUBY_VERSION folder under the
 project root. This is a bit similar to rvm's gemsets except that they live

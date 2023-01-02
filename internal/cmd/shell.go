@@ -21,7 +21,7 @@ type Shell interface {
 // shell.
 type ShellExport map[string]*string
 
-// Add represents the additon of a new environment variable
+// Add represents the addition of a new environment variable
 func (e ShellExport) Add(key, value string) {
 	e[key] = &value
 }
