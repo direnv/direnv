@@ -15,8 +15,7 @@ type Env map[string]string
 // key->values which is more handy to work with.
 //
 // NOTE:  We don't support having two variables with the same name.
-//        I've never seen it used in the wild but accoding to POSIX
-//        it's allowed.
+// I've never seen it used in the wild but according to POSIX it's allowed.
 func GetEnv() Env {
 	env := make(Env)
 
