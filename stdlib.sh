@@ -1272,16 +1272,16 @@ use_flake() {
 
 # Usage: use_guix [...]
 #
-# Load environment variables from `guix environment`.
-# Any arguments given will be passed to guix environment. For example,
-# `use guix hello` would setup an environment with the dependencies of
-# the hello package. To create an environment including hello, the
-# `--ad-hoc` flag is used `use guix --ad-hoc hello`. Other options
-# include `--load` which allows loading an environment from a
+# Load environment variables from `guix shell`.
+# Any arguments given will be passed to guix shell. For example,
+# `use guix hello` would setup an environment including the hello
+# package. To create an environment with the hello dependencies, the
+# `--development` flag is used `use guix --development hello`. Other
+# options include `--file` which allows loading an environment from a
 # file. For a full list of options, consult the documentation for the
-# `guix environment` command.
+# `guix shell` command.
 use_guix() {
-  eval "$(guix environment "$@" --search-paths)"
+  eval "$(guix shell "$@" --search-paths)"
 }
 
 # Usage: use_vim [<vimrc_file>]

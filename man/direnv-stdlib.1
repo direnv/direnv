@@ -449,13 +449,13 @@ will have to enable on your own. Flakes is not considered stable yet.
 
 .SS \fB\fCuse guix [...]\fR
 .PP
-Load environment variables from \fB\fCguix environment\fR\&.
+Load environment variables from \fB\fCguix shell\fR\&.
 
 .PP
-Any arguments given will be passed to guix environment. For example, \fB\fCuse guix hello\fR would setup an environment with the dependencies of the hello package. To create an environment including hello, the \fB\fC--ad-hoc\fR flag is used \fB\fCuse guix --ad-hoc hello\fR\&. Other options include \fB\fC--load\fR which allows loading an environment from a file.
+Any arguments given will be passed to guix shell. For example, \fB\fCuse guix hello\fR would setup an environment including the hello package. To create an environment with the hello dependencies, the \fB\fC--development\fR flag is used \fB\fCuse guix --development hello\fR\&. Other options include \fB\fC--file\fR which allows loading an environment from a file.
 
 .PP
-See https://www.gnu.org/software/guix/manual/html_node/Invoking-guix-environment.html
+See https://guix.gnu.org/en/manual/en/guix.html#Invoking-guix-shell
 
 .SS \fB\fCrvm [...]\fR
 .PP
