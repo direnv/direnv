@@ -328,11 +328,11 @@ will have to enable on your own. Flakes is not considered stable yet.
 
 ### `use guix [...]`
 
-Load environment variables from `guix environment`.
+Load environment variables from `guix shell`.
 
-Any arguments given will be passed to guix environment. For example, `use guix hello` would setup an environment with the dependencies of the hello package. To create an environment including hello, the `--ad-hoc` flag is used `use guix --ad-hoc hello`. Other options include `--load` which allows loading an environment from a file.
+Any arguments given will be passed to guix shell. For example, `use guix hello` would setup an environment including the hello package. To create an environment with the hello dependencies, the `--development` flag is used `use guix --development hello`. Other options include `--file` which allows loading an environment from a file.
 
-See https://www.gnu.org/software/guix/manual/html_node/Invoking-guix-environment.html
+See https://guix.gnu.org/en/manual/en/guix.html#Invoking-guix-shell
 
 ### `rvm [...]`
 
