@@ -245,10 +245,10 @@ func fileExists(path string) bool {
 	if err != nil {
 		return false
 	}
-	f.Close()
+	defer f.Close()
 
 	// Next, check that the file is a regular file.
-	fi, err := os.Stat(path)
+	fi, err := f.Stat()
 	if err != nil {
 		return false
 	}
