@@ -30,7 +30,7 @@ fn direnv-eval {
 				unset-env $k
 			}
 		}
-	} except e {
+	} catch e {
 		nop
 	}
 }
@@ -71,7 +71,7 @@ fn test-scenario [name fct]{
 
 try {
 	direnv allow
-} except e {
+} catch e {
 	nop
 }
 
