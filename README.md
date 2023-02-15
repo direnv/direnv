@@ -15,6 +15,7 @@ current directory.
 * Load 12factor apps environment variables
 * Create per-project isolated development environments
 * Load secrets for deployment
+* Can be used as a replacement for all known terraform wrappers
 
 ## How it works
 
