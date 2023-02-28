@@ -1,6 +1,7 @@
 *.sw?
 .direnv
 .gopath
+.vscode
 /direnv
 /direnv.test
 /dist
