@@ -72,15 +72,16 @@ func init() {
 func cmdWithWarnTimeout(fn action) action {
 	return actionWithConfig(func(env Env, args []string, config *Config) (err error) {
 		done := make(chan bool, 1)
-		go func() {
-			select {
-			case <-done:
-				return
-			case <-time.After(config.WarnTimeout):
-				logError("(%v) is taking a while to execute. Use CTRL-C to give up.", args)
-			}
-		}()
-
+		if env["DIRENV_SKIP_TIMEOUT"] != "TRUE" {
+			go func() {
+				select {
+				case <-done:
+					return
+				case <-time.After(config.WarnTimeout):
+					logError("(%v) is taking a while to execute. Use CTRL-C to give up.", args)
+				}
+			}()
+		}
 		err = fn.Call(env, args, config)
 		done <- true
 		return err
