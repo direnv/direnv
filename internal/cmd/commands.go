@@ -8,7 +8,7 @@ import (
 
 type actionSimple func(env Env, args []string) error
 
-func (fn actionSimple) Call(env Env, args []string, config *Config) error {
+func (fn actionSimple) Call(env Env, args []string, _ *Config) error {
 	return fn(env, args)
 }
 

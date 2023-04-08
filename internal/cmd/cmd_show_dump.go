@@ -17,7 +17,7 @@ var CmdShowDump = &Cmd{
 	Action:  actionSimple(cmdShowDumpAction),
 }
 
-func cmdShowDumpAction(env Env, args []string) (err error) {
+func cmdShowDumpAction(_ Env, args []string) (err error) {
 	if len(args) < 2 {
 		return fmt.Errorf("missing DUMP argument")
 	}

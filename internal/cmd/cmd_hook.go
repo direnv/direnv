@@ -21,7 +21,7 @@ var CmdHook = &Cmd{
 	Action: actionSimple(cmdHookAction),
 }
 
-func cmdHookAction(env Env, args []string) (err error) {
+func cmdHookAction(_ Env, args []string) (err error) {
 	var target string
 
 	if len(args) > 1 {

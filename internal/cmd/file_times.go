@@ -11,9 +11,9 @@ import (
 
 // FileTime represents a single recorded file status
 type FileTime struct {
-	Path    string
-	Modtime int64
-	Exists  bool
+	Path    string `json:"path"`
+	Modtime int64  `json:"modtime"`
+	Exists  bool   `json:"exists"`
 }
 
 // FileTimes represent a record of all the known files and times

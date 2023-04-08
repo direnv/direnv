@@ -20,7 +20,7 @@ var CmdFetchURL = &Cmd{
 	Action: actionWithConfig(cmdFetchURL),
 }
 
-func cmdFetchURL(env Env, args []string, config *Config) (err error) {
+func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 	if len(args) < 2 {
 		return fmt.Errorf("missing URL argument")
 	}

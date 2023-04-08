@@ -13,7 +13,7 @@ var CmdPrune = &Cmd{
 	Action: actionWithConfig(cmdPruneAction),
 }
 
-func cmdPruneAction(env Env, args []string, config *Config) (err error) {
+func cmdPruneAction(_ Env, _ []string, config *Config) (err error) {
 	var dir *os.File
 	var fi os.FileInfo
 	var dirList []string
