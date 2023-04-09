@@ -57,8 +57,8 @@ type tomlGlobal struct {
 }
 
 type tomlWhitelist struct {
-	Prefix []string
-	Exact  []string
+	Prefix []string `toml:"prefix"`
+	Exact  []string `toml:"exact"`
 }
 
 // Expand a path string prefixed with ~/ to the current user's home directory.

@@ -19,7 +19,7 @@ var CmdDotEnv = &Cmd{
 	Action:  actionSimple(cmdDotEnvAction),
 }
 
-func cmdDotEnvAction(env Env, args []string) (err error) {
+func cmdDotEnvAction(_ Env, args []string) (err error) {
 	var shell Shell
 	var newenv Env
 	var target string

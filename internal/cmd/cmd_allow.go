@@ -23,7 +23,7 @@ better to keep that folder for user-editable configuration so the data is
 being moved to XDG_DATA_HOME.
 `
 
-func cmdAllowAction(env Env, args []string, config *Config) (err error) {
+func cmdAllowAction(_ Env, args []string, config *Config) (err error) {
 	var rcPath string
 	if len(args) > 1 {
 		if rcPath, err = filepath.Abs(args[1]); err != nil {
