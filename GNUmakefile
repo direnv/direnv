@@ -103,6 +103,15 @@ tests = \
 				test-tcsh \
 				test-zsh
 
+# Skip few checks for IBM Z mainframe's z/OS aka OS/390
+ifeq ($(shell uname), OS/390)
+	tests = \
+		test-stdlib \
+		test-go \
+		test-go-fmt \
+		test-bash
+endif
+
 .PHONY: $(tests)
 test: build $(tests)
 	@echo
