@@ -12,7 +12,7 @@ current directory.
 
 ## Use cases
 
-* Load 12factor apps environment variables
+* Load [12factor apps](https://12factor.net/) environment variables
 * Create per-project isolated development environments
 * Load secrets for deployment
 
