@@ -20,6 +20,7 @@ direnv is packaged for a variety of systems:
 * [MacPorts](https://ports.macports.org/port/direnv/)
 * [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [GNU Guix](https://www.gnu.org/software/guix/)
+* [Windows](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
 
 See also:
 
