@@ -285,6 +285,13 @@ test_start '$test'
   [[ $FOO = bar ]]
 test_stop
 
+# Make sure that directories with names that can end up creating paths like
+# \b or \r are not broken (Windows specific issue).
+test_start 'special-characters/backspace/return'
+  direnv_eval
+  test_eq "${HI}" "there"
+test_stop
+
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
 # BUG: foo/bar is resolved in the .envrc execution context and so can't find
 #      the .envrc file.

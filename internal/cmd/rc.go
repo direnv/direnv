@@ -183,12 +183,16 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		prelude = "set -euo pipefail && "
 	}
 
+	// Non-Windows platforms will already use slashes. However, on Windows
+	// backslashes are used by default which can result in unexpected escapes
+	// like \b or \r in paths. Force slash usage to avoid issues on Windows.
+	slashSeparatedPath := filepath.ToSlash(rc.Path())
 	arg := fmt.Sprintf(
 		`%seval "$("%s" stdlib)" && __main__ %s %s`,
 		prelude,
 		direnv,
 		fn,
-		BashEscape(rc.Path()),
+		BashEscape(slashSeparatedPath),
 	)
 
 	// G204: Subprocess launched with function call as argument or cmd arguments
