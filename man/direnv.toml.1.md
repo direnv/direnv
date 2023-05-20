@@ -44,11 +44,11 @@ If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc
 
 ### `load_dotenv`
 
-Also look for and load `.env` files on top of the `.envrc` files. If both `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
+If set to `true`, also look for and load `.env` files on top of the `.envrc` files. If both `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
 
 ### `strict_env`
 
-If set to true, the `.envrc` will be loaded with `set -euo pipefail`. This
+If set to `true`, the `.envrc` will be loaded with `set -euo pipefail`. This
 option will be the default in the future.
 
 ### `warn_timeout`
