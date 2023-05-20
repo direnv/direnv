@@ -1,4 +1,20 @@
 
+2.32.3 / 2023-05-20
+==================
+
+  * fix: incorrect escape sequences during Loads under git-bash (Windows) (#1085)
+  * fix: skip some tests for IBM Z mainframe's z/OS operating system (#1094)
+  * fix: stdlib: use_guix: Switch to guix shell. (#1045)
+  * fix: stat the already open rc file rather than another path based one on it (#1044)
+  * fix: remove deprecated io/ioutil uses (#1042)
+  * fix: spelling fixes (#1041)
+  * fix: appease Go 1.19 gofmt (#1040)
+  * fix: pass BASH_PATH to make, matches the nixpkgs derivation (#1006)
+  * fix: stdlib/layout_python: exclude patchlevel from $python_version (#1033)
+  * doc: add Windows installation with winget (#1096)
+  * doc: link 12factor webpage for more clarity (#1095)
+  * website: add Plausible analytics
+
 2.32.2 / 2022-11-24
 ==================
 
