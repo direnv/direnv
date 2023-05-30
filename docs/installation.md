@@ -10,7 +10,7 @@ The installation has two parts.
 direnv is packaged for a variety of systems:
 
 * [Fedora](https://src.fedoraproject.org/rpms/direnv)
-* [Arch Linux](https://archlinux.org/packages/community/x86_64/direnv/)
+* [Arch Linux](https://archlinux.org/packages/extra/x86_64/direnv/)
 * [Debian](https://packages.debian.org/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [Gentoo go-overlay](https://github.com/Dr-Terrible/go-overlay)
 * [NetBSD pkgsrc-wip](http://www.pkgsrc.org/wip/)
