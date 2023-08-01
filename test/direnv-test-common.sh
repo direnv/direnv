@@ -160,12 +160,14 @@ test_start "empty-var-unset"
 test_stop
 
 test_start "in-envrc"
+  # demonstrate a conditional on $DIRENV_IN_ENVRC
   direnv_eval
-  set +e
-  ./test-in-envrc
-  es=$?
-  set -e
-  test_eq "$es" "1"
+  test_eq "$?" "0"
+  test_eq "$FROM_ENVRC" true
+  unset FROM_ENVRC
+  . ./.envrc || exit_status=$?
+  test_eq "$exit_status" 1
+  test_eq "$FROM_ENVRC" ""
 test_stop
 
 test_start "missing-file-source-env"
