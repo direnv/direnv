@@ -153,6 +153,15 @@ Or drop by on [Matrix](https://matrix.to/#/#direnv:numtide.com) to
 have a chat. If you ask a question make sure to stay around as not everyone is
 active all day.
 
+### Testing
+
+To run our tests, use these commands: (you may need to install [homebrew](https://brew.sh/))
+
+```
+brew bundle
+make test
+```
+
 ## Complementary projects
 
 Here is a list of projects you might want to look into if you are using direnv.

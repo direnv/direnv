@@ -7,3 +7,6 @@
 /test/config
 /test/data
 /test/scenarios/inherited/.envrc
+
+# for context: https://github.com/Homebrew/homebrew-bundle/pull/552
+Brewfile.lock.json
