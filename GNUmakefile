@@ -163,7 +163,7 @@ install: all
 dist:
 	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
 	CGO_ENABLED=0 GOFLAGS="-trimpath" \
-		gox -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}" \
+		gox -rebuild -ldflags="-s -w" -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}" \
 		-osarch darwin/amd64 \
 		-osarch darwin/arm64 \
 		-osarch freebsd/386 \
