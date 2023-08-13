@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   build:
-    name: Build
+    name: Go Build
     runs-on: ${{ matrix.os }}
 
     strategy:

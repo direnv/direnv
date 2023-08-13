@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   build:
-    name: Build
+    name: Nix Build
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3.5.3
