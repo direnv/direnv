@@ -2,11 +2,11 @@ queue_rules:
   - name: default
     merge_conditions:
       - check-success=Analyze (go)
-      - check-success=Build (macos-latest)
-      - check-success=Build (ubuntu-latest)
-      - check-success=Build (windows-latest)
-      - check-success=build
-      - check-success=report-build-status
+      - check-success=Go Build (macos-latest)
+      - check-success=Go Build (ubuntu-latest)
+      - check-success=Go Build (windows-latest)
+      - check-success=Nix Build (macos-latest)
+      - check-success=Nix Build (ubuntu-latest)
 defaults:
   actions:
     queue:
