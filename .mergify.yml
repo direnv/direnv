@@ -1,0 +1,21 @@
+queue_rules:
+  - name: default
+    merge_conditions:
+      - check-success=Analyze (go)
+      - check-success=Build (macos-latest)
+      - check-success=Build (ubuntu-latest)
+      - check-success=Build (windows-latest)
+      - check-success=build
+      - check-success=report-build-status
+defaults:
+  actions:
+    queue:
+      allow_merging_configuration_change: true
+      method: rebase
+pull_request_rules:
+  - name: merge using the merge queue
+    conditions:
+      - base=master
+      - label~=merge-queue|dependencies
+    actions:
+      queue: {}
