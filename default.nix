@@ -1,4 +1,4 @@
-{ pkgs ? import ./nix { }, vendorHash ? "sha256-eQaQ77pOYC8q+IA26ArEhHQ0DCU093TbzaYhdV3UydE=" }:
+{ pkgs ? import ./nix { }, vendorHash ? "sha256-KbB7Oz22KrZ+ErZW4sfJ3qUunenA6R9OKA2gnp1mczc=" }:
 let
   inherit (pkgs)
     bash
