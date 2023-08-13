@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"encoding/json"
 )
 
 // CmdStatus is `direnv status`
@@ -12,7 +12,7 @@ var CmdStatus = &Cmd{
 	Desc: "prints some debug status information",
 	Args: []string{"[--json]"},
 	Action: actionWithConfig(func(env Env, args []string, config *Config) error {
-		if (len(args) > 1 && (args[1] == "-json" || args[1] == "--json")) {
+		if len(args) > 1 && (args[1] == "-json" || args[1] == "--json") {
 			loadedRC := config.LoadedRC()
 			foundRC, err := config.FindRC()
 			if err != nil {
@@ -20,14 +20,14 @@ var CmdStatus = &Cmd{
 			}
 			jsonOutput := map[string]interface{}{
 				"config": map[string]string{
-					"SelfPath": config.SelfPath,
+					"SelfPath":  config.SelfPath,
 					"ConfigDir": config.ConfDir,
 				},
 				"state": map[string]interface{}{},
 			}
 			if loadedRC != nil {
 				jsonOutput["state"].(map[string]interface{})["loadedRC"] = map[string]interface{}{
-					"path": loadedRC.path,
+					"path":    loadedRC.path,
 					"allowed": loadedRC.Allowed(),
 				}
 			} else {
@@ -35,7 +35,7 @@ var CmdStatus = &Cmd{
 			}
 			if foundRC != nil {
 				jsonOutput["state"].(map[string]interface{})["foundRC"] = map[string]interface{}{
-					"path": foundRC.path,
+					"path":    foundRC.path,
 					"allowed": foundRC.Allowed(),
 				}
 			} else {
