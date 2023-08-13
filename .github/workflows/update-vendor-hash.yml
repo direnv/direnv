@@ -1,0 +1,30 @@
+name: Update vendorHash
+on: pull_request
+
+permissions:
+  contents: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Install Nix
+        uses: cachix/install-nix-action@v22
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update checksum
+        run: |
+          ./scripts/update-vendor-hash
+          # git push if we have a diff
+          if [[ -n $(git diff) ]]; then
+            git add default.nix
+            git config --global user.email "<49699333+dependabot[bot]@users.noreply.github.com>"
+            git config --global user.name "dependabot[bot]"
+            git commit -m "update vendorHash"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
