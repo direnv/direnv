@@ -17,6 +17,7 @@ jobs:
         uses: cachix/install-nix-action@v22
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          nix_path: nixpkgs=channel:nixos-unstable
       - name: Update checksum
         run: |
           ./script/update-vendor-hash
