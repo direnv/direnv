@@ -32,8 +32,9 @@ buildGoModule rec {
 
   meta = {
     description = "A shell extension that manages your environment";
-    homepage = https://direnv.net;
+    homepage = "https://direnv.net";
     license = lib.licenses.mit;
     maintainers = [ lib.maintainers.zimbatm ];
+    mainProgram = "direnv";
   };
 }
