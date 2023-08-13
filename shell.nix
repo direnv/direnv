@@ -24,6 +24,7 @@ stdenv'.mkDerivation  {
 
     # Test dependencies
     golangci-lint
+    python3
     ruby
     shellcheck
     shfmt

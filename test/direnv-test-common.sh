@@ -257,6 +257,11 @@ if has python; then
       echo "FAILED: VIRTUAL_ENV/bin not added to PATH"
       exit 1
     fi
+
+    if [[ ! -f .direnv/CACHEDIR.TAG ]]; then
+      echo "the layout dir should contain that file to filter that folder out of backups"
+      exit 1
+    fi
   test_stop
 
   test_start "python-custom-virtual-env"
