@@ -1,4 +1,4 @@
-{ pkgs ? import ./nix { } }:
+{ pkgs ? import ./nix { }, vendorHash ? "sha256-eQaQ77pOYC8q+IA26ArEhHQ0DCU093TbzaYhdV3UydE=" }:
 let
   inherit (pkgs)
     bash
@@ -12,7 +12,7 @@ buildGoModule rec {
   version = lib.fileContents ./version.txt;
   subPackages = [ "." ];
 
-  vendorSha256 = "sha256-eQaQ77pOYC8q+IA26ArEhHQ0DCU093TbzaYhdV3UydE=";
+  inherit vendorHash;
 
   src = builtins.fetchGit ./.;
 
