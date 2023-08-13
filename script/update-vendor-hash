@@ -3,7 +3,9 @@
 
 set -exuo pipefail
 
-failedbuild=$(nix build --impure --expr 'import ./. { vendorHash = ""; }' 2>&1 || true)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+failedbuild=$(nix build --impure --expr "import $SCRIPT_DIR/.. { vendorHash = ""; }" 2>&1 || true)
 echo "$failedbuild"
 checksum=$(echo "$failedbuild" | awk '/got:.*sha256/ { print $2 }')
-sed -i -e "s|vendorHash ? \".*\"|vendorHash ? \"$checksum\"|" default.nix
+sed -i -e "s|vendorHash ? \".*\"|vendorHash ? \"$checksum\"|" $SCRIPT_DIR/../default.nix
