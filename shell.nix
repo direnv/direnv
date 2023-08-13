@@ -1,6 +1,11 @@
 { pkgs ? import ./nix {} }:
 with pkgs;
-mkShell {
+let
+  # required by go > 1.17
+  stdenv' = if stdenv.isDarwin then darwin.apple_sdk_11_0.stdenv else stdenv;
+in
+stdenv'.mkDerivation  {
+  name = "shell";
   buildInputs = [
     # Build
     gitAndTools.git
