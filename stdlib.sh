@@ -206,7 +206,7 @@ expand_path() {
 }
 
 # --- vendored from https://github.com/bashup/realpaths
-realpath.dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$|^//$ ]] || REPLY="${1%${BASH_REMATCH[0]}}"; REPLY=${REPLY:-/}; }
+realpath.dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$|^//$ ]] || REPLY="${1%"${BASH_REMATCH[0]}"}"; REPLY=${REPLY:-/}; }
 realpath.basename(){ REPLY=/; ! [[ $1 =~ /*([^/]+)/*$ ]] || REPLY="${BASH_REMATCH[1]}"; }
 
 realpath.absolute() {
@@ -214,7 +214,7 @@ realpath.absolute() {
   while (($#)); do case $1 in
     //|//[^/]*) REPLY=//; set -- "${1:2}" "${@:2}" ;;
     /*) REPLY=/; set -- "${1##+(/)}" "${@:2}" ;;
-    */*) set -- "${1%%/*}" "${1##${1%%/*}+(/)}" "${@:2}" ;;
+    */*) set -- "${1%%/*}" "${1##"${1%%/*}"+(/)}" "${@:2}" ;;
     ''|.) shift ;;
     ..) realpath.dirname "$REPLY"; shift ;;
     *) REPLY="${REPLY%/}/$1"; shift ;;
@@ -279,7 +279,7 @@ user_rel_path() {
   if [[ -z $abs_path ]]; then return; fi
 
   if [[ -n $HOME ]]; then
-    local rel_path=${abs_path#$HOME}
+    local rel_path=${abs_path#"$HOME"}
     if [[ $rel_path != "$abs_path" ]]; then
       abs_path=~$rel_path
     fi
@@ -736,7 +736,7 @@ semver_search() {
   # Sort by version: split by "." then reverse numeric sort for each piece of the version string
   # The first one is the highest
   find "$version_dir" -maxdepth 1 -mindepth 1 -type d -name "${prefix}${partial_version}*" \
-    | while IFS= read -r line; do echo "${line#${version_dir%/}/${prefix}}"; done \
+    | while IFS= read -r line; do echo "${line#"${version_dir%/}"/"${prefix}"}"; done \
     | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
     | head -1
 }
@@ -746,9 +746,9 @@ semver_search() {
 # A semantic dispatch used to describe common project layouts.
 #
 layout() {
-  local name=$1
+  local funcname="layout_$1"
   shift
-  eval "layout_$name" "$@"
+  "$funcname" "$@"
 }
 
 # Usage: layout go
@@ -913,7 +913,7 @@ layout_anaconda() {
   # If only config, it needs a name field
   if [[ -n "$env_config" ]]; then
     if [[ -e "$env_config" ]]; then
-      env_name="$(grep -- '^name:' $env_config)"
+      env_name="$(grep -- '^name:' "$env_config")"
       env_name="${env_name/#name:*([[:space:]])}"
       if [[ -z "$env_name" ]]; then
         log_error "Unable to find 'name' in '$env_config'"
@@ -1362,6 +1362,7 @@ __main__() {
   exec 3>&1
   exec 1>&2
 
+  # shellcheck disable=SC2317
   __dump_at_exit() {
     local ret=$?
     "$direnv" dump json "" >&3
