@@ -19,7 +19,7 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Update checksum
         run: |
-          ./scripts/update-vendor-hash
+          ./script/update-vendor-hash
           # git push if we have a diff
           if [[ -n $(git diff) ]]; then
             git add default.nix
