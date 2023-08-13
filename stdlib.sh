@@ -749,6 +749,14 @@ layout() {
   local funcname="layout_$1"
   shift
   "$funcname" "$@"
+  local layout_dir
+  layout_dir=$(direnv_layout_dir)
+  if [[ -d "$layout_dir" && ! -f "$layout_dir/CACHEDIR.TAG" ]]; then
+    echo 'Signature: 8a477f597d28d172789f06886806bc55
+# This file is a cache directory tag created by direnv.
+# For information about cache directory tags, see:
+#	http://www.brynosaurus.com/cachedir/' > "$layout_dir/CACHEDIR.TAG"
+  fi
 }
 
 # Usage: layout go
