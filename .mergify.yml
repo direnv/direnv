@@ -6,7 +6,6 @@ queue_rules:
       - check-success=Build (ubuntu-latest)
       - check-success=Build (windows-latest)
       - check-success=build
-      - check-success=deploy
       - check-success=report-build-status
 defaults:
   actions:
