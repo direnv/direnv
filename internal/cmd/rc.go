@@ -3,8 +3,10 @@ package cmd
 import (
 	"context"
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -17,6 +19,7 @@ import (
 type RC struct {
 	path      string
 	allowPath string
+	denyPath  string
 	times     FileTimes
 	config    *Config
 }
@@ -33,12 +36,19 @@ func FindRC(wd string, config *Config) (*RC, error) {
 
 // RCFromPath inits the RC from a given path
 func RCFromPath(path string, config *Config) (*RC, error) {
-	hash, err := fileHash(path)
+	fileHash, err := fileHash(path)
 	if err != nil {
 		return nil, err
 	}
 
-	allowPath := filepath.Join(config.AllowDir(), hash)
+	allowPath := filepath.Join(config.AllowDir(), fileHash)
+
+	pathHash, err := pathHash(path)
+	if err != nil {
+		return nil, err
+	}
+
+	denyPath := filepath.Join(config.DenyDir(), pathHash)
 
 	times := NewFileTimes()
 
@@ -52,24 +62,37 @@ func RCFromPath(path string, config *Config) (*RC, error) {
 		return nil, err
 	}
 
-	return &RC{path, allowPath, times, config}, nil
+	err = times.Update(denyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return &RC{path, allowPath, denyPath, times, config}, nil
 }
 
 // RCFromEnv inits the RC from the environment
 func RCFromEnv(path, marshalledTimes string, config *Config) *RC {
-	hash, err := fileHash(path)
+	fileHash, err := fileHash(path)
 	if err != nil {
 		return nil
 	}
 
-	allowPath := filepath.Join(config.AllowDir(), hash)
+	allowPath := filepath.Join(config.AllowDir(), fileHash)
 
 	times := NewFileTimes()
 	err = times.Unmarshal(marshalledTimes)
 	if err != nil {
 		return nil
 	}
-	return &RC{path, allowPath, times, config}
+
+	pathHash, err := pathHash(path)
+	if err != nil {
+		return nil
+	}
+
+	denyPath := filepath.Join(config.DenyDir(), pathHash)
+
+	return &RC{path, allowPath, denyPath, times, config}
 }
 
 // Allow grants the RC as allowed to load
@@ -83,44 +106,83 @@ func (rc *RC) Allow() (err error) {
 	if err = allow(rc.path, rc.allowPath); err != nil {
 		return
 	}
-	err = rc.times.Update(rc.allowPath)
-	return
+	if err = rc.times.Update(rc.allowPath); err != nil {
+		return
+	}
+	if _, err = os.Stat(rc.denyPath); err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
+	return os.Remove(rc.denyPath)
 }
 
 // Deny revokes the permission of the RC file to load
-func (rc *RC) Deny() error {
+func (rc *RC) Deny() (err error) {
+	if err = os.MkdirAll(filepath.Dir(rc.denyPath), 0755); err != nil {
+		return
+	}
+
+	// G306: Expect WriteFile permissions to be 0600 or less
+	// #nosec
+	if err = os.WriteFile(rc.denyPath, []byte(rc.path+"\n"), 0644); err != nil {
+		return
+	}
+
+	if _, err = os.Stat(rc.allowPath); err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
+
 	return os.Remove(rc.allowPath)
 }
 
+type AllowStatus int
+
+const (
+	Allowed AllowStatus = iota
+	NotAllowed
+	Denied
+)
+
 // Allowed checks if the RC file has been granted loading
-func (rc *RC) Allowed() bool {
-	// happy path is if this envrc has been explicitly allowed, O(1)ish common case
-	_, err := os.Stat(rc.allowPath)
+func (rc *RC) Allowed() AllowStatus {
+	_, err := os.Stat(rc.denyPath)
 
 	if err == nil {
-		return true
+		return Denied
+	}
+
+	// happy path is if this envrc has been explicitly allowed, O(1)ish common case
+	_, err = os.Stat(rc.allowPath)
+
+	if err == nil {
+		return Allowed
 	}
 
 	// when whitelisting we want to be (path) absolutely sure we've not been duped with a symlink
 	path, err := filepath.Abs(rc.path)
 	// seems unlikely that we'd hit this, but have to handle it
 	if err != nil {
-		return false
+		return NotAllowed
 	}
 
 	// exact whitelists are O(1)ish to check, so look there first
 	if rc.config.WhitelistExact[path] {
-		return true
+		return Allowed
 	}
 
 	// finally we check if any of our whitelist prefixes match
 	for _, prefix := range rc.config.WhitelistPrefix {
 		if strings.HasPrefix(path, prefix) {
-			return true
+			return Allowed
 		}
 	}
 
-	return false
+	return NotAllowed
 }
 
 // Path returns the path to the RC file
@@ -153,8 +215,12 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	}()
 
 	// Abort if the file is not allowed
-	if !rc.Allowed() {
+	switch rc.Allowed() {
+	case NotAllowed:
 		err = fmt.Errorf(notAllowed, rc.Path())
+		return
+	case Allowed:
+	case Denied:
 		return
 	}
 
@@ -283,6 +349,20 @@ func fileHash(path string) (hash string, err error) {
 		return
 	}
 	if _, err = io.Copy(hasher, fd); err != nil {
+		return
+	}
+
+	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
+}
+
+func pathHash(path string) (hash string, err error) {
+	if path, err = filepath.Abs(path); err != nil {
+		return
+	}
+
+	hasher := sha256.New()
+	_, err = hasher.Write([]byte(path + "\n"))
+	if err != nil {
 		return
 	}
 
