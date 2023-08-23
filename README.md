@@ -182,6 +182,13 @@ submit new ones.
 * [shadowenv](https://shopify.github.io/shadowenv/) - uses an s-expression format to define environment changes that should be executed
 * [quickenv](https://github.com/untitaker/quickenv) - an alternative loader for `.envrc` files that does not hook into your shell and favors speed over convenience.
 
+## Commercial support
+
+Looking for help or customization?
+
+Get in touch with Numtide to get a quote. We make it easy for companies to
+work with Open Source projects: <https://numtide.com/contact>
+
 ## COPYRIGHT
 
 [MIT licence](LICENSE) - Copyright (C) 2019 @zimbatm and [contributors](https://github.com/direnv/direnv/graphs/contributors)
