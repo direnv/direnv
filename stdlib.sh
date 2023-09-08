@@ -377,7 +377,7 @@ source_env_if_exists() {
 
 # Usage: env_vars_required <varname> [<varname> ...]
 #
-# Logs error for every variable not present in the environment or having an empty value.  
+# Logs error for every variable not present in the environment or having an empty value.
 # Typically this is used in combination with source_env and source_env_if_exists.
 #
 # Example:
@@ -1276,6 +1276,27 @@ use_flake() {
   watch_file flake.lock
   mkdir -p "$(direnv_layout_dir)"
   eval "$(nix print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
+}
+
+# Usage: use_flakepath [<installable>]
+#
+# Load PATH from your flake, similiar to `nix develop` but without loading a new shell.
+#
+# Behaves like use_flake except that it only modifies your PATH
+#
+# Note that the flakes feature is hidden behind an experimental flag, which
+# you will have to enable on your own. Flakes is not considered stable yet.
+use_flakepath() {
+  watch_file flake.nix
+  watch_file flake.lock
+
+  OLDIFS=$IFS
+  IFS=":"
+
+  for path in $(nix print-dev-env "$@" --json | jq ".variables.PATH.value" -r); do
+    PATH_add $path
+  done
+  export IFS=$OLDIFS
 }
 
 # Usage: use_guix [...]

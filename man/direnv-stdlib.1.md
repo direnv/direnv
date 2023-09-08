@@ -92,7 +92,7 @@ Example:
 
 ### `env_vars_required <varname> [<varname> ...]`
 
-Logs error for every variable not present in the environment or having an empty value.  
+Logs error for every variable not present in the environment or having an empty value.
 Typically this is used in combination with source_env and source_env_if_exists.
 
 Example:
@@ -318,6 +318,19 @@ See http://nixos.org/nix/manual/#sec-nix-shell
 ### `use flake [<installable>]`
 
 Load the build environment of a derivation similar to `nix develop`.
+
+By default it will load the current folder flake.nix devShell attribute. Or
+pass an "installable" like "nixpkgs#hello" to load all the build dependencies
+of the hello package from the latest nixpkgs.
+
+Note that the flakes feature is hidden behind an experimental flag, which you
+will have to enable on your own. Flakes is not considered stable yet.
+
+### `use flakepath [<installable>]`
+
+Load the PATH of a derivation similar to `nix develop` (without switching shells).
+
+Depends on jq
 
 By default it will load the current folder flake.nix devShell attribute. Or
 pass an "installable" like "nixpkgs#hello" to load all the build dependencies
