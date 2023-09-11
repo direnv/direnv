@@ -18,8 +18,11 @@ direnv="$(command -v direnv)"
 # Config, change in the direnvrc
 DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
 
-# Where direnv configuration should be stored
+# Where user-specific direnv configuration should be stored
 direnv_config_dir="${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}"
+
+# Where system-wide direnv configuration is stored
+direnv_sysconfig_dir="${DIRENV_SYSCONFIG:-/etc/direnv}"
 
 # This variable can be used by programs to detect when they are running inside
 # of a .envrc evaluation context. It is ignored by the direnv diffing
@@ -1379,13 +1382,27 @@ __main__() {
   }
   trap __dump_at_exit EXIT
 
-  # load direnv libraries
+  if [ -n "$direnv_sysconfig_dir" ]; then
+    # load system-wide direnv libraries
+    for lib in "$direnv_sysconfig_dir/direnv.d/"*.sh; do
+      # shellcheck disable=SC1090
+      source "$lib"
+    done
+
+    # load system-wide direnvrc if present
+    if [[ -f "$direnv_sysconfig_dir/direnvrc" ]]; then
+      # shellcheck disable=SC1090,SC1091
+      source "$direnv_sysconfig_dir/direnvrc" >&2
+    fi
+  fi
+
+  # load user-specific direnv libraries
   for lib in "$direnv_config_dir/lib/"*.sh; do
     # shellcheck disable=SC1090
     source "$lib"
   done
 
-  # load the global ~/.direnvrc if present
+  # load user-specific direnvrc if present
   if [[ -f $direnv_config_dir/direnvrc ]]; then
     # shellcheck disable=SC1090,SC1091
     source "$direnv_config_dir/direnvrc" >&2

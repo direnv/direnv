@@ -17,12 +17,14 @@ type Config struct {
 	Env             Env
 	WorkDir         string // Current directory
 	ConfDir         string
+	SysConfDir      string
 	CacheDir        string
 	DataDir         string
 	SelfPath        string
 	BashPath        string
 	RCFile          string
 	TomlPath        string
+	SysTomlPath     string
 	DisableStdin    bool
 	StrictEnv       bool
 	LoadDotenv      bool
@@ -92,6 +94,11 @@ func LoadConfig(env Env) (config *Config, err error) {
 		return
 	}
 
+	config.SysConfDir = env[DIRENV_SYSCONFIG]
+	if config.SysConfDir == "" {
+		config.SysConfDir = sysConfDir
+	}
+
 	var exePath string
 	if exePath, err = os.Executable(); err != nil {
 		err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
@@ -111,7 +118,13 @@ func LoadConfig(env Env) (config *Config, err error) {
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
 
-	// Load the TOML config
+	// Load system-wide TOML config
+	config.SysTomlPath = filepath.Join(config.SysConfDir, "direnv.toml")
+	if _, statErr := os.Stat(config.SysTomlPath); statErr != nil {
+		config.SysTomlPath = ""
+	}
+
+	// Load user-specific TOML config
 	config.TomlPath = filepath.Join(config.ConfDir, "direnv.toml")
 	if _, statErr := os.Stat(config.TomlPath); statErr != nil {
 		config.TomlPath = filepath.Join(config.ConfDir, "config.toml")
@@ -120,7 +133,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		}
 	}
 
-	if config.TomlPath != "" {
+	if config.TomlPath != "" || config.SysTomlPath != "" {
 		// Declare global once and then share it between the top-level and Global
 		// keys. The goal here is to let the decoder fill global regardless of if
 		// the values are in the [global] section or not. The reason we do that is
@@ -130,9 +143,19 @@ func LoadConfig(env Env) (config *Config, err error) {
 			tomlGlobal: &global,
 			Global:     &global,
 		}
-		if _, err = toml.DecodeFile(config.TomlPath, &tomlConf); err != nil {
-			err = fmt.Errorf("LoadConfig() failed to parse %s: %w", config.TomlPath, err)
-			return
+
+		if config.SysTomlPath != "" {
+			if _, err = toml.DecodeFile(config.SysTomlPath, &tomlConf); err != nil {
+				err = fmt.Errorf("LoadConfig() failed to parse %s: %w", config.SysTomlPath, err)
+				return
+			}
+		}
+
+		if config.TomlPath != "" {
+			if _, err = toml.DecodeFile(config.TomlPath, &tomlConf); err != nil {
+				err = fmt.Errorf("LoadConfig() failed to parse %s: %w", config.TomlPath, err)
+				return
+			}
 		}
 
 		for _, path := range tomlConf.Whitelist.Prefix {

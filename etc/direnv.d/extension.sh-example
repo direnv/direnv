@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# ---------------------------------------------------------------------------
+# Hint: To activate this direnv extension, remove the '-example' suffix
+# ---------------------------------------------------------------------------
+
+use_foobar() {
+  log_status "direnv: example-extension setting FOO=bar"
+  export FOO=bar
+}

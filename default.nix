@@ -5,6 +5,7 @@ let
     buildGoModule
     lib
     stdenv
+    gnused
     ;
 in
 buildGoModule rec {

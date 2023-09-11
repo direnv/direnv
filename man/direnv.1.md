@@ -138,8 +138,10 @@ things.
 Exporting variables by hand is a bit repetitive so direnv provides a set of
 utility functions that are made available in the context of the `.envrc` file.
 Check the direnv-stdlib(1) man page for more details. You can also define your
-own extensions inside `$XDG_CONFIG_HOME/direnv/direnvrc` or
-`$XDG_CONFIG_HOME/direnv/lib/*.sh` files.
+user-specific extensions inside `$DIRENV_CONFIG/direnvrc` or
+`$DIRENV_CONFIG/lib/*.sh` files. Additionally system-wide extensions can be
+placed in  `$DIRENV_SYSCONFIG/direnvrc`, which in turn loads system-wide
+extensions from  `$DIRENV_SYSCONFIG/direnv.d/*.sh`.
 
 Hopefully this is enough to get you started.
 
@@ -149,20 +151,35 @@ ENVIRONMENT
 `XDG_CONFIG_HOME`
 : Defaults to `$HOME/.config`.
 
+`DIRENV_CONFIG`
+: Defaults to `$XDG_CONFIG_HOME/direnv`.
+
+`DIRENV_SYSCONFIG`
+: Defaults to `/etc/direnv`. 
+
 FILES
 -----
 
-`$XDG_CONFIG_HOME/direnv/direnv.toml`
-: Direnv configuration. See direnv.toml(1).
+`$DIRENV_CONFIG/direnv.toml`
+: Direnv user-specific configuration. See direnv.toml(1).
 
-`$XDG_CONFIG_HOME/direnv/direnvrc`
+`$DIRENV_CONFIG/direnvrc`
 : Bash code loaded before every `.envrc`. Good for personal extensions.
 
-`$XDG_CONFIG_HOME/direnv/lib/*.sh`
-: Bash code loaded before every `.envrc`. Good for third-party extensions.
+`$DIRENV_CONFIG/lib/*.sh`
+: Bash code loaded before every `.envrc`. Good for personal third-party extensions.
 
-`$XDG_DATA_HOME/direnv/allow`
+`$DIRENV_CONFIG/allow`
 : Records which `.envrc` files have been `direnv allow`ed.
+
+`$DIRENV_SYSCONFIG/direnv.toml`
+: Direnv system-wide configuration loaded before user-specific configuration. See direnv.toml(1).
+
+`$DIRENV_SYSCONFIG/direnvrc`
+: Bash code loaded before every `.envrc`. Good for system-wide extensions.
+
+`$DIRENV_SYSCONFIG/direnv.d/*.sh`
+: Bash code loaded before every `.envrc`. Good for system-wide third-party extensions.
 
 CONTRIBUTE
 ----------

@@ -14,6 +14,7 @@ stdenv'.mkDerivation  {
     go
     go-md2man
     gox
+    gnused
 
     # Shells
     bashInteractive
