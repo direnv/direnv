@@ -109,11 +109,9 @@ func CommandsDispatch(env Env, args []string) error {
 			command = cmd
 			break
 		}
-		if cmd.Aliases != nil {
-			for _, alias := range cmd.Aliases {
-				if alias == commandName {
-					command = cmd
-				}
+		for _, alias := range cmd.Aliases {
+			if alias == commandName {
+				command = cmd
 			}
 		}
 	}
