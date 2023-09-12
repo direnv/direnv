@@ -1,4 +1,4 @@
-name: Update vendorHash
+name: Update gomod2nix
 on: pull_request
 
 permissions:
@@ -20,12 +20,12 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
       - name: Update checksum
         run: |
-          ./script/update-vendor-hash
+          ./script/update-gomod2nix
           # git push if we have a diff
           if [[ -n $(git diff) ]]; then
             git add default.nix
             git config --global user.email "<49699333+dependabot[bot]@users.noreply.github.com>"
             git config --global user.name "dependabot[bot]"
-            git commit -m "update vendorHash"
+            git commit -m "update gomod2nix"
             git push origin HEAD:${{ github.head_ref }}
           fi
