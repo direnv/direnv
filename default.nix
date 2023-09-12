@@ -1,32 +1,26 @@
-{ pkgs ? import ./nix { }, vendorHash ? "sha256-UsdVGKIoiI3nJgbIdSg+BIDInoUODFjfyvoTdxg2a8Q=" }:
-let
-  inherit (pkgs)
-    bash
-    buildGoModule
-    lib
-    stdenv
-    ;
-in
-buildGoModule rec {
-  name = "direnv-${version}";
+{ buildGoApplication, lib, stdenv, bash }:
+buildGoApplication {
+  pname = "direnv";
   version = lib.fileContents ./version.txt;
   subPackages = [ "." ];
 
-  inherit vendorHash;
-
-  src = builtins.fetchGit ./.;
+  src = ./.;
+  pwd = ./.;
+  modules = ./gomod2nix.toml;
 
   # we have no bash at the moment for windows
   BASH_PATH =
     lib.optionalString (!stdenv.hostPlatform.isWindows)
-    "${bash}/bin/bash";
+      "${bash}/bin/bash";
 
   # replace the build phase to use the GNUMakefile instead
   buildPhase = ''
+    ls -la ./vendor
     make BASH_PATH=$BASH_PATH
   '';
 
   installPhase = ''
+    echo $GOCACHE
     make install PREFIX=$out
   '';
 

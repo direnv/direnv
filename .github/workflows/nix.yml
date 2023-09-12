@@ -17,16 +17,16 @@ jobs:
       - uses: cachix/install-nix-action@v23
 
       - name: Build
-        run: nix-build
+        run: nix build
 
         # Run the more comprehensive test suite with nix because we have
         # access to all the build dependencies.
       - name: Test
-        run: NIX_PATH=nixpkgs=$PWD/nix nix-shell --pure --run "make test"
+        run: nix develop --ignore-environment -c make test
 
         # Test that the release generation works
       - name: Test Dist
-        run: NIX_PATH=nixpkgs=$PWD/nix nix-shell --pure --run "make dist"
+        run: nix develop --ignore-environment -c make dist
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]

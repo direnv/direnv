@@ -1,0 +1,39 @@
+schema = 3
+
+[mod]
+  [mod."github.com/BurntSushi/toml"]
+    version = "v1.3.2"
+    hash = "sha256-FIwyH67KryRWI9Bk4R8s1zFP0IgKR4L66wNQJYQZLeg="
+  [mod."github.com/mattn/go-isatty"]
+    version = "v0.0.14"
+    hash = "sha256-e8zn5eCVh/B1HOP1PGXeXH0bGkIV0vKYP9KLwZni5as="
+  [mod."github.com/yuin/goldmark"]
+    version = "v1.4.13"
+    hash = "sha256-GVwFKZY6moIS6I0ZGuio/WtDif+lkZRfqWS6b4AAJyI="
+  [mod."golang.org/x/crypto"]
+    version = "v0.0.0-20210921155107-089bfa567519"
+    hash = "sha256-62Qtoqu7AxoxpZFd+75qXC0naixAct3rWsJd0nSgMCU="
+  [mod."golang.org/x/mod"]
+    version = "v0.12.0"
+    hash = "sha256-M/oXnzm7odpJdQzEnG6W0pNYtl0uhOM/l7qgfGVpU2M="
+  [mod."golang.org/x/net"]
+    version = "v0.0.0-20220722155237-a158d28d115b"
+    hash = "sha256-TccMT2GgC1qKp8Yxk1zShJVvr29GemCqKSNJeYkjLo4="
+  [mod."golang.org/x/sync"]
+    version = "v0.0.0-20220722155255-886fb9371eb4"
+    hash = "sha256-ZZyIlxh+nqsOiWHstW7eHXN7RhHnbSL2eDIzcve07Q0="
+  [mod."golang.org/x/sys"]
+    version = "v0.0.0-20220722155257-8c9f86f7a55f"
+    hash = "sha256-mXgFTb2vfUEjTPA6PX7CZTvKGJWaxoU2QplyI1GjC+w="
+  [mod."golang.org/x/term"]
+    version = "v0.0.0-20210927222741-03fcf44c2211"
+    hash = "sha256-DsX2xay7Y/0/bikp4vU8ArF0B6KHyqEc37PwgvmjhSs="
+  [mod."golang.org/x/text"]
+    version = "v0.3.7"
+    hash = "sha256-XH2pUzzQx95O0rak00grQvfACfL+EmZiV7ZzJBkX+XY="
+  [mod."golang.org/x/tools"]
+    version = "v0.1.12"
+    hash = "sha256-D0kGneGMt+LFbdUDo9Axd0yB0a5t3Z0YKVAnJDDaBo8="
+  [mod."golang.org/x/xerrors"]
+    version = "v0.0.0-20190717185122-a985d3407aa7"
+    hash = "sha256-kj2qs47n+a4gtKXHJN3U9gcSQ3BozjzYu7EphXjJnwM="
