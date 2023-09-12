@@ -57,12 +57,19 @@ func RCFromPath(path string, config *Config) (*RC, error) {
 
 // RCFromEnv inits the RC from the environment
 func RCFromEnv(path, marshalledTimes string, config *Config) *RC {
-	times := NewFileTimes()
-	err := times.Unmarshal(marshalledTimes)
+	hash, err := fileHash(path)
 	if err != nil {
 		return nil
 	}
-	return &RC{path, "", times, config}
+
+	allowPath := filepath.Join(config.AllowDir(), hash)
+
+	times := NewFileTimes()
+	err = times.Unmarshal(marshalledTimes)
+	if err != nil {
+		return nil
+	}
+	return &RC{path, allowPath, times, config}
 }
 
 // Allow grants the RC as allowed to load

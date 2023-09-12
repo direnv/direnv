@@ -204,11 +204,11 @@ func (config *Config) AllowDir() string {
 
 // LoadedRC returns a RC file if any has been loaded
 func (config *Config) LoadedRC() *RC {
-	if config.RCFile == "" {
+	if config.Env[DIRENV_FILE] == "" {
 		logDebug("RCFile is blank - loadedRC is nil")
 		return nil
 	}
-	rcPath := config.RCFile
+	rcPath := config.Env[DIRENV_FILE]
 
 	timesString := config.Env[DIRENV_WATCHES]
 
