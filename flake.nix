@@ -13,21 +13,13 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
-
-          gomod2nixBuilder = callPackage "${gomod2nix}/builder" {
-            gomod2nix = gomod2nix';
-          };
-          gomod2nix' = callPackage "${gomod2nix}/default.nix" {
-            inherit (gomod2nixBuilder) mkGoEnv buildGoApplication;
-          };
         in
         {
           packages.default = callPackage ./. {
-            inherit (gomod2nixBuilder) buildGoApplication;
+            inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
           };
           devShells.default = callPackage ./shell.nix {
-            inherit (gomod2nixBuilder) mkGoEnv;
-            gomod2nix = gomod2nix';
+            inherit (gomod2nix.legacyPackages.${system}) mkGoEnv gomod2nix;
           };
         }));
 }
