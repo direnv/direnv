@@ -297,6 +297,15 @@ func touch(path string) (err error) {
 }
 
 func allow(path string, allowPath string) (err error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	if perm := int(fi.Mode().Perm()); perm^0600 != 0 {
+		if err := os.Chmod(path, 0600); err != nil {
+			return err
+		}
+	}
 	// G306: Expect WriteFile permissions to be 0600 or less
 	// #nosec
 	return os.WriteFile(allowPath, []byte(path+"\n"), 0644)
