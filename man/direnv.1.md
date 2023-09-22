@@ -114,6 +114,14 @@ and add the following line to your `~/.elvish/rc.elv` file:
 use direnv
 ```
 
+### PowerShell
+
+Add the following line to your `$PROFILE`:
+
+```powershell
+Invoke-Expression "$(direnv hook powershell)"
+```
+
 USAGE
 -----
 
