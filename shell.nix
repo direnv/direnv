@@ -12,6 +12,7 @@
 , fish
 , tcsh
 , zsh
+, powershell
 , golangci-lint
 , python3
 , ruby

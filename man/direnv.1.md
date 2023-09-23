@@ -119,7 +119,7 @@ use direnv
 Add the following line to your `$PROFILE`:
 
 ```powershell
-Invoke-Expression "$(direnv hook powershell)"
+Invoke-Expression "$(direnv hook pwsh)"
 ```
 
 USAGE
