@@ -14,7 +14,7 @@ direnv is packaged for a variety of systems:
 * [Debian](https://packages.debian.org/search?keywords=direnv&searchon=names&suite=all&section=all)
 * [Gentoo go-overlay](https://github.com/Dr-Terrible/go-overlay)
 * [NetBSD pkgsrc-wip](http://www.pkgsrc.org/wip/)
-* [NixOS](https://nixos.org/nixos/packages.html?query=direnv)
+* [NixOS](https://search.nixos.org/options?query=programs.direnv)
 * [macOS Homebrew](https://formulae.brew.sh/formula/direnv#default)
 * [openSUSE](https://build.opensuse.org/package/show/openSUSE%3AFactory/direnv)
 * [MacPorts](https://ports.macports.org/port/direnv/)
