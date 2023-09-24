@@ -50,7 +50,7 @@ function Invoke-Test {
 
   try {
     Start-DirenvTest $Name
-    $Test.Invoke()
+    Invoke-Command -Command $Test
     Stop-DirenvTest
   }
   catch {
@@ -66,7 +66,7 @@ function Invoke-DirenvEval {
   }
 }
 
-function Test-Equal {
+function Assert-Equal {
   [CmdletBinding()]
   param (
     [string]$Expect,
@@ -78,7 +78,7 @@ function Test-Equal {
   }
 }
 
-function Test-NotEqual {
+function Assert-NotEqual {
   [CmdletBinding()]
   param (
     [string]$Expect,
@@ -90,7 +90,7 @@ function Test-NotEqual {
   }
 }
 
-function Test-Empty {
+function Assert-Empty {
   [CmdletBinding()]
   param ([string]$Actual)
 
@@ -99,7 +99,7 @@ function Test-Empty {
   }
 }
 
-function Test-NonEmpty {
+function Assert-NotEmpty {
   [CmdletBinding()]
   param ([string]$Actual)
 
@@ -137,24 +137,24 @@ Invoke-DirenvEval
 Invoke-Test "base" -Test {
   Write-Host "Setting up"
   Invoke-DirenvEval
-  Test-Equal $env:HELLO "World"
+  Assert-Equal $env:HELLO "World"
 
   $env:WATCHES = $env:DIRENV_WATCHES
 
   Write-Host "Reloading (should be no-op)"
   Invoke-DirenvEval
-  Test-Equal $env:WATCHES $env:DIRENV_WATCHES
+  Assert-Equal $env:WATCHES $env:DIRENV_WATCHES
 
   Write-Host "Updating envrc and reloading (should reload)"
   touch .envrc
   Invoke-DirenvEval
-  Test-NotEqual $env:WATCHES $env:DIRENV_WATCHES
+  Assert-NotEqual $env:WATCHES $env:DIRENV_WATCHES
 
   Write-Host "Leaving dir (should clear env set by dir's envrc)"
   Set-Location ..
   Invoke-DirenvEval
   Write-Host $env:HELLO
-  Test-Empty $env:HELLO
+  Assert-Empty $env:HELLO
 
   Remove-Item "env:/WATCHES"
 }
@@ -162,46 +162,49 @@ Invoke-Test "base" -Test {
 Invoke-Test "inherit" -Test {
   Copy-Item "../base/.envrc" "../inherited/.envrc"
   Invoke-DirenvEval
-  Test-Equal $env:HELLO "World"
+  Assert-Equal $env:HELLO "World"
 
   Start-Sleep 1
   Write-Output "export HELLO=goodbye" | Out-File -FilePath "../inherited/.envrc"
   Invoke-DirenvEval
-  Test-Equal $env:HELLO "goodbye"
+  Assert-Equal $env:HELLO "goodbye"
 }
 
-#region ruby scenario
-#TODO:
-#endregion
+if (Get-Command ruby -ErrorAction SilentlyContinue) {
+  Invoke-Test "ruby-layout" -Test {
+    Invoke-DirenvEval
+    Assert-NotEmpty $env:GEM_HOME
+  }
+}
 
 Invoke-Test "space dir" -Test {
   Invoke-DirenvEval
-  Test-Equal $env:SPACE_DIR "true"
+  Assert-Equal $env:SPACE_DIR "true"
 }
 
 Invoke-Test "child-env" -Test {
   Invoke-DirenvEval
-  Test-Equal $env:PARENT_PRE "1"
-  Test-Equal $env:CHILD "1"
-  Test-Equal $env:PARENT_POST "1"
-  Test-Empty $env:REMOVE_ME
+  Assert-Equal $env:PARENT_PRE "1"
+  Assert-Equal $env:CHILD "1"
+  Assert-Equal $env:PARENT_POST "1"
+  Assert-Empty $env:REMOVE_ME
 }
 
 Invoke-Test "special-vars" -Test {
   $env:DIRENV_BASH = "$(command -v bash)"
   $env:DIRENV_CONFIG = "foobar"
   Invoke-DirenvEval
-  Test-NonEmpty $env:DIRENV_BASH
-  Test-Equal $env:DIRENV_CONFIG "foobar"
+  Assert-NotEmpty $env:DIRENV_BASH
+  Assert-Equal $env:DIRENV_CONFIG "foobar"
   Remove-Item env:/DIRENV_BASH
   Remove-Item env:/DIRENV_CONFIG
 }
 
 Invoke-Test "dump" -Test {
   Invoke-DirenvEval
-  Test-Equal $env:LS_COLORS "*.ogg=38;5;45:*.wav=38;5;45"
-  Test-Equal $env:THREE_BACKSLASHES '\\\'
-  Test-Equal $env:LESSOPEN "||/usr/bin/lesspipe.sh %s"
+  Assert-Equal $env:LS_COLORS "*.ogg=38;5;45:*.wav=38;5;45"
+  Assert-Equal $env:THREE_BACKSLASHES '\\\'
+  Assert-Equal $env:LESSOPEN "||/usr/bin/lesspipe.sh %s"
 }
 
 #region empty-var scenario
@@ -217,14 +220,14 @@ Invoke-Test "empty-var-unset" -Test {
   if (-not $env:FOO) {
     $env:FOO = "unset"
   }
-  Test-Equal $env:FOO "unset"
+  Assert-Equal $env:FOO "unset"
   Remove-Item env:/FOO
 }
 
 Invoke-Test "in-envrc" -Test {
   Invoke-DirenvEval
   ./test-in-envrc
-  Test-Equal $LASTEXITCODE "1"
+  Assert-Equal $LASTEXITCODE "1"
 }
 
 Invoke-Test "missing-file-source-env" -Test {
@@ -234,12 +237,12 @@ Invoke-Test "missing-file-source-env" -Test {
 Invoke-Test "symlink-changed" -Test {
   ln -fs ./state-A ./symlink
   Invoke-DirenvEval
-  Test-Equal $env:STATE "A"
+  Assert-Equal $env:STATE "A"
   Start-Sleep 1
 
   ln -fs ./state-B ./symlink
   Invoke-DirenvEval
-  Test-Equal $env:STATE "B"
+  Assert-Equal $env:STATE "B"
 }
 
 Invoke-Test "symlink-dir" -Test {
@@ -253,7 +256,7 @@ Invoke-Test "symlink-dir" -Test {
 
 Invoke-Test "utf-8" -Test {
   Invoke-DirenvEval
-  Test-Equal $env:UTFSTUFF "♀♂"
+  Assert-Equal $env:UTFSTUFF "♀♂"
 }
 
 Invoke-Test "failure" -Test {
@@ -261,18 +264,18 @@ Invoke-Test "failure" -Test {
   #
   # This is needed so that direnv doesn't go into a loop when the loading
   # fails.
-  Test-Empty $env:DIRENV_DIFF
-  Test-Empty $env:DIRENV_WATCHES
+  Assert-Empty $env:DIRENV_DIFF
+  Assert-Empty $env:DIRENV_WATCHES
 
   Invoke-DirenvEval
 
-  Test-NonEmpty $env:DIRENV_DIFF
-  Test-NonEmpty $env:DIRENV_WATCHES
+  Assert-NotEmpty $env:DIRENV_DIFF
+  Assert-NotEmpty $env:DIRENV_WATCHES
 }
 
 Invoke-Test "watch-dir" -Test {
   Write-Host "no watches by default"
-  Test-Equal $env:DIRENV_WATCHES $env:WATCHES
+  Assert-Equal $env:DIRENV_WATCHES $env:WATCHES
 
   Invoke-DirenvEval
 
@@ -281,13 +284,12 @@ Invoke-Test "watch-dir" -Test {
   }
 
   Write-Host "After eval, watches have changed"
-  Test-NotEqual $env:DIRENV_WATCHES $env:WATCHES
-  Remove-Item "env:/WATCHES"
+  Assert-NotEqual $env:DIRENV_WATCHES $env:WATCHES
 }
 
 Invoke-Test "load-envrc-before-env" -Test {
   Invoke-DirenvEval
-  Test-Equal $env:HELLO "bar"
+  Assert-Equal $env:HELLO "bar"
 }
 
 Invoke-Test "load-env" -Test {
@@ -297,26 +299,74 @@ load_dotenv = true
 "@ | Out-File "${env:XDG_CONFIG_HOME}/direnv/direnv.toml"
   direnv allow
   Invoke-DirenvEval
-  Test-Equal $env:HELLO "world"
+  Assert-Equal $env:HELLO "world"
 }
 
 Invoke-Test "skip-env" -Test {
   Invoke-DirenvEval
-  Test-Empty $env:SKIPPED
+  Assert-Empty $env:SKIPPED
 }
 
 if (Get-Command python -ErrorAction SilentlyContinue) {
   Invoke-Test "python-layout" -Test {
-    Remove-Item .direnv -Force
+    Remove-Item .direnv -Force -Recurse
 
     Invoke-DirenvEval
-    Test-NonEmpty $env:VIRTUAL_ENV
+    Assert-NotEmpty $env:VIRTUAL_ENV
 
-    # TODO: Layout is currently bash-only. Must solve for this.
     if (($env:PATH -split ":") -notcontains "${env:VIRTUAL_ENV}/bin") {
       throw "FAILED: VIRTUAL_ENV/bin not added to PATH"
     }
+
+    if (-not (Get-Item ./.direnv/CACHEDIR.TAG -ErrorAction SilentlyContinue)) {
+      throw "the layout dir should contain that file to filter that folder out of backups"
+    }
   }
+
+  Invoke-Test "python-custom-virtual-env" -Test {
+    Invoke-DirenvEval
+    if (-not (Get-Item $env:VIRTUAL_ENV)) {
+      throw "${env:VIRTUAL_ENV} does not exist"
+    }
+
+    if (($env:PATH -split ":") -notcontains "$PWD/foo/bin") {
+      throw "FAILED: VIRTUAL_ENV/bin not added to PATH"
+    }
+  }
+}
+
+Invoke-Test "aliases" -Test {
+  direnv deny
+  # check that allow/deny aliases work
+  Write-Host "direnv permit"
+  direnv permit
+  Invoke-DirenvEval
+  Assert-NotEmpty $env:HELLO
+
+  Write-Host "direnv block"
+  direnv block
+  Invoke-DirenvEval
+  Assert-Empty $env:HELLO
+
+  Write-Host "direnv grant"
+  direnv grant
+  Invoke-DirenvEval
+  Assert-NotEmpty $env:HELLO
+
+  Write-Host "direnv revoke"
+  direnv revoke
+  Invoke-DirenvEval
+  Assert-Empty $env:HELLO
+}
+
+Invoke-Test '$test' -Test {
+  Invoke-DirenvEval
+  Assert-Equal $env:FOO "bar"
+}
+
+Invoke-Test "special-characters/backspace/return" -Test {
+  Invoke-DirenvEval
+  Assert-Equal $env:HI "there"
 }
 
 #endregion
