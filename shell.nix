@@ -40,6 +40,7 @@ stdenv.mkDerivation {
     fish
     tcsh
     zsh
+    powershell
 
     # Test dependencies
     golangci-lint

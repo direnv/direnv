@@ -191,7 +191,7 @@ Invoke-Test "child-env" -Test {
 }
 
 Invoke-Test "special-vars" -Test {
-  $env:DIRENV_BASH = "$(command -v bash)"
+  $env:DIRENV_BASH = (Get-Command bash).Source
   $env:DIRENV_CONFIG = "foobar"
   Invoke-DirenvEval
   Assert-NotEmpty $env:DIRENV_BASH
@@ -309,7 +309,9 @@ Invoke-Test "skip-env" -Test {
 
 if (Get-Command python -ErrorAction SilentlyContinue) {
   Invoke-Test "python-layout" -Test {
-    Remove-Item .direnv -Force -Recurse
+    if (Get-Item .direnv -ErrorAction SilentlyContinue) {
+      Remove-Item .direnv -Force -Recurse -ErrorAction SilentlyContinue
+    }
 
     Invoke-DirenvEval
     Assert-NotEmpty $env:VIRTUAL_ENV
