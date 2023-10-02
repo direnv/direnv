@@ -64,7 +64,7 @@ use direnv
 
 ## Nushell
 
-add the following hook to your `$env.config.hooks.env_change.PWD` list in `config.nu`:
+Add the following hook to your `$env.config.hooks.env_change.PWD` list in `config.nu`:
 ```nushell
 { ||
     if (which direnv | is-empty) {
