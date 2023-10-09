@@ -151,6 +151,19 @@ use direnv
 .fi
 .RE
 
+.SS PowerShell
+.PP
+Add the following line at the end of the \fB\fC$PROFILE\fR:
+
+.PP
+.RS
+
+.nf
+Invoke-Expression "$(direnv hook pwsh)"
+
+.fi
+.RE
+
 .SH USAGE
 .PP
 In some target folder, create an \fB\fC\&.envrc\fR file and add some export(1)
