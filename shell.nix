@@ -12,6 +12,7 @@
 , fish
 , tcsh
 , zsh
+, powershell
 , golangci-lint
 , python3
 , ruby
@@ -39,6 +40,7 @@ stdenv.mkDerivation {
     fish
     tcsh
     zsh
+    powershell
 
     # Test dependencies
     golangci-lint

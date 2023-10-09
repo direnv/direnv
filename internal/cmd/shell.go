@@ -60,6 +60,8 @@ func DetectShell(target string) Shell {
 		return Vim
 	case "zsh":
 		return Zsh
+	case "pwsh":
+		return Pwsh
 	}
 
 	return nil

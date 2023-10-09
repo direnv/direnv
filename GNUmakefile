@@ -101,7 +101,8 @@ tests = \
 				test-elvish \
 				test-fish \
 				test-tcsh \
-				test-zsh
+				test-zsh \
+				test-pwsh
 
 # Skip few checks for IBM Z mainframe's z/OS aka OS/390
 ifeq ($(shell uname), OS/390)
@@ -145,6 +146,9 @@ test-tcsh:
 
 test-zsh:
 	zsh ./test/direnv-test.zsh
+
+test-pwsh:
+	pwsh ./test/direnv-test.ps1
 
 ############################################################################
 # Installation

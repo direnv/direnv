@@ -37,7 +37,7 @@ used to build solutions similar to rbenv, pyenv and phpenv.
 ### Prerequisites
 
 * Unix-like operating system (macOS, Linux, ...)
-* A supported shell (bash, zsh, tcsh, fish, elvish)
+* A supported shell (bash, zsh, tcsh, fish, elvish, powershell)
 
 ### Basic Installation
 
