@@ -11,7 +11,7 @@ var CmdDeny = &Cmd{
 	Name:    "block",
 	Desc:    "Revokes the authorization of a given .envrc or .env file.",
 	Args:    []string{"[PATH_TO_RC]"},
-	Aliases: []string{"deny", "revoke"},
+	Aliases: []string{"deny", "disallow", "revoke"},
 	Action:  actionWithConfig(cmdDenyAction),
 }
 
