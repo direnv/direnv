@@ -278,10 +278,12 @@ fi
 test_start "aliases"
   direnv deny
   # check that allow/deny aliases work
-  direnv permit && direnv_eval && test -n "${HELLO}"
-  direnv block  && direnv_eval && test -z "${HELLO}"
-  direnv grant  && direnv_eval && test -n "${HELLO}"
-  direnv revoke && direnv_eval && test -z "${HELLO}"
+  direnv permit   && direnv_eval && test -n "${HELLO}"
+  direnv block    && direnv_eval && test -z "${HELLO}"
+  direnv grant    && direnv_eval && test -n "${HELLO}"
+  direnv revoke   && direnv_eval && test -z "${HELLO}"
+  direnv grant    && direnv_eval && test -n "${HELLO}"
+  direnv disallow && direnv_eval && test -z "${HELLO}"
 test_stop
 
 # shellcheck disable=SC2016
