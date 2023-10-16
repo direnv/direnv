@@ -202,6 +202,11 @@ func (config *Config) AllowDir() string {
 	return filepath.Join(config.DataDir, "allow")
 }
 
+// DenyDir is the folder where all the "deny" files are stored.
+func (config *Config) DenyDir() string {
+	return filepath.Join(config.DataDir, "deny")
+}
+
 // LoadedRC returns a RC file if any has been loaded
 func (config *Config) LoadedRC() *RC {
 	if config.Env[DIRENV_FILE] == "" {
