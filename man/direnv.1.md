@@ -157,6 +157,9 @@ ENVIRONMENT
 `XDG_CONFIG_HOME`
 : Defaults to `$HOME/.config`.
 
+`XDG_DATA_HOME`
+: Defaults to `$HOME/.local/share`.
+
 FILES
 -----
 
