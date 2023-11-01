@@ -377,7 +377,7 @@ source_env_if_exists() {
 
 # Usage: env_vars_required <varname> [<varname> ...]
 #
-# Logs error for every variable not present in the environment or having an empty value.  
+# Logs error for every variable not present in the environment or having an empty value.
 # Typically this is used in combination with source_env and source_env_if_exists.
 #
 # Example:
@@ -1012,7 +1012,14 @@ layout_pyenv() {
   # first in the path
   local i
   for ((i = $#; i > 0; i--)); do
-    local python_version=${!i}
+    # Let pyenv resolve the exact version so we can specify versions like
+    # 3.11 and have the latest 3.11.x Python activated
+    local input_version="${!i}"
+    local python_version="$(PYENV_VERSION="$input_version" pyenv version-name)"
+    if [ -z "$python_version" ]; then
+        log_error "Python version ${input_version} not found"
+        return 1
+    fi
     local pyenv_python
     pyenv_python=$(pyenv root)/versions/${python_version}/bin/python
     if [[ -x "$pyenv_python" ]]; then
