@@ -2,7 +2,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
 
 # TODO: also publish the dist
 name: Create Release
@@ -13,7 +13,7 @@ permissions:
 jobs:
   build:
     permissions:
-      contents: write  # for actions/create-release to create a release
+      contents: write # for actions/create-release to create a release
     name: Create Release
     runs-on: ubuntu-latest
     steps:
@@ -40,3 +40,15 @@ jobs:
           body: "${{ steps.release-notes.outputs.body }}"
           draft: true
           prerelease: false
+
+  publish-to-winget:
+    name: Publish to WinGet
+    needs:
+      - build
+    runs-on: windows-latest
+    steps:
+      - uses: vedantmgoyal2009/winget-releaser@v2
+        with:
+          identifier: direnv.direnv
+          max-versions-to-keep: 5 # keep only latest 5 versions
+          token: ${{ secrets.GITHUB_TOKEN }}
