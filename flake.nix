@@ -5,7 +5,7 @@
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.gomod2nix.url = "github:nix-community/gomod2nix";
   inputs.gomod2nix.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.gomod2nix.inputs.utils.follows = "flake-utils";
+  inputs.gomod2nix.inputs.flake-utils.follows = "flake-utils";
 
   outputs = { self, nixpkgs, flake-utils, gomod2nix }:
     (flake-utils.lib.eachDefaultSystem

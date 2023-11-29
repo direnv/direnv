@@ -57,7 +57,9 @@ ifneq ($(strip $(GO_LDFLAGS)),)
 	GO_BUILD_FLAGS = -ldflags '$(GO_LDFLAGS)'
 endif
 
-direnv: *.go
+SOURCES = $(wildcard *.go internal/*/*.go pkg/*/*.go)
+
+direnv: $(SOURCES)
 	$(GO) build $(GO_BUILD_FLAGS) -o $(exe)
 
 ############################################################################
