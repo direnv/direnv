@@ -1,7 +1,26 @@
-2.X / XXXX-XX-XX
+
+2.33.0 / 2023-11-29
 ==================
 
-  * bump to go 1.20
+  * doc: add a Nushell section to `hook.md` by @amtoine in https://github.com/direnv/direnv/pull/1175
+  * doc: fix broken links in installation.md by @just1602 in https://github.com/direnv/direnv/pull/1110
+  * doc: show how to run tests by @bukzor-sentryio in https://github.com/direnv/direnv/pull/1137
+  * doc: update NixOS installation instructions by @Gerg-L in https://github.com/direnv/direnv/pull/1172
+  * doc: update direnv.toml.1.md by @Ativerc in https://github.com/direnv/direnv/pull/1099
+  * feat: `direnv status --json` by @shivaraj-bh in https://github.com/direnv/direnv/pull/1142
+  * feat: add PowerShell Support by @bamsammich in https://github.com/direnv/direnv/pull/1171
+  * feat: add mergify configuration by @Mic92 in https://github.com/direnv/direnv/pull/1147
+  * feat: add support for armv7l platform in install.sh by @ardje in https://github.com/direnv/direnv/pull/1162
+  * feat: add watch print command by @Mic92 in https://github.com/direnv/direnv/pull/1198
+  * feat: alias `direnv disallow` to deny by @will in https://github.com/direnv/direnv/pull/1182
+  * feat: stdlib: create CACHEDIR.TAG inside .direnv by @Mic92 in https://github.com/direnv/direnv/pull/1148
+  * fix: `allowPath` for `LoadedRC` by @shivaraj-bh in https://github.com/direnv/direnv/pull/1157
+  * fix: don't prompt to allow if user explicitly denied by @Gabriella439 in https://github.com/direnv/direnv/pull/1158
+  * fix: man/direnv-stdlib: fix obsolete opam-env example by @mzacho in https://github.com/direnv/direnv/pull/1170
+  * fix: print correct path in source_env log message by @wentasah in https://github.com/direnv/direnv/pull/1144
+  * fix: quote tcsh $PATH, to avoid failure on whitespace by @bukzor-sentryio in https://github.com/direnv/direnv/pull/1139
+  * fix: remove redundant nil check in `CommandsDispatch` by @Juneezee in https://github.com/direnv/direnv/pull/1166
+  * fix: update nixpkgs and shellcheck by @Mic92 in https://github.com/direnv/direnv/pull/1146
 
 2.32.3 / 2023-05-20
 ==================
