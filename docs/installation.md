@@ -12,7 +12,7 @@ direnv is packaged for a variety of systems:
 * [Fedora](https://src.fedoraproject.org/rpms/direnv)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/direnv/)
 * [Debian](https://packages.debian.org/search?keywords=direnv&searchon=names&suite=all&section=all)
-* [Gentoo go-overlay](https://github.com/Dr-Terrible/go-overlay)
+* [Gentoo Guru](https://wiki.gentoo.org/wiki/Project:GURU/Information_for_End_Users)
 * [NetBSD pkgsrc-wip](http://www.pkgsrc.org/wip/)
 * [NixOS](https://search.nixos.org/options?query=programs.direnv)
 * [macOS Homebrew](https://formulae.brew.sh/formula/direnv#default)
