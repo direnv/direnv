@@ -74,18 +74,20 @@ Example:
 
 ```toml
 [whitelist]
-prefix = [ "/home/user/code/project-a" ]
+prefix = [ "/home/user/code/project-a", "~/code/project-b" ]
 ```
 
 In this example, the following .envrc files will be implicitly allowed:
 
 * `/home/user/code/project-a/.envrc`
 * `/home/user/code/project-a/subdir/.envrc`
+* `~/code/project-b/.envrc`
+* `~/code/project-b/subdir/.envrc`
 * and so on
 
 In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running `direnv allow`):
 
-* `/home/user/project-b/.envrc`
+* `/home/user/project-c/.envrc`
 * `/opt/random/.envrc`
 
 ### `exact`
@@ -96,18 +98,18 @@ Example:
 
 ```toml
 [whitelist]
-exact = [ "/home/user/project-b/.envrc", "/home/user/project-b/subdir-a" ]
+exact = [ "/home/user/project-a/.envrc", "~/project-b/subdir-a" ]
 ```
 
 In this example, the following .envrc files will be implicitly allowed, and no others:
 
-* `/home/user/code/project-b/.envrc`
-* `/home/user/code/project-b/subdir-a`
+* `/home/user/code/project-a/.envrc`
+* `~/project-b/subdir-a`
 
 In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running `direnv allow`):
 
 * `/home/user/code/project-b/subproject-c/.envrc`
-* `/home/user/code/.envrc`
+* `~/code/.envrc`
 
 COPYRIGHT
 ---------
