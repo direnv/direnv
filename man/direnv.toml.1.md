@@ -60,6 +60,9 @@ A duration string is a possibly signed sequence of decimal numbers, each with
 optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 
+This feature is disabled if the duration is lower or equal to zero.
+Will be overwritten if the environment variable `DIRENV_WARN_TIMEOUT` is set to any of the above values.
+
 ## [whitelist]
 
 Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" -- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. **This feature should be used with great care**, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.

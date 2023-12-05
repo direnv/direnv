@@ -58,7 +58,7 @@ func (sh bash) escape(str string) string {
  * Escaping
  */
 
-//nolint
+// nolint
 const (
 	ACK           = 6
 	TAB           = 9

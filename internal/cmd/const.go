@@ -1,6 +1,6 @@
 package cmd
 
-//nolint
+// nolint
 const (
 	DIRENV_CONFIG = "DIRENV_CONFIG"
 	DIRENV_BASH   = "DIRENV_BASH"

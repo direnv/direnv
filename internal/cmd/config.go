@@ -48,12 +48,12 @@ type tomlConfig struct {
 }
 
 type tomlGlobal struct {
-	BashPath     string       `toml:"bash_path"`
-	DisableStdin bool         `toml:"disable_stdin"`
-	StrictEnv    bool         `toml:"strict_env"`
-	SkipDotenv   bool         `toml:"skip_dotenv"` // deprecated, use load_dotenv
-	LoadDotenv   bool         `toml:"load_dotenv"`
-	WarnTimeout  tomlDuration `toml:"warn_timeout"`
+	BashPath     string        `toml:"bash_path"`
+	DisableStdin bool          `toml:"disable_stdin"`
+	StrictEnv    bool          `toml:"strict_env"`
+	SkipDotenv   bool          `toml:"skip_dotenv"` // deprecated, use load_dotenv
+	LoadDotenv   bool          `toml:"load_dotenv"`
+	WarnTimeout  *tomlDuration `toml:"warn_timeout"`
 }
 
 type tomlWhitelist struct {
@@ -106,6 +106,9 @@ func LoadConfig(env Env) (config *Config, err error) {
 		return
 	}
 
+	// Default Warn Timeout
+	config.WarnTimeout = 5 * time.Second
+
 	config.RCFile = env[DIRENV_FILE]
 
 	config.WhitelistPrefix = make([]string, 0)
@@ -155,16 +158,18 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.DisableStdin = tomlConf.DisableStdin
 		config.LoadDotenv = tomlConf.LoadDotenv
 		config.StrictEnv = tomlConf.StrictEnv
-		config.WarnTimeout = tomlConf.WarnTimeout.Duration
+		if tomlConf.WarnTimeout != nil {
+			config.WarnTimeout = tomlConf.WarnTimeout.Duration
+		}
 	}
 
-	if config.WarnTimeout == 0 {
-		timeout, err := time.ParseDuration(env.Fetch("DIRENV_WARN_TIMEOUT", "5s"))
-		if err != nil {
+	if ts := env.Fetch("DIRENV_WARN_TIMEOUT", ""); ts != "" {
+		timeout, err := time.ParseDuration(ts)
+		if err == nil {
+			config.WarnTimeout = timeout
+		} else {
 			logError("invalid DIRENV_WARN_TIMEOUT: " + err.Error())
-			timeout = 5 * time.Second
 		}
-		config.WarnTimeout = timeout
 	}
 
 	if config.BashPath == "" {
