@@ -72,6 +72,11 @@ func init() {
 
 func cmdWithWarnTimeout(fn action) action {
 	return actionWithConfig(func(env Env, args []string, config *Config) (err error) {
+		// Disable warning if WarnTimeout is <= 0
+		if config.WarnTimeout <= 0 {
+			return fn.Call(env, args, config)
+		}
+
 		done := make(chan bool, 1)
 		go func() {
 			select {
