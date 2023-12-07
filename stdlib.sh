@@ -1290,13 +1290,7 @@ use_flakepath() {
   watch_file flake.nix
   watch_file flake.lock
 
-  OLDIFS=$IFS
-  IFS=":"
-
-  for path in $(nix print-dev-env "$@" --json | jq ".variables.PATH.value" -r); do
-    PATH_add $path
-  done
-  export IFS=$OLDIFS
+  PATH_add "$(nix develop -c sh -c 'echo $PATH')"`
 }
 
 # Usage: use_guix [...]
