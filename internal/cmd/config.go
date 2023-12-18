@@ -26,6 +26,7 @@ type Config struct {
 	DisableStdin    bool
 	StrictEnv       bool
 	LoadDotenv      bool
+	EnvPaths        []string
 	WarnTimeout     time.Duration
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
@@ -53,6 +54,7 @@ type tomlGlobal struct {
 	StrictEnv    bool          `toml:"strict_env"`
 	SkipDotenv   bool          `toml:"skip_dotenv"` // deprecated, use load_dotenv
 	LoadDotenv   bool          `toml:"load_dotenv"`
+	EnvPaths     []string      `toml:"env_paths"`
 	WarnTimeout  *tomlDuration `toml:"warn_timeout"`
 }
 
@@ -157,6 +159,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.BashPath = tomlConf.BashPath
 		config.DisableStdin = tomlConf.DisableStdin
 		config.LoadDotenv = tomlConf.LoadDotenv
+		config.EnvPaths = tomlConf.EnvPaths
 		config.StrictEnv = tomlConf.StrictEnv
 		if tomlConf.WarnTimeout != nil {
 			config.WarnTimeout = tomlConf.WarnTimeout.Duration
@@ -197,6 +200,10 @@ func LoadConfig(env Env) (config *Config, err error) {
 	if config.DataDir == "" {
 		err = fmt.Errorf("couldn't find a data directory for direnv")
 		return
+	}
+
+	if len(config.EnvPaths) == 0 {
+		config.EnvPaths = []string{".envrc", ".env"}
 	}
 
 	return
