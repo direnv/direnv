@@ -148,6 +148,19 @@ const (
 	Denied
 )
 
+func (s AllowStatus) String() string {
+	switch s {
+	case Allowed:
+		return "allowed"
+	case NotAllowed:
+		return "notAllowed"
+	case Denied:
+		return "denied"
+	default:
+		return ""
+	}
+}
+
 // Allowed checks if the RC file has been granted loading
 func (rc *RC) Allowed() AllowStatus {
 	_, err := os.Stat(rc.denyPath)
