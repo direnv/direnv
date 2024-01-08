@@ -62,6 +62,8 @@ func DetectShell(target string) Shell {
 		return Zsh
 	case "pwsh":
 		return Pwsh
+	case "systemd":
+		return Systemd
 	}
 
 	return nil
