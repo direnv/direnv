@@ -198,6 +198,28 @@ test_name source_env_if_exists
   [[ "${output#*'loading ~/existing_file'}" != "$output" ]]
 )
 
+test_name inherit-parent
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  cd "$workdir"
+  echo 'export SUCCESS=true' > "$workdir/.envrc"
+  mkdir -p "$workdir/sub/dir"
+  cd "$workdir/sub/dir"
+
+  # inherit grandparent envrc
+  source_env ../..
+  [[ $SUCCESS = true ]]
+
+  # Expect correct path being logged
+  export HOME=$workdir
+  output="$(source_env ../.. 2>&1 > /dev/null)"
+  assert_eq "$output" "direnv: loading ~/.envrc"
+)
+
 test_name env_vars_required
 (
   load_stdlib
