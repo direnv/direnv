@@ -9,7 +9,7 @@ import (
 // CmdPrune is `direnv prune`
 var CmdPrune = &Cmd{
 	Name:   "prune",
-	Desc:   "removes old allowed files",
+	Desc:   "Removes old allowed files",
 	Action: actionWithConfig(cmdPruneAction),
 }
 

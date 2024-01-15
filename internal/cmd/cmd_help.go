@@ -8,7 +8,7 @@ import (
 // CmdHelp is `direnv help`
 var CmdHelp = &Cmd{
 	Name:    "help",
-	Desc:    "shows this help",
+	Desc:    "Shows this help",
 	Args:    []string{"[SHOW_PRIVATE]"},
 	Aliases: []string{"--help"},
 	Action: actionSimple(func(env Env, args []string) (err error) {
