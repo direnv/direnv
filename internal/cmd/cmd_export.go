@@ -7,12 +7,23 @@ import (
 	"strings"
 )
 
+func supportedShellFormattedString() string {
+	res := "["
+	for k := range supportedShellList {
+		res += k + ", "
+	}
+	res = strings.TrimSuffix(res, ", ")
+	res += "]"
+	return res
+}
+
 // CmdExport is `direnv export $0`
 var CmdExport = &Cmd{
-	Name:    "export",
-	Desc:    "loads an .envrc or .env and prints the diff in terms of exports",
+	Name: "export",
+	Desc: `Loads an .envrc or .env and prints the diff in terms of exports.
+  Supported SHELL values are: ` + supportedShellFormattedString(),
 	Args:    []string{"SHELL"},
-	Private: true,
+	Private: false,
 	Action:  cmdWithWarnTimeout(actionWithConfig(exportCommand)),
 }
 
