@@ -9,7 +9,7 @@ import (
 // CmdStatus is `direnv status`
 var CmdStatus = &Cmd{
 	Name: "status",
-	Desc: "prints some debug status information",
+	Desc: "Prints some debug status information",
 	Args: []string{"[--json]"},
 	Action: actionWithConfig(func(env Env, args []string, config *Config) error {
 		if len(args) > 1 && (args[1] == "-json" || args[1] == "--json") {
