@@ -129,7 +129,7 @@ See also `direnv-fetchurl(1)` for more details.
 
 ### `fetchurl <url> [<integrity-hash>]`
 
-Fetches the given `url` onto disk and outputs it's path location on stdout.
+Fetches the given `url` onto disk and outputs its path location on stdout.
 
 If the `integrity-hash` argument is provided, it will also check the integrity
 of the script.
