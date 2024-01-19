@@ -100,8 +100,12 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		}
 	}
 
-	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" {
-		logStatus(currentEnv, "export %s", out)
+	if out, count := diffStatus(previousEnv.Diff(newEnv)); out != "" {
+		if format, ok := currentEnv["DIRENV_LOG_VERBOSE"]; ok && format == "0" {
+			logStatus(currentEnv, "export %d environment variables", count)
+		} else {
+			logStatus(currentEnv, "export %s", out)
+		}
 	}
 
 	diffString := currentEnv.Diff(newEnv).ToShell(shell)
@@ -111,7 +115,8 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 }
 
 // Return a string of +/-/~ indicators of an environment diff
-func diffStatus(oldDiff *EnvDiff) string {
+func diffStatus(oldDiff *EnvDiff) (string, int) {
+	count := 0
 	if oldDiff.Any() {
 		var out []string
 		for key := range oldDiff.Prev {
@@ -131,12 +136,13 @@ func diffStatus(oldDiff *EnvDiff) string {
 			} else {
 				out = append(out, "+"+key)
 			}
+			count++
 		}
 
 		sort.Strings(out)
-		return strings.Join(out, " ")
+		return strings.Join(out, " "), count
 	}
-	return ""
+	return "", count
 }
 
 func direnvKey(key string) bool {
