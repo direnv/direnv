@@ -100,13 +100,14 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		}
 	}
 
-	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" {
+	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" && !config.HideEnvDiff {
 		logStatus(currentEnv, "export %s", out)
 	}
 
 	diffString := currentEnv.Diff(newEnv).ToShell(shell)
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
+
 	return
 }
 
