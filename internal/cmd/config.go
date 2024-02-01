@@ -23,6 +23,7 @@ type Config struct {
 	BashPath        string
 	RCFile          string
 	TomlPath        string
+	HideEnvDiff     bool
 	DisableStdin    bool
 	StrictEnv       bool
 	LoadDotenv      bool
