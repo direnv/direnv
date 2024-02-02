@@ -325,3 +325,19 @@ func TestVariableExpansionWithDefaults(t *testing.T) {
 	envShouldContain(t, env, "OPTION_R", "") // this is actually invalid in bash, but what to do here?
 	envShouldContain(t, env, "OPTION_S", ":-")
 }
+
+const TestVariableExpansionWithShellExpansionEnv = `
+OPTION_A=$PWD
+`
+
+func TestVariableExpansionWithShellExpansion(t *testing.T) {
+	err := os.Setenv("PWD", "/hello/world")
+	if err != nil {
+		t.Fatalf("unable to set environment variable for testing: %s", err)
+	}
+
+	env := dotenv.MustParse(TestVariableExpansionWithShellExpansionEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "PWD", "/hello/world")
+}
