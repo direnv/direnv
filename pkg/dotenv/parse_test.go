@@ -2,6 +2,8 @@ package dotenv_test
 
 import (
 	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	dotenv "github.com/direnv/direnv/v2/pkg/dotenv"
@@ -17,6 +19,12 @@ func envShouldContain(t *testing.T, env map[string]string, key string, value str
 	if env[key] != value {
 		t.Errorf("%s: %s, expected %s", key, env[key], value)
 	}
+}
+
+func getPkgDirPath() string {
+	_, filename, _, _ := runtime.Caller(0)
+	dirPath := filepath.Dir(filename)
+	return dirPath
 }
 
 // See the reference implementation:
@@ -327,17 +335,14 @@ func TestVariableExpansionWithDefaults(t *testing.T) {
 }
 
 const TestVariableExpansionWithShellExpansionEnv = `
-OPTION_A=$PWD
+PWD=$PWD
+HELLO="${echo hello}"
 `
 
 func TestVariableExpansionWithShellExpansion(t *testing.T) {
-	err := os.Setenv("PWD", "/hello/world")
-	if err != nil {
-		t.Fatalf("unable to set environment variable for testing: %s", err)
-	}
-
 	env := dotenv.MustParse(TestVariableExpansionWithShellExpansionEnv)
 	shouldNotHaveEmptyKey(t, env)
 
-	envShouldContain(t, env, "PWD", "/hello/world")
+	envShouldContain(t, env, "PWD", getPkgDirPath())
+	envShouldContain(t, env, "HELLO", "hello")
 }

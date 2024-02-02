@@ -7,6 +7,7 @@ package dotenv
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 )
@@ -116,11 +117,16 @@ func expandEnv(value string, dotenv map[string]string) string {
 	expander := func(value string) string {
 		envKey, defaultValue, hasDefault := splitKeyAndDefault(value, ":-")
 		expanded, found := lookupDotenv(envKey, dotenv)
-
 		if found {
 			return expanded
 		}
-		return getFromEnvOrDefault(envKey, defaultValue, hasDefault)
+
+		envValue, found := getFromEnvOrDefault(envKey, defaultValue, hasDefault)
+		if found {
+			return envValue
+		}
+
+		return getFromShellExpansion(envKey, defaultValue, hasDefault)
 	}
 
 	return os.Expand(value, expander)
@@ -140,11 +146,18 @@ func lookupDotenv(value string, dotenv map[string]string) (string, bool) {
 	return retval, ok
 }
 
-func getFromEnvOrDefault(envKey string, defaultValue string, hasDefault bool) string {
-	var envValue = os.Getenv(envKey)
+func getFromEnvOrDefault(envKey string, defaultValue string, hasDefault bool) (string, bool) {
+	envValue, found := os.LookupEnv(envKey)
 
-	if len(envValue) == 0 && hasDefault {
-		return defaultValue
+	if !found && hasDefault {
+		return defaultValue, false
 	}
-	return envValue
+	return envValue, found
+}
+
+func getFromShellExpansion(envKey string, defaultValue string, hasDefault bool) string {
+	cmd := strings.Split(envKey, " ")
+	out, _ := exec.Command(cmd[0], cmd[1:]...).Output()
+	result := strings.TrimSpace(string(out))
+	return result
 }
