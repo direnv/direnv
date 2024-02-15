@@ -1,3 +1,7 @@
+Unreleased
+==================
+
+  * feat: Add python poetry support (#995)
 
 2.33.0 / 2023-11-29
 ==================
