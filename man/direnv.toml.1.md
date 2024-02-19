@@ -44,7 +44,11 @@ If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc
 
 ### `load_dotenv`
 
-If set to `true`, also look for and load `.env` files on top of the `.envrc` files. If both `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
+If set to `true`, also look for and load `.env`  files on top of the `.envrc` files. If both `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
+
+### `env_paths`
+
+Only useful if `load_dotenv` is set to `true`. Defaults to `[".envrc", ".env"]`. Indicates the priorities and files direnv should search for.
 
 ### `strict_env`
 
