@@ -31,6 +31,20 @@ func (e ShellExport) Remove(key string) {
 	e[key] = nil
 }
 
+var supportedShellList = map[string]Shell{
+	"bash":    Bash,
+	"elvish":  Elvish,
+	"fish":    Fish,
+	"gha":     GitHubActions,
+	"gzenv":   GzEnv,
+	"json":    JSON,
+	"tcsh":    Tcsh,
+	"vim":     Vim,
+	"zsh":     Zsh,
+	"pwsh":    Pwsh,
+	"systemd": Systemd,
+}
+
 // DetectShell returns a Shell instance from the given target.
 //
 // target is usually $0 and can also be prefixed by `-`
@@ -41,27 +55,9 @@ func DetectShell(target string) Shell {
 		target = target[1:]
 	}
 
-	switch target {
-	case "bash":
-		return Bash
-	case "elvish":
-		return Elvish
-	case "fish":
-		return Fish
-	case "gha":
-		return GitHubActions
-	case "gzenv":
-		return GzEnv
-	case "json":
-		return JSON
-	case "tcsh":
-		return Tcsh
-	case "vim":
-		return Vim
-	case "zsh":
-		return Zsh
-	case "pwsh":
-		return Pwsh
+	detechedShell, isValid := supportedShellList[target]
+	if isValid {
+		return detechedShell
 	}
 
 	return nil

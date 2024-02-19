@@ -121,6 +121,7 @@ information such as common recipes, editor integration, tips-and-tricks.
 ### Man pages
 
 * [direnv(1) man page](man/direnv.1.md)
+* [direnv-fetchurl(1) man page](man/direnv-fetchurl.1.md)
 * [direnv-stdlib(1) man page](man/direnv-stdlib.1.md)
 * [direnv.toml(1) man page](man/direnv.toml.1.md)
 
@@ -135,7 +136,7 @@ confusing for users:
 
 2. It's possible to override the stdlib with your own set of function by
    adding a bash file to `~/.config/direnv/direnvrc`. This file is loaded and
-   it's content made available to any `.envrc` file.
+   its content made available to any `.envrc` file.
 
 3. direnv is not loading the `.envrc` into the current shell. It's creating a
    new bash sub-process to load the stdlib, direnvrc and `.envrc`, and only
