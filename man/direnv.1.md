@@ -122,6 +122,14 @@ Add the following line to your `$PROFILE`:
 Invoke-Expression "$(direnv hook pwsh)"
 ```
 
+### Murex
+
+Add the following line to your `~/.murex_profile`:
+
+```
+direnv hook murex -> source
+```
+
 USAGE
 -----
 

@@ -13,6 +13,7 @@
 , tcsh
 , zsh
 , powershell
+, murex
 , golangci-lint
 , python3
 , ruby
@@ -41,6 +42,7 @@ stdenv.mkDerivation {
     tcsh
     zsh
     powershell
+    murex
 
     # Test dependencies
     golangci-lint
