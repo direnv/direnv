@@ -1308,6 +1308,7 @@ use_flake() {
   watch_file flake.lock
   mkdir -p "$(direnv_layout_dir)"
   eval "$(nix print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
+  nix profile wipe-history --profile "$(direnv_layout_dir)/flake-profile"
 }
 
 # Usage: use_guix [...]
