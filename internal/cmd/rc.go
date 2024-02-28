@@ -124,9 +124,7 @@ func (rc *RC) Deny() (err error) {
 		return
 	}
 
-	// G306: Expect WriteFile permissions to be 0600 or less
-	// #nosec
-	if err = os.WriteFile(rc.denyPath, []byte(rc.path+"\n"), 0644); err != nil {
+	if err = os.WriteFile(rc.denyPath, []byte(rc.path+"\n"), 0644); /* #nosec G306 -- these deny files are not private */ err != nil {
 		return
 	}
 

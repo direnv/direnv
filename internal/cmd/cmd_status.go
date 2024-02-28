@@ -11,7 +11,7 @@ var CmdStatus = &Cmd{
 	Name: "status",
 	Desc: "Prints some debug status information",
 	Args: []string{"[--json]"},
-	Action: actionWithConfig(func(env Env, args []string, config *Config) error {
+	Action: actionWithConfig(func(_ Env, args []string, config *Config) error {
 		if len(args) > 1 && (args[1] == "-json" || args[1] == "--json") {
 			loadedRC := config.LoadedRC()
 			foundRC, err := config.FindRC()
