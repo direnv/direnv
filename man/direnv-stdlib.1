@@ -2,72 +2,61 @@
 .TH DIRENV-STDLIB 1 "2019" direnv "User Manuals"
 .SH NAME
 .PP
-direnv-stdlib - functions for the \fB\fC\&.envrc\fR
+direnv-stdlib - functions for the \fB\&.envrc\fR
 
 .SH SYNOPSIS
 .PP
-\fB\fCdirenv stdlib\fR
+\fBdirenv stdlib\fR
 
 .SH DESCRIPTION
 .PP
-Outputs a bash script called the \fIstdlib\fP\&. The following commands are included in that script and loaded in the context of an \fB\fC\&.envrc\fR\&. In addition, it also loads the file in \fB\fC~/.config/direnv/direnvrc\fR if it exists.
+Outputs a bash script called the \fIstdlib\fP\&. The following commands are included in that script and loaded in the context of an \fB\&.envrc\fR\&. In addition, it also loads the file in \fB~/.config/direnv/direnvrc\fR if it exists.
 
 .SH STDLIB
-.SS \fB\fChas <command>\fR
+.SS \fBhas <command>\fR
 .PP
 Returns 0 if the \fIcommand\fP is available. Returns 1 otherwise. It can be a binary in the PATH or a shell function.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 if has curl; then
   echo "Yes we do"
 fi
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCexpand_path <rel_path> [<relative_to>]\fR
+.SS \fBexpand_path <rel_path> [<relative_to>]\fR
 .PP
 Outputs the absolute path of \fIrel_path\fP relative to \fIrelative_to\fP or the current directory.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 cd /usr/local/games
 expand_path ../foo
 # output: /usr/local/foo
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCdotenv [<dotenv_path>]\fR
+.SS \fBdotenv [<dotenv_path>]\fR
 .PP
 Loads a ".env" file into the current environment.
 
-.SS \fB\fCdotenv_if_exists [<dotenv_path>]\fR
+.SS \fBdotenv_if_exists [<dotenv_path>]\fR
 .PP
 Loads a ".env" file into the current environment, but only if it exists.
 
-.SS \fB\fCuser_rel_path <abs_path>\fR
+.SS \fBuser_rel_path <abs_path>\fR
 .PP
 Transforms an absolute path \fIabs_path\fP into a user-relative path if possible.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 echo $HOME
 # output: /home/user
 user_rel_path /home/user/my/project
@@ -75,20 +64,16 @@ user_rel_path /home/user/my/project
 user_rel_path /usr/local/lib
 # output: /usr/local/lib
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCfind_up <filename>\fR
+.SS \fBfind_up <filename>\fR
 .PP
 Outputs the path of \fIfilename\fP when searched from the current directory up to /. Returns 1 if the file has not been found.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 cd /usr/local/my
 mkdir -p project/foo
 touch bar
@@ -96,37 +81,32 @@ cd project/foo
 find_up bar
 # output: /usr/local/my/bar
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCsource_env <file_or_dir_path>\fR
+.SS \fBsource_env <file_or_dir_path>\fR
 .PP
-Loads another \fB\fC\&.envrc\fR either by specifying its path or filename.
+Loads another \fB\&.envrc\fR either by specifying its path or filename.
 
 .PP
-NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.
+NOTE: the other \fB\&.envrc\fR is not checked by the security framework.
 
-.SS \fB\fCsource_env_if_exists <filename>\fR
+.SS \fBsource_env_if_exists <filename>\fR
 .PP
 Loads another ".envrc", but only if it exists.
 
 .PP
-NOTE: contrary to \fB\fCsource_env\fR, this only works when passing a path to a file,
+NOTE: contrary to \fBsource_env\fR, this only works when passing a path to a file,
       not a directory.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 source_env_if_exists .envrc.private
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCenv_vars_required <varname> [<varname> ...]\fR
+.SS \fBenv_vars_required <varname> [<varname> ...]\fR
 .PP
 Logs error for every variable not present in the environment or having an empty value.
 .br
@@ -135,106 +115,94 @@ Typically this is used in combination with source_env and source_env_if_exists.
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 # expect .envrc.private to provide tokens
 source_env .envrc.private
 # check presence of tokens
 env_vars_required GITHUB_TOKEN OTHER_TOKEN
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCsource_up [<filename>]\fR
+.SS \fBsource_up [<filename>]\fR
 .PP
-Loads another \fB\fC\&.envrc\fR if found with the find_up command. Returns 1 if no file
+Loads another \fB\&.envrc\fR if found with the find_up command. Returns 1 if no file
 is found.
 
 .PP
-NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.
+NOTE: the other \fB\&.envrc\fR is not checked by the security framework.
 
-.SS \fB\fCsource_up_if_exists [<filename>]\fR
+.SS \fBsource_up_if_exists [<filename>]\fR
 .PP
-Loads another \fB\fC\&.envrc\fR if found with the find_up command. If one is not
+Loads another \fB\&.envrc\fR if found with the find_up command. If one is not
 found, nothing happens.
 
 .PP
-NOTE: the other \fB\fC\&.envrc\fR is not checked by the security framework.
+NOTE: the other \fB\&.envrc\fR is not checked by the security framework.
 
-.SS \fB\fCsource_url <url> <integrity-hash>\fR
+.SS \fBsource_url <url> <integrity-hash>\fR
 .PP
-Loads another script from the given \fB\fCurl\fR\&. Before loading it it will check the
-integrity using the provided \fB\fCintegrity-hash\fR\&.
+Loads another script from the given \fBurl\fR\&. Before loading it it will check the
+integrity using the provided \fBintegrity-hash\fR\&.
 
 .PP
-To find the value of the \fB\fCintegrity-hash\fR, call \fB\fCdirenv fetchurl <url>\fR and
+To find the value of the \fBintegrity-hash\fR, call \fBdirenv fetchurl <url>\fR and
 extract the hash from the outputted message.
 
 .PP
-See also \fB\fCdirenv-fetchurl(1)\fR for more details.
+See also \fBdirenv-fetchurl(1)\fR for more details.
 
-.SS \fB\fCfetchurl <url> [<integrity-hash>]\fR
+.SS \fBfetchurl <url> [<integrity-hash>]\fR
 .PP
-Fetches the given \fB\fCurl\fR onto disk and outputs its path location on stdout.
+Fetches the given \fBurl\fR onto disk and outputs its path location on stdout.
 
 .PP
-If the \fB\fCintegrity-hash\fR argument is provided, it will also check the integrity
+If the \fBintegrity-hash\fR argument is provided, it will also check the integrity
 of the script.
 
 .PP
-See also \fB\fCdirenv-fetchurl(1)\fR for more details.
+See also \fBdirenv-fetchurl(1)\fR for more details.
 
-.SS \fB\fCdirenv_apply_dump <file>\fR
+.SS \fBdirenv_apply_dump <file>\fR
 .PP
-Loads the output of \fB\fCdirenv dump\fR that was stored in a file.
+Loads the output of \fBdirenv dump\fR that was stored in a file.
 
-.SS \fB\fCdirenv_load [<command-generating-dump-output>]\fR
+.SS \fBdirenv_load [<command-generating-dump-output>]\fR
 .PP
 Applies the environment generated by running \fIargv\fP as a command. This is useful for adopting the environment of a child process - cause that process to run "direnv dump" and then wrap the results with direnv_load.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 direnv_load opam exec direnv dump
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCPATH_add <path>\fR
+.SS \fBPATH_add <path>\fR
 .PP
 Prepends the expanded \fIpath\fP to the PATH environment variable. It prevents a common mistake where PATH is replaced by only the new \fIpath\fP\&.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 pwd
 # output: /home/user/my/project
 PATH_add bin
 echo $PATH
 # output: /home/user/my/project/bin:/usr/bin:/bin
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCMANPATH_add <path>\fR
+.SS \fBMANPATH_add <path>\fR
 .PP
 Prepends the expanded \fIpath\fP to the MANPATH environment variable. It takes care of man-specific heuritic.
 
-.SS \fB\fCpath_add <varname> <path>\fR
+.SS \fBpath_add <varname> <path>\fR
 .PP
-Works like \fB\fCPATH_add\fR except that it's for an arbitrary \fIvarname\fP\&.
+Works like \fBPATH_add\fR except that it's for an arbitrary \fIvarname\fP\&.
 
-.SS \fB\fCPATH_rm <pattern> [<pattern> ...]\fR
+.SS \fBPATH_rm <pattern> [<pattern> ...]\fR
 .PP
 Removes directories that match any of the given shell patterns from the PATH environment variable. Order of the remaining directories is preserved in the resulting PATH.
 
@@ -245,30 +213,23 @@ Bash pattern syntax:
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 echo $PATH
 # output: /dontremove/me:/remove/me:/usr/local/bin/:...
 PATH_rm '/remove/*'
 echo $PATH
 # output: /dontremove/me:/usr/local/bin/:...
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCload_prefix <prefix_path>\fR
+.SS \fBload_prefix <prefix_path>\fR
 .PP
-Expands some common path variables for the given \fIprefix_path\fP prefix. This is useful if you installed something in the \fIprefix_path\fP using \fB\fC\&./configure --prefix=$prefix_path && make install\fR and want to use it in the project.
+Expands some common path variables for the given \fIprefix_path\fP prefix. This is useful if you installed something in the \fIprefix_path\fP using \fB\&./configure --prefix=$prefix_path && make install\fR and want to use it in the project.
 
 .PP
 Variables set:
 
-.PP
-.RS
-
-.nf
+.EX
 CPATH
 LD_LIBRARY_PATH
 LIBRARY_PATH
@@ -276,35 +237,27 @@ MANPATH
 PATH
 PKG_CONFIG_PATH
 
-.fi
-.RE
+.EE
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 \&./configure --prefix=$HOME/rubies/ruby-1.9.3
 make && make install
 # Then in the .envrc
 load_prefix ~/rubies/ruby-1.9.3
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCsemver_search <directory> <folder_prefix> <partial_version>\fR
+.SS \fBsemver_search <directory> <folder_prefix> <partial_version>\fR
 .PP
 Search a directory for the highest version number in SemVer format (X.Y.Z).
 
 .PP
 Examples:
 
-.PP
-.RS
-
-.nf
+.EX
 $ tree .
 .
 |-- dir
@@ -318,125 +271,116 @@ $ semver_search "dir" "program-" "1.4"
 $ semver_search "dir" "program-" "1"
 1.5.0
 
-.fi
-.RE
+.EE
 
-.SS \fB\fClayout <type>\fR
+.SS \fBlayout <type>\fR
 .PP
 A semantic dispatch used to describe common project layouts.
 
-.SS \fB\fClayout go\fR
+.SS \fBlayout go\fR
 .PP
 Adds "$(direnv_layout_dir)/go" to the GOPATH environment variable.
 And also adds "$PWD/bin" to the PATH environment variable.
 
-.SS \fB\fClayout julia\fR
+.SS \fBlayout julia\fR
 .PP
-Sets the \fB\fCJULIA_PROJECT\fR environment variable to the current directory.
+Sets the \fBJULIA_PROJECT\fR environment variable to the current directory.
 
-.SS \fB\fClayout node\fR
+.SS \fBlayout node\fR
 .PP
 Adds "$PWD/node_modules/.bin" to the PATH environment variable.
 
-.SS \fB\fClayout php\fR
+.SS \fBlayout php\fR
 .PP
 Adds "$PWD/vendor/bin" to the PATH environment variable.
 
-.SS \fB\fClayout perl\fR
+.SS \fBlayout perl\fR
 .PP
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
 
-.SS \fB\fClayout pipenv\fR
+.SS \fBlayout pipenv\fR
 .PP
-Similar to \fB\fClayout python\fR, but uses Pipenv to build a virtualenv from the \fB\fCPipfile\fR located in the same directory. The path can be overridden by the \fB\fCPIPENV_PIPFILE\fR environment variable.
+Similar to \fBlayout python\fR, but uses Pipenv to build a virtualenv from the \fBPipfile\fR located in the same directory. The path can be overridden by the \fBPIPENV_PIPFILE\fR environment variable.
 
 .PP
-Note that unlike invoking Pipenv manually, this does not load environment variables from a \fB\fC\&.env\fR file automatically. You may want to add \fB\fCdotenv .env\fR to copy that behavior.
+Note that unlike invoking Pipenv manually, this does not load environment variables from a \fB\&.env\fR file automatically. You may want to add \fBdotenv .env\fR to copy that behavior.
 
-.SS \fB\fClayout pyenv [<version> ...]\fR
+.SS \fBlayout pyenv [<version> ...]\fR
 .PP
-Similar to \fB\fClayout python\fR, but uses pyenv to build a virtualenv with the specified Python interpreter version.
+Similar to \fBlayout python\fR, but uses pyenv to build a virtualenv with the specified Python interpreter version.
 
 .PP
 Multiple versions may be specified separated by spaces; please refer to the pyenv documentation for more information.
 
-.SS \fB\fClayout python [<python_exe>]\fR
+.SS \fBlayout python [<python_exe>]\fR
 .PP
-Creates and loads a virtualenv environment under \fB\fC$PWD/.direnv/python-$python_version\fR\&. This forces the installation of any egg into the project's sub-folder.
+Creates and loads a virtualenv environment under \fB$PWD/.direnv/python-$python_version\fR\&. This forces the installation of any egg into the project's sub-folder.
 
 .PP
-It's possible to specify the python executable if you want to use different versions of python (eg: \fB\fClayout python python3\fR).
+It's possible to specify the python executable if you want to use different versions of python (eg: \fBlayout python python3\fR).
 
 .PP
-Note that previously virtualenv was located under \fB\fC$PWD/.direnv/virtualenv\fR and will be re-used by direnv if it exists.
+Note that previously virtualenv was located under \fB$PWD/.direnv/virtualenv\fR and will be re-used by direnv if it exists.
 
-.SS \fB\fClayout python3\fR
+.SS \fBlayout python3\fR
 .PP
-A shortcut for \fB\fClayout python python3\fR
+A shortcut for \fBlayout python python3\fR
 
-.SS \fB\fClayout ruby\fR
+.SS \fBlayout ruby\fR
 .PP
-Sets the GEM_HOME environment variable to \fB\fC$PWD/.direnv/ruby/RUBY_VERSION\fR\&. This forces the installation of any gems into the project's sub-folder. If you're using bundler it will create wrapper programs that can be invoked directly instead of using the \fB\fCbundle exec\fR prefix.
+Sets the GEM_HOME environment variable to \fB$PWD/.direnv/ruby/RUBY_VERSION\fR\&. This forces the installation of any gems into the project's sub-folder. If you're using bundler it will create wrapper programs that can be invoked directly instead of using the \fBbundle exec\fR prefix.
 
-.SS \fB\fCuse <program_name> [<version>]\fR
+.SS \fBuse <program_name> [<version>]\fR
 .PP
 A semantic command dispatch intended for loading external dependencies into the environment.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 use_ruby() {
   echo "Ruby $1"
 }
 use ruby 1.9.3
 # output: Ruby 1.9.3
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCuse julia <version>\fR
+.SS \fBuse julia <version>\fR
 .PP
 Loads the specified Julia version. You must specify a path to the directory with
 installed Julia versions using $JULIA_VERSIONS. You can optionally override the
-prefix for folders inside $JULIA_VERSIONS (default \fB\fCjulia-\fR) using $JULIA_VERSION_PREFIX.
-If no exact match for \fB\fC<version>\fR is found a search will be performed and the latest
+prefix for folders inside $JULIA_VERSIONS (default \fBjulia-\fR) using $JULIA_VERSION_PREFIX.
+If no exact match for \fB<version>\fR is found a search will be performed and the latest
 version will be loaded.
 
 .PP
 Examples (.envrc):
 
-.PP
-.RS
-
-.nf
+.EX
 use julia 1.5.1   # loads $JULIA_VERSIONS/julia-1.5.1
 use julia 1.5     # loads $JULIA_VERSIONS/julia-1.5.1
 use julia master  # loads $JULIA_VERSIONS/julia-master
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCuse rbenv\fR
+.SS \fBuse rbenv\fR
 .PP
 Loads rbenv which add the ruby wrappers available on the PATH.
 
-.SS \fB\fCuse nix [...]\fR
+.SS \fBuse nix [...]\fR
 .PP
-Load environment variables from \fB\fCnix-shell\fR\&.
+Load environment variables from \fBnix-shell\fR\&.
 
 .PP
-If you have a \fB\fCdefault.nix\fR or \fB\fCshell.nix\fR these will be used by default, but you can also specify packages directly (e.g \fB\fCuse nix -p ocaml\fR).
+If you have a \fBdefault.nix\fR or \fBshell.nix\fR these will be used by default, but you can also specify packages directly (e.g \fBuse nix -p ocaml\fR).
 
 .PP
 See http://nixos.org/nix/manual/#sec-nix-shell
 
-.SS \fB\fCuse flake [<installable>]\fR
+.SS \fBuse flake [<installable>]\fR
 .PP
-Load the build environment of a derivation similar to \fB\fCnix develop\fR\&.
+Load the build environment of a derivation similar to \fBnix develop\fR\&.
 
 .PP
 By default it will load the current folder flake.nix devShell attribute. Or
@@ -447,26 +391,26 @@ of the hello package from the latest nixpkgs.
 Note that the flakes feature is hidden behind an experimental flag, which you
 will have to enable on your own. Flakes is not considered stable yet.
 
-.SS \fB\fCuse guix [...]\fR
+.SS \fBuse guix [...]\fR
 .PP
-Load environment variables from \fB\fCguix shell\fR\&.
+Load environment variables from \fBguix shell\fR\&.
 
 .PP
-Any arguments given will be passed to guix shell. For example, \fB\fCuse guix hello\fR would setup an environment including the hello package. To create an environment with the hello dependencies, the \fB\fC--development\fR flag is used \fB\fCuse guix --development hello\fR\&. Other options include \fB\fC--file\fR which allows loading an environment from a file.
+Any arguments given will be passed to guix shell. For example, \fBuse guix hello\fR would setup an environment including the hello package. To create an environment with the hello dependencies, the \fB--development\fR flag is used \fBuse guix --development hello\fR\&. Other options include \fB--file\fR which allows loading an environment from a file.
 
 .PP
 See https://guix.gnu.org/en/manual/en/guix.html#Invoking-guix-shell
 
-.SS \fB\fCrvm [...]\fR
+.SS \fBrvm [...]\fR
 .PP
 Should work just like in the shell if you have rvm installed.
 
-.SS \fB\fCuse node [<version>]\fR:
+.SS \fBuse node [<version>]\fR:
 .PP
 Loads the specified NodeJS version into the environment.
 
 .PP
-If a partial NodeJS version is passed (i.e. \fB\fC4.2\fR), a fuzzy match
+If a partial NodeJS version is passed (i.e. \fB4.2\fR), a fuzzy match
 is performed and the highest matching version installed is selected.
 
 .PP
@@ -487,38 +431,34 @@ Overrides the default version prefix.
 
 .RE
 
-.SS \fB\fCuse vim [<vimrc_file>]\fR
+.SS \fBuse vim [<vimrc_file>]\fR
 .PP
 Prepends the specified vim script (or .vimrc.local by default) to the
-\fB\fCDIRENV_EXTRA_VIMRC\fR environment variable.
+\fBDIRENV_EXTRA_VIMRC\fR environment variable.
 
 .PP
 This variable is understood by the direnv/direnv.vim extension. When found,
 it will source it after opening files in the directory.
 
-.SS \fB\fCwatch_file <path> [<path> ...]\fR
+.SS \fBwatch_file <path> [<path> ...]\fR
 .PP
 Adds each file to direnv's watch-list. If the file changes direnv will reload the environment on the next prompt.
 
 .PP
 Example (.envrc):
 
-.PP
-.RS
-
-.nf
+.EX
 watch_file Gemfile
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCdirenv_version <version_at_least>\fR
+.SS \fBdirenv_version <version_at_least>\fR
 .PP
-Checks that the direnv version is at least old as \fB\fCversion_at_least\fR\&. This can
-be useful when sharing an \fB\fC\&.envrc\fR and to make sure that the users are up to
+Checks that the direnv version is at least old as \fBversion_at_least\fR\&. This can
+be useful when sharing an \fB\&.envrc\fR and to make sure that the users are up to
 date.
 
-.SS \fB\fCstrict_env [<command> ...]\fR
+.SS \fBstrict_env [<command> ...]\fR
 .PP
 Turns on shell execution strictness. This will force the .envrc
 evaluation context to exit immediately if:
@@ -526,12 +466,12 @@ evaluation context to exit immediately if:
 .RS
 .IP \(bu 2
 any command in a pipeline returns a non-zero exit status that is not
-otherwise handled as part of \fB\fCif\fR, \fB\fCwhile\fR, or \fB\fCuntil\fR tests,
-return value negation (\fB\fC!\fR), or part of a boolean (\fB\fC&&\fR or \fB\fC||\fR)
+otherwise handled as part of \fBif\fR, \fBwhile\fR, or \fBuntil\fR tests,
+return value negation (\fB!\fR), or part of a boolean (\fB&&\fR or \fB||\fR)
 chain.
 .IP \(bu 2
 any variable that has not explicitly been set or declared (with
-either \fB\fCdeclare\fR or \fB\fClocal\fR) is referenced.
+either \fBdeclare\fR or \fBlocal\fR) is referenced.
 
 .RE
 
@@ -542,29 +482,21 @@ of the command.
 .PP
 Example (Whole Script):
 
-.PP
-.RS
-
-.nf
+.EX
 strict_env
 has curl
 
-.fi
-.RE
+.EE
 
 .PP
 Example (Command):
 
-.PP
-.RS
-
-.nf
+.EX
 strict_env has curl
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCunstrict_env [<command> ...]\fR
+.SS \fBunstrict_env [<command> ...]\fR
 .PP
 Turns off shell execution strictness. If followed by a command-line, the
 strictness applies for the duration of the command.
@@ -572,45 +504,34 @@ strictness applies for the duration of the command.
 .PP
 Example (Whole Script):
 
-.PP
-.RS
-
-.nf
+.EX
 unstrict_env
 has curl
 
-.fi
-.RE
+.EE
 
 .PP
 Example (Command):
 
-.PP
-.RS
-
-.nf
+.EX
 unstrict_env has curl
 
-.fi
-.RE
+.EE
 
-.SS \fB\fCon_git_branch [<branch_name>]\fR
+.SS \fBon_git_branch [<branch_name>]\fR
 .PP
-Returns 0 if within a git repository with given \fB\fCbranch_name\fR\&. If no branch name
+Returns 0 if within a git repository with given \fBbranch_name\fR\&. If no branch name
 is provided, then returns 0 when within \fIany\fP branch. Requires the git command
 to be installed. Returns 1 otherwise.
 
 .PP
-When a branch is specified, then \fB\fC\&.git/HEAD\fR is watched so that entering/exiting
+When a branch is specified, then \fB\&.git/HEAD\fR is watched so that entering/exiting
 a branch triggers a reload.
 
 .PP
 Example (.envrc):
 
-.PP
-.RS
-
-.nf
+.EX
 if on_git_branch child_changes; then
   export MERGE_BASE_BRANCH=parent_changes
 fi
@@ -619,8 +540,7 @@ if on_git_branch; then
   echo "Thanks for contributing to a GitHub project!"
 fi
 
-.fi
-.RE
+.EE
 
 .SH COPYRIGHT
 .PP

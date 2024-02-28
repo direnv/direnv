@@ -35,8 +35,8 @@ __env_strictness() {
   mode="$1"
   shift
 
-  set +o | grep 'pipefail\|nounset\|errexit' > "$tmpfile"
-  old_shell_options=$(< "$tmpfile")
+  set +o | grep 'pipefail\|nounset\|errexit' >"$tmpfile"
+  old_shell_options=$(<"$tmpfile")
   rm -f "$tmpfile"
 
   case "$mode" in
@@ -202,23 +202,48 @@ join_args() {
 #    # output: /usr/local/foo
 #
 expand_path() {
-  local REPLY; realpath.absolute "${2+"$2"}" "${1+"$1"}"; echo "$REPLY"
+  local REPLY
+  realpath.absolute "${2+"$2"}" "${1+"$1"}"
+  echo "$REPLY"
 }
 
 # --- vendored from https://github.com/bashup/realpaths
-realpath.dirname() { REPLY=.; ! [[ $1 =~ /+[^/]+/*$|^//$ ]] || REPLY="${1%"${BASH_REMATCH[0]}"}"; REPLY=${REPLY:-/}; }
-realpath.basename(){ REPLY=/; ! [[ $1 =~ /*([^/]+)/*$ ]] || REPLY="${BASH_REMATCH[1]}"; }
+realpath.dirname() {
+  REPLY=.
+  ! [[ $1 =~ /+[^/]+/*$|^//$ ]] || REPLY="${1%"${BASH_REMATCH[0]}"}"
+  REPLY=${REPLY:-/}
+}
+realpath.basename() {
+  REPLY=/
+  ! [[ $1 =~ /*([^/]+)/*$ ]] || REPLY="${BASH_REMATCH[1]}"
+}
 
 realpath.absolute() {
-  REPLY=$PWD; local eg=extglob; ! shopt -q $eg || eg=; ${eg:+shopt -s $eg}
+  REPLY=$PWD
+  local eg=extglob
+  ! shopt -q $eg || eg=
+  ${eg:+shopt -s $eg}
   while (($#)); do case $1 in
-    //|//[^/]*) REPLY=//; set -- "${1:2}" "${@:2}" ;;
-    /*) REPLY=/; set -- "${1##+(/)}" "${@:2}" ;;
+    // | //[^/]*)
+      REPLY=//
+      set -- "${1:2}" "${@:2}"
+      ;;
+    /*)
+      REPLY=/
+      set -- "${1##+(/)}" "${@:2}"
+      ;;
     */*) set -- "${1%%/*}" "${1##"${1%%/*}"+(/)}" "${@:2}" ;;
-    ''|.) shift ;;
-    ..) realpath.dirname "$REPLY"; shift ;;
-    *) REPLY="${REPLY%/}/$1"; shift ;;
-  esac; done; ${eg:+shopt -u $eg}
+    '' | .) shift ;;
+    ..)
+      realpath.dirname "$REPLY"
+      shift
+      ;;
+    *)
+      REPLY="${REPLY%/}/$1"
+      shift
+      ;;
+    esac done
+  ${eg:+shopt -u $eg}
 }
 # ---
 
@@ -324,7 +349,7 @@ find_up() {
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_env() {
   local rcpath=${1/#\~/$HOME}
-  if has cygpath ; then
+  if has cygpath; then
     rcpath=$(cygpath -u "$rcpath")
   fi
 
@@ -377,7 +402,7 @@ source_env_if_exists() {
 
 # Usage: env_vars_required <varname> [<varname> ...]
 #
-# Logs error for every variable not present in the environment or having an empty value.  
+# Logs error for every variable not present in the environment or having an empty value.
 # Typically this is used in combination with source_env and source_env_if_exists.
 #
 # Example:
@@ -394,7 +419,7 @@ env_vars_required() {
   ret=0
 
   for var in "$@"; do
-    if [[ "$environment" != *"$var="* || -z ${!var:-}  ]]; then
+    if [[ "$environment" != *"$var="* || -z ${!var:-} ]]; then
       log_error "env var $var is required but missing/empty"
       ret=1
     fi
@@ -514,14 +539,15 @@ direnv_load() {
   # `set -e`, for example) and hence always remove the temporary directory.
   touch "$output_file" &&
     DIRENV_DUMP_FILE_PATH="$output_file" "$@" &&
-    { test -s "$output_file" || {
+    {
+      test -s "$output_file" || {
         log_error "Environment not dumped; did you invoke 'direnv dump'?"
         false
       }
     } &&
-    "$direnv" apply_dump "$output_file" > "$script_file" &&
+    "$direnv" apply_dump "$output_file" >"$script_file" &&
     source "$script_file" ||
-      exit_code=$?
+    exit_code=$?
 
   # Scrub temporary directory
   rm -rf "$temp_dir"
@@ -735,10 +761,10 @@ semver_search() {
   # strip $version_dir/$prefix prefix from line.
   # Sort by version: split by "." then reverse numeric sort for each piece of the version string
   # The first one is the highest
-  find "$version_dir" -maxdepth 1 -mindepth 1 -type d -name "${prefix}${partial_version}*" \
-    | while IFS= read -r line; do echo "${line#"${version_dir%/}"/"${prefix}"}"; done \
-    | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
-    | head -1
+  find "$version_dir" -maxdepth 1 -mindepth 1 -type d -name "${prefix}${partial_version}*" |
+    while IFS= read -r line; do echo "${line#"${version_dir%/}"/"${prefix}"}"; done |
+    sort -t . -k 1,1rn -k 2,2rn -k 3,3rn |
+    head -1
 }
 
 # Usage: layout <type>
@@ -755,7 +781,7 @@ layout() {
     echo 'Signature: 8a477f597d28d172789f06886806bc55
 # This file is a cache directory tag created by direnv.
 # For information about cache directory tags, see:
-#	http://www.brynosaurus.com/cachedir/' > "$layout_dir/CACHEDIR.TAG"
+#	http://www.brynosaurus.com/cachedir/' >"$layout_dir/CACHEDIR.TAG"
   fi
 }
 
@@ -835,20 +861,20 @@ layout_python() {
       VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
     fi
     case $ve in
-      "venv")
-        if [[ ! -d $VIRTUAL_ENV ]]; then
-          $python -m venv "$@" "$VIRTUAL_ENV"
-        fi
-        ;;
-      "virtualenv")
-        if [[ ! -d $VIRTUAL_ENV ]]; then
-          $python -m virtualenv "$@" "$VIRTUAL_ENV"
-        fi
-        ;;
-      *)
-        log_error "Error: neither venv nor virtualenv are available."
-        return 1
-        ;;
+    "venv")
+      if [[ ! -d $VIRTUAL_ENV ]]; then
+        $python -m venv "$@" "$VIRTUAL_ENV"
+      fi
+      ;;
+    "virtualenv")
+      if [[ ! -d $VIRTUAL_ENV ]]; then
+        $python -m virtualenv "$@" "$VIRTUAL_ENV"
+      fi
+      ;;
+    *)
+      log_error "Error: neither venv nor virtualenv are available."
+      return 1
+      ;;
     esac
   fi
   export VIRTUAL_ENV
@@ -922,7 +948,7 @@ layout_anaconda() {
   if [[ -n "$env_config" ]]; then
     if [[ -e "$env_config" ]]; then
       env_name="$(grep -- '^name:' "$env_config")"
-      env_name="${env_name/#name:*([[:space:]])}"
+      env_name="${env_name/#name:*([[:space:]])/}"
       if [[ -z "$env_name" ]]; then
         log_error "Unable to find 'name' in '$env_config'"
         return 1
@@ -967,7 +993,7 @@ layout_anaconda() {
     fi
   fi
 
-  eval "$( "$conda" shell.bash activate "$env_loc" )"
+  eval "$("$conda" shell.bash activate "$env_loc")"
 }
 
 # Usage: layout pipenv
@@ -982,7 +1008,10 @@ layout_pipenv() {
     exit 2
   fi
 
-  VIRTUAL_ENV=$(pipenv --venv 2>/dev/null ; true)
+  VIRTUAL_ENV=$(
+    pipenv --venv 2>/dev/null
+    true
+  )
 
   if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
     pipenv install --dev
@@ -1237,10 +1266,10 @@ use_nodenv() {
   node_versions_dir="$(nodenv root)/versions"
   nodenv_version="${node_versions_dir}/${node_version}"
   if [[ -e "$nodenv_version" ]]; then
-      # Put the selected node version in the PATH
-      NODE_VERSIONS="${node_versions_dir}" NODE_VERSION_PREFIX="" use_node "${node_version}"
-      # Add $PWD/node_modules/.bin to the PATH
-      layout_node
+    # Put the selected node version in the PATH
+    NODE_VERSIONS="${node_versions_dir}" NODE_VERSION_PREFIX="" use_node "${node_version}"
+    # Add $PWD/node_modules/.bin to the PATH
+    layout_node
   else
     log_error "nodenv: version '$node_version' not installed.  Use \`nodenv install ${node_version}\` to install it first."
     return 1
@@ -1343,12 +1372,12 @@ on_git_branch() {
   if ! has git; then
     log_error "on_git_branch needs git, which could not be found on your system"
     return 1
-  elif ! git_dir=$(git rev-parse --absolute-git-dir 2> /dev/null); then
+  elif ! git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null); then
     log_error "on_git_branch could not locate the .git directory corresponding to the current working directory"
     return 1
   elif [ -z "$1" ]; then
     return 0
-  elif [[ "$1" = "-r"  &&  -z "$2" ]]; then
+  elif [[ "$1" = "-r" && -z "$2" ]]; then
     log_error "missing regexp pattern after \`-r\` flag"
     return 1
   fi
