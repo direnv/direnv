@@ -38,6 +38,7 @@ var supportedShellList = map[string]Shell{
 	"gha":     GitHubActions,
 	"gzenv":   GzEnv,
 	"json":    JSON,
+	"murex":   Murex,
 	"tcsh":    Tcsh,
 	"vim":     Vim,
 	"zsh":     Zsh,
@@ -59,6 +60,5 @@ func DetectShell(target string) Shell {
 	if isValid {
 		return detechedShell
 	}
-
 	return nil
 }

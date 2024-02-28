@@ -86,3 +86,11 @@ Add the following line to your `$PROFILE`:
 ```powershell
 Invoke-Expression "$(direnv hook pwsh)"
 ```
+
+## Murex
+
+Add the following line to your `~/.murex_profile` file:
+
+```sh
+direnv hook murex -> source
+```
