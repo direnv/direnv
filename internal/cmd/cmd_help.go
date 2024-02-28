@@ -11,7 +11,7 @@ var CmdHelp = &Cmd{
 	Desc:    "Shows this help",
 	Args:    []string{"[SHOW_PRIVATE]"},
 	Aliases: []string{"--help"},
-	Action: actionSimple(func(env Env, args []string) (err error) {
+	Action: actionSimple(func(_ Env, args []string) (err error) {
 		var showPrivate = len(args) > 1
 		fmt.Printf(`direnv v%s
 Usage: direnv COMMAND [...ARGS]
