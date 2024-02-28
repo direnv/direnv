@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"path/filepath"
 	"fmt"
-	"os"
 	"github.com/direnv/direnv/v2/pkg/dotenv"
+	"os"
+	"path/filepath"
 )
 
 // CmdDotEnv is `direnv dotenv [SHELL [PATH_TO_DOTENV]]`
@@ -42,20 +42,17 @@ func cmdDotEnvAction(_ Env, args []string) (err error) {
 	if data, err = os.ReadFile(target); err != nil {
 		return
 	}
-	// Set PWD env var to the directory the .env file resides in This results in
-	// the least amount of surprise, as a dotenv file is most often defined
-	// in the same directory it's loaded from, so refering to PWD should
-	// match the directory of the dotenv file.
+
+	// Set PWD env var to the directory the .env file resides in. This results
+	// in the least amount of surprise, as a dotenv file is most often defined
+	// in the same directory it's loaded from, so referring to PWD should match
+	// the directory of the .env file.
 	path, err := filepath.Abs(target)
 	if err != nil {
 		return err
 	}
-	path, err = filepath.EvalSymlinks(path)
-	if err != nil {
-		return err
-	}
-	pwd := filepath.Dir(path)
-	os.Setenv("PWD", pwd)
+	os.Setenv("PWD", filepath.Dir(path))
+
 	newenv, err = dotenv.Parse(string(data))
 	if err != nil {
 		return err
