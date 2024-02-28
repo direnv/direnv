@@ -24,6 +24,16 @@ Add the following line at the end of the `~/.zshrc` file:
 eval "$(direnv hook zsh)"
 ```
 
+## Oh my zsh
+
+Oh my zsh has [a core plugin with direnv](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/direnv) support.
+
+Add direnv to the plugins array in your zshrc file:
+
+```sh
+plugins=(... direnv)
+```
+
 ## FISH
 
 Add the following line at the end of the `~/.config/fish/config.fish` file:
