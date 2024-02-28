@@ -1223,6 +1223,8 @@ use_node() {
     via=".node-version"
   fi
 
+  version=${version#v}
+
   if [[ -z $version ]]; then
     log_error "I do not know which NodeJS version to load because one has not been specified!"
     return 1
