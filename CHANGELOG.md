@@ -1,4 +1,27 @@
 
+2.34.0 / 2024-03-01
+==================
+
+  * doc: README.md, man pages: it's typos (#1230)
+  * doc: add shell setup instructions for oh-my-zsh (#1070)
+  * doc: added fetchurl manpage link to README.md
+  * doc: document XDG_DATA_HOME (#1185)
+  * doc: update installation.md for Gentoo (#1206)
+  * feat: add Murex support (#1242)
+  * feat: added systemd shell for export (#1126)
+  * feat: allow to disable warn timeouts (#1209)
+  * feat: hide env diff (#1223, #1234)
+  * feat: made 'direnv export' non private (#1229)
+  * fix: `use_julia` should not set LD_LIBRARY_PATH (#900)
+  * fix: add missing deps for release in go.mod
+  * fix: avoid use of regex in bash hook output (#1043)
+  * fix: direnv.toml.1.md: add examples for $HOME expansion
+  * fix: stdlib: use_flake: don't keep old generations around (#1089)
+  * fix: stdlib: use_node: strip leading v from version (#1071)
+  * fix: support Bash 5.1 array PROMPT_COMMAND (#1208)
+  * fix: update stdlib.sh to avoid deprecation warning (#1221)
+  * fix: update zsh syntax in internal/cmd/shell_zsh.go (#1075)
+
 2.33.0 / 2023-11-29
 ==================
 
