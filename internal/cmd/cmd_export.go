@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os/exec"
 	"sort"
 	"strings"
 )
@@ -25,6 +26,19 @@ var CmdExport = &Cmd{
 	Args:    []string{"SHELL"},
 	Private: false,
 	Action:  cmdWithWarnTimeout(actionWithConfig(exportCommand)),
+}
+
+func runExitScript() {
+	// Path to the script
+	scriptPath := "/home/ajaym/.envrcexit"
+
+	// Command to execute the script
+	out, err := exec.Command(scriptPath).Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("echo '%s'", out)
 }
 
 func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
@@ -81,6 +95,8 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	}
 
 	if toLoad == "" {
+		runExitScript()
+
 		logStatus(currentEnv, "unloading")
 		newEnv = previousEnv.Copy()
 		newEnv.CleanContext()
