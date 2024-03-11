@@ -28,9 +28,9 @@ var CmdExport = &Cmd{
 	Action:  cmdWithWarnTimeout(actionWithConfig(exportCommand)),
 }
 
-func runExitScript() {
+func runExitScript(currentEnv Env) {
 	// Path to the script
-	scriptPath := "/home/ajaym/.envrcexit"
+	scriptPath := currentEnv[DIRENV_DIR_PLAIN] + "/.envrcexit"
 
 	// Command to execute the script
 	out, err := exec.Command(scriptPath).Output()
@@ -95,9 +95,8 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	}
 
 	if toLoad == "" {
-		runExitScript()
-
 		logStatus(currentEnv, "unloading")
+		runExitScript(currentEnv)
 		newEnv = previousEnv.Copy()
 		newEnv.CleanContext()
 	} else {
@@ -110,7 +109,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		}
 		if newEnv == nil {
 			// unless of course, the error was in hashing and timestamp loading,
-			// in which case we have to abort because we don't know what timestamp
+			// in which case we have to abort because we don"t know what timestamp
 			// to put in the diff!
 			return
 		}

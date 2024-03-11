@@ -208,6 +208,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	defer func() {
 		// Record directory changes even if load is disallowed or fails
 		newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
+		newEnv[DIRENV_DIR_PLAIN] = filepath.Dir(rc.path)
 		newEnv[DIRENV_FILE] = rc.path
 		newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
 	}()
