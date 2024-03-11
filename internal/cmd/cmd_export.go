@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"sort"
@@ -29,17 +31,27 @@ var CmdExport = &Cmd{
 	Action:  cmdWithWarnTimeout(actionWithConfig(exportCommand)),
 }
 
+func checkFileExists(filePath string) bool {
+	_, error := os.Stat(filePath)
+
+	return !errors.Is(error, os.ErrNotExist)
+}
 func runExitScript(currentEnv Env) {
 	// Path to the script
 	scriptPath := filepath.Dir(currentEnv[DIRENV_FILE]) + "/.envrcexit"
 
-	// Command to execute the script
-	out, err := exec.Command(scriptPath).Output()
-	if err != nil {
-		log.Fatal(err)
+	isFileExist := checkFileExists(scriptPath)
+	if isFileExist {
+		// Command to execute the script
+		out, err := exec.Command(scriptPath).Output()
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			fmt.Printf("echo '%s'", out)
+		}
+	} else {
+		// exit script doesnt exist
 	}
-
-	fmt.Printf("echo '%s'", out)
 }
 
 func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
