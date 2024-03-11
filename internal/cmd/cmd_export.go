@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -30,7 +31,7 @@ var CmdExport = &Cmd{
 
 func runExitScript(currentEnv Env) {
 	// Path to the script
-	scriptPath := currentEnv[DIRENV_DIR_PLAIN] + "/.envrcexit"
+	scriptPath := filepath.Dir(currentEnv[DIRENV_FILE]) + "/.envrcexit"
 
 	// Command to execute the script
 	out, err := exec.Command(scriptPath).Output()
