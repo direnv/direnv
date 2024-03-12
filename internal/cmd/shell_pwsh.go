@@ -58,7 +58,7 @@ func (sh pwsh) export(key, value string) string {
 	if !regexp.MustCompile(`'.*'`).MatchString(value) {
 		value = fmt.Sprintf("'%s'", value)
 	}
-	return fmt.Sprintf("$env:%s=%s;", sh.escape(key), value)
+	return fmt.Sprintf("${env:%s}=%s;", sh.escape(key), value)
 }
 
 func (sh pwsh) unset(key string) string {
