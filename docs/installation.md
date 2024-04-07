@@ -12,6 +12,7 @@ direnv is packaged for a variety of systems:
 * [Fedora](https://src.fedoraproject.org/rpms/direnv)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/direnv/)
 * [Debian](https://packages.debian.org/search?keywords=direnv&searchon=names&suite=all&section=all)
+* [Exherbo Linux](https://gitlab.exherbo.org/exherbo-unofficial/CleverCloud/-/tree/master/packages/app-shells/direnv)
 * [Gentoo Guru](https://wiki.gentoo.org/wiki/Project:GURU/Information_for_End_Users)
 * [NetBSD pkgsrc-wip](http://www.pkgsrc.org/wip/)
 * [NixOS](https://search.nixos.org/options?query=programs.direnv)
