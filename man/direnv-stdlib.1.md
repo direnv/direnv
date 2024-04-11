@@ -119,7 +119,7 @@ NOTE: the other `.envrc` is not checked by the security framework.
 
 ### `source_url <url> <integrity-hash>`
 
-Loads another script from the given `url`. Before loading it it will check the
+Loads another script from the given `url`. Before loading it will check the
 integrity using the provided `integrity-hash`.
 
 To find the value of the `integrity-hash`, call `direnv fetchurl <url>` and
