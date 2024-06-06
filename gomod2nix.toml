@@ -8,8 +8,8 @@ schema = 3
     version = "v0.0.20"
     hash = "sha256-qhw9hWtU5wnyFyuMbKx+7RB8ckQaFQ8D+8GKPkN3HHQ="
   [mod."golang.org/x/mod"]
-    version = "v0.16.0"
-    hash = "sha256-aN1Cz5Wqd9YCjK8nFW6JWn+n1HfFoEcgYZmGO/FYtbw="
+    version = "v0.17.0"
+    hash = "sha256-CLaPeF6uTFuRDv4oHwOQE6MCMvrzkUjWN3NuyywZjKU="
   [mod."golang.org/x/sys"]
     version = "v0.6.0"
     hash = "sha256-zAgxiTuL24sGhbXrna9R1UYqLQh46ldztpumOScmduY="
