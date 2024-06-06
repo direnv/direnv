@@ -788,7 +788,7 @@ layout() {
 # Usage: layout go
 #
 # Adds "$(direnv_layout_dir)/go" to the GOPATH environment variable.
-# Furthermore "$(direnv_layout_dir/go/bin" is set as the value for the GOBIN environment variable and added to the PATH environment variable.
+# Furthermore "$(direnv_layout_dir)/go/bin" is set as the value for the GOBIN environment variable and added to the PATH environment variable.
 layout_go() {
   path_add GOPATH "$(direnv_layout_dir)/go"
 
