@@ -614,10 +614,7 @@ path_add() {
   done
 
   # join back all the paths
-  path=$(
-    IFS=:
-    echo "${path_array[*]}"
-  )
+  IFS=: path=${path_array[*]}
 
   # and finally export back the result to the original variable
   export "$var_name=$path"
@@ -689,10 +686,7 @@ path_rm() {
   done
 
   # join the result paths
-  result=$(
-    IFS=:
-    echo "${results[*]}"
-  )
+  IFS=: result=${results[*]}
 
   # and finally export back the result to the original variable
   export "$var_name=$result"
