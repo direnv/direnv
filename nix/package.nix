@@ -1,11 +1,13 @@
-{ buildGoApplication, lib, stdenv, bash }:
+{ buildGoApplication, lib, stdenv, bash, git }:
 buildGoApplication {
   pname = "direnv";
-  version = lib.fileContents ./version.txt;
+  version = "0+git";
   subPackages = [ "." ];
 
-  src = ./.;
-  pwd = ./.;
+  nativeBuildInputs = [ git ];
+
+  src = ../.;
+
   modules = ./gomod2nix.toml;
 
   # we have no bash at the moment for windows
@@ -15,12 +17,10 @@ buildGoApplication {
 
   # replace the build phase to use the GNUMakefile instead
   buildPhase = ''
-    ls -la ./vendor
     make BASH_PATH=$BASH_PATH
   '';
 
   installPhase = ''
-    echo $GOCACHE
     make install PREFIX=$out
   '';
 

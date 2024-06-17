@@ -1,0 +1,113 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+
+# The lines below are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/need to use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 1
+
+project_name: direnv
+
+before:
+  hooks:
+    - make man
+
+builds:
+  - id: direnv
+    main: .
+    binary: direnv
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -extldflags "-static" -X main.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - freebsd_386
+      - freebsd_amd64
+      - freebsd_arm
+      - linux_386
+      - linux_amd64
+      - linux_arm
+      - linux_arm64
+      - linux_mips
+      - linux_mips64
+      - linux_mips64le
+      - linux_mipsle
+      - linux_ppc64
+      - linux_ppc64le
+      - linux_s390x
+      - netbsd_386
+      - netbsd_amd64
+      - netbsd_arm
+      - openbsd_386
+      - openbsd_amd64
+      - windows_386
+      - windows_amd64
+archives:
+  - id: direnv
+    builds: [direnv]
+    format: tar.gz
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+      - man/*.1
+nfpms:
+  -
+    # Name of the package.
+    # Default: ProjectName
+    # Templates: allowed (since v1.18)
+    package_name: direnv
+
+    # Your app's vendor.
+    vendor: direnv
+
+    # Your app's homepage.
+    homepage: https://direnv.net/
+
+    # Your app's maintainer (probably you).
+    maintainer: zimbatm <zimbatm@zimbatm.com>
+
+    # Your app's description.
+    description: unclutter your .profile
+
+    # Your app's license.
+    license: MIT
+
+    # Formats to be generated.
+    formats:
+      - apk
+      - archlinux
+      - deb
+      - rpm
+
+    # Section.
+    section: default
+
+    # Priority.
+    priority: extra
+
+    # Contents to add to the package.
+    # GoReleaser will automatically add the binaries.
+    contents:
+      - src: ./man/*.1
+        dst: /usr/share/man/man1
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

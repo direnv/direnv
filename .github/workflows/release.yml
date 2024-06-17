@@ -1,43 +1,27 @@
+name: Release
+
 on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-# TODO: also publish the dist
-name: Create Release
-
 permissions:
-  contents: read
+  contents: write
+  packages: write
 
 jobs:
-  build:
-    permissions:
-      contents: write  # for actions/create-release to create a release
-    name: Create Release
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.16
-        uses: actions/setup-go@v5.0.0
-        with:
-          go-version: 1.16
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+
       - name: Get release notes
-        id: release-notes
         run: |
           go mod download golang.org/x/tools
-          go run ./script/issue-command/main.go set-output \
-            --name=body \
-            "$(go run ./script/release-changelog/main.go)"
-      - name: Create Release
-        id: create_release
+          go run ./script/release-changelog/main.go
+      - name: Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: "${{ steps.release-notes.outputs.body }}"
-          draft: true
-          prerelease: false

@@ -6,7 +6,7 @@
 , gnumake
 , go
 , go-md2man
-, gox
+, goreleaser
 , bashInteractive
 , elvish
 , fish
@@ -24,25 +24,23 @@
 stdenv.mkDerivation {
   name = "shell";
   buildInputs = [
-    (mkGoEnv { pwd = ./.; })
-
     # Build
+    (mkGoEnv { pwd = ../.; })
     git
     git-extras # for git-changelog
     gnumake
-    go
     go-md2man
-    gox
     gomod2nix
+    goreleaser
 
     # Shells
     bashInteractive
     elvish
     fish
+    murex
+    powershell
     tcsh
     zsh
-    powershell
-    murex
 
     # Test dependencies
     golangci-lint

@@ -53,6 +53,10 @@ ifdef BASH_PATH
 	GO_LDFLAGS += -X main.bashPath=$(BASH_PATH)
 endif
 
+ifdef DIRENV_VERSION
+	GO_LDFLAGS += -X main.version=$(DIRENV_VERSION)
+endif
+
 ifneq ($(strip $(GO_LDFLAGS)),)
 	GO_BUILD_FLAGS = -ldflags '$(GO_LDFLAGS)'
 endif
@@ -171,30 +175,5 @@ install: all
 
 .PHONY: dist
 dist:
-	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
-	CGO_ENABLED=0 GOFLAGS="-trimpath" \
-		gox -rebuild -ldflags="-s -w" -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}" \
-		-osarch darwin/amd64 \
-		-osarch darwin/arm64 \
-		-osarch freebsd/386 \
-		-osarch freebsd/amd64 \
-		-osarch freebsd/arm \
-		-osarch linux/386 \
-		-osarch linux/amd64 \
-		-osarch linux/arm \
-		-osarch linux/arm64 \
-		-osarch linux/mips \
-		-osarch linux/mips64 \
-		-osarch linux/mips64le \
-		-osarch linux/mipsle \
-		-osarch linux/ppc64 \
-		-osarch linux/ppc64le \
-		-osarch linux/s390x \
-		-osarch netbsd/386 \
-		-osarch netbsd/amd64 \
-		-osarch netbsd/arm \
-		-osarch openbsd/386 \
-		-osarch openbsd/amd64 \
-		-osarch windows/386 \
-		-osarch windows/amd64 \
-		&& true
+	@command -v goreleaser >/dev/null || (echo "Could not generate dist because goreleaser is missing."; false)
+	goreleaser build --clean --snapshot
