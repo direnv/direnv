@@ -26,6 +26,7 @@ jobs:
       - name: Get release notes
         id: release-notes
         run: |
+          go mod download golang.org/x/tools
           go run ./script/issue-command/main.go set-output \
             --name=body \
             "$(go run ./script/release-changelog/main.go)"
