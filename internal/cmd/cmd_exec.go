@@ -67,7 +67,18 @@ func cmdExecAction(env Env, args []string, config *Config) (err error) {
 		return
 	}
 
-	// #nosec G204
-	err = syscall.Exec(commandPath, args, newEnv.ToGoEnv())
+	_ = execEnv(commandPath, args, newEnv)
 	return
+}
+
+// execEnv will execute commandPath using the given env environment.
+//
+// NOTE: syscall.Exec is: "not supported by Windows"
+// https://github.com/golang/go/issues/30662
+func execEnv(commandPath string, args []string, env Env) error {
+	if Cygpath != nil {
+		return Cygpath.Exec(commandPath, args, env)
+	}
+	// #nosec G204
+	return syscall.Exec(commandPath, args, env.ToGoEnv())
 }

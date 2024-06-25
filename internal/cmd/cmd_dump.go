@@ -31,6 +31,7 @@ func cmdDumpAction(env Env, args []string) (err error) {
 	}
 
 	if filePath != "" {
+		filePath = FixPath(filePath)
 		if num, err := strconv.Atoi(filePath); err == nil {
 			w = os.NewFile(uintptr(num), filePath)
 		} else {
