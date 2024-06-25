@@ -20,13 +20,6 @@ assert_eq() {
   fi
 }
 
-assert_neq() {
-  if [[ $1 == "$2" ]]; then
-    echo "expected '$1' to not equal '$2'"
-    return 1
-  fi
-}
-
 test_name() {
   echo "--- $*"
 }
@@ -223,6 +216,7 @@ test_name env_vars_required
   [[ "${output#*'BAZ is required'}" != "$output" ]]
   [[ "${output#*'MISSING is required'}" != "$output" ]]
 )
+
 
 # test strict_env and unstrict_env
 ./strict_env_test.bash
