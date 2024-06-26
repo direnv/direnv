@@ -287,11 +287,11 @@ if { ${ which python } != 'unknown' } then {
 	rm -rf .direnv
 
 	direnv_eval
-	test_nonempty "$VIETUAL_ENV"
+	test_nonempty "$VIRTUAL_ENV"
 
 	set bool python_in_path = false
 	$PATH -> :paths: foreach paths_entry {
-		if { "$paths_entry" == '$VIRTUAL_ENV/bin' } then {
+		if { "$paths_entry" == "$VIRTUAL_ENV/bin" } then {
 			set python_in_path = true
 		}
 	}
