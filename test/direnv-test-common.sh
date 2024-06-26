@@ -21,6 +21,7 @@ unset DIRENV_DIR
 unset DIRENV_FILE
 unset DIRENV_WATCHES
 unset DIRENV_DIFF
+unset DIRENV_STATUS
 
 mkdir -p "${XDG_CONFIG_HOME}/direnv"
 touch "${XDG_CONFIG_HOME}/direnv/direnvrc"
@@ -74,6 +75,7 @@ test_start base
   echo "Setting up"
   direnv_eval
   test_eq "$HELLO" "world"
+  test_eq "${DIRENV_STATUS:-}" "allowed"
 
   WATCHES=$DIRENV_WATCHES
 
@@ -206,11 +208,13 @@ test_start "failure"
   # fails.
   test_eq "${DIRENV_DIFF:-}" ""
   test_eq "${DIRENV_WATCHES:-}" ""
+  test_eq "${DIRENV_STATUS:-}" ""
 
   direnv_eval
 
   test_neq "${DIRENV_DIFF:-}" ""
   test_neq "${DIRENV_WATCHES:-}" ""
+  test_eq "${DIRENV_STATUS:-}" "failed"
 test_stop
 
 test_start "watch-dir"
@@ -279,6 +283,15 @@ if has python; then
     fi
   test_stop
 fi
+
+test_start "deny"
+  direnv deny
+  direnv_eval
+  test_neq "${DIRENV_DIFF:-}" ""
+  test_neq "${DIRENV_WATCHES:-}" ""
+  test_eq "${DIRENV_STATUS:-}" "denied"
+  test -z "${HELLO}"
+test_stop
 
 test_start "aliases"
   direnv deny
