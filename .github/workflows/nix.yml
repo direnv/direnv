@@ -16,9 +16,6 @@ jobs:
           fetch-depth: 0
       - uses: cachix/install-nix-action@V27
 
-      - name: Build
-        run: nix build
-
         # Run the more comprehensive test suite with nix because we have
         # access to all the build dependencies.
       - name: Test
