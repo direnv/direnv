@@ -153,7 +153,7 @@ log_status() {
 # Example:
 #
 #    log_error "Unable to find specified directory!"
-
+#
 log_error() {
   if [[ -n $DIRENV_LOG_FORMAT ]]; then
     local msg=$* color_normal='' color_error=''
@@ -163,6 +163,85 @@ log_error() {
     fi
     # shellcheck disable=SC2059,SC1117
     printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
+  fi
+}
+
+# Usage: log_debug [<message> ...]
+#
+# Logs a debug message. Acts like echo,
+# but wraps output in the standard direnv log format
+# (controlled by $DIRENV_LOG_FORMAT), and directs it
+# to stderr rather than stdout.
+#
+# Only activated when DIRENV_DEBUG=1.
+#
+# Example:
+#
+#    log_debug "Unable to find specified directory!"
+#
+log_debug() {
+  if [[ -n $DIRENV_LOG_FORMAT && "${DIRENV_DEBUG:-}" == "1" ]]; then
+    local msg=$* color_normal='' color_error=''
+    if [[ -t 2 ]]; then
+      color_normal="\e[m"
+      color_error="\e[38;5;1m"
+    fi
+    # shellcheck disable=SC2059,SC1117
+    printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
+  fi
+}
+
+# Usage: __unix_path <path>
+#
+# In environments with cygpath, it returns the unix path for the given <path>.
+# Otherwise it just returns <path>.
+#
+# The conversion is only performed when <path> looks like a Windows path.
+#
+# This is a private helper function.
+#
+# Example:
+#
+#    __unix_path /usr/local/foo
+#    # output: /usr/local/foo
+#    __unix_path C:\\Foo
+#    # output: /c/Foo
+#
+__unix_path() {
+  # TODO: A future PR could implement this functionality directly in direnv and
+  # drop the dependency on cygpath, e.g: "$direnv" __unix_path "$@"
+  if [[ "$1" == *":/"* || "$1" == *":\\"* ]] && has cygpath; then
+    log_debug "__unix_path: cygpath: $1"
+    cygpath -u "$1" || echo "$1"
+  else
+    echo "$1"
+  fi
+}
+
+# Usage: __unix_path_list <path_list>
+#
+# In environments with cygpath, it returns the unix path list for the given <path_list>.
+# Otherwise it just returns <path_list>.
+#
+# The conversion is only performed when <path_list> looks like a Windows path list.
+#
+# This is a private helper function.
+#
+# Example:
+#
+#    __unix_path_list /usr/local/foo:/usr/bin
+#    # output: /usr/local/foo:/usr/bin
+#    __unix_path_list C:\\Foo;C:\\Bar
+#    # output: /c/Foo:/c/Bar
+#
+__unix_path_list() {
+  # TODO: A future PR could implement this functionality directly in direnv and
+  # drop the dependency on cygpath, e.g: "$direnv" __unix_path_list  "$@"
+  if [[ "$1" == *";"* ]] && has cygpath; then
+    log_debug "__unix_path_list: cygpath: $1"
+    cygpath -u -p "$1" || echo "$1"
+  else
+    echo "$1"
   fi
 }
 
@@ -349,9 +428,7 @@ find_up() {
 # NOTE: the other ".envrc" is not checked by the security framework.
 source_env() {
   local rcpath=${1/#\~/$HOME}
-  if has cygpath; then
-    rcpath=$(cygpath -u "$rcpath")
-  fi
+  rcpath="$(__unix_path "$rcpath")"
 
   local REPLY
   if [[ -d $rcpath ]]; then
@@ -605,12 +682,12 @@ path_add() {
   local path i var_name="$1"
   # split existing paths into an array
   declare -a path_array
-  IFS=: read -ra path_array <<<"${!1-}"
+  IFS=: read -ra path_array <<<"$(__unix_path_list "${!1-}")"
   shift
 
   # prepend the passed paths in the right order
   for ((i = $#; i > 0; i--)); do
-    path_array=("$(expand_path "${!i}")" ${path_array[@]+"${path_array[@]}"})
+    path_array=("$(expand_path "$(__unix_path "${!i}")")" ${path_array[@]+"${path_array[@]}"})
   done
 
   # join back all the paths
@@ -635,7 +712,7 @@ path_add() {
 MANPATH_add() {
   local old_paths="${MANPATH:-$(man -w)}"
   local dir
-  dir=$(expand_path "$1")
+  dir="$(expand_path "$(__unix_path "$1")")"
   export "MANPATH=$dir:$old_paths"
 }
 
@@ -666,7 +743,7 @@ path_rm() {
   local path i discard var_name="$1"
   # split existing paths into an array
   declare -a path_array
-  IFS=: read -ra path_array <<<"${!1}"
+  IFS=: read -ra path_array <<<"$(__unix_path_list "${!1-}")"
   shift
 
   patterns=("$@")
@@ -678,6 +755,7 @@ path_rm() {
     discard=false
     # shellcheck disable=SC2068
     for pattern in ${patterns[@]+"${patterns[@]}"}; do
+      pattern="$(__unix_path "$pattern")"
       if [[ "$path" == +($pattern) ]]; then
         discard=true
         break
@@ -777,6 +855,7 @@ layout() {
   "$funcname" "$@"
   local layout_dir
   layout_dir=$(direnv_layout_dir)
+  mkdir -p "$layout_dir" || true
   if [[ -d "$layout_dir" && ! -f "$layout_dir/CACHEDIR.TAG" ]]; then
     echo 'Signature: 8a477f597d28d172789f06886806bc55
 # This file is a cache directory tag created by direnv.
@@ -862,13 +941,13 @@ layout_python() {
     else
       VIRTUAL_ENV=$(direnv_layout_dir)/python-$python_version
     fi
-    case $ve in
-    "venv")
+    case "$ve" in
+    *"venv"*)
       if [[ ! -d $VIRTUAL_ENV ]]; then
         $python -m venv "$@" "$VIRTUAL_ENV"
       fi
       ;;
-    "virtualenv")
+    *"virtualenv"*)
       if [[ ! -d $VIRTUAL_ENV ]]; then
         $python -m virtualenv "$@" "$VIRTUAL_ENV"
       fi
@@ -1404,6 +1483,8 @@ __main__() {
   # reserve stdout for dumping
   exec 3>&1
   exec 1>&2
+
+  direnv_config_dir="$(__unix_path "$direnv_config_dir")"
 
   # shellcheck disable=SC2317
   __dump_at_exit() {

@@ -75,6 +75,10 @@ fmt-sh:
 	@command -v shfmt >/dev/null || (echo "Could not format stdlib.sh because shfmt is missing. Run: go get -u mvdan.cc/sh/cmd/shfmt"; false)
 	shfmt -i 2 -w stdlib.sh
 
+.PHONY: fmt-go-lint
+fmt-go-lint: fmt-go
+	golangci-lint run --fix
+
 ############################################################################
 # Documentation
 ############################################################################
@@ -112,6 +116,28 @@ ifeq ($(shell uname), OS/390)
 	tests = \
 		test-stdlib \
 		test-go \
+		test-go-fmt \
+		test-bash
+endif
+
+# Skip few checks for MSYS2
+ifneq ($(MSYSTEM),)
+	tests = \
+		test-shellcheck \
+		test-stdlib \
+		test-go \
+		test-go-lint \
+		test-go-fmt \
+		test-bash
+endif
+
+# Skip few checks for Cygwin
+ifeq ($(shell uname -o), Cygwin)
+	tests = \
+		test-shellcheck \
+		test-stdlib \
+		test-go \
+		test-go-lint \
 		test-go-fmt \
 		test-bash
 endif
@@ -155,6 +181,102 @@ test-pwsh:
 
 test-mx:
 	murex -trypipe ./test/direnv-test.mx
+
+############################################################################
+# Cygpath (MSYS2/Cygwin)
+############################################################################
+
+.ONESHELL:
+.PHONY: init-cygpath-msys2-ci
+init-cygpath-msys2-ci:
+	@set -e
+	# pacman -S fish
+	# pacman -S zsh
+	# pacman -S ruby
+	# pacman -S python
+	# pacman -S go
+	# pacman -S make
+
+.ONESHELL:
+.PHONY: init-cygpath
+init-cygpath:
+	@set -e
+	command -v scoop >/dev/null || (echo "Please install Scoop first."; false)
+	scoop install main/make
+	scoop install main/golangci-lint
+	scoop install main/shfmt
+	scoop install main/shellcheck
+	scoop install main/go
+	scoop install main/msys2
+	scoop install main/python
+	scoop install main/ruby
+	scoop install main/hyperfine
+
+.ONESHELL:
+.PHONY: test-cygpath-env
+test-cygpath-env:
+	@set -e
+	command -v cygpath >/dev/null || (echo "cygpath is missing"; false)
+	command -v bash >/dev/null || (echo "bash is missing"; false)
+	command -v make >/dev/null || (echo "make is missing"; false)
+	command -v shfmt >/dev/null || (echo "shfmt is missing, do you want to run make init-cygpath?"; false)
+	command -v golangci-lint >/dev/null || (echo "golangci-lint is missing, do you want to run make init-cygpath?"; false)
+	command -v shellcheck >/dev/null || (echo "shellcheck is missing, do you want to run make init-cygpath?"; false)
+	echo "Environment check done."
+
+.PHONY: test-cygpath-go
+test-cygpath-go: test-cygpath-env fmt fmt-go-lint
+	$(GO) test -v ./internal/cmd -run TestCygpath
+
+.PHONY: test-cygpath-go-bench
+test-cygpath-go-bench: test-cygpath-env fmt fmt-go-lint
+	$(GO) test -run XXX -bench=. ./internal/cmd
+
+.PHONY: test-cygpath-bash
+test-cygpath-bash: test-cygpath-env fmt-sh build test-shellcheck test-stdlib test-bash
+
+.PHONY: test-cygpath
+test-cygpath: test-cygpath-go test-cygpath-bash
+
+# Run like this for accurate measurements on MSYS2:
+# MSYS2_ENV_CONV_EXCL="*" make test-cygpath-bench
+.ONESHELL:
+.PHONY: test-cygpath-bench
+test-cygpath-bench: SHELL:=/usr/bin/bash
+test-cygpath-bench: build
+	@set -euxo pipefail
+	direnv_path="$(realpath ./direnv.exe)"
+	export direnv_path
+	echo "$$direnv_path"
+	echo "MSYS2_ENV_CONV_EXCL=${MSYS2_ENV_CONV_EXCL:-}"
+	bench_1() { 
+		eval "$(MSYS2_ENV_CONV_EXCL="*" "$$direnv_path" export bash)"
+	}
+	export -f bench_1
+	bench_4() { 
+		MSYS2_ENV_CONV_EXCL="*" "$$direnv_path" exec . hostname
+	}
+	export -f bench_4
+	bench_2() { 
+		eval "$("$$direnv_path" export bash)"
+	}
+	export -f bench_2
+	bench_3() { 
+		"$$direnv_path" exec . hostname
+	}
+	export -f bench_3
+	cd ./test/scenarios/cygpath-perf 
+	MSYS2_ENV_CONV_EXCL="*" "$$direnv_path" allow
+	hyperfine --show-output --export-markdown /tmp/bench_1.md --shell=bash --runs 10 --warmup 1 bench_1
+	hyperfine --show-output --export-markdown /tmp/bench_4.md --shell=bash --runs 10 --warmup 1 bench_4
+	unset MSYS2_ENV_CONV_EXCL
+	"$$direnv_path" allow
+	hyperfine --show-output --export-markdown /tmp/bench_2.md --shell=bash --runs 10 --warmup 1 bench_2
+	hyperfine --show-output --export-markdown /tmp/bench_3.md --shell=bash --runs 10 --warmup 1 bench_3
+	cat /tmp/bench_1.md
+	cat /tmp/bench_4.md
+	cat /tmp/bench_2.md
+	cat /tmp/bench_3.md
 
 ############################################################################
 # Installation

@@ -85,6 +85,9 @@ func LoadConfig(env Env) (config *Config, err error) {
 		Env: env,
 	}
 
+	revertEnv := InitTempEnv(env)
+	defer revertEnv()
+
 	config.ConfDir = env[DIRENV_CONFIG]
 	if config.ConfDir == "" {
 		config.ConfDir = xdg.ConfigDir(env, "direnv")

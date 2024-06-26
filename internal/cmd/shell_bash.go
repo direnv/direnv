@@ -11,7 +11,7 @@ const bashHook = `
 _direnv_hook() {
   local previous_exit_status=$?;
   trap -- '' SIGINT;
-  eval "$("{{.SelfPath}}" export bash)";
+  eval "$(MSYS2_ENV_CONV_EXCL="*" "{{.SelfPath}}" export bash)";
   trap - SIGINT;
   return $previous_exit_status;
 };
