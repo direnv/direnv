@@ -110,6 +110,19 @@ unstrict_env() {
   fi
 }
 
+# Usage: direnv_leaf_dir
+#
+# Prints the folder where direnv's _leaf_ .envrc file is located. This
+# will not change even when source_up is used, unlike `direnv_layout_dir`
+# which can be overridden by setting a variable. Both $PWD and
+# `direnv_layout_dir` can change during execution; this one cannot.
+#
+# The output is always the directory where the closest .envrc file is found.
+__direnv_leaf_dir=${__direnv_leaf_dir:-$PWD}
+direnv_leaf_dir() {
+  echo "${__direnv_leaf_dir}"
+}
+
 # Usage: direnv_layout_dir
 #
 # Prints the folder path that direnv should use to store layout content.
