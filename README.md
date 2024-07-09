@@ -6,47 +6,30 @@ direnv -- unclutter your .profile
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/direnv.svg)](https://repology.org/project/direnv/versions)
 [![Support room on Matrix](https://img.shields.io/matrix/direnv:numtide.com.svg?label=%23direnv%3Anumtide.com&logo=matrix&server_fqdn=matrix.numtide.com)](https://matrix.to/#/#direnv:numtide.com)
 
-`direnv` is an extension for your shell. It augments existing shells with a
-new feature that can load and unload environment variables depending on the
-current directory.
+`direnv` is an extension for your unix shell. It augments existing shells with a
+new feature that can **load and unload environment variables** depending on the
+directory you are in.
 
 ## Use cases
 
-* Load [12factor apps](https://12factor.net/) environment variables
+Primary use-cases **hacking on nix based software**:
 * Create per-project isolated development environments
-* Load secrets for deployment
+  * **flake support**: automates running **nix develop** when entering the project directory
+  * **nix-shell** support: automates running **nix-shell** when entering the project directory
 
-## How it works
+Generic use-case (no nix involved): **environment variable management**:
+* Load project specific variables for build, development and deployment
+  * Load [12factor apps](https://12factor.net/) environment variables
 
-Before each prompt, direnv checks for the existence of a `.envrc` file (and
-[optionally](man/direnv.toml.1.md#codeloaddotenvcode) a `.env` file) in the current
-and parent directories. If the file exists (and is authorized), it is loaded
-into a **bash** sub-shell and all exported variables are then captured by
-direnv and then made available to the current shell.
+Supported platforms are:
+* Unix-like operating system (Linux, macOS, Windows via WSL2, FreeBSD)
 
-It supports hooks for all the common shells like bash, zsh, tcsh and fish.
-This allows project-specific environment variables without cluttering the
-`~/.profile` file.
+Supported shells are:
+* **bash, zsh, fish, tcsh, csh, elvish, rc, powershell, murex, nushell and xonsh** shells.
 
-Because direnv is compiled into a single static executable, it is fast enough
-to be unnoticeable on each prompt. It is also language-agnostic and can be
-used to build solutions similar to rbenv, pyenv and phpenv.
+Note: **direnv is limited to interactive shells** so 'ssh nixos@nixos "cd myproject; export" will not show added variables but 'ssh nixos@nixos' and then manually typing 'export' will show them.
 
-## Getting Started
-
-### Prerequisites
-
-* Unix-like operating system (macOS, Linux, ...)
-* A supported shell (bash, zsh, tcsh, fish, elvish, powershell, murex, nushell)
-
-### Basic Installation
-
-1. direnv is packaged in most distributions already. See [the installation documentation](docs/installation.md) for details.
-2. [hook direnv into your shell](docs/hook.md).
-
-Now restart your shell.
-
-### Quick demo
+### Demo: Custom environment variables in shell
 
 To follow along in your shell once direnv is installed.
 
@@ -83,6 +66,80 @@ direnv: unloading
 $ echo ${FOO-nope}
 nope
 ```
+
+### Demo: Flake support
+
+On NixOS with this configuration.nix option set:
+```nix
+programs.direnv.enable = true;
+```
+
+So with your average [rust project flake](https://codeberg.org/slowtec/klick/src/branch/master/flake.nix) one can do this:
+
+```shell
+$ echo "use flake" > ~/klick/.envrc
+$ rustc --version
+The program 'rustc' is not in your PATH. 
+
+$ cd ~/klick
+$ direnv allow .
+direnv: loading ~/klick/.envrc
+direnv: using flake
+direnv: nix-direnv: renewed cache
+direnv: export +AR +AR_FOR_TARGET +AS +AS_FOR_TARGET +CC +CC_FOR_TARGET +CONFIG_SHELL +CXX +CXX_FOR_TARGET +GDK_PIXBUF_MODULE_FILE +GETTEXTDATADIRS +HOST_PATH +IN_NIX_SHELL +LD +LD_FOR_TARGET +NIX_BINTOOLS +NIX_BINTOOLS_FOR_TARGET +NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_BINTOOLS_WRAPPER_TARGET_TARGET_x86_64_unknown_linux_gnu +NIX_BUILD_CORES +NIX_CC +NIX_CC_FOR_TARGET +NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_CC_WRAPPER_TARGET_TARGET_x86_64_unknown_linux_gnu +NIX_CFLAGS_COMPILE +NIX_CFLAGS_COMPILE_FOR_TARGET +NIX_ENFORCE_NO_NATIVE +NIX_HARDENING_ENABLE +NIX_LDFLAGS +NIX_LDFLAGS_FOR_TARGET +NIX_PKG_CONFIG_WRAPPER_TARGET_TARGET_x86_64_unknown_linux_gnu +NIX_STORE +NM +NM_FOR_TARGET +NODE_PATH +OBJCOPY +OBJCOPY_FOR_TARGET +OBJDUMP +OBJDUMP_FOR_TARGET +PKG_CONFIG_FOR_TARGET +PKG_CONFIG_PATH_FOR_TARGET +RANLIB +RANLIB_FOR_TARGET +READELF +READELF_FOR_TARGET +SIZE +SIZE_FOR_TARGET +SOURCE_DATE_EPOCH +STRINGS +STRINGS_FOR_TARGET +STRIP +STRIP_FOR_TARGET +__structuredAttrs +buildInputs +buildPhase +builder +cmakeFlags +configureFlags +depsBuildBuild +depsBuildBuildPropagated +depsBuildTarget +depsBuildTargetPropagated +depsHostHost +depsHostHostPropagated +depsTargetTarget +depsTargetTargetPropagated +doCheck +doInstallCheck +dontAddDisableDepTrack +mesonFlags +name +nativeBuildInputs +out +outputs +patches +phases +preferLocalBuild +propagatedBuildInputs +propagatedNativeBuildInputs +shell +shellHook +stdenv +strictDeps +system ~PATH ~XDG_DATA_DIRS
+
+$ rustc --version
+rustc 1.79.0 (129f3b996 2024-06-10)
+```
+
+### Demo: Nix shell support
+
+```shell
+$ cat myproject/default.nix
+with (import <nixpkgs> {});
+mkShell {
+  buildInputs = [
+   screen
+  ];
+}
+
+$ echo 'use nix' > myproject/.envrc
+$ cd myproject/
+$ direnv allow .
+direnv: loading ~/myproject/.envrc
+direnv: using nix
+direnv: nix-direnv: using cached dev shell
+direnv: export +AR +AS +CC +CONFIG_SHELL +CXX +HOST_PATH +IN_NIX_SHELL +LD +NIX_BINTOOLS +NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_BUILD_CORES +NIX_CC +NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_CFLAGS_COMPILE +NIX_ENFORCE_NO_NATIVE +NIX_HARDENING_ENABLE +NIX_LDFLAGS +NIX_STORE +NM +OBJCOPY +OBJDUMP +RANLIB +READELF +SIZE +SOURCE_DATE_EPOCH +STRINGS +STRIP +__structuredAttrs +buildInputs +buildPhase +builder +cmakeFlags +configureFlags +depsBuildBuild +depsBuildBuildPropagated +depsBuildTarget +depsBuildTargetPropagated +depsHostHost +depsHostHostPropagated +depsTargetTarget +depsTargetTargetPropagated +doCheck +doInstallCheck +dontAddDisableDepTrack +mesonFlags +name +nativeBuildInputs +out +outputs +patches +phases +preferLocalBuild +propagatedBuildInputs +propagatedNativeBuildInputs +shell +shellHook +stdenv +strictDeps +system ~PATH ~XDG_DATA_DIRS
+$ which screen
+/nix/store/s4dk03ikih0ca6dkifl6zfc25nibgzsr-screen-4.9.1/bin/screen
+```
+
+## How it works
+
+Before each prompt, direnv checks for the existence of a `.envrc` file (and
+[optionally](man/direnv.toml.1.md#codeloaddotenvcode) a `.env` file) in the current
+and parent directories. If the file exists (and is authorized), it is loaded
+into a **bash** sub-shell and all exported variables are then captured by
+direnv and then made available to the current shell.
+
+It supports hooks for all the common shells like bash, zsh, tcsh and fish.
+This allows project-specific environment variables without cluttering the
+`~/.profile` file.
+
+Because direnv is compiled into a single static executable, it is fast enough
+to be unnoticeable on each prompt. It is also language-agnostic and can be
+used to build solutions similar to rbenv, pyenv and phpenv.
+
+## Getting Started
+
+### Basic Installation
+
+1. direnv is packaged in most distributions already. See [the installation documentation](docs/installation.md) for details.
+2. [hook direnv into your shell](docs/hook.md).
+
+Now restart your shell.
+
+
 
 ### The stdlib
 
