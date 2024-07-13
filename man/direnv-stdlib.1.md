@@ -241,6 +241,10 @@ Sets the `JULIA_PROJECT` environment variable to the current directory.
 
 Adds "$PWD/node_modules/.bin" to the PATH environment variable.
 
+### `layout opam`
+
+Sets environment variables from `opam env`.
+
 ### `layout php`
 
 Adds "$PWD/vendor/bin" to the PATH environment variable.

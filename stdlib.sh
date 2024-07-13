@@ -804,6 +804,14 @@ layout_node() {
   PATH_add node_modules/.bin
 }
 
+# Usage: layout opam
+#
+# Sets environment variables from `opam env`.
+layout_opam() {
+  export OPAMSWITCH=$PWD
+  eval "$(opam env "$@")"
+}
+
 # Usage: layout perl
 #
 # Setup environment variables required by perl's local::lib
