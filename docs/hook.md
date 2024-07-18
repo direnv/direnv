@@ -63,10 +63,11 @@ eval `direnv hook tcsh`
 Run:
 
 ```
-$> direnv hook elvish > ~/.elvish/lib/direnv.elv
+~> mkdir -p ~/.config/elvish/lib
+~> direnv hook elvish > ~/.config/elvish/lib/direnv.elv
 ```
 
-and add the following line to your `~/.elvish/rc.elv` file:
+and add the following line to your `~/.config/elvish/rc.elv` file:
 
 ```
 use direnv
