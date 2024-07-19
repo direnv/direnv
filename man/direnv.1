@@ -44,7 +44,6 @@ direnv: unloading
 direnv export: ~PATH
 $ echo ${FOO-nope}
 nope
-
 .EE
 
 .SH SETUP
@@ -58,7 +57,6 @@ Add the following line at the end of the \fB~/.bashrc\fR file:
 
 .EX
 eval "$(direnv hook bash)"
-
 .EE
 
 .PP
@@ -71,7 +69,6 @@ Add the following line at the end of the \fB~/.zshrc\fR file:
 
 .EX
 eval "$(direnv hook zsh)"
-
 .EE
 
 .SS FISH
@@ -80,7 +77,6 @@ Add the following line at the end of the \fB$XDG_CONFIG_HOME/fish/config.fish\fR
 
 .EX
 direnv hook fish | source
-
 .EE
 
 .PP
@@ -90,7 +86,6 @@ Fish supports 3 modes you can set with with the global environment variable \fBd
 set -g direnv_fish_mode eval_on_arrow    # trigger direnv at prompt, and on every arrow-based directory change (default)
 set -g direnv_fish_mode eval_after_arrow # trigger direnv at prompt, and only after arrow-based directory changes before executing command
 set -g direnv_fish_mode disable_arrow    # trigger direnv at prompt only, this is similar functionality to the original behavior
-
 .EE
 
 .SS TCSH
@@ -99,7 +94,6 @@ Add the following line at the end of the \fB~/.cshrc\fR file:
 
 .EX
 eval `direnv hook tcsh`
-
 .EE
 
 .SS Elvish
@@ -107,16 +101,15 @@ eval `direnv hook tcsh`
 Run:
 
 .EX
-$> direnv hook elvish > ~/.elvish/lib/direnv.elv
-
+~> mkdir -p ~/.config/elvish/lib
+~> direnv hook elvish > ~/.config/elvish/lib/direnv.elv
 .EE
 
 .PP
-and add the following line to your \fB~/.elvish/rc.elv\fR file:
+and add the following line to your \fB~/.config/elvish/rc.elv\fR file:
 
 .EX
 use direnv
-
 .EE
 
 .SS PowerShell
@@ -125,7 +118,6 @@ Add the following line to your \fB$PROFILE\fR:
 
 .EX
 Invoke-Expression "$(direnv hook pwsh)"
-
 .EE
 
 .SS Murex
@@ -134,7 +126,6 @@ Add the following line to your \fB~/.murex_profile\fR:
 
 .EX
 direnv hook murex -> source
-
 .EE
 
 .SH USAGE
