@@ -7,6 +7,11 @@ fi
 
 set -e
 
+# Ensure that we are using MSYS2 defaults in our base tests.
+unset MSYS2_ENV_CONV_EXCL
+unset MSYS2_ARG_CONV_EXCL
+unset MSYS_NO_PATHCONV
+
 cd "$(dirname "$0")"
 TEST_DIR=$PWD
 export XDG_CONFIG_HOME=${TEST_DIR}/config
@@ -29,8 +34,40 @@ has() {
   type -P "$1" &>/dev/null
 }
 
+is_msys2() {
+  [[ -n "${MSYSTEM-}" ]]
+}
+
+is_cygwin() {
+  has cygpath && ! is_msys2
+}
+
+unix_path() {
+  has cygpath && cygpath -u "$1" || echo "$1"
+}
+
 direnv_eval() {
   eval "$(direnv export "$TARGET_SHELL")"
+}
+
+direnv_eval_msys2() {
+  eval "$(MSYS2_ENV_CONV_EXCL="*" direnv export "$TARGET_SHELL")"
+}
+
+direnv_exec() {
+  direnv exec "$@"
+}
+
+direnv_exec_msys2() {
+  MSYS2_ENV_CONV_EXCL="*" direnv exec "$@"
+}
+
+symlink() {
+  ln -fs $1 $2
+  if has cygpath; then
+    # symlinks on MSYS2/Cygwin behave differently
+    direnv allow
+  fi
 }
 
 test_start() {
@@ -52,6 +89,9 @@ test_stop() {
 }
 
 test_eq() {
+  if [[ "$DIRENV_DEBUG" == "1" ]]; then
+    echo test_eq $1 $2
+  fi
   if [[ "$1" != "$2" ]]; then
     echo "FAILED: '$1' == '$2'"
     exit 1
@@ -59,6 +99,9 @@ test_eq() {
 }
 
 test_neq() {
+  if [[ "$DIRENV_DEBUG" == "1" ]]; then
+    echo test_neq $1 $2
+  fi
   if [[ "$1" == "$2" ]]; then
     echo "FAILED: '$1' != '$2'"
     exit 1
@@ -140,7 +183,7 @@ test_start "special-vars"
 test_stop
 
 test_start "dump"
-  direnv_eval
+  direnv_eval_msys2
   test_eq "$LS_COLORS" "*.ogg=38;5;45:*.wav=38;5;45"
   test_eq "$THREE_BACKSLASHES" '\\\'
   test_eq "$LESSOPEN" "||/usr/bin/lesspipe.sh %s"
@@ -148,14 +191,29 @@ test_stop
 
 test_start "empty-var"
   direnv_eval
-  test_neq "${FOO-unset}" "unset"
   test_eq "${FOO}" ""
+  if is_cygwin; then
+    # TODO: an empty variable is seen as unset in cygwin, can this be fixed?
+    # TODO: an unset variable is seen as empty in cygwin, can this be fixed?
+    test_eq "${FOO-unset}" "unset"
+    test_eq "${FOO:-empty}" "empty"
+    test_neq "${FOO-unset}" ""
+  else
+    test_neq "${FOO-unset}" "unset"
+  fi
 test_stop
 
 test_start "empty-var-unset"
   export FOO=""
   direnv_eval
-  test_eq "${FOO-unset}" "unset"
+  if is_cygwin; then
+    # TODO: an empty variable is seen as unset in cygwin, can this be fixed?
+    # TODO: an unset variable is seen as empty in cygwin, can this be fixed?
+    test_eq "${FOO-unset}" ""
+    test_eq "${FOO:-empty}" "empty"
+  else
+    test_eq "${FOO-unset}" "unset"
+  fi
   unset FOO
 test_stop
 
@@ -175,12 +233,11 @@ test_stop
 test_start "symlink-changed"
   # when using a symlink, reload if the symlink changes, or if the
   # target file changes.
-  ln -fs ./state-A ./symlink
+  symlink ./state-A ./symlink
   direnv_eval
   test_eq "${STATE}" "A"
   sleep 1
-
-  ln -fs ./state-B ./symlink
+  symlink ./state-B ./symlink
   direnv_eval
   test_eq "${STATE}" "B"
 test_stop
@@ -258,7 +315,9 @@ if has python; then
     direnv_eval
     test -n "${VIRTUAL_ENV:-}"
 
-    if [[ ":$PATH:" != *":${VIRTUAL_ENV}/bin:"* ]]; then
+    # ensure that venv_path is a unix path before looking for it in PATH
+    venv_path="$(unix_path "${VIRTUAL_ENV}")"
+    if [[ ":$PATH:" != *":${venv_path}/bin:"* ]]; then
       echo "FAILED: VIRTUAL_ENV/bin not added to PATH"
       exit 1
     fi
@@ -323,3 +382,6 @@ test_stop
 #   NEW_LINK_TIME=`direnv file-mtime link-to-somefile`
 #   test "$LINK_TIME" = "$NEW_LINK_TIME"
 # test_stop
+
+# shellcheck disable=SC1091
+source "$TEST_DIR/direnv-test-cygpath.sh"

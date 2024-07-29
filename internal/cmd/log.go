@@ -43,14 +43,31 @@ func logStatus(env Env, msg string, a ...interface{}) {
 	}
 }
 
-func logDebug(msg string, a ...interface{}) {
-	if !debugging {
-		return
-	}
+func logDebugFormat(msg string, a ...interface{}) {
 	defer log.SetFlags(log.Flags())
 	log.SetFlags(log.Flags() | log.Lshortfile)
 	msg = fmt.Sprintf(msg, a...)
 	_ = log.Output(2, msg)
+}
+
+func logDebug(msg string, a ...interface{}) {
+	if !debugging {
+		return
+	}
+	logDebugFormat(msg, a...)
+}
+
+// logDebugInit is an alternative to logDebug that can be called before
+// setupLogging is called.
+// NOTE: logDebug depends on variables that are set by setupLogging, which in
+// turn depends on the existence of an Env object. Sometimes we need debug
+// logging before we have an Env object (see the cygpath implementation).
+func logDebugInit(msg string, a ...interface{}) {
+	// aka !debugging (see setupLogging and logDebug)
+	if debug := os.Getenv("DIRENV_DEBUG"); debug != "1" {
+		return
+	}
+	logDebugFormat(msg, a...)
 }
 
 func logMsg(format, msg string, a ...interface{}) {
