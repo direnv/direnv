@@ -255,3 +255,15 @@ func (config *Config) Revert(env Env) (Env, error) {
 	}
 	return nil, err
 }
+
+// RevertHook executes a user-provided hook for side-effects that should be
+// performed when an environment is unloaded, if provided by the user
+func (config *Config) RevertHook(env Env) {
+    logDebug("executing RevertHook")
+    hook := env["DIRENV_UNLOAD"]
+    if hook == "" {
+        return
+    }
+
+    fmt.Print(hook + ";")
+}

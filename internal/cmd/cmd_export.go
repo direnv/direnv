@@ -80,6 +80,8 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		return
 	}
 
+	config.RevertHook(currentEnv);
+
 	if toLoad == "" {
 		logStatus(currentEnv, "unloading")
 		newEnv = previousEnv.Copy()
