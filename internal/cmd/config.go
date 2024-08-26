@@ -16,6 +16,7 @@ import (
 type Config struct {
 	Env             Env
 	WorkDir         string // Current directory
+	OriginDir       string
 	ConfDir         string
 	CacheDir        string
 	DataDir         string
@@ -107,6 +108,8 @@ func LoadConfig(env Env) (config *Config, err error) {
 		err = fmt.Errorf("LoadConfig() Getwd failed: %w", err)
 		return
 	}
+
+	config.OriginDir = env[DIRENV_ORIGIN]
 
 	// Default Warn Timeout
 	config.WarnTimeout = 5 * time.Second

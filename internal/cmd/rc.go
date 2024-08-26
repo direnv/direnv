@@ -210,6 +210,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
 		newEnv[DIRENV_FILE] = rc.path
 		newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
+		newEnv[DIRENV_ORIGIN] = wd
 	}()
 
 	// Abort if the file is not allowed

@@ -2,7 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"io/fs"
 	"log"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -22,7 +25,7 @@ var CmdExport = &Cmd{
 	Name: "export",
 	Desc: `Loads an .envrc or .env and prints the diff in terms of exports.
   Supported SHELL values are: ` + supportedShellFormattedString(),
-	Args:    []string{"SHELL"},
+	Args:    []string{"SHELL", "DIR"},
 	Private: false,
 	Action:  cmdWithWarnTimeout(actionWithConfig(exportCommand)),
 }
@@ -43,9 +46,35 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		return fmt.Errorf("unknown target shell '%s'", target)
 	}
 
+	var rcPath string
+
+	if len(args) > 2 {
+		var fi fs.FileInfo
+
+		rcPath = filepath.Clean(args[2])
+		fi, err = os.Stat(rcPath)
+		if err != nil {
+			return
+		}
+
+		if !fi.IsDir() {
+			rcPath = filepath.Dir(rcPath)
+		}
+	}
+
+	if rcPath == "" {
+		// If the working directory has not changed, keep using whatever RC was
+		// active, otherwise reflect the changed working directory
+		if config.OriginDir == config.WorkDir {
+			rcPath = config.RCFile
+		} else {
+			rcPath = config.WorkDir
+		}
+	}
+
 	logDebug("loading RCs")
 	loadedRC := config.LoadedRC()
-	toLoad := findEnvUp(config.WorkDir, config.LoadDotenv)
+	toLoad := findEnvUp(rcPath, config.LoadDotenv)
 
 	if loadedRC == nil && toLoad == "" {
 		return
