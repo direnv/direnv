@@ -46,8 +46,8 @@ func cmdDiffAction(env Env, args []string) (err error) {
 		}
 	}
 
-	out_str := strings.Join(out, "")
-	fmt.Println(out_str)
+	output := strings.Join(out, "")
+	fmt.Println(output)
 
 	return
 }
