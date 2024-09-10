@@ -100,12 +100,12 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		}
 	}
 
-	if out := diffStatus(previousEnv.Diff(newEnv), newEnv); out != "" && !config.HideEnvDiff {
-		logStatus(currentEnv, "export %s", out)
+	if _, ok := newEnv[DIRENV_DIFF_HIDE]; ok && !config.HideHiddenExportWarning {
+		logStatus(currentEnv, "some exports may be hidden")
 	}
 
-	if _, ok := newEnv[DIRENV_DIFF_HIDE]; ok {
-		logStatus(currentEnv, "some changes may be hidden")
+	if out := diffStatus(previousEnv.Diff(newEnv), newEnv); out != "" && !config.HideEnvDiff {
+		logStatus(currentEnv, "export %s", out)
 	}
 
 	diffString := currentEnv.Diff(newEnv).ToShell(shell)
