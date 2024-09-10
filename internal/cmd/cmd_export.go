@@ -104,7 +104,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logStatus(currentEnv, "some exports may be hidden")
 	}
 
-	if out := diffStatus(previousEnv.Diff(newEnv), newEnv); out != "" && !config.HideEnvDiff {
+	if out := diffStatus(&newEnv, &previousEnv); out != "" && !config.HideEnvDiff {
 		logStatus(currentEnv, "export %s", out)
 	}
 
@@ -116,12 +116,13 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 }
 
 // Return a string of +/-/~ indicators of an environment diff
-func diffStatus(oldDiff *EnvDiff, newEnv Env) string {
+func diffStatus(newEnv *Env, oldEnv *Env) string {
+	oldDiff := oldEnv.Diff(*newEnv)
 	if oldDiff.Any() {
 		var out []string
 
 		// DIRENV_DIFF_HIDE is a colon-separated list of keys to ignore when reporting diffs
-		hideKeysEnv, ok := newEnv[DIRENV_DIFF_HIDE]
+		hideKeysEnv, ok := (*newEnv)[DIRENV_DIFF_HIDE]
 		if !ok {
 			hideKeysEnv = ""
 		}
