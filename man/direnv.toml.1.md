@@ -44,6 +44,8 @@ If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc
 
 ### `load_dotenv`
 
+> direnv >= 2.31.0 is required
+
 If set to `true`, also look for and load `.env` files on top of the `.envrc` files. If both `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
 
 ### `strict_env`
