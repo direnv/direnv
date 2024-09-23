@@ -50,6 +50,10 @@ If set to \fBtrue\fR, stdin is disabled (redirected to /dev/null) during the \fB
 
 .SS \fBload_dotenv\fR
 .PP
+.RS
+direnv >= 2.31.0 is required
+.RE
+.PP
 If set to \fBtrue\fR, also look for and load \fB\&.env\fR files on top of the \fB\&.envrc\fR files. If both \fB\&.envrc\fR and \fB\&.env\fR files exist, the \fB\&.envrc\fR will always be chosen first.
 
 .SS \fBstrict_env\fR
