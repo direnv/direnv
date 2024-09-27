@@ -1068,6 +1068,69 @@ layout_pyenv() {
   [[ -n "$PYENV_VERSION" ]] && export PYENV_VERSION
 }
 
+# Usage: layout uv [<python_version>]
+#
+# Uses uv to create and a virutal environment, and then activates it.
+# See https://docs.astral.sh/uv/pip/environments/ for more details.
+# If no python version is specified, the default python version is used. uv will
+# also install the requested python version if it is not installed.
+layout_uv() {
+    # optional argument to specify python version
+    local python_version=$1
+    if [[ -d ".venv" ]]; then
+        VIRTUAL_ENV="$(pwd)/.venv"
+    fi
+
+    if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
+        log_status "No virtual environment exists. Executing \`uv venv\` to create one."
+        # If there is a python version specified, use it to create the environment
+        if [[ -n $python_version ]]; then
+            uv venv --python "$python_version"
+        else
+            uv venv
+        fi
+        VIRTUAL_ENV="$(pwd)/.venv"
+    fi
+
+    PATH_add "$VIRTUAL_ENV/bin"
+    export UV_ACTIVE=1
+    export VIRTUAL_ENV
+}
+
+# Usage: layout uvp [<python_version>]
+#
+# Uses uv to create a new project and a virutal environment, and then activates it.
+# See https://docs.astral.sh/uv/guides/projects/ for more details.
+# If no python version is specified, the default python version is used. uv will
+# also install the requested python version if it is not installed.
+layout_uvp() {
+    local python_version=$1
+    if [[ -d ".venv" ]]; then
+        VIRTUAL_ENV="$(pwd)/.venv"
+    fi
+
+    if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
+        log_status "No uv project exists. Executing \`uv init\` to create one."
+        # If there is a python version specified, use it to create the project
+        if [[ -n $python_version ]]; then
+            uv init --no-readme --python "$python_version"
+        else
+            uv init --no-readme
+        fi
+        # By default, uv creates a hello.py file. Remove it.
+        rm hello.py
+        # Activate the venv
+        uv venv
+        VIRTUAL_ENV="$(pwd)/.venv"
+    fi
+
+    PATH_add "$VIRTUAL_ENV/bin"
+    export UV_ACTIVE=1
+    export VIRTUAL_ENV
+}
+
+
+
 # Usage: layout ruby
 #
 # Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".
