@@ -67,7 +67,7 @@ Will be overwritten if the environment variable `DIRENV_WARN_TIMEOUT` is set to 
 
 ### `hide_env_diff`
 
-Set to `true` to hide the diff of the environment variables when loading the
+Set to `true` to hide the diff of the environment variables and only show a count of exported variables when loading the
 `.envrc`. Defaults to `false`.
 
 ## [whitelist]
