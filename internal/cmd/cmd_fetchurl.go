@@ -64,6 +64,7 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 		return err
 	}
 	defer os.Remove(tmpfile.Name()) // clean up
+	defer tmpfile.Close()
 
 	// Get the URL
 	// G107: Potential HTTP request made with variable url
@@ -104,6 +105,10 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 
 	// Put the file into the CAS store if it's not already there
 	if !fileExists(casFile) {
+		err = tmpfile.Close()
+		if err != nil {
+			return err
+		}
 		// Move the temporary file to the CAS location.
 		if err = os.Rename(tmpfile.Name(), casFile); err != nil {
 			return err

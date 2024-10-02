@@ -2,14 +2,14 @@ schema = 3
 
 [mod]
   [mod."github.com/BurntSushi/toml"]
-    version = "v1.3.2"
-    hash = "sha256-FIwyH67KryRWI9Bk4R8s1zFP0IgKR4L66wNQJYQZLeg="
+    version = "v1.4.0"
+    hash = "sha256-3cr8hfVA4th/AfveHDxigmj8Eiiae0ZBnxAgy+7RYO4="
   [mod."github.com/mattn/go-isatty"]
     version = "v0.0.20"
     hash = "sha256-qhw9hWtU5wnyFyuMbKx+7RB8ckQaFQ8D+8GKPkN3HHQ="
   [mod."golang.org/x/mod"]
-    version = "v0.14.0"
-    hash = "sha256-sx3hWp5l99DBfIrn821ohfoBwvaITSHMWbzPvX0btLM="
+    version = "v0.19.0"
+    hash = "sha256-9TUzg1aDvdZw3Z8IyGGSVSnLfUwgeGC/vrnkhkarXL4="
   [mod."golang.org/x/sys"]
     version = "v0.6.0"
     hash = "sha256-zAgxiTuL24sGhbXrna9R1UYqLQh46ldztpumOScmduY="

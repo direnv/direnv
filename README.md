@@ -37,7 +37,7 @@ used to build solutions similar to rbenv, pyenv and phpenv.
 ### Prerequisites
 
 * Unix-like operating system (macOS, Linux, ...)
-* A supported shell (bash, zsh, tcsh, fish, elvish, powershell)
+* A supported shell (bash, zsh, tcsh, fish, elvish, powershell, murex, nushell)
 
 ### Basic Installation
 
@@ -121,6 +121,7 @@ information such as common recipes, editor integration, tips-and-tricks.
 ### Man pages
 
 * [direnv(1) man page](man/direnv.1.md)
+* [direnv-fetchurl(1) man page](man/direnv-fetchurl.1.md)
 * [direnv-stdlib(1) man page](man/direnv-stdlib.1.md)
 * [direnv.toml(1) man page](man/direnv.toml.1.md)
 

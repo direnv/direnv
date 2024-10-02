@@ -19,7 +19,7 @@ direnv is packaged for a variety of systems:
 * [openSUSE](https://build.opensuse.org/package/show/openSUSE%3AFactory/direnv)
 * [MacPorts](https://ports.macports.org/port/direnv/)
 * [Ubuntu](https://packages.ubuntu.com/search?keywords=direnv&searchon=names&suite=all&section=all)
-* [GNU Guix](https://www.gnu.org/software/guix/)
+* [GNU Guix](https://packages.guix.gnu.org/search/?query=direnv)
 * [Windows](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
 
 See also:

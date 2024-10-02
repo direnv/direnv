@@ -72,7 +72,7 @@ fmt-go:
 	$(GO) fmt
 
 fmt-sh:
-	@command -v shfmt >/dev/null || (echo "Could not format stdlib.sh because shfmt is missing. Run: go get -u mvdan.cc/sh/cmd/shfmt"; false)
+	@command -v shfmt >/dev/null || (echo "Could not format stdlib.sh because shfmt is missing. Run: go install mvdan.cc/sh/cmd/shfmt@latest"; false)
 	shfmt -i 2 -w stdlib.sh
 
 ############################################################################
@@ -86,7 +86,7 @@ roffs = $(man_md:.md=)
 man: $(roffs)
 
 %.1: %.1.md
-	@command -v go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing. Run: go get -u github.com/cpuguy83/go-md2man/v2"; false)
+	@command -v go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing. Run: go install github.com/cpuguy83/go-md2man/v2@latest"; false)
 	go-md2man -in $< -out $@
 
 ############################################################################
@@ -104,7 +104,8 @@ tests = \
 				test-fish \
 				test-tcsh \
 				test-zsh \
-				test-pwsh
+				test-pwsh \
+				test-mx
 
 # Skip few checks for IBM Z mainframe's z/OS aka OS/390
 ifeq ($(shell uname), OS/390)
@@ -151,6 +152,9 @@ test-zsh:
 
 test-pwsh:
 	pwsh ./test/direnv-test.ps1
+
+test-mx:
+	murex -trypipe ./test/direnv-test.mx
 
 ############################################################################
 # Installation

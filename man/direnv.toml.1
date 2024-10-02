@@ -7,7 +7,7 @@ direnv.toml - the direnv configuration file
 .SH DESCRIPTION
 .PP
 A configuration file in TOML
-\[la]https://github.com/toml-lang/toml\[ra] format to specify a variety of configuration options for direnv. The file is read from \fB\fC$XDG_CONFIG_HOME/direnv/direnv.toml\fR\&.
+\[la]https://github.com/toml\-lang/toml\[ra] format to specify a variety of configuration options for direnv. The file is read from \fB$XDG_CONFIG_HOME/direnv/direnv.toml\fR (typically ~/.config/direnv/direnv.toml).
 
 .PP
 .RS
@@ -20,48 +20,48 @@ For versions v2.21.0 and below use config.toml instead of direnv.toml
 .SH FORMAT
 .PP
 See the TOML GitHub Repository
-\[la]https://github.com/toml-lang/toml\[ra] for details about the syntax of the configuration file.
+\[la]https://github.com/toml\-lang/toml\[ra] for details about the syntax of the configuration file.
 
 .SH CONFIG
 .PP
 The configuration is specified in sections which each have their own top-level tables
-\[la]https://github.com/toml-lang/toml#table\[ra], with key/value pairs specified in each section.
+\[la]https://github.com/toml\-lang/toml#table\[ra], with key/value pairs specified in each section.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 [section]
 key = "value"
 
-.fi
-.RE
+.EE
 
 .PP
 The following sections are supported:
 
 .SH [global]
-.SS \fB\fCbash_path\fR
+.SS \fBbash_path\fR
 .PP
 This allows one to hard-code the position of bash. It maybe be useful to set this to avoid having direnv to fail when PATH is being mutated.
 
-.SS \fB\fCdisable_stdin\fR
+.SS \fBdisable_stdin\fR
 .PP
-If set to \fB\fCtrue\fR, stdin is disabled (redirected to /dev/null) during the \fB\fC\&.envrc\fR evaluation.
+If set to \fBtrue\fR, stdin is disabled (redirected to /dev/null) during the \fB\&.envrc\fR evaluation.
 
-.SS \fB\fCload_dotenv\fR
+.SS \fBload_dotenv\fR
 .PP
-Also look for and load \fB\fC\&.env\fR files on top of the \fB\fC\&.envrc\fR files. If both \fB\fC\&.envrc\fR and \fB\fC\&.env\fR files exist, the \fB\fC\&.envrc\fR will always be chosen first.
+.RS
+direnv >= 2.31.0 is required
+.RE
+.PP
+If set to \fBtrue\fR, also look for and load \fB\&.env\fR files on top of the \fB\&.envrc\fR files. If both \fB\&.envrc\fR and \fB\&.env\fR files exist, the \fB\&.envrc\fR will always be chosen first.
 
-.SS \fB\fCstrict_env\fR
+.SS \fBstrict_env\fR
 .PP
-If set to true, the \fB\fC\&.envrc\fR will be loaded with \fB\fCset -euo pipefail\fR\&. This
+If set to \fBtrue\fR, the \fB\&.envrc\fR will be loaded with \fBset -euo pipefail\fR\&. This
 option will be the default in the future.
 
-.SS \fB\fCwarn_timeout\fR
+.SS \fBwarn_timeout\fR
 .PP
 Specify how long to wait before warning the user that the command is taking
 too long to execute. Defaults to "5s".
@@ -71,6 +71,15 @@ A duration string is a possibly signed sequence of decimal numbers, each with
 optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 
+.PP
+This feature is disabled if the duration is lower or equal to zero.
+Will be overwritten if the environment variable \fBDIRENV_WARN_TIMEOUT\fR is set to any of the above values.
+
+.SS \fBhide_env_diff\fR
+.PP
+Set to \fBtrue\fR to hide the diff of the environment variables when loading the
+\fB\&.envrc\fR\&. Defaults to \fBfalse\fR\&.
+
 .SH [whitelist]
 .PP
 Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" -- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. \fBThis feature should be used with great care\fP, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.
@@ -78,83 +87,79 @@ Specifying whitelist directives marks specific directory hierarchies or specific
 .PP
 There are two types of whitelist directives supported:
 
-.SS \fB\fCprefix\fR
+.SS \fBprefix\fR
 .PP
-Accepts an array of strings. If any of the strings in this list are a prefix of an .envrc file's absolute path, that file will be implicitly allowed, regardless of contents or past usage of \fB\fCdirenv allow\fR or \fB\fCdirenv deny\fR\&.
+Accepts an array of strings. If any of the strings in this list are a prefix of an .envrc file's absolute path, that file will be implicitly allowed, regardless of contents or past usage of \fBdirenv allow\fR or \fBdirenv deny\fR\&.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 [whitelist]
-prefix = [ "/home/user/code/project-a" ]
+prefix = [ "/home/user/code/project-a", "~/code/project-b" ]
 
-.fi
-.RE
+.EE
 
 .PP
 In this example, the following .envrc files will be implicitly allowed:
 
 .RS
 .IP \(bu 2
-\fB\fC/home/user/code/project-a/.envrc\fR
+\fB/home/user/code/project-a/.envrc\fR
 .IP \(bu 2
-\fB\fC/home/user/code/project-a/subdir/.envrc\fR
+\fB/home/user/code/project-a/subdir/.envrc\fR
+.IP \(bu 2
+\fB~/code/project-b/.envrc\fR
+.IP \(bu 2
+\fB~/code/project-b/subdir/.envrc\fR
 .IP \(bu 2
 and so on
 
 .RE
 
 .PP
-In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fB\fCdirenv allow\fR):
+In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fBdirenv allow\fR):
 
 .RS
 .IP \(bu 2
-\fB\fC/home/user/project-b/.envrc\fR
+\fB/home/user/project-c/.envrc\fR
 .IP \(bu 2
-\fB\fC/opt/random/.envrc\fR
+\fB/opt/random/.envrc\fR
 
 .RE
 
-.SS \fB\fCexact\fR
+.SS \fBexact\fR
 .PP
-Accepts an array of strings. Each string can be a directory name or the full path to an .envrc file. If a directory name is passed, it will be treated as if it had been passed as itself with \fB\fC/.envrc\fR appended. After resolving the filename, each string will be checked for being an exact match with an .envrc file's absolute path. If they match exactly, that .envrc file will be implicitly allowed, regardless of contents or past usage of \fB\fCdirenv allow\fR or \fB\fCdirenv deny\fR\&.
+Accepts an array of strings. Each string can be a directory name or the full path to an .envrc file. If a directory name is passed, it will be treated as if it had been passed as itself with \fB/.envrc\fR appended. After resolving the filename, each string will be checked for being an exact match with an .envrc file's absolute path. If they match exactly, that .envrc file will be implicitly allowed, regardless of contents or past usage of \fBdirenv allow\fR or \fBdirenv deny\fR\&.
 
 .PP
 Example:
 
-.PP
-.RS
-
-.nf
+.EX
 [whitelist]
-exact = [ "/home/user/project-b/.envrc", "/home/user/project-b/subdir-a" ]
+exact = [ "/home/user/project-a/.envrc", "~/project-b/subdir-a" ]
 
-.fi
-.RE
+.EE
 
 .PP
 In this example, the following .envrc files will be implicitly allowed, and no others:
 
 .RS
 .IP \(bu 2
-\fB\fC/home/user/code/project-b/.envrc\fR
+\fB/home/user/code/project-a/.envrc\fR
 .IP \(bu 2
-\fB\fC/home/user/code/project-b/subdir-a\fR
+\fB~/project-b/subdir-a\fR
 
 .RE
 
 .PP
-In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fB\fCdirenv allow\fR):
+In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running \fBdirenv allow\fR):
 
 .RS
 .IP \(bu 2
-\fB\fC/home/user/code/project-b/subproject-c/.envrc\fR
+\fB/home/user/code/project-b/subproject-c/.envrc\fR
 .IP \(bu 2
-\fB\fC/home/user/code/.envrc\fR
+\fB~/code/.envrc\fR
 
 .RE
 

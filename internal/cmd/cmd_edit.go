@@ -86,6 +86,7 @@ func cmdEditAction(env Env, args []string, config *Config) (err error) {
 
 // Editors contains a list of known editors and how to start them.
 var Editors = [][]string{
+	{"editor"},
 	{"subl", "-w"},
 	{"mate", "-w"},
 	{"open", "-t", "-W"}, // Opens with the default text editor on mac

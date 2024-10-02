@@ -23,6 +23,7 @@ type Config struct {
 	BashPath        string
 	RCFile          string
 	TomlPath        string
+	HideEnvDiff     bool
 	DisableStdin    bool
 	StrictEnv       bool
 	LoadDotenv      bool
@@ -54,6 +55,7 @@ type tomlGlobal struct {
 	SkipDotenv   bool          `toml:"skip_dotenv"` // deprecated, use load_dotenv
 	LoadDotenv   bool          `toml:"load_dotenv"`
 	WarnTimeout  *tomlDuration `toml:"warn_timeout"`
+	HideEnvDiff  bool          `toml:"hide_env_diff"`
 }
 
 type tomlWhitelist struct {
@@ -137,6 +139,8 @@ func LoadConfig(env Env) (config *Config, err error) {
 			err = fmt.Errorf("LoadConfig() failed to parse %s: %w", config.TomlPath, err)
 			return
 		}
+
+		config.HideEnvDiff = tomlConf.HideEnvDiff
 
 		for _, path := range tomlConf.Whitelist.Prefix {
 			config.WhitelistPrefix = append(config.WhitelistPrefix, expandTildePath(path))

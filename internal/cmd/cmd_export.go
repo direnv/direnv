@@ -100,17 +100,14 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		}
 	}
 
-	if out, count := diffStatus(previousEnv.Diff(newEnv)); out != "" {
-		if format, ok := currentEnv["DIRENV_LOG_VERBOSE"]; ok && format == "0" {
-			logStatus(currentEnv, "export %d environment variables", count)
-		} else {
-			logStatus(currentEnv, "export %s", out)
-		}
+	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" && !config.HideEnvDiff {
+		logStatus(currentEnv, "export %s", out)
 	}
 
 	diffString := currentEnv.Diff(newEnv).ToShell(shell)
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
+
 	return
 }
 

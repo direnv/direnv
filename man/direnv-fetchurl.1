@@ -14,9 +14,9 @@ This command downloads the given URL into a fixed disk location, based on the
 content of the retrieved file.
 
 .PP
-This has been introduced to avoid a dependency on \fB\fCcurl\fR or \fB\fCwget\fR, while also
+This has been introduced to avoid a dependency on \fBcurl\fR or \fBwget\fR, while also
 promoting a more secure way to fetch data from the Internet. Use this instead
-of \fB\fCcurl <url> | sh\fR\&.
+of \fBcurl <url> | sh\fR\&.
 
 .PP
 This command has two modes of operation:
@@ -55,19 +55,16 @@ to fetch and execute static binaries.
 \fIdirenv fetchurl\fP outputs different content based on the argument.
 
 .PP
-If the \fB\fCintegrity-hash\fR is being passed, it will output the path to the
+If the \fBintegrity-hash\fR is being passed, it will output the path to the
 on-disk location, if the retrieval was successful.
 
 .PP
-If only the \fB\fCurl\fR is being passed, it will output the hash as well as some
+If only the \fBurl\fR is being passed, it will output the hash as well as some
 human-readable instruction. If stdout is not a tty, only the hash will be
 displayed.
 
 .SH EXAMPLE
-.PP
-.RS
-
-.nf
+.EX
 $ ./direnv fetchurl https://releases.nixos.org/nix/nix-2.3.7/install
 Found hash: sha256-7Gxl5GzI9juc/U30Igh/pY+p6+gj5Waohfwql3jHIds=
 
@@ -76,15 +73,14 @@ Invoke fetchurl again with the hash as an argument to get the disk location:
   direnv fetchurl "https://releases.nixos.org/nix/nix-2.3.7/install" "sha256-7Gxl5GzI9juc/U30Igh/pY+p6+gj5Waohfwql3jHIds="
   #=> /home/zimbatm/.cache/direnv/cas/sha256-7Gxl5GzI9juc_U30Igh_pY+p6+gj5Waohfwql3jHIds=
 
-.fi
-.RE
+.EE
 
 .SH ENVIRONMENT VARIABLES
 .PP
 \fBXDG_CACHE_HOME\fP
     This variable is used to select the on-disk location of the fetched URLs
-    as \fB\fC$XDG_CACHE_HOME/direnv/cas\fR\&. If \fBXDG_CACHE_HOME\fP is unset or empty,
-    defaults to \fB\fC$HOME/.cache\fR\&.
+    as \fB$XDG_CACHE_HOME/direnv/cas\fR\&. If \fBXDG_CACHE_HOME\fP is unset or empty,
+    defaults to \fB$HOME/.cache\fR\&.
 
 .SH COPYRIGHT
 .PP

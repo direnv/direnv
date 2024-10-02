@@ -105,10 +105,11 @@ eval `direnv hook tcsh`
 Run:
 
 ```
-$> direnv hook elvish > ~/.elvish/lib/direnv.elv
+~> mkdir -p ~/.config/elvish/lib
+~> direnv hook elvish > ~/.config/elvish/lib/direnv.elv
 ```
 
-and add the following line to your `~/.elvish/rc.elv` file:
+and add the following line to your `~/.config/elvish/rc.elv` file:
 
 ```
 use direnv
@@ -120,6 +121,14 @@ Add the following line to your `$PROFILE`:
 
 ```powershell
 Invoke-Expression "$(direnv hook pwsh)"
+```
+
+### Murex
+
+Add the following line to your `~/.murex_profile`:
+
+```
+direnv hook murex -> source
 ```
 
 USAGE
@@ -156,6 +165,9 @@ ENVIRONMENT
 
 `XDG_CONFIG_HOME`
 : Defaults to `$HOME/.config`.
+
+`XDG_DATA_HOME`
+: Defaults to `$HOME/.local/share`.
 
 FILES
 -----

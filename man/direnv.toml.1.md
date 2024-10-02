@@ -44,6 +44,8 @@ If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc
 
 ### `load_dotenv`
 
+> direnv >= 2.31.0 is required
+
 If set to `true`, also look for and load `.env` files on top of the `.envrc` files. If both `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
 
 ### `strict_env`
@@ -62,6 +64,11 @@ Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 
 This feature is disabled if the duration is lower or equal to zero.
 Will be overwritten if the environment variable `DIRENV_WARN_TIMEOUT` is set to any of the above values.
+
+### `hide_env_diff`
+
+Set to `true` to hide the diff of the environment variables when loading the
+`.envrc`. Defaults to `false`.
 
 ## [whitelist]
 

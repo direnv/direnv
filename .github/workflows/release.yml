@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.16
-        uses: actions/setup-go@v5.0.0
+        uses: actions/setup-go@v5.0.2
         with:
           go-version: 1.16
       - name: Checkout code
@@ -26,6 +26,7 @@ jobs:
       - name: Get release notes
         id: release-notes
         run: |
+          go mod download golang.org/x/tools
           go run ./script/issue-command/main.go set-output \
             --name=body \
             "$(go run ./script/release-changelog/main.go)"
