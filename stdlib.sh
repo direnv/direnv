@@ -1095,6 +1095,7 @@ layout_uv() {
     PATH_add "$VIRTUAL_ENV/bin"
     export UV_ACTIVE=1
     export VIRTUAL_ENV
+    export UV_PROJECT_ENVIRONMENT=$VIRTUAL_ENV
 }
 
 # Usage: layout uvp [<python_version>]
@@ -1127,6 +1128,7 @@ layout_uvp() {
     PATH_add "$VIRTUAL_ENV/bin"
     export UV_ACTIVE=1
     export VIRTUAL_ENV
+    export UV_PROJECT_ENVIRONMENT=$VIRTUAL_ENV
 }
 
 
