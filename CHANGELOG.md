@@ -2,6 +2,7 @@ Unreleased
 ==================
 
   * feat: add opam support
+  * fix: stdlib: dotenv, dotenv_if_exists, source_env_if_exists: support file descriptors (#1313)
 
 2.34.0 / 2024-03-01
 ==================

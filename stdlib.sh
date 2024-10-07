@@ -259,7 +259,7 @@ dotenv() {
     path=$path/.env
   fi
   watch_file "$path"
-  if ! [[ -f $path ]]; then
+  if ! [[ -e $path ]]; then
     log_error ".env at $path not found"
     return 1
   fi
@@ -278,7 +278,7 @@ dotenv_if_exists() {
     path=$path/.env
   fi
   watch_file "$path"
-  if ! [[ -f $path ]]; then
+  if ! [[ -e $path ]]; then
     return
   fi
   eval "$("$direnv" dotenv bash "$@")"
@@ -397,7 +397,7 @@ source_env() {
 #
 source_env_if_exists() {
   watch_file "$1"
-  if [[ -f "$1" ]]; then source_env "$1"; fi
+  if [[ -e "$1" ]]; then source_env "$1"; fi
 }
 
 # Usage: env_vars_required <varname> [<varname> ...]
