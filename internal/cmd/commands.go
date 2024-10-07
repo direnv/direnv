@@ -49,6 +49,7 @@ func init() {
 		CmdApplyDump,
 		CmdShowDump,
 		CmdDeny,
+		CmdDiff,
 		CmdDotEnv,
 		CmdDump,
 		CmdEdit,

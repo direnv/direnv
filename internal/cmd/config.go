@@ -14,22 +14,23 @@ import (
 
 // Config represents the direnv configuration and state.
 type Config struct {
-	Env             Env
-	WorkDir         string // Current directory
-	ConfDir         string
-	CacheDir        string
-	DataDir         string
-	SelfPath        string
-	BashPath        string
-	RCFile          string
-	TomlPath        string
-	HideEnvDiff     bool
-	DisableStdin    bool
-	StrictEnv       bool
-	LoadDotenv      bool
-	WarnTimeout     time.Duration
-	WhitelistPrefix []string
-	WhitelistExact  map[string]bool
+	Env                     Env
+	WorkDir                 string // Current directory
+	ConfDir                 string
+	CacheDir                string
+	DataDir                 string
+	SelfPath                string
+	BashPath                string
+	RCFile                  string
+	TomlPath                string
+	HideEnvDiff             bool
+	HideHiddenExportWarning bool
+	DisableStdin            bool
+	StrictEnv               bool
+	LoadDotenv              bool
+	WarnTimeout             time.Duration
+	WhitelistPrefix         []string
+	WhitelistExact          map[string]bool
 }
 
 type tomlDuration struct {
@@ -49,13 +50,14 @@ type tomlConfig struct {
 }
 
 type tomlGlobal struct {
-	BashPath     string        `toml:"bash_path"`
-	DisableStdin bool          `toml:"disable_stdin"`
-	StrictEnv    bool          `toml:"strict_env"`
-	SkipDotenv   bool          `toml:"skip_dotenv"` // deprecated, use load_dotenv
-	LoadDotenv   bool          `toml:"load_dotenv"`
-	WarnTimeout  *tomlDuration `toml:"warn_timeout"`
-	HideEnvDiff  bool          `toml:"hide_env_diff"`
+	BashPath                string        `toml:"bash_path"`
+	DisableStdin            bool          `toml:"disable_stdin"`
+	StrictEnv               bool          `toml:"strict_env"`
+	SkipDotenv              bool          `toml:"skip_dotenv"` // deprecated, use load_dotenv
+	LoadDotenv              bool          `toml:"load_dotenv"`
+	WarnTimeout             *tomlDuration `toml:"warn_timeout"`
+	HideEnvDiff             bool          `toml:"hide_env_diff"`
+	HideHiddenExportWarning bool          `toml:"hide_hidden_export_warning"`
 }
 
 type tomlWhitelist struct {
@@ -141,6 +143,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		}
 
 		config.HideEnvDiff = tomlConf.HideEnvDiff
+		config.HideHiddenExportWarning = tomlConf.HideHiddenExportWarning
 
 		for _, path := range tomlConf.Whitelist.Prefix {
 			config.WhitelistPrefix = append(config.WhitelistPrefix, expandTildePath(path))
