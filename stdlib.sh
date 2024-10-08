@@ -1076,7 +1076,7 @@ layout_pyenv() {
 # also install the requested python version if it is not installed.
 layout_uv() {
     # optional argument to specify python version
-    local python_version=$1
+    local python_version=${1:-}
     if [[ -d ".venv" ]]; then
         VIRTUAL_ENV="$(pwd)/.venv"
     fi
