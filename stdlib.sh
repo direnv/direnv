@@ -1070,7 +1070,7 @@ layout_pyenv() {
 
 # Usage: layout uv [<python_version>]
 #
-# Uses uv to create and a virutal environment, and then activates it.
+# Uses uv to create a virtual environment, and then activates it.
 # See https://docs.astral.sh/uv/pip/environments/ for more details.
 # If no python version is specified, the default python version is used. uv will
 # also install the requested python version if it is not installed.
