@@ -22,7 +22,7 @@ func cmdApplyDumpAction(env Env, args []string) (err error) {
 	if len(args) > 2 {
 		return fmt.Errorf("too many arguments")
 	}
-	filename := args[1]
+	filename := FixPath(args[1])
 
 	dumped, err := os.ReadFile(filename)
 	if err != nil {

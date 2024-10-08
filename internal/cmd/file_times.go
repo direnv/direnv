@@ -30,6 +30,9 @@ func NewFileTimes() (times FileTimes) {
 
 // Update gets the latest stats on the path and updates the record.
 func (times *FileTimes) Update(path string) (err error) {
+
+	path = FixPath(path)
+
 	var modtime int64
 	var exists bool
 
@@ -71,6 +74,7 @@ func (times *FileTimes) NewTime(path string, modtime int64, exists bool) (err er
 		newTimes := append(*times.list, FileTime{Path: path})
 		times.list = &newTimes
 		time = &((*times.list)[len(*times.list)-1])
+		logDebug("NewTime: %s", path)
 	}
 
 	time.Modtime = modtime

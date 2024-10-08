@@ -28,7 +28,9 @@ func GetEnv() Env {
 		env[key] = value
 	}
 
-	return env
+	// In some environments we need to "fix" the environment, such as
+	// MSYS2/Cygwin.
+	return InitExportEnv(env)
 }
 
 // CleanContext removes all the direnv-related environment variables. Call
@@ -46,6 +48,9 @@ func (env Env) CleanContext() {
 func LoadEnv(gzenvStr string) (env Env, err error) {
 	env = make(Env)
 	err = gzenv.Unmarshal(gzenvStr, &env)
+	if err != nil {
+		logDebug("LoadEnv: unmarshalling failed %v", err)
+	}
 	return
 }
 

@@ -2,6 +2,7 @@
 .direnv
 .gopath
 /direnv
+/direnv.exe
 /direnv.test
 /dist
 /test/config
