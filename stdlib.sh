@@ -1085,9 +1085,9 @@ layout_uv() {
     log_status "No virtual environment exists. Executing \`uv venv\` to create one."
     # If there is a python version specified, use it to create the environment
     if [[ -n $python_version ]]; then
-        uv venv --python "$python_version"
+      uv venv --python "$python_version"
     else
-        uv venv
+      uv venv
     fi
     VIRTUAL_ENV="$(pwd)/.venv"
   fi
@@ -1114,9 +1114,9 @@ layout_uvp() {
     log_status "No uv project exists. Executing \`uv init\` to create one."
     # If there is a python version specified, use it to create the project
     if [[ -n $python_version ]]; then
-        uv init --no-readme --python "$python_version"
+      uv init --no-readme --python "$python_version"
     else
-        uv init --no-readme
+      uv init --no-readme
     fi
     # By default, uv creates a hello.py file. Remove it.
     rm hello.py
