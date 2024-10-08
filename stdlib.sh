@@ -857,7 +857,7 @@ layout_python() {
   else
     local python_version ve
     # shellcheck disable=SC2046
-    read -r python_version ve <<<$($python -c "import importlib.util as u, platform as p;ve='venv' if u.find_spec('venv') else ('virtualenv' if u.find_spec('virtualenv') else '');print('.'.join(p.python_version_tuple()[:2])+' '+ve)")
+    read -r python_version ve <<<$($python -c "import sys, importlib, pkgutil, platform as p;find_spec=importlib.util.find_spec if sys.version_info[0] >= 3 and sys.version_info[1] >= 4 else pkgutil.find_loader;ve='venv' if find_spec('venv') else ('virtualenv' if find_spec('virtualenv') else '');print('.'.join(p.python_version_tuple()[:2])+' '+ve)")
     if [[ -z $python_version ]]; then
       log_error "Could not find python's version"
       return 1
