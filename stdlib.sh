@@ -1078,7 +1078,7 @@ layout_uv() {
     # optional argument to specify python version
     local python_version=${1:-}
     if [[ -d ".venv" ]]; then
-        VIRTUAL_ENV="$(pwd)/.venv"
+        VIRTUAL_ENV="${PWD}/.venv"
     fi
 
     if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
