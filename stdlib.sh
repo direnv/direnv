@@ -138,8 +138,11 @@ log_status() {
     if [[ -t 2 ]]; then
       color_normal="\e[m"
     fi
-    # shellcheck disable=SC2059,SC1117
-    printf "${color_normal}${DIRENV_LOG_FORMAT}\n" "$msg" >&2
+    local filter=${DIRENV_LOG_FILTER:-.*}
+    if [[ $msg =~ $filter ]]; then
+      # shellcheck disable=SC2059,SC1117
+      printf "${color_normal}${DIRENV_LOG_FORMAT}\n" "$msg" >&2
+    fi
   fi
 }
 

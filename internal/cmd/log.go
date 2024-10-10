@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 )
 
 const (
@@ -38,7 +39,16 @@ func logStatus(env Env, msg string, a ...interface{}) {
 	if !ok {
 		format = defaultLogFormat
 	}
-	if format != "" {
+	shouldLog := true
+	filter, ok := env["DIRENV_LOG_FILTER"]
+	if ok {
+		filterRegEx, err := regexp.Compile(filter)
+		// Apply the filter if it was valid
+		if err == nil {
+			shouldLog = filterRegEx.MatchString(msg)
+		}
+	}
+	if shouldLog && format != "" {
 		logMsg(format, msg, a...)
 	}
 }
