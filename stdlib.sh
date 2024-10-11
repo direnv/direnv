@@ -1075,22 +1075,14 @@ layout_pyenv() {
 # If no python version is specified, the default python version is used. uv will
 # also install the requested python version if it is not installed.
 layout_uv() {
-  # optional argument to specify python version
   local python_version=${1:-}
-  if [[ -d ".venv" ]]; then
-    VIRTUAL_ENV="${PWD}/.venv"
+  if [[ -n $python_version ]]; then
+    uv venv --python "$python_version"
+  else
+    uv venv
   fi
 
-  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
-    log_status "No virtual environment exists. Executing \`uv venv\` to create one."
-    # If there is a python version specified, use it to create the environment
-    if [[ -n $python_version ]]; then
-      uv venv --python "$python_version"
-    else
-      uv venv
-    fi
-    VIRTUAL_ENV="$(pwd)/.venv"
-  fi
+  VIRTUAL_ENV="$(PWD)/.venv"
 
   PATH_add "$VIRTUAL_ENV/bin"
   export UV_ACTIVE=1
@@ -1107,7 +1099,7 @@ layout_uv() {
 layout_uvp() {
   local python_version=${1:-}
   if [[ -d ".venv" ]]; then
-    VIRTUAL_ENV="$(pwd)/.venv"
+    VIRTUAL_ENV="$(PWD)/.venv"
   fi
 
   if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
@@ -1122,7 +1114,7 @@ layout_uvp() {
     rm hello.py
     # Activate the venv
     uv venv
-    VIRTUAL_ENV="$(pwd)/.venv"
+    VIRTUAL_ENV="$(PWD)/.venv"
   fi
 
   PATH_add "$VIRTUAL_ENV/bin"
