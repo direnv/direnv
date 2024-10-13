@@ -82,14 +82,15 @@ set -euo pipefail
   if [[ -n "${DIRENV_GITHUB_API_TOKEN:-}" ]]; then
     # note: this doesn't actually print the token value.
     echo "using DIRENV_GITHUB_API_TOKEN for GitHub API authentication"
-    authorization_args="-H 'Authorization: Bearer ${DIRENV_GITHUB_API_TOKEN}'"
+    authorization_args=(-H "Authorization: Bearer ${DIRENV_GITHUB_API_TOKEN}")
   else
-    authorization_args=""
+    authorization_args=()
   fi
 
   log "looking for a download URL"
   download_url=$(
-    curl -fL "https://api.github.com/repos/direnv/direnv/releases/$release" $authorization_args \
+    curl -fL "https://api.github.com/repos/direnv/direnv/releases/$release" \
+      "${authorization_args[@]}" \
     | grep browser_download_url \
     | cut -d '"' -f 4 \
     | grep "direnv.$kernel.$machine\$"
