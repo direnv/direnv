@@ -1,7 +1,21 @@
-Unreleased
+
+2.35.0 / 2024-10-07
 ==================
 
-  * feat: add opam support
+  * doc: Add version requirement for load_dotenv option (#1326)
+  * doc: fix broken link (#1327)
+  * doc: update elvish docs (#1305)
+  * docs: change Guix link to its package search. (#1268)
+  * feat: add opam support (#1298)
+  * fix: add NuShell into list of supported shells (#1260)
+  * fix: close tmp file (#1272)
+  * fix: direnv edit: use `editor` when EDITOR not found, closes #1246 (#1247)
+  * fix: release script
+  * fix: stdlib: enable flakes when use flake is used (#1299)
+  * fix: stdlib: export GOBIN for layout_go (#1286)
+  * fix: stdlib: update layout_python to resolve deprecation warning (#1176)
+  * fix: using PWD in .env files (#1052)
+  * test: Fix Murex python-layout test (#1293)
 
 2.34.0 / 2024-03-01
 ==================
