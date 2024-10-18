@@ -1098,9 +1098,7 @@ layout_uv() {
 # also install the requested python version if it is not installed.
 layout_uvp() {
   local python_version=${1:-}
-  if [[ -d ".venv" ]]; then
-    VIRTUAL_ENV="$(PWD)/.venv"
-  fi
+  VIRTUAL_ENV="$(PWD)/.venv"
 
   if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
     log_status "No uv project exists. Executing \`uv init\` to create one."

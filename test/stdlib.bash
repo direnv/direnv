@@ -217,6 +217,60 @@ test_name env_vars_required
   [[ "${output#*'MISSING is required'}" != "$output" ]]
 )
 
+test_name uv
+(
+  load_stdlib
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  # Create a virtual environment
+  layout uv 3.12
+
+  # Check if VIRTUAL_ENV is set correctly
+  [[ $VIRTUAL_ENV = "$tmpdir/.venv" ]]
+
+  # Check if Python is available and its version
+  [[ $(python --version) = "Python 3.12"* ]]
+
+  # Check if UV_ACTIVE is set
+  [[ $UV_ACTIVE = "1" ]]
+
+  # Check if UV_PROJECT_ENVIRONMENT is set correctly
+  [[ $UV_PROJECT_ENVIRONMENT = "$tmpdir/.venv" ]]
+)
+
+test_name uvp
+(
+  load_stdlib
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  # Create a virtual environment
+  layout uvp 3.12
+
+  # Check if VIRTUAL_ENV is set correctly
+  [[ $VIRTUAL_ENV = "$tmpdir/.venv" ]]
+
+  # Check if Python is available and its version
+  [[ $(python --version) = "Python 3.12"* ]]
+
+  # Check if pyproject.toml exists
+  [[ -f pyproject.toml ]]
+
+  # Make sure that hello.py does not exist
+  [[ ! -f hello.py ]]
+
+  # Check if UV_ACTIVE is set
+  [[ $UV_ACTIVE = "1" ]]
+
+  # Check if UV_PROJECT_ENVIRONMENT is set correctly
+  [[ $UV_PROJECT_ENVIRONMENT = "$tmpdir/.venv" ]]
+)
+
 
 # test strict_env and unstrict_env
 ./strict_env_test.bash
