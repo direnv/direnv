@@ -133,16 +133,13 @@ direnv_layout_dir() {
 #    log_status "Loading ..."
 #
 log_status() {
-  if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg=$* color_normal=''
-    if [[ -t 2 ]]; then
-      color_normal="\e[m"
-    fi
-    local filter=${DIRENV_LOG_FILTER:-.*}
-    if [[ $msg =~ $filter ]]; then
-      # shellcheck disable=SC2059,SC1117
-      printf "${color_normal}${DIRENV_LOG_FORMAT}\n" "$msg" >&2
-    fi
+  local msg=$* color_normal=''
+  if [[ -t 2 ]]; then
+    color_normal="\e[m"
+  fi
+  local -r direnv_msg=$(direnv log "$msg" 2>&1)
+  if [[ -n "$direnv_msg" ]]; then
+    printf "${color_normal}%s\n" "${direnv_msg}" >&2
   fi
 }
 
