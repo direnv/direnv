@@ -2,7 +2,7 @@ package cmd
 
 import "fmt"
 
-// CmdFetchURL is `direnv fetchurl <url> [<integrity-hash>]`
+// CmdLog is `direnv log <message>
 var CmdLog = &Cmd{
 	Name:   "log",
 	Desc:   "Logs a given message using log-related environment variables: [DIRENV_LOG_FORMAT, DIRENV_LOG_FILTER]",
