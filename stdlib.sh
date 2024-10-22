@@ -133,14 +133,7 @@ direnv_layout_dir() {
 #    log_status "Loading ..."
 #
 log_status() {
-  local msg=$* color_normal=''
-  if [[ -t 2 ]]; then
-    color_normal="\e[m"
-  fi
-  local -r direnv_msg=$(direnv log "$msg" 2>&1)
-  if [[ -n "$direnv_msg" ]]; then
-    printf "${color_normal}%s\n" "${direnv_msg}" >&2
-  fi
+  direnv log -status "$*"
 }
 
 # Usage: log_error [<message> ...]
@@ -155,15 +148,7 @@ log_status() {
 #    log_error "Unable to find specified directory!"
 
 log_error() {
-  if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg=$* color_normal='' color_error=''
-    if [[ -t 2 ]]; then
-      color_normal="\e[m"
-      color_error="\e[38;5;1m"
-    fi
-    # shellcheck disable=SC2059,SC1117
-    printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
-  fi
+  direnv log -error "$*"
 }
 
 # Usage: has <command>

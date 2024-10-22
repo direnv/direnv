@@ -1,20 +1,30 @@
 package cmd
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // CmdLog is `direnv log <message>
 var CmdLog = &Cmd{
 	Name:   "log",
 	Desc:   "Logs a given message using log-related environment variables: [DIRENV_LOG_FORMAT, DIRENV_LOG_FILTER]",
-	Args:   []string{"<message>"},
+	Args:   []string{"[--status | --error]", "<message>"},
 	Action: actionWithConfig(cmdLog),
 }
 
 func cmdLog(env Env, args []string, config *Config) (err error) {
-	if len(args) < 2 {
-		return fmt.Errorf("missing message argument")
+	if len(args) != 3 {
+		return errors.New("invalid arguments")
 	}
-	message := args[1]
-	logStatus(env, message)
+	logType := args[1]
+	message := args[2]
+	if logType == "--status" || logType == "-status" {
+		logStatus(env, message)
+	} else if logType == "--error" || logType == "-error" {
+		logError(message)
+	} else {
+		return fmt.Errorf("invalid log-type '%s'", logType)
+	}
 	return nil
 }

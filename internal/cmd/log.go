@@ -11,6 +11,7 @@ const (
 	defaultLogFormat        = "direnv: %s"
 	errorLogFormat          = defaultLogFormat
 	errorLogFormatWithColor = "\033[31mdirenv: %s\033[0m"
+	clearColor              = "\033[0m"
 )
 
 var debugging bool
@@ -49,7 +50,11 @@ func logStatus(env Env, msg string, a ...interface{}) {
 		}
 	}
 	if shouldLog && format != "" {
-		logMsg(format, msg, a...)
+		if noColor {
+			logMsg(format, msg, a...)
+		} else {
+			logMsg(fmt.Sprintf("%s%s", clearColor, format), msg, a...)
+		}
 	}
 }
 
