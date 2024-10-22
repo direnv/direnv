@@ -1082,7 +1082,7 @@ layout_uv() {
     uv venv
   fi
 
-  VIRTUAL_ENV="$(PWD)/.venv"
+  VIRTUAL_ENV="${PWD}/.venv"
 
   PATH_add "$VIRTUAL_ENV/bin"
   export UV_ACTIVE=1
@@ -1112,7 +1112,7 @@ layout_uvp() {
     rm hello.py
     # Activate the venv
     uv venv
-    VIRTUAL_ENV="$(PWD)/.venv"
+    VIRTUAL_ENV="${PWD}/.venv"
   fi
 
   PATH_add "$VIRTUAL_ENV/bin"
