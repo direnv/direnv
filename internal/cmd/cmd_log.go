@@ -13,7 +13,7 @@ var CmdLog = &Cmd{
 	Action: actionWithConfig(cmdLog),
 }
 
-func cmdLog(env Env, args []string, config *Config) (err error) {
+func cmdLog(env Env, args []string, _ *Config) (err error) {
 	if len(args) != 3 {
 		return errors.New("invalid arguments")
 	}
