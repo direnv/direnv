@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// CmdLog is `direnv log <message>
+// CmdLog is `direnv log [--status | --error] <message>`
 var CmdLog = &Cmd{
 	Name:   "log",
 	Desc:   "Logs a given message using log-related environment variables: [DIRENV_LOG_FORMAT, DIRENV_LOG_FILTER]",
