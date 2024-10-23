@@ -1090,26 +1090,39 @@ layout_uv() {
   export UV_PROJECT_ENVIRONMENT=$VIRTUAL_ENV
 }
 
-# Usage: layout uvp [<python_version>]
+# Usage: layout uvp [<python_version>] [-- <additional_args>...]
 #
 # Uses uv to create a new project and a virtual environment, and then activates it.
 # See https://docs.astral.sh/uv/guides/projects/ for more details.
 # If no python version is specified, the default python version is used. uv will
 # also install the requested python version if it is not installed.
+# Additional arguments can be passed to `uv init` after a double dash (--).
 layout_uvp() {
-  local python_version=${1:-}
+  local python_version=""
+  local additional_args=()
+  local parsing_additional_args=false
+
+  # Parse arguments
+  for arg in "$@"; do
+    if [[ $arg == "--" ]]; then
+      parsing_additional_args=true
+    elif $parsing_additional_args; then
+      additional_args+=("$arg")
+    elif [[ -z $python_version ]]; then
+      python_version=$arg
+    fi
+  done
+
   VIRTUAL_ENV="${PWD}/.venv"
 
   if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
     log_status "No uv project exists. Executing \`uv init\` to create one."
     # If there is a python version specified, use it to create the project
     if [[ -n $python_version ]]; then
-      uv init --no-readme --python "$python_version"
+      uv init --python "$python_version" "${additional_args[@]}"
     else
-      uv init --no-readme
+      uv init "${additional_args[@]}"
     fi
-    # By default, uv creates a hello.py file. Remove it.
-    rm hello.py
     # Activate the venv
     uv venv
     VIRTUAL_ENV="${PWD}/.venv"

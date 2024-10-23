@@ -273,8 +273,8 @@ test_name uvp
   # Check if pyproject.toml exists
   [[ -f pyproject.toml ]]
 
-  # Make sure that hello.py does not exist
-  [[ ! -f hello.py ]]
+  # README should exist
+  [[ -f README.md ]]
 
   # Check if UV_ACTIVE is set
   [[ $UV_ACTIVE = "1" ]]
@@ -283,6 +283,13 @@ test_name uvp
   [[ $UV_PROJECT_ENVIRONMENT = "$tmpdir/.venv" ]]
 )
 
+test_name uvp_additional_args
+(
+  load_stdlib
+  layout uvp -- --no-readme
+  # Make sure README.md does not exist
+  [[ ! -f README.md ]]
+)
 
 # test strict_env and unstrict_env
 ./strict_env_test.bash
