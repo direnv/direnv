@@ -220,6 +220,12 @@ test_name env_vars_required
 test_name uv
 (
   load_stdlib
+
+  if ! has uv; then
+    echo "WARN: uv not found, skipping..."
+    return
+  fi
+
   tmpdir=$(mktemp -d)
   trap 'rm -rf $tmpdir' EXIT
 
@@ -244,6 +250,12 @@ test_name uv
 test_name uvp
 (
   load_stdlib
+
+  if ! has uv; then
+    echo "WARN: uv not found, skipping..."
+    return
+  fi
+
   tmpdir=$(mktemp -d)
   trap 'rm -rf $tmpdir' EXIT
 
