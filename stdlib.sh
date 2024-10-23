@@ -1076,13 +1076,32 @@ layout_pyenv() {
 # also install the requested python version if it is not installed.
 layout_uv() {
   local python_version=${1:-}
-  if [[ -n $python_version ]]; then
-    uv venv --python "$python_version"
-  else
-    uv venv
-  fi
+  # If they have specified a python version, check to see if there is already a
+  # .python-version file. If there is, and the specified version is different,
+  # then recreate the virtual environment with the new version.
+  # Otherwise, just use the existing virtual environment, if there is already a
+  # .venv directory.
 
   VIRTUAL_ENV="${PWD}/.venv"
+  # Get the current python version from the .python-version file
+  local python_version_file=".python-version"
+  local current_python_version=""
+  if [[ -f "$python_version_file" ]]; then
+    current_python_version=$(<"$python_version_file")
+  fi
+
+  # Check to see if there is already an existing virtual environment,
+  # OR if the current python version is different from the one specified in .python-version
+  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV || $current_python_version != "$python_version" ]]; then
+    log_status "No virtual environment exists. Executing \`uv venv\` to create one."
+    if [[ -n $python_version ]]; then
+      uv venv --python "$python_version"
+      # Write the python version to the .python-version file
+      echo "$python_version" > .python-version
+    else
+      uv venv
+    fi
+  fi
 
   PATH_add "$VIRTUAL_ENV/bin"
   export UV_ACTIVE=1
@@ -1101,6 +1120,11 @@ layout_uvp() {
   local python_version=""
   local additional_args=()
   local parsing_additional_args=false
+  local python_version_file=".python-version"
+  local current_python_version=""
+  if [[ -f "$python_version_file" ]]; then
+    current_python_version=$(<"$python_version_file")
+  fi
 
   # Parse arguments
   for arg in "$@"; do
@@ -1115,8 +1139,19 @@ layout_uvp() {
 
   VIRTUAL_ENV="${PWD}/.venv"
 
+  # If there IS a virtual environment, but it's not the right python version,
+  # then prompt the user to re-create it with the right python version.
+  if [[ -d $VIRTUAL_ENV && $current_python_version != "$python_version" ]]; then
+    log_error "Virtual environment exists, but is with the wrong python version."
+    log_error "Update it by editing .python-version and pyproject.toml."
+  fi
+
   if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
-    log_status "No uv project exists. Executing \`uv init\` to create one."
+    if [[ -n $python_version ]]; then
+      log_status "No uv project exists with python version $python_version. Executing \`uv init --python $python_version\` to create one."
+    else
+      log_status "No uv project exists. Executing \`uv init\` to create one."
+    fi
     # If there is a python version specified, use it to create the project
     if [[ -n $python_version ]]; then
       uv init --python "$python_version" "${additional_args[@]}"

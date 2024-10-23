@@ -283,9 +283,50 @@ test_name uvp
   [[ $UV_PROJECT_ENVIRONMENT = "$tmpdir/.venv" ]]
 )
 
+test_name uv_version_switch
+(
+  load_stdlib
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  layout uv 3.12
+
+  same_version_output_message=$(layout uv 3.12 2>&1)
+  [[ "${same_version_output_message}" != *"No virtual environment exists"* ]]
+
+  different_version_output_message=$(layout uv 3.11 2>&1)
+  [[ "${different_version_output_message}" = *"No virtual environment exists"* ]]
+)
+
+test_name uvp_version_mismatch
+(
+  load_stdlib
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  layout uvp 3.12
+
+  error_output=$(layout uvp 3.11 2>&1 >/dev/null)
+
+  # Make sure error message contains the string "wrong python versionk"
+  [[ "${error_output#*'wrong python version'}" != "$error_output" ]]
+)
+
 test_name uvp_additional_args
 (
   load_stdlib
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
   layout uvp -- --no-readme
   # Make sure README.md does not exist
   [[ ! -f README.md ]]
