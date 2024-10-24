@@ -157,12 +157,8 @@ func LoadConfig(env Env) (config *Config, err error) {
 			config.LogFormat = defaultLogFormat
 		}
 
-		filter := env["DIRENV_LOG_FILTER"]
-		if filter != "" {
-			filter = global.LogFilter
-		}
-		if filter != "" {
-			filterRegexp, err := regexp.Compile(filter)
+		if global.LogFilter != "" {
+			filterRegexp, err := regexp.Compile(global.LogFilter)
 			if err != nil {
 				err = fmt.Errorf("error in log filter: %w", err)
 				return nil, err
