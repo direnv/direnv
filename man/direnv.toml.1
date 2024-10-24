@@ -51,8 +51,12 @@ If set to \fBtrue\fR, stdin is disabled (redirected to /dev/null) during the \fB
 .SS \fBload_dotenv\fR
 .PP
 .RS
+
+.PP
 direnv >= 2.31.0 is required
+
 .RE
+
 .PP
 If set to \fBtrue\fR, also look for and load \fB\&.env\fR files on top of the \fB\&.envrc\fR files. If both \fB\&.envrc\fR and \fB\&.env\fR files exist, the \fB\&.envrc\fR will always be chosen first.
 
@@ -79,6 +83,14 @@ Will be overwritten if the environment variable \fBDIRENV_WARN_TIMEOUT\fR is set
 .PP
 Set to \fBtrue\fR to hide the diff of the environment variables when loading the
 \fB\&.envrc\fR\&. Defaults to \fBfalse\fR\&.
+
+.SS \fBlog_format\fR
+.PP
+Sets the log format for direnv outputs. Set to "-" to disable normal logging.
+
+.SS \fBlog_filter\fR
+.PP
+A Regexp that can be used to filter out some of the logs.
 
 .SH [whitelist]
 .PP

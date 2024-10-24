@@ -84,7 +84,7 @@ func cmdWithWarnTimeout(fn action) action {
 			case <-done:
 				return
 			case <-time.After(config.WarnTimeout):
-				logError("(%v) is taking a while to execute. Use CTRL-C to give up.", args)
+				logError(config, "(%v) is taking a while to execute. Use CTRL-C to give up.", args)
 			}
 		}()
 

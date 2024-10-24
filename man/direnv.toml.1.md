@@ -70,6 +70,14 @@ Will be overwritten if the environment variable `DIRENV_WARN_TIMEOUT` is set to 
 Set to `true` to hide the diff of the environment variables when loading the
 `.envrc`. Defaults to `false`.
 
+### `log_format`
+
+Sets the log format for direnv outputs. Set to "-" to disable normal logging.
+
+### `log_filter`
+
+A Regexp that can be used to filter out some of the logs.
+
 ## [whitelist]
 
 Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" -- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. **This feature should be used with great care**, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.

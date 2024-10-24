@@ -81,7 +81,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	}
 
 	if toLoad == "" {
-		logStatus(currentEnv, "unloading")
+		logStatus(config, "unloading")
 		newEnv = previousEnv.Copy()
 		newEnv.CleanContext()
 	} else {
@@ -101,7 +101,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	}
 
 	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" && !config.HideEnvDiff {
-		logStatus(currentEnv, "export %s", out)
+		logStatus(config, "export %s", out)
 	}
 
 	diffString := currentEnv.Diff(newEnv).ToShell(shell)

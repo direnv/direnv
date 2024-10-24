@@ -3,19 +3,15 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os"
-	"regexp"
 )
 
 const (
-	defaultLogFormat        = "direnv: %s"
-	errorLogFormat          = defaultLogFormat
-	errorLogFormatWithColor = "\033[31mdirenv: %s\033[0m"
-	clearColor              = "\033[0m"
+	defaultLogFormat = "direnv: %s"
+	errorColor       = "\033[31m"
+	clearColor       = "\033[0m"
 )
 
 var debugging bool
-var noColor = os.Getenv("TERM") == "dumb"
 
 func setupLogging(env Env) {
 	log.SetFlags(0)
@@ -27,30 +23,22 @@ func setupLogging(env Env) {
 	}
 }
 
-func logError(msg string, a ...interface{}) {
-	if noColor {
-		logMsg(errorLogFormat, msg, a...)
+func logError(c *Config, msg string, a ...interface{}) {
+	if c.LogColor {
+		logMsg(c.LogFormat, msg, a...)
 	} else {
-		logMsg(errorLogFormatWithColor, msg, a...)
+		logMsg(errorColor+c.LogFormat+clearColor, msg, a...)
 	}
 }
 
-func logStatus(env Env, msg string, a ...interface{}) {
-	format, ok := env["DIRENV_LOG_FORMAT"]
-	if !ok {
-		format = defaultLogFormat
-	}
+func logStatus(c *Config, msg string, a ...interface{}) {
+	format := c.LogFormat
 	shouldLog := true
-	filter, ok := env["DIRENV_LOG_FILTER"]
-	if ok {
-		filterRegEx, err := regexp.Compile(filter)
-		// Apply the filter if it was valid
-		if err == nil {
-			shouldLog = filterRegEx.MatchString(msg)
-		}
+	if c.LogFilter != nil {
+		shouldLog = c.LogFilter.MatchString(msg)
 	}
 	if shouldLog && format != "" {
-		if noColor {
+		if c.LogColor {
 			logMsg(format, msg, a...)
 		} else {
 			logMsg(fmt.Sprintf("%s%s", clearColor, format), msg, a...)
