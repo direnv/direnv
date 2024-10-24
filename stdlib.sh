@@ -15,9 +15,6 @@ shopt -s extglob
 # NOTE: don't touch the RHS, it gets replaced at runtime
 direnv="$(command -v direnv)"
 
-# Config, change in the direnvrc
-DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
-
 # Where direnv configuration should be stored
 direnv_config_dir="${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}"
 
@@ -125,8 +122,7 @@ direnv_layout_dir() {
 #
 # Logs a status message. Acts like echo,
 # but wraps output in the standard direnv log format
-# (controlled by $DIRENV_LOG_FORMAT), and directs it
-# to stderr rather than stdout.
+# and directs it to stderr rather than stdout.
 #
 # Example:
 #
@@ -140,8 +136,7 @@ log_status() {
 #
 # Logs an error message. Acts like echo,
 # but wraps output in the standard direnv log format
-# (controlled by $DIRENV_LOG_FORMAT), and directs it
-# to stderr rather than stdout.
+# and directs it to stderr rather than stdout.
 #
 # Example:
 #
