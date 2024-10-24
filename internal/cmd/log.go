@@ -25,9 +25,9 @@ func setupLogging(env Env) {
 
 func logError(c *Config, msg string, a ...interface{}) {
 	if c.LogColor {
-		logMsg(c.LogFormat, msg, a...)
+		logMsg(defaultLogFormat, msg, a...)
 	} else {
-		logMsg(errorColor+c.LogFormat+clearColor, msg, a...)
+		logMsg(errorColor+defaultLogFormat+clearColor, msg, a...)
 	}
 }
 
