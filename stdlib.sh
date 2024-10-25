@@ -129,7 +129,7 @@ direnv_layout_dir() {
 #    log_status "Loading ..."
 #
 log_status() {
-  direnv log -status "$*" >&2
+  "$direnv" log -status "$*" >&2
 }
 
 # Usage: log_error [<message> ...]
@@ -143,7 +143,7 @@ log_status() {
 #    log_error "Unable to find specified directory!"
 
 log_error() {
-  direnv log -error "$*" >&2
+  "$direnv" log -error "$*" >&2
 }
 
 # Usage: has <command>
