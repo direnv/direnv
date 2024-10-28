@@ -100,7 +100,11 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		}
 	}
 
-	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" && !config.HideEnvDiff {
+	if _, ok := newEnv[DIRENV_DIFF_HIDE]; ok && !config.HideHiddenExportWarning {
+		logStatus(currentEnv, "some exports may be hidden")
+	}
+
+	if out := diffStatus(&newEnv, &previousEnv); out != "" && !config.HideEnvDiff {
 		logStatus(currentEnv, "export %s", out)
 	}
 
@@ -112,19 +116,28 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 }
 
 // Return a string of +/-/~ indicators of an environment diff
-func diffStatus(oldDiff *EnvDiff) string {
+func diffStatus(newEnv *Env, oldEnv *Env) string {
+	oldDiff := oldEnv.Diff(*newEnv)
 	if oldDiff.Any() {
 		var out []string
+
+		// DIRENV_DIFF_HIDE is a colon-separated list of keys to ignore when reporting diffs
+		hideKeysEnv, ok := (*newEnv)[DIRENV_DIFF_HIDE]
+		if !ok {
+			hideKeysEnv = ""
+		}
+		ignoreKeys := strings.Split(hideKeysEnv, ":")
+
 		for key := range oldDiff.Prev {
 			_, ok := oldDiff.Next[key]
-			if !ok && !direnvKey(key) {
+			if !ok && !direnvKey(key) && !hideKey(key, ignoreKeys) {
 				out = append(out, "-"+key)
 			}
 		}
 
 		for key := range oldDiff.Next {
 			_, ok := oldDiff.Prev[key]
-			if direnvKey(key) {
+			if direnvKey(key) || hideKey(key, ignoreKeys) {
 				continue
 			}
 			if ok {
@@ -142,4 +155,13 @@ func diffStatus(oldDiff *EnvDiff) string {
 
 func direnvKey(key string) bool {
 	return strings.HasPrefix(key, "DIRENV_")
+}
+
+func hideKey(key string, hideKeys []string) bool {
+	for _, k := range hideKeys {
+		if k == key {
+			return true
+		}
+	}
+	return false
 }
