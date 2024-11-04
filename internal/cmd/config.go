@@ -122,6 +122,9 @@ func LoadConfig(env Env) (config *Config, err error) {
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
 
+	// Default log format
+	config.LogFormat = defaultLogFormat
+
 	// Load the TOML config
 	config.TomlPath = filepath.Join(config.ConfDir, "direnv.toml")
 	if _, statErr := os.Stat(config.TomlPath); statErr != nil {
@@ -153,8 +156,6 @@ func LoadConfig(env Env) (config *Config, err error) {
 			config.LogFormat = format
 		} else if global.LogFormat != "" {
 			config.LogFormat = global.LogFormat
-		} else {
-			config.LogFormat = defaultLogFormat
 		}
 
 		if global.LogFilter != "" {
