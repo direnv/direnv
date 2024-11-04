@@ -117,13 +117,13 @@ func LoadConfig(env Env) (config *Config, err error) {
 	// Default Warn Timeout
 	config.WarnTimeout = 5 * time.Second
 
+	// Default log format
+	config.LogFormat = defaultLogFormat
+
 	config.RCFile = env[DIRENV_FILE]
 
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
-
-	// Default log format
-	config.LogFormat = defaultLogFormat
 
 	// Load the TOML config
 	config.TomlPath = filepath.Join(config.ConfDir, "direnv.toml")
