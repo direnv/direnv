@@ -47,5 +47,5 @@ func (sh vim) escapeKey(str string) string {
 
 // TODO: Make sure this escaping is valid
 func (sh vim) escapeValue(str string) string {
-	return "'" + strings.Replace(str, "'", "''", -1) + "'"
+	return "'" + strings.Replace(strings.Replace(str, "\n", "\\n", -1), "'", "''", -1) + "'"
 }
