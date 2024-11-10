@@ -67,6 +67,8 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logDebug("new RC, loading")
 	case loadedRC.times.Check() != nil:
 		logDebug("file changed, reloading")
+	case loadedRC.commands.Check(config) != nil:
+		logDebug("command changed, reloading")
 	default:
 		logDebug("no update needed")
 		return
