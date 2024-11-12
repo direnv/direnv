@@ -1,7 +1,6 @@
 package dotenv_test
 
 import (
-	"os"
 	"testing"
 
 	dotenv "github.com/direnv/direnv/v2/pkg/dotenv"
@@ -237,10 +236,7 @@ OPTION_A1="$OPTION_A/bar/${OPTION_H}/$FOO"
 `
 
 func TestVariableExpansion(t *testing.T) {
-	err := os.Setenv("FOO", "foo")
-	if err != nil {
-		t.Fatalf("unable to set environment variable for testing: %s", err)
-	}
+	t.Setenv("FOO", "foo")
 
 	env := dotenv.MustParse(TestVariableExpansionEnv)
 	shouldNotHaveEmptyKey(t, env)
@@ -297,10 +293,7 @@ OPTION_S="${BAR:-:-}"
 `
 
 func TestVariableExpansionWithDefaults(t *testing.T) {
-	err := os.Setenv("FOO", "foo")
-	if err != nil {
-		t.Fatalf("unable to set environment variable for testing: %s", err)
-	}
+	t.Setenv("FOO", "foo")
 
 	env := dotenv.MustParse(TestVariableExpansionWithDefaultsEnv)
 	shouldNotHaveEmptyKey(t, env)
