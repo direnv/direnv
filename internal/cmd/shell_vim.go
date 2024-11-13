@@ -7,7 +7,7 @@ import (
 
 type vim struct{}
 
-// Vim adds support for vim. Not really a shell but it's handly.
+// Vim adds support for vim. Not really a shell but it's handy.
 var Vim Shell = vim{}
 
 func (sh vim) Hook() (string, error) {

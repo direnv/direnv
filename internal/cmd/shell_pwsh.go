@@ -138,7 +138,7 @@ func PowerShellEscape(str string) string {
 		// 	quoted(char)
 		// case char <= BACKTICK:
 		// 	quoted(char)
-		// case char <= TILDA:
+		// case char <= TILDE:
 		// 	quoted(char)
 		case char == DEL:
 			hex(char)
