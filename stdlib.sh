@@ -1068,6 +1068,27 @@ layout_pyenv() {
   [[ -n "$PYENV_VERSION" ]] && export PYENV_VERSION
 }
 
+# Usage: layout uv
+#
+# Enables the uv project layout in the current directory, and syncs
+# the dependencies in the project.
+#
+# This relies on the `uv` command being available in the PATH, and performs a
+# sync on cd because uv is fast enough it's not impactful. It relies on uv's
+# configuration file and environment variables, rather than arguments.
+#
+layout_uv() {
+  uv sync || return 1
+
+  # activate the virtualenv after syncing; this puts the newly-installed
+  # binaries on PATH.
+  venv_path=$(pwd)/.venv
+  if [[ -f $venv_path ]]; then
+    # shellcheck source=/dev/null
+    source "$venv_path/bin/activate"
+  fi
+}
+
 # Usage: layout ruby
 #
 # Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".
