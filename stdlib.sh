@@ -1078,7 +1078,7 @@ layout_pyenv() {
 # configuration file and environment variables, rather than arguments.
 #
 layout_uv() {
-  # watch the uv configuration file for changes
+  # Watch the uv configuration file for changes
   watch_file .python-version
   watch_file pyproject.toml
   watch_file uv.lock
