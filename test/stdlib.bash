@@ -225,7 +225,7 @@ test_name uv
   load_stdlib
   if ! has uv; then
     echo "WARN: uv not found, skipping test"
-    return
+    exit 0
   fi
 
   tmpdir=$(mktemp -d)
