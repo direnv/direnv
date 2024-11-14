@@ -221,7 +221,7 @@ test_name env_vars_required
 )
 
 test_name uv
-{
+(
   load_stdlib
   if ! has uv; then
     echo "WARN: uv not found, skipping test"
@@ -250,7 +250,7 @@ EOF
 
   layout_uv
   [[ -d .venv ]]
-}
+)
 
 # test strict_env and unstrict_env
 ./strict_env_test.bash
