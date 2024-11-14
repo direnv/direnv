@@ -1078,6 +1078,11 @@ layout_pyenv() {
 # configuration file and environment variables, rather than arguments.
 #
 layout_uv() {
+  # watch the uv configuration file for changes
+  watch_file .python-version
+  watch_file pyproject.toml
+  watch_file uv.lock
+
   uv sync || return 1
 
   # activate the virtualenv after syncing; this puts the newly-installed
@@ -1087,6 +1092,7 @@ layout_uv() {
     # shellcheck source=/dev/null
     source "$venv_path/bin/activate"
   fi
+
 }
 
 # Usage: layout ruby
