@@ -248,6 +248,9 @@ version = "1.0"
 dependencies = []
 EOF
 
+  # we also need an actual lock file for this, otherwise --locked will fail.
+  uv sync
+
   layout_uv
   [[ -d .venv ]]
 )
