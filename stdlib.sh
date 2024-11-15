@@ -1079,9 +1079,7 @@ layout_pyenv() {
 #
 layout_uv() {
   # Watch the uv configuration file for changes
-  watch_file .python-version
-  watch_file pyproject.toml
-  watch_file uv.lock
+  watch_file .python-version pyproject.toml uv.lock
 
   uv sync || return 1
 
