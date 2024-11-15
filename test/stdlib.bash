@@ -236,7 +236,7 @@ test_name uv
 
   # uv should do nothing if no project is found
   output=$(layout_uv 2>&1 >/dev/null || echo "--- result: $?")
-  [[ "${output#*'--- result: 1'}" != "$output" ]]
+  [[ "${output#*'error:'}" != "$output" ]]
 
   # if a pyproject.toml exists and is valid "enough" uv should sync
   # and create its environment.
