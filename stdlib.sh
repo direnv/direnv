@@ -1081,10 +1081,10 @@ layout_uv() {
   # Watch the uv configuration file for changes
   watch_file .python-version pyproject.toml uv.lock
 
-  # Use --locked so that direnv entry does not change the lock contents. This
+  # Use --frozen so that direnv entry does not change the lock contents. This
   # can fail if the lock file is badly out of sync, but it'll report that to the
   # user and the resolution is obvious.
-  uv sync --locked || true
+  uv sync --frozen || true
 
   # activate the virtualenv after syncing; this puts the newly-installed
   # binaries on PATH.
