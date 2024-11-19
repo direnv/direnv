@@ -15,9 +15,6 @@ shopt -s extglob
 # NOTE: don't touch the RHS, it gets replaced at runtime
 direnv="$(command -v direnv)"
 
-# Config, change in the direnvrc
-DIRENV_LOG_FORMAT="${DIRENV_LOG_FORMAT-direnv: %s}"
-
 # Where direnv configuration should be stored
 direnv_config_dir="${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}"
 
@@ -125,45 +122,28 @@ direnv_layout_dir() {
 #
 # Logs a status message. Acts like echo,
 # but wraps output in the standard direnv log format
-# (controlled by $DIRENV_LOG_FORMAT), and directs it
-# to stderr rather than stdout.
+# and directs it to stderr rather than stdout.
 #
 # Example:
 #
 #    log_status "Loading ..."
 #
 log_status() {
-  if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg=$* color_normal=''
-    if [[ -t 2 ]]; then
-      color_normal="\e[m"
-    fi
-    # shellcheck disable=SC2059,SC1117
-    printf "${color_normal}${DIRENV_LOG_FORMAT}\n" "$msg" >&2
-  fi
+  "$direnv" log -status "$*"
 }
 
 # Usage: log_error [<message> ...]
 #
 # Logs an error message. Acts like echo,
 # but wraps output in the standard direnv log format
-# (controlled by $DIRENV_LOG_FORMAT), and directs it
-# to stderr rather than stdout.
+# and directs it to stderr rather than stdout.
 #
 # Example:
 #
 #    log_error "Unable to find specified directory!"
 
 log_error() {
-  if [[ -n $DIRENV_LOG_FORMAT ]]; then
-    local msg=$* color_normal='' color_error=''
-    if [[ -t 2 ]]; then
-      color_normal="\e[m"
-      color_error="\e[38;5;1m"
-    fi
-    # shellcheck disable=SC2059,SC1117
-    printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
-  fi
+  "$direnv" log -error "$*"
 }
 
 # Usage: has <command>
