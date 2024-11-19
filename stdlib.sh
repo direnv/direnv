@@ -1089,7 +1089,7 @@ layout_uv() {
   # activate the virtualenv after syncing; this puts the newly-installed
   # binaries on PATH.
   venv_path="$(expand_path "${UV_PROJECT_ENVIRONMENT:-.venv}")"
-  if [[ -f $venv_path ]]; then
+  if [[ -e $venv_path ]]; then
     # shellcheck source=/dev/null
     source "$venv_path/bin/activate"
   fi
