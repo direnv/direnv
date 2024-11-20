@@ -1,5 +1,8 @@
 queue_rules:
   - name: default
+    queue_conditions:
+      - base=master
+      - label~=merge-queue|dependencies
     merge_conditions:
       - check-success=Analyze (go)
       - check-success=Go Build (macos-latest)
@@ -7,15 +10,10 @@ queue_rules:
       - check-success=Go Build (windows-latest)
       - check-success=Nix Build (macos-latest)
       - check-success=Nix Build (ubuntu-latest)
-defaults:
-  actions:
-    queue:
-      allow_merging_configuration_change: true
-      method: rebase
+    merge_method: rebase
+
 pull_request_rules:
-  - name: merge using the merge queue
-    conditions:
-      - base=master
-      - label~=merge-queue|dependencies
+  - name: refactored queue action rule
+    conditions: []
     actions:
-      queue: {}
+      queue:
