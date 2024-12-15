@@ -30,6 +30,14 @@ var CmdExport = &Cmd{
 func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	defer log.SetPrefix(log.Prefix())
 	log.SetPrefix(log.Prefix() + "export:")
+
+	for _, ignorePath := range config.IgnorePaths {
+		if strings.HasPrefix(config.WorkDir, ignorePath) {
+			logDebug("ignoring directory %s", config.WorkDir)
+			return
+		}
+	}
+
 	logDebug("start")
 
 	var target string
