@@ -217,6 +217,120 @@ test_name env_vars_required
   [[ "${output#*'MISSING is required'}" != "$output" ]]
 )
 
+test_name uv
+(
+  load_stdlib
+
+  if ! has uv; then
+    echo "WARN: uv not found, skipping..."
+    return
+  fi
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  # Create a virtual environment
+  layout uv 3.12
+
+  # Check if VIRTUAL_ENV is set correctly
+  [[ $VIRTUAL_ENV = "$tmpdir/.venv" ]]
+
+  # Check if Python is available and its version
+  [[ $(python --version) = "Python 3.12"* ]]
+
+  # Check if UV_ACTIVE is set
+  [[ $UV_ACTIVE = "1" ]]
+
+  # Check if UV_PROJECT_ENVIRONMENT is set correctly
+  [[ $UV_PROJECT_ENVIRONMENT = "$tmpdir/.venv" ]]
+)
+
+test_name uvp
+(
+  load_stdlib
+
+  if ! has uv; then
+    echo "WARN: uv not found, skipping..."
+    return
+  fi
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  # Create a virtual environment
+  layout uvp 3.12
+
+  # Check if VIRTUAL_ENV is set correctly
+  [[ $VIRTUAL_ENV = "$tmpdir/.venv" ]]
+
+  # Check if Python is available and its version
+  [[ $(python --version) = "Python 3.12"* ]]
+
+  # Check if pyproject.toml exists
+  [[ -f pyproject.toml ]]
+
+  # README should exist
+  [[ -f README.md ]]
+
+  # Check if UV_ACTIVE is set
+  [[ $UV_ACTIVE = "1" ]]
+
+  # Check if UV_PROJECT_ENVIRONMENT is set correctly
+  [[ $UV_PROJECT_ENVIRONMENT = "$tmpdir/.venv" ]]
+)
+
+test_name uv_version_switch
+(
+  load_stdlib
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  layout uv 3.12
+
+  same_version_output_message=$(layout uv 3.12 2>&1)
+  [[ "${same_version_output_message}" != *"No virtual environment exists"* ]]
+
+  different_version_output_message=$(layout uv 3.11 2>&1)
+  [[ "${different_version_output_message}" = *"No virtual environment exists"* ]]
+)
+
+test_name uvp_version_mismatch
+(
+  load_stdlib
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  layout uvp 3.12
+
+  error_output=$(layout uvp 3.11 2>&1 >/dev/null)
+
+  # Make sure error message contains the string "wrong python versionk"
+  [[ "${error_output#*'wrong python version'}" != "$error_output" ]]
+)
+
+test_name uvp_additional_args
+(
+  load_stdlib
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  layout uvp -- --no-readme
+  # Make sure README.md does not exist
+  [[ ! -f README.md ]]
+)
 
 # test strict_env and unstrict_env
 ./strict_env_test.bash
