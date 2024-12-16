@@ -110,7 +110,7 @@ func (sh fish) escape(str string) string {
 			backslash(char)
 		case char == BACKSLASH:
 			backslash(char)
-		case char <= TILDA:
+		case char <= TILDE:
 			literal(char)
 		case char == DEL:
 			hex(char)

@@ -56,9 +56,9 @@ func DetectShell(target string) Shell {
 		target = target[1:]
 	}
 
-	detechedShell, isValid := supportedShellList[target]
+	detectedShell, isValid := supportedShellList[target]
 	if isValid {
-		return detechedShell
+		return detectedShell
 	}
 	return nil
 }

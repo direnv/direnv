@@ -197,7 +197,7 @@
   * Updated conditional for zsh hook to be more forgiving (#808)
   * Add -r flag for matching Git branches with a regexp (#800)
   * Add docs about pipenv (#797)
-  * Enable syntax hilights to the quick demo code (#752)
+  * Enable syntax highlights to the quick demo code (#752)
   * Fixed extra quotes for lower alpha characters (#783)
   * Remove noisy warning about PS1 again (#781)
 
@@ -456,7 +456,7 @@ expose issues with existing `.envrc` files.
   * FIX: Perform stricter search for existing Anaconda environments (#462)
   * FIX: arity mismatch for elvish (#482)
   * FIX: avoid reloading on each prompt after error (#468)
-  * FIX: improve bash hook handlign of empty PROMPT_COMMAND (#473)
+  * FIX: improve bash hook handling of empty PROMPT_COMMAND (#473)
   * FIX: improved the tests for bash, zsh, fish and tcsh (#469)
   * MISC: migrated from Travis CI to Azure Pipelines (#484)
 

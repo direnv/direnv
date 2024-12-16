@@ -82,7 +82,7 @@ const (
 	CLOSE_BRACKET = 93
 	BACKTICK      = 96
 	LOWERCASE_Z   = 122
-	TILDA         = 126
+	TILDE         = 126
 	DEL           = 127
 )
 
@@ -163,7 +163,7 @@ func BashEscape(str string) string {
 			quoted(char)
 		case char <= BACKTICK:
 			quoted(char)
-		case char <= TILDA:
+		case char <= TILDE:
 			quoted(char)
 		case char == DEL:
 			hex(char)
