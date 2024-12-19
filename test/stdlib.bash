@@ -283,6 +283,44 @@ test_name uvp
   [[ $UV_PROJECT_ENVIRONMENT = "$tmpdir/.venv" ]]
 )
 
+test_name uv_no_version_twice
+(
+  load_stdlib
+
+  if ! has uv; then
+    echo "WARN: uv not found, skipping..."
+    return
+  fi
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  # Create a virtual environment with no version specified
+  layout uv
+
+  # Create a virtual environment with no version specified again
+  second_run_output=$(layout uv 2>&1)
+  [[ "${second_run_output}" != *"No virtual environment exists"* ]]
+)
+
+test_name uvp_no_version_twice
+(
+  load_stdlib
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  cd "$tmpdir"
+
+  layout uvp
+
+  second_run_output=$(layout uvp 2>&1)
+  [[ "${second_run_output}" != *"wrong python version"* ]]
+  [[ "${second_run_output}" != *"No uv project exists"* ]]
+)
+
 test_name uv_version_switch
 (
   load_stdlib

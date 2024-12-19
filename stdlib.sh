@@ -1092,7 +1092,7 @@ layout_uv() {
 
   # Check to see if there is already an existing virtual environment,
   # OR if the current python version is different from the one specified in .python-version
-  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV || $current_python_version != "$python_version" ]]; then
+  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV || (-n $python_version && $current_python_version != "$python_version") ]]; then
     log_status "No virtual environment exists. Executing \`uv venv\` to create one."
     if [[ -n $python_version ]]; then
       uv venv --python "$python_version"
@@ -1141,7 +1141,7 @@ layout_uvp() {
 
   # If there IS a virtual environment, but it's not the right python version,
   # then prompt the user to re-create it with the right python version.
-  if [[ -d $VIRTUAL_ENV && $current_python_version != "$python_version" ]]; then
+  if [[ -d $VIRTUAL_ENV && (-n $python_version && $current_python_version != "$python_version") ]]; then
     log_error "Virtual environment exists, but is with the wrong python version."
     log_error "Update it by editing .python-version and pyproject.toml."
   fi
