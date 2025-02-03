@@ -24,6 +24,7 @@ Add the following line at the end of the `~/.zshrc` file:
 eval "$(direnv hook zsh)"
 ```
 
+
 ## Oh my zsh
 
 Oh my zsh has [a core plugin with direnv](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/direnv) support.
