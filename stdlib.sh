@@ -1312,6 +1312,8 @@ use_flake() {
 # file. For a full list of options, consult the documentation for the
 # `guix shell` command.
 use_guix() {
+  watch_file guix.scm
+  watch_file manifest.scm
   eval "$(guix shell "$@" --search-paths)"
 }
 
