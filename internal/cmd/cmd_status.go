@@ -86,6 +86,9 @@ func formatRC(desc string, rc *RC) {
 	for idx := range *(rc.times.list) {
 		fmt.Println(desc, "watch:", (*rc.times.list)[idx].Formatted(workDir))
 	}
+	for idx := range *(rc.commands.list) {
+		fmt.Println(desc, "command watch:", (*rc.commands.list)[idx].Formatted())
+	}
 	fmt.Println(desc, "RC allowed", rc.Allowed())
 	fmt.Println(desc, "RC allowPath", rc.allowPath)
 }
