@@ -1048,6 +1048,109 @@ layout_pyenv() {
   [[ -n "$PYENV_VERSION" ]] && export PYENV_VERSION
 }
 
+# Usage: layout uv [<python_version>]
+#
+# Uses uv to create a virtual environment, and then activates it.
+# See https://docs.astral.sh/uv/pip/environments/ for more details.
+# If no python version is specified, the default python version is used. uv will
+# also install the requested python version if it is not installed.
+layout_uv() {
+  local python_version=${1:-}
+  # If they have specified a python version, check to see if there is already a
+  # .python-version file. If there is, and the specified version is different,
+  # then recreate the virtual environment with the new version.
+  # Otherwise, just use the existing virtual environment, if there is already a
+  # .venv directory.
+
+  VIRTUAL_ENV="${PWD}/.venv"
+  # Get the current python version from the .python-version file
+  local python_version_file=".python-version"
+  local current_python_version=""
+  if [[ -f "$python_version_file" ]]; then
+    current_python_version=$(<"$python_version_file")
+  fi
+
+  # Check to see if there is already an existing virtual environment,
+  # OR if the current python version is different from the one specified in .python-version
+  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV || (-n $python_version && $current_python_version != "$python_version") ]]; then
+    log_status "No virtual environment exists. Executing \`uv venv\` to create one."
+    if [[ -n $python_version ]]; then
+      uv venv --python "$python_version"
+      # Write the python version to the .python-version file
+      echo "$python_version" > .python-version
+    else
+      uv venv
+    fi
+  fi
+
+  PATH_add "$VIRTUAL_ENV/bin"
+  export UV_ACTIVE=1
+  export VIRTUAL_ENV
+  export UV_PROJECT_ENVIRONMENT=$VIRTUAL_ENV
+}
+
+# Usage: layout uvp [<python_version>] [-- <additional_args>...]
+#
+# Uses uv to create a new project and a virtual environment, and then activates it.
+# See https://docs.astral.sh/uv/guides/projects/ for more details.
+# If no python version is specified, the default python version is used. uv will
+# also install the requested python version if it is not installed.
+# Additional arguments can be passed to `uv init` after a double dash (--).
+layout_uvp() {
+  local python_version=""
+  local additional_args=()
+  local parsing_additional_args=false
+  local python_version_file=".python-version"
+  local current_python_version=""
+  if [[ -f "$python_version_file" ]]; then
+    current_python_version=$(<"$python_version_file")
+  fi
+
+  # Parse arguments
+  for arg in "$@"; do
+    if [[ $arg == "--" ]]; then
+      parsing_additional_args=true
+    elif $parsing_additional_args; then
+      additional_args+=("$arg")
+    elif [[ -z $python_version ]]; then
+      python_version=$arg
+    fi
+  done
+
+  VIRTUAL_ENV="${PWD}/.venv"
+
+  # If there IS a virtual environment, but it's not the right python version,
+  # then prompt the user to re-create it with the right python version.
+  if [[ -d $VIRTUAL_ENV && (-n $python_version && $current_python_version != "$python_version") ]]; then
+    log_error "Virtual environment exists, but is with the wrong python version."
+    log_error "Update it by editing .python-version and pyproject.toml."
+  fi
+
+  if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
+    if [[ -n $python_version ]]; then
+      log_status "No uv project exists with python version $python_version. Executing \`uv init --python $python_version\` to create one."
+    else
+      log_status "No uv project exists. Executing \`uv init\` to create one."
+    fi
+    # If there is a python version specified, use it to create the project
+    if [[ -n $python_version ]]; then
+      uv init --python "$python_version" "${additional_args[@]}"
+    else
+      uv init "${additional_args[@]}"
+    fi
+    # Activate the venv
+    uv venv
+    VIRTUAL_ENV="${PWD}/.venv"
+  fi
+
+  PATH_add "$VIRTUAL_ENV/bin"
+  export UV_ACTIVE=1
+  export VIRTUAL_ENV
+  export UV_PROJECT_ENVIRONMENT=$VIRTUAL_ENV
+}
+
+
+
 # Usage: layout ruby
 #
 # Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".
