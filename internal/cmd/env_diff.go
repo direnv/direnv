@@ -43,6 +43,10 @@ func NewEnvDiff() *EnvDiff {
 func BuildEnvDiff(e1, e2 Env) *EnvDiff {
 	diff := NewEnvDiff()
 
+	// because PS1 can not be exported, expose it as DIRENV_PS1
+	e1[DIRENV_PS1] = e1[PS1]
+	e2[DIRENV_PS1] = e2[PS1]
+
 	in := func(key string, e Env) bool {
 		_, ok := e[key]
 		return ok
