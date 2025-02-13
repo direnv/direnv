@@ -1,4 +1,5 @@
 { stdenv
+, pkgs
 , mkGoEnv
 , gomod2nix
 , git
@@ -23,14 +24,16 @@
 }:
 stdenv.mkDerivation {
   name = "shell";
-  buildInputs = [
-    (mkGoEnv { pwd = ./.; })
+  buildInputs = with pkgs; [
+
+    (mkGoEnv { pwd = ./.; go = go_1_24; })
+
+    go_1_24
 
     # Build
     git
     git-extras # for git-changelog
     gnumake
-    go
     go-md2man
     gox
     gomod2nix
@@ -46,6 +49,11 @@ stdenv.mkDerivation {
 
     # Test dependencies
     golangci-lint
+    #(golangci-lint.override {
+    #  #go = pkgs.go_1_24;
+    #  #languages.go.package = buildPackages.go_1_24;
+    #  #buildGoModule = nixpkgs.buildGo124Module;
+    #})
     python3
     ruby
     shellcheck
