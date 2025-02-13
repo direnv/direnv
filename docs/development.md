@@ -2,7 +2,7 @@
 
 Setup a go environment https://golang.org/doc/install
 
-> go >= 1.20 is required
+> go >= 1.23 is required
 
 Clone the project:
 

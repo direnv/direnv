@@ -1,6 +1,6 @@
 module github.com/direnv/direnv/v2
 
-go 1.24
+go 1.23
 
 require (
 	github.com/BurntSushi/toml v1.4.0
