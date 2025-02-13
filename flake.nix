@@ -28,7 +28,7 @@
     in
     {
       packages = eachSystem (
-        { callPackage, gomod2nixPkgs, ... }:
+        { callPackage, gomod2nixPkgs, pkgs, ... }:
         {
           default = callPackage ./. { inherit (gomod2nixPkgs) buildGoApplication; };
         }
@@ -42,7 +42,7 @@
       );
 
       checks = eachSystem (
-        { system, ... }:
+        { system, pkgs, ... }:
         {
           check-package = self.packages.${system}.default;
         }
