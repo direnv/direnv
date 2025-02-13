@@ -48,12 +48,11 @@ stdenv.mkDerivation {
     murex
 
     # Test dependencies
-    golangci-lint
-    #(golangci-lint.override {
-    #  #go = pkgs.go_1_24;
-    #  #languages.go.package = buildPackages.go_1_24;
-    #  #buildGoModule = nixpkgs.buildGo124Module;
+    #golangci-lint
+    (golangci-lint.override { buildGoModule = buildGo124Module; } )
+    #  go = pkgs.go_1_24;
     #})
+
     python3
     ruby
     shellcheck
