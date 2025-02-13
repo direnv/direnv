@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.gomod2nix.url = "github:nix-community/gomod2nix";
-  inputs.gomod2nix.inputs.nixpkgs.follows = "nixpkgs";
+  #inputs.gomod2nix.inputs.nixpkgs.follows = "nixpkgs";
   inputs.systems.url = "github:nix-systems/default";
 
   outputs =
