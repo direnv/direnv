@@ -132,6 +132,7 @@ test-go:
 	$(GO) test -v ./...
 
 test-go-lint:
+	golangci-lint version
 	golangci-lint run
 
 test-bash:
