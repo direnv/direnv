@@ -47,12 +47,8 @@ stdenv.mkDerivation {
     powershell
     murex
 
-    # Test dependencies
-    #golangci-lint
+    # force golangci-lint to be built against 1.24
     (golangci-lint.override { buildGoModule = buildGo124Module; } )
-    #  go = pkgs.go_1_24;
-    #})
-
     python3
     ruby
     shellcheck

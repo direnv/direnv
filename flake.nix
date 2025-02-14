@@ -1,8 +1,7 @@
 {
   description = "A basic gomod2nix flake";
 
-  #inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs"; #-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
   inputs.gomod2nix.url = "github:nix-community/gomod2nix";
   inputs.gomod2nix.inputs.nixpkgs.follows = "nixpkgs";
   inputs.systems.url = "github:nix-systems/default";
@@ -24,8 +23,6 @@
             gomod2nixPkgs = gomod2nix.legacyPackages.${system};
             inherit system;
             pkgs = nixpkgs.legacyPackages.${system};
-            #buildGoModule = pkgs.buildGo124Module;
-            #go = pkgs.go_1_24;
           }
         );
     in

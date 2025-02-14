@@ -24,3 +24,10 @@ To install to /usr/local:
 Or to a different location like `~/.local`:
 
     $ make install PREFIX=~/.local
+
+## Updating gomod2nix.toml
+
+Execute `./script/update-gomod2nix`; if you don't have nix locally, can
+do so via a docker container like so:
+
+    $ docker run -it --platform linux/amd64 -v $(pwd):/workdir nixos/nix /bin/sh -c "cd workdir && ./script/update-gomod2nix"
