@@ -14,8 +14,8 @@ func (sh pwsh) Hook() (string, error) {
 	const hook = `using namespace System;
 using namespace System.Management.Automation;
 
-if ($PSVersionTable.PSVersion.Major -lt 7) {
-    throw "direnv: powershell version $($PSVersionTable.PSVersion) does not meet the minimum required version 7!"
+if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -lt 2)) {
+    throw "direnv: PowerShell version $($PSVersionTable.PSVersion) does not meet the minimum required version 7.2!"
 }
 
 $hook = [EventHandler[LocationChangedEventArgs]] {
