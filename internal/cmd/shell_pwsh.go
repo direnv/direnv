@@ -11,11 +11,12 @@ type pwsh struct{}
 var Pwsh Shell = pwsh{}
 
 func (sh pwsh) Hook() (string, error) {
-	const hook = `if ($PSVersionTable.PSVersion.Major -lt 7) {
+	const hook = `using namespace System;
+using namespace System.Management.Automation;
+
+if ($PSVersionTable.PSVersion.Major -lt 7) {
     throw "direnv: powershell version $($PSVersionTable.PSVersion) does not meet the minimum required version 7!"
 }
-using namespace System;
-using namespace System.Management.Automation;
 
 $hook = [EventHandler[LocationChangedEventArgs]] {
   param([object] $source, [LocationChangedEventArgs] $eventArgs)
