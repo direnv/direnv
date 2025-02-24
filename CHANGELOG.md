@@ -1,3 +1,7 @@
+Unreleased
+==========
+
+  * feat: Add layout_pixi to stdlib
 
 2.37.1 / 2025-07-20
 ==================

@@ -256,6 +256,12 @@ Sets environment variables from \fBopam env\fR\&.
 .SS \fBlayout php\fR
 Adds "$PWD/vendor/bin" to the PATH environment variable.
 
+.SS \fBlayout pixi\fR
+Loads a pixi environment. If no additional arguments are given the \fBdefault\fR environment is loaded.
+
+.PP
+You can pass \fB-e <env_name>\fR to load a different environment instead. For supported arguments see \fBpixi shell-hook --help\fR\&.
+
 .SS \fBlayout perl\fR
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
 
