@@ -815,6 +815,21 @@ layout_php() {
   PATH_add vendor/bin
 }
 
+# Usage: layout pixi [args]
+#
+# Loads a pixi environmnt.
+# If no additional arguments are given the `default` environment is loaded.
+# You can pass `-e <env_name>` to load a different environment instead.
+# For supported arguments see `pixi shell-hook --help`.
+layout_pixi() {
+  if [[ ! -f "pixi.toml" ]] && [[ ! -f "pyproject.toml" ]]; then
+    log_error "No pixi.toml or pyproject.toml found.  Use \`pixi init\` to create a project first."
+    exit 2
+  fi
+  watch_file pixi.lock
+  eval "$(pixi shell-hook "$@")"
+}
+
 # Usage: layout python <python_exe>
 #
 # Creates and loads a virtual environment.
