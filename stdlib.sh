@@ -1311,8 +1311,18 @@ use_flake() {
 # options include `--file` which allows loading an environment from a
 # file. For a full list of options, consult the documentation for the
 # `guix shell` command.
+# If a channels.scm is available, `guix time-machine -C channels.scm`
+# is automatically invoked before creating the shell.
 use_guix() {
-  eval "$(guix shell "$@" --search-paths)"
+  if [ -f channels.scm ]
+  then
+	  log_status "Using Guix version from channels.scm"
+	  export GUIX_ENVIRONMENT=$(guix time-machine -C channels.scm -- environment "$@" -- bash -c 'echo $GUIX_ENVIRONMENT')
+	  eval "$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
+  else
+	  export GUIX_ENVIRONMENT=$(guix environment "$@" -- bash -c 'echo $GUIX_ENVIRONMENT')
+	  eval "$(guix shell "$@" --search-paths)"
+  fi
 }
 
 # Usage: use_vim [<vimrc_file>]
