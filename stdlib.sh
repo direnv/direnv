@@ -1314,6 +1314,9 @@ use_flake() {
 # If a channels.scm is available, `guix time-machine -C channels.scm`
 # is automatically invoked before creating the shell.
 use_guix() {
+    watch_file guix.scm
+    watch_file manifest.scm
+    watch_file channels.scm
     if [ -f channels.scm ]
     then
 	log_status "Using Guix version from channels.scm"
