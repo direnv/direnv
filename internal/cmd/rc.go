@@ -388,6 +388,9 @@ func findEnvUp(searchDir string, loadDotenv bool) (path string) {
 }
 
 func findUp(searchDir string, fileNames ...string) (path string) {
+	if searchDir == "" {
+		return ""
+	}
 	for _, dir := range eachDir(searchDir) {
 		for _, fileName := range fileNames {
 			path := filepath.Join(dir, fileName)
