@@ -83,7 +83,7 @@ Add the following line at the end of the `$XDG_CONFIG_HOME/fish/config.fish` fil
 direnv hook fish | source
 ```
 
-Fish supports 3 modes you can set with with the global environment variable `direnv_fish_mode`:
+Fish supports 3 modes you can set with the global environment variable `direnv_fish_mode`:
 
 ```fish
 set -g direnv_fish_mode eval_on_arrow    # trigger direnv at prompt, and on every arrow-based directory change (default)
