@@ -1,7 +1,7 @@
 {
   description = "A basic gomod2nix flake";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
   inputs.gomod2nix.url = "github:nix-community/gomod2nix";
   inputs.gomod2nix.inputs.nixpkgs.follows = "nixpkgs";
   inputs.systems.url = "github:nix-systems/default";
@@ -27,23 +27,19 @@
         );
     in
     {
-      packages = eachSystem (
-        { callPackage, gomod2nixPkgs, ... }:
-        {
+
+      packages = eachSystem ({ callPackage, gomod2nixPkgs, pkgs, ... }: {
+
           default = callPackage ./. { inherit (gomod2nixPkgs) buildGoApplication; };
         }
       );
 
-      devShells = eachSystem (
-        { callPackage, gomod2nixPkgs, ... }:
-        {
+      devShells = eachSystem ({ callPackage, gomod2nixPkgs, pkgs, ... }: {
           default = callPackage ./shell.nix { inherit (gomod2nixPkgs) mkGoEnv gomod2nix; };
         }
       );
 
-      checks = eachSystem (
-        { system, ... }:
-        {
+      checks = eachSystem ({ system, ... }: {
           check-package = self.packages.${system}.default;
         }
       );
