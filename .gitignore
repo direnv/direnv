@@ -1,6 +1,7 @@
 *.sw?
 .direnv
 .gopath
+/.envrc
 /direnv
 /direnv.test
 /dist
