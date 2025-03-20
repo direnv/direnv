@@ -334,7 +334,7 @@ source_env() {
     rcpath=$rcpath/.envrc
   fi
   if [[ ! -e $rcpath ]]; then
-    log_status "referenced $rcpath does not exist"
+    log_status "referenced $rcpath does not exist (1)"
     return 1
   fi
 
@@ -354,7 +354,7 @@ source_env() {
     # shellcheck disable=SC1090
     . "./$rcpath_base"
   else
-    log_status "referenced $rcfile does not exist"
+    log_status "referenced ./$rcpath_base does not exist (2)"
   fi
   popd >/dev/null || return 1
   popd >/dev/null || return 1
