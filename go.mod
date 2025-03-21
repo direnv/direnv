@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/mattn/go-isatty v0.0.20
 	golang.org/x/mod v0.24.0
-	mvdan.cc/sh/v3 v3.11.0
+	mvdan.cc/sh/v3 v3.11.1-0.20250320204535-080029041389
 )
 
 require (
