@@ -343,8 +343,6 @@ source_env() {
   realpath.basename "$rcpath"
   local rcpath_base=$REPLY
 
-  local rcfile
-  rcfile=$(user_rel_path "$rcpath")
   watch_file "$rcpath"
 
   pushd "$(pwd 2>/dev/null)" >/dev/null || return 1
