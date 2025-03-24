@@ -54,7 +54,7 @@ type tomlConfig struct {
 }
 
 type tomlGlobal struct {
-	BashBuiltin  bool         `toml:"bash_builtin"`
+	BashBuiltin  bool          `toml:"bash_builtin"`
 	BashPath     string        `toml:"bash_path"`
 	DisableStdin bool          `toml:"disable_stdin"`
 	StrictEnv    bool          `toml:"strict_env"`
