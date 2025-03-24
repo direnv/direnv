@@ -23,3 +23,5 @@ golang.org/x/term v0.30.0 h1:PQ39fJZ+mfadBm0y5WlL4vlM7Sx1Hgf13sMIY2+QS9Y=
 golang.org/x/term v0.30.0/go.mod h1:NYYFdzHoI5wRh/h5tDMdMqCqPJZEuNqVR5xJLd/n67g=
 mvdan.cc/sh/v3 v3.11.1-0.20250320204535-080029041389 h1:VBbIRo+dWWeY8UZ9GtaeAl+EmCl0Hp5OgbLa9YjeK+s=
 mvdan.cc/sh/v3 v3.11.1-0.20250320204535-080029041389/go.mod h1:T7RzV1naZuFxIF7OVU5H3Ra8ScXVOfCMjxz1VPkpjvk=
+mvdan.cc/sh/v3 v3.11.1-0.20250322161411-3c81230e03ef h1:TKWKC7Swod2n+7dHqdBDl7Fc8bKu6pks0/47qrFLqGQ=
+mvdan.cc/sh/v3 v3.11.1-0.20250322161411-3c81230e03ef/go.mod h1:T7RzV1naZuFxIF7OVU5H3Ra8ScXVOfCMjxz1VPkpjvk=
