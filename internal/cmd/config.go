@@ -109,8 +109,9 @@ func LoadConfig(env Env) (config *Config, err error) {
 	exePath = strings.Replace(exePath, "\\", "/", -1)
 	config.SelfPath = exePath
 
-	if config.WorkDir, err = os.Getwd(); err != nil {
-		err = fmt.Errorf("LoadConfig() Getwd failed: %w", err)
+	var wdErr error
+	if config.WorkDir, wdErr = os.Getwd(); wdErr != nil {
+		// handled by `findEnvUp`
 		return
 	}
 
