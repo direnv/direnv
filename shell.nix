@@ -19,6 +19,7 @@
 , ruby
 , shellcheck
 , shfmt
+, uv
 , cacert
 }:
 stdenv.mkDerivation {
@@ -50,6 +51,7 @@ stdenv.mkDerivation {
     ruby
     shellcheck
     shfmt
+    uv
   ];
 
   shellHook = ''

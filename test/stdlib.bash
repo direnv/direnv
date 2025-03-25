@@ -37,7 +37,7 @@ test_name dotenv
   dotenv .env.non_existing_file && return 1
 
   # Try to source a file that exists
-  echo "export FOO=bar" > .env
+  echo "export FOO=bar" >.env
   dotenv .env
   [[ $FOO = bar ]]
 )
@@ -52,10 +52,10 @@ test_name dotenv_if_exists
   cd "$workdir"
 
   # Try to source a file that doesn't exist - should succeed
-  dotenv_if_exists .env.non_existing_file  || return 1
+  dotenv_if_exists .env.non_existing_file || return 1
 
   # Try to source a file that exists
-  echo "export FOO=bar" > .env
+  echo "export FOO=bar" >.env
   dotenv_if_exists .env
   [[ $FOO = bar ]]
 )
@@ -82,7 +82,7 @@ test_name direnv_apply_dump
   trap cleanup EXIT
 
   load_stdlib
-  FOO=bar direnv dump > "$tmpfile"
+  FOO=bar direnv dump >"$tmpfile"
   direnv_apply_dump "$tmpfile"
   assert_eq "$FOO" bar
 )
@@ -131,12 +131,12 @@ test_name semver_search
   mkdir "$versions/1.6.0"
 
   assert_eq "$(semver_search "$versions" "program-" "1.4.0")" "1.4.0"
-  assert_eq "$(semver_search "$versions" "program-" "1.4")"   "1.4.1"
-  assert_eq "$(semver_search "$versions" "program-" "1")"     "1.5.0"
-  assert_eq "$(semver_search "$versions" "program-" "1.8")"   ""
-  assert_eq "$(semver_search "$versions" "" "1.6")"           "1.6.0"
-  assert_eq "$(semver_search "$versions" "program-" "")"      "1.5.0"
-  assert_eq "$(semver_search "$versions" "" "")"              "1.6.0"
+  assert_eq "$(semver_search "$versions" "program-" "1.4")" "1.4.1"
+  assert_eq "$(semver_search "$versions" "program-" "1")" "1.5.0"
+  assert_eq "$(semver_search "$versions" "program-" "1.8")" ""
+  assert_eq "$(semver_search "$versions" "" "1.6")" "1.6.0"
+  assert_eq "$(semver_search "$versions" "program-" "")" "1.5.0"
+  assert_eq "$(semver_search "$versions" "" "")" "1.6.0"
 )
 
 test_name use_julia
@@ -152,10 +152,13 @@ test_name use_julia
     julia=$JULIA_VERSIONS/$version_prefix$version/bin/julia
     mkdir -p "$(dirname "$julia")"
     echo "#!/usr/bin/env bash
-    echo \"test-julia $version\"" > "$julia"
+    echo \"test-julia $version\"" >"$julia"
     chmod +x "$julia"
     # Locally disable set -u (see https://github.com/direnv/direnv/pull/667)
-    if ! [[ "$(set +u; use julia "$version" 2>&1)" =~ Successfully\ loaded\ test-julia\ $version ]]; then
+    if ! [[ "$(
+      set +u
+      use julia "$version" 2>&1
+    )" =~ Successfully\ loaded\ test-julia\ $version ]]; then
       return 1
     fi
   }
@@ -166,13 +169,13 @@ test_name use_julia
   test_julia "julia-" "1.1"
   # Custom JULIA_VERSION_PREFIX
   JULIA_VERSION_PREFIX="jl-"
-  test_julia "jl-"    "1.2.0"
-  test_julia "jl-"    "1.3"
+  test_julia "jl-" "1.2.0"
+  test_julia "jl-" "1.3"
   # Empty JULIA_VERSION_PREFIX
   # shellcheck disable=SC2034
   JULIA_VERSION_PREFIX=
-  test_julia ""    "1.4.0"
-  test_julia ""    "1.5"
+  test_julia "" "1.4.0"
+  test_julia "" "1.5"
 )
 
 test_name source_env_if_exists
@@ -188,13 +191,13 @@ test_name source_env_if_exists
   source_env_if_exists non_existing_file
 
   # Try to source a file that exists
-  echo "export FOO=bar" > existing_file
+  echo "export FOO=bar" >existing_file
   source_env_if_exists existing_file
   [[ $FOO = bar ]]
 
   # Expect correct path being logged
   export HOME=$workdir
-  output="$(source_env_if_exists existing_file 2>&1 > /dev/null)"
+  output="$(source_env_if_exists existing_file 2>&1 >/dev/null)"
   [[ "${output#*'loading ~/existing_file'}" != "$output" ]]
 )
 
@@ -209,7 +212,7 @@ test_name env_vars_required
   # shellcheck disable=SC2034
   BAR=1
   export BAZ=
-  output="$(env_vars_required BAR BAZ MISSING 2>&1 > /dev/null || echo "--- result: $?")"
+  output="$(env_vars_required BAR BAZ MISSING 2>&1 >/dev/null || echo "--- result: $?")"
 
   [[ "${output#*'--- result: 1'}" != "$output" ]]
   [[ "${output#*'BAR is required'}" != "$output" ]]
@@ -217,6 +220,40 @@ test_name env_vars_required
   [[ "${output#*'MISSING is required'}" != "$output" ]]
 )
 
+test_name uv
+(
+  load_stdlib
+  if ! has uv; then
+    echo "WARN: uv not found, skipping test"
+    exit 0
+  fi
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf $tmpdir' EXIT
+
+  mkdir "$tmpdir/no-project"
+  cd "$tmpdir/no-project"
+
+  # uv should do nothing if no project is found
+  output=$(layout_uv 2>&1 >/dev/null || echo "--- result: $?")
+  [[ "${output#*'error:'}" != "$output" ]]
+
+  # if a pyproject.toml exists and is valid "enough" uv should sync
+  # and create its environment.
+  mkdir "$tmpdir/project"
+  cat <<EOF >pyproject.toml
+[project]
+name = "test-direnv"
+version = "1.0"
+dependencies = []
+EOF
+
+  # we also need an actual lock file for this, otherwise --locked will fail.
+  uv sync
+
+  layout_uv
+  [[ -d .venv ]]
+)
 
 # test strict_env and unstrict_env
 ./strict_env_test.bash
