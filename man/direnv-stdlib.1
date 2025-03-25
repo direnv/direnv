@@ -316,6 +316,8 @@ Similar to \fBlayout python\fR, but uses pyenv to build a virtualenv with the sp
 .PP
 Multiple versions may be specified separated by spaces; please refer to the pyenv documentation for more information.
 
+
+
 .SS \fBlayout python [<python_exe>]\fR
 .PP
 Creates and loads a virtualenv environment under \fB$PWD/.direnv/python-$python_version\fR\&. This forces the installation of any egg into the project's sub-folder.
@@ -333,6 +335,20 @@ A shortcut for \fBlayout python python3\fR
 .SS \fBlayout ruby\fR
 .PP
 Sets the GEM_HOME environment variable to \fB$PWD/.direnv/ruby/RUBY_VERSION\fR\&. This forces the installation of any gems into the project's sub-folder. If you're using bundler it will create wrapper programs that can be invoked directly instead of using the \fBbundle exec\fR prefix.
+
+.SS \fBlayout uv [<python_version>]\fR
+.PP
+Uses uv to create a virtual environment, and then activates it.
+See https://docs.astral.sh/uv/pip/environments/ for more details.
+If no python version is specified, the default python version is used. uv will
+also install the requested python version if it is not installed.
+
+.SS \fBlayout uvp [<python_version>]\fR
+.PP
+Uses uv to create a new project and a virtual environment, and then activates it.
+See https://docs.astral.sh/uv/guides/projects/ for more details.
+If no python version is specified, the default python version is used. uv will
+also install the requested python version if it is not installed.
 
 .SS \fBuse <program_name> [<version>]\fR
 .PP
@@ -553,3 +569,4 @@ MIT licence - Copyright (C) 2019 @zimbatm and contributors
 .SH SEE ALSO
 .PP
 direnv(1), direnv.toml(1)
+
