@@ -53,6 +53,7 @@ func init() {
 		CmdDump,
 		CmdEdit,
 		CmdExec,
+		CmdExpandPath,
 		CmdExport,
 		CmdFetchURL,
 		CmdHelp,
