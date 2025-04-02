@@ -1277,8 +1277,25 @@ use_nodenv() {
 # (e.g `use nix -p ocaml`).
 #
 use_nix() {
+  local -A values_to_restore=(
+    ["NIX_BUILD_TOP"]=${NIX_BUILD_TOP:-__UNSET__}
+    ["TMP"]=${TMP:-__UNSET__}
+    ["TMPDIR"]=${TMPDIR:-__UNSET__}
+    ["TEMP"]=${TEMP:-__UNSET__}
+    ["TEMPDIR"]=${TEMPDIR:-__UNSET__}
+    ["terminfo"]=${terminfo:-__UNSET__}
+  )
   direnv_load nix-shell --show-trace "$@" --run "$(join_args "$direnv" dump)"
   if [[ $# == 0 ]]; then
+    for key in "${!values_to_restore[@]}"; do
+      local value=${values_to_restore[$key]}
+      if [[ $value == __UNSET__ ]]; then
+        unset "$key"
+      else
+        export "$key=$value"
+      fi
+    done
+
     watch_file default.nix shell.nix
   fi
 }
