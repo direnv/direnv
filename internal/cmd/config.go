@@ -112,7 +112,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 	var wdErr error
 	if config.WorkDir, wdErr = os.Getwd(); wdErr != nil {
 		// handled by `findEnvUp`
-		return
+		return //nolint:nilnesserr
 	}
 
 	// Default Warn Timeout
