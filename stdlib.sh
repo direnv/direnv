@@ -837,7 +837,20 @@ layout_python() {
   else
     local python_version ve
     # shellcheck disable=SC2046
-    read -r python_version ve <<<$(echo -e 'import platform as p\ntry:\n import venv\n ve="venv"\nexcept Exception:\n try:\n  import virtualenv\n  ve="virtualenv"\n except Exception:\n  ve=""\nprint(p.python_version()+" "+ve)' | $python)
+    read -r python_version ve <<<$($python <<EOF
+import platform as p
+try:
+ import venv
+ ve="venv"
+except Exception:
+ try:
+   import virtualenv
+   ve="virtualenv"
+ except Exception:
+   ve=""
+print(p.python_version()+" "+ve)
+EOF
+)
     if [[ -z $python_version ]]; then
       log_error "Could not find python's version"
       return 1
