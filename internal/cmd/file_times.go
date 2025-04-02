@@ -117,7 +117,7 @@ func (times *FileTimes) CheckOne(path string) (err error) {
 }
 
 // Check verifies that the file is good and hasn't changed
-func (times FileTime) Check() (err error) {
+func (times *FileTime) Check() (err error) {
 	stat, err := getLatestStat(times.Path)
 
 	switch {
