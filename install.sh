@@ -27,7 +27,7 @@ set -euo pipefail
   trap at_exit EXIT
 
   if [ $# -ge 1 ];then
-    if [ "${1}x" == "--helpx" ] || [ "${1}x" == "-hx" ];then
+    if [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
       printf "USAGE: ./install-direnv.sh [bin_path]\n"
       printf "bin_path=~/.local/bin ./install-direnv.sh\n"
       exit 0
