@@ -11,7 +11,13 @@ type tcsh struct{}
 var Tcsh Shell = tcsh{}
 
 func (sh tcsh) Hook() (string, error) {
-	return "alias precmd 'eval `{{.SelfPath}} export tcsh`'", nil
+	commands := []string{
+		"set USER_PRECMD = \"`alias precmd`\";",
+		"set DIRENV_PRECMD = 'alias precmd 'eval `{{.SelfPath}} export tcsh`'';",
+		"alias precmd \"$DIRENV_PRECMD;$USER_PRECMD\";",
+	}
+	init := strings.Join(commands, "\n")
+	return init, nil
 }
 
 func (sh tcsh) Export(e ShellExport) (out string) {
