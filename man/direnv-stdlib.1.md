@@ -336,7 +336,7 @@ Load environment variables from `guix shell`.
 
 Any arguments given will be passed to guix shell. For example, `use guix hello` would setup an environment including the hello package. To create an environment with the hello dependencies, the `--development` flag is used `use guix --development hello`. Other options include `--file` which allows loading an environment from a file.
 
-See https://guix.gnu.org/en/manual/en/guix.html#Invoking-guix-shell
+See https://guix.gnu.org/manual/en/guix.html#Invoking-guix-shell
 
 ### `rvm [...]`
 
