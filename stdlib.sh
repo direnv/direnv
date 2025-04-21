@@ -848,7 +848,7 @@ except Exception:
    ve="virtualenv"
  except Exception:
    ve=""
-print(p.python_version()+" "+ve)
+print(".".join(p.python_version_tuple()[:2])+" "+ve)
 EOF
 )
     if [[ -z $python_version ]]; then
