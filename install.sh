@@ -7,7 +7,7 @@ set -euo pipefail
 { # Prevent execution if this script was only partially downloaded
 
   log() {
-    echo "[installer] $*" >&2
+    printf "[installer] %s\n" "$*" >&2
   }
 
   die() {
@@ -18,14 +18,26 @@ set -euo pipefail
   at_exit() {
     ret=$?
     if [[ $ret -gt 0 ]]; then
-      log "the script failed with error $ret.\n" \
-        "\n" \
-        "To report installation errors, submit an issue to\n" \
-        "    https://github.com/direnv/direnv/issues/new/choose"
+      log "the script failed with error ${ret}.\n" \
+      "To report installation errors, submit an issue to\n" \
+      "https://github.com/direnv/direnv/issues/new/choose"
     fi
     exit "$ret"
   }
   trap at_exit EXIT
+
+  if [ $# -ge 1 ];then
+    if [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
+      printf "USAGE: ./install-direnv.sh [bin_path]\n"
+      printf "bin_path=~/.local/bin ./install-direnv.sh\n"
+      exit 0
+    elif [ -d "$(realpath "$1")" ] && [ -w "$(realpath "$1")" ]; then
+      bin_path="$(realpath "$1")"
+    else
+      log "bin_path ${1} does not exist or is not writeable" >&2
+      exit 1
+    fi
+  fi
 
   kernel=$(uname -s | tr "[:upper:]" "[:lower:]")
   case "${kernel}" in
@@ -66,9 +78,12 @@ set -euo pipefail
         break
       fi
     done
+    if [[ -z "$bin_path" || -w $bin_path ]]; then
+      die "did not find a writeable path in $PATH"
+    fi
   fi
-  if [[ -z "$bin_path" ]]; then
-    die "did not find a writeable path in $PATH"
+  if ! [[ -w "$bin_path" ]]; then
+    die "bin_path ${bin_path} is not writeable"
   fi
   echo "bin_path=$bin_path"
 
