@@ -852,7 +852,20 @@ layout_python() {
   else
     local python_version ve
     # shellcheck disable=SC2046
-    read -r python_version ve <<<$($python -c "import importlib.util as u, platform as p;ve='venv' if u.find_spec('venv') else ('virtualenv' if u.find_spec('virtualenv') else '');print('.'.join(p.python_version_tuple()[:2])+' '+ve)")
+    read -r python_version ve <<<$($python <<EOF
+import platform as p
+try:
+ import venv
+ ve="venv"
+except Exception:
+ try:
+   import virtualenv
+   ve="virtualenv"
+ except Exception:
+   ve=""
+print(".".join(p.python_version_tuple()[:2])+" "+ve)
+EOF
+)
     if [[ -z $python_version ]]; then
       log_error "Could not find python's version"
       return 1
@@ -1292,7 +1305,24 @@ use_nodenv() {
 # (e.g `use nix -p ocaml`).
 #
 use_nix() {
+  local -A values_to_restore=(
+    ["NIX_BUILD_TOP"]=${NIX_BUILD_TOP:-__UNSET__}
+    ["TMP"]=${TMP:-__UNSET__}
+    ["TMPDIR"]=${TMPDIR:-__UNSET__}
+    ["TEMP"]=${TEMP:-__UNSET__}
+    ["TEMPDIR"]=${TEMPDIR:-__UNSET__}
+    ["terminfo"]=${terminfo:-__UNSET__}
+  )
   direnv_load nix-shell --show-trace "$@" --run "$(join_args "$direnv" dump)"
+  for key in "${!values_to_restore[@]}"; do
+    local value=${values_to_restore[$key]}
+    if [[ $value == __UNSET__ ]]; then
+      unset "$key"
+    else
+      export "$key=$value"
+    fi
+  done
+
   if [[ $# == 0 ]]; then
     watch_file default.nix shell.nix
   fi
@@ -1316,6 +1346,68 @@ use_flake() {
   nix --extra-experimental-features "nix-command flakes" profile wipe-history --profile "$(direnv_layout_dir)/flake-profile"
 }
 
+# Usage: use_flox [...]
+#
+# Load environment variables from `flox activate`. By default uses the .flox
+# directory in the current directory.
+#
+# You can specify a remote environment with '--remote=<owner>/<name>' where
+# <owner>/<name> is the FloxHub environment name (e.g. `use_flox --remote=myorg/env`).
+#
+# The '--trust' flag can be added to automatically trust remote environments:
+#    use_flox --trust --remote=myorg/env
+#
+# An alternate local environment directory can be specified with '--dir=<path>',
+# where <path> contains a .flox directory.
+#
+# Example:
+#
+#    use_flox --remote=acme/production
+#    use_flox --dir=/path/to/env
+#
+# Note: Custom commands are not supported since flox activate is used for loading.
+function use_flox() {
+    local flox_dir=".flox"
+    local args=()
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --dir=*)
+                flox_dir="${1#*=}"/.flox
+                args+=("$1")
+                shift
+                ;;
+            --dir)
+                if [[ $# -lt 2 ]]; then
+                    printf "direnv(use_flox): --dir flag requires a path argument\n" >&2
+                    return 1
+                fi
+                flox_dir="$2"/.flox
+                args+=("$1" "$2")
+                shift 2
+                ;;
+            *)
+                args+=("$1")
+                shift
+                ;;
+        esac
+    done
+
+    if [[ ! -d "$flox_dir" ]]; then
+        printf "direnv(use_flox): \`.flox\` directory not found at %s\n" "$flox_dir" >&2
+        printf "direnv(use_flox): Did you run \`flox init\` in this directory?\n" >&2
+        return 1
+    fi
+
+    direnv_load flox activate "${args[@]}" -- "$direnv" dump
+
+    if [[ ${#args[@]} -eq 0 ]]; then
+        watch_dir "$flox_dir/env/"
+        watch_file "$flox_dir/env.json"
+        watch_file "$flox_dir/env.lock"
+    fi
+}
+
 # Usage: use_guix [...]
 #
 # Load environment variables from `guix shell`.
@@ -1326,9 +1418,21 @@ use_flake() {
 # options include `--file` which allows loading an environment from a
 # file. For a full list of options, consult the documentation for the
 # `guix shell` command.
+# If a channels.scm is available, `guix time-machine -C channels.scm`
+# is automatically invoked before creating the shell.
 use_guix() {
-  eval "$(guix shell "$@" --search-paths)"
+    watch_file guix.scm
+    watch_file manifest.scm
+    watch_file channels.scm
+    if [ -f channels.scm ]
+    then
+	log_status "Using Guix version from channels.scm"
+	eval "$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
+    else
+	eval "$(guix shell "$@" --search-paths)"
+    fi
 }
+
 
 # Usage: use_vim [<vimrc_file>]
 #

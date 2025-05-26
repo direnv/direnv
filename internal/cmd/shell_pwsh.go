@@ -14,6 +14,10 @@ func (sh pwsh) Hook() (string, error) {
 	const hook = `using namespace System;
 using namespace System.Management.Automation;
 
+if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -lt 2)) {
+    throw "direnv: PowerShell version $($PSVersionTable.PSVersion) does not meet the minimum required version 7.2!"
+}
+
 $hook = [EventHandler[LocationChangedEventArgs]] {
   param([object] $source, [LocationChangedEventArgs] $eventArgs)
   end {
@@ -138,7 +142,7 @@ func PowerShellEscape(str string) string {
 		// 	quoted(char)
 		// case char <= BACKTICK:
 		// 	quoted(char)
-		// case char <= TILDA:
+		// case char <= TILDE:
 		// 	quoted(char)
 		case char == DEL:
 			hex(char)

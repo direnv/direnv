@@ -3,13 +3,31 @@ Unreleased
 
   * feat: Add layout_pixi to stdlib
 
+v2.36.0 / 2025-04-11
+==================
+
+  * direnv now requires go 1.24 (#1384)
+  * doc: Correct duplicate usage of 'with' in the direnv(1) (#1394)
+  * doc: note direnv version for log_{format,filter} (#1369)
+  * feat: Add `use_flox` to stdlib.sh (#1372)
+  * feat: logging filter (#1336)
+  * fix use_nix: unset TMPDIR variables (#1409)
+  * fix: A more universal fix for the python 3.14 `find_spec` deprecation warning (#1382)
+  * fix: Don't give an error when the current directory doesn't exist (#1395)
+  * fix: add support to fully reproducible guix shells (#1392)
+  * fix: assert minimum powershell version (#1385)
+  * fix: escape newlines in generated vimscript (#1347)
+  * fix: fix empty array error in install.sh (#1406)
+  * fix: optionally authenticate against github api during install (#1337)
+  * fix: use_guix: Enable the watching of Guix related files. (#1353)
+
 2.35.0 / 2024-10-07
 ==================
 
   * doc: Add version requirement for load_dotenv option (#1326)
+  * doc: change Guix link to its package search. (#1268)
   * doc: fix broken link (#1327)
   * doc: update elvish docs (#1305)
-  * docs: change Guix link to its package search. (#1268)
   * feat: add opam support (#1298)
   * fix: add NuShell into list of supported shells (#1260)
   * fix: close tmp file (#1272)
@@ -201,7 +219,7 @@ Unreleased
   * Updated conditional for zsh hook to be more forgiving (#808)
   * Add -r flag for matching Git branches with a regexp (#800)
   * Add docs about pipenv (#797)
-  * Enable syntax hilights to the quick demo code (#752)
+  * Enable syntax highlights to the quick demo code (#752)
   * Fixed extra quotes for lower alpha characters (#783)
   * Remove noisy warning about PS1 again (#781)
 
@@ -460,7 +478,7 @@ expose issues with existing `.envrc` files.
   * FIX: Perform stricter search for existing Anaconda environments (#462)
   * FIX: arity mismatch for elvish (#482)
   * FIX: avoid reloading on each prompt after error (#468)
-  * FIX: improve bash hook handlign of empty PROMPT_COMMAND (#473)
+  * FIX: improve bash hook handling of empty PROMPT_COMMAND (#473)
   * FIX: improved the tests for bash, zsh, fish and tcsh (#469)
   * MISC: migrated from Travis CI to Azure Pipelines (#484)
 

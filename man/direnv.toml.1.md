@@ -74,9 +74,13 @@ Set to `true` to hide the diff of the environment variables when loading the
 
 Sets the log format for direnv outputs. Set to "-" to disable normal logging.
 
+> direnv >= 2.36.0 is required
+
 ### `log_filter`
 
 A Regexp that can be used to filter out some of the logs.
+
+> direnv >= 2.36.0 is required
 
 ## [whitelist]
 
