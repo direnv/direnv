@@ -197,4 +197,5 @@ dist:
 		-osarch openbsd/amd64 \
 		-osarch windows/386 \
 		-osarch windows/amd64 \
+		-osarch windows/arm64 \
 		&& true
