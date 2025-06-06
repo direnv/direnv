@@ -63,6 +63,7 @@ func init() {
 		CmdStdlib,
 		CmdVersion,
 		CmdWatch,
+		CmdWatchCmd,
 		CmdWatchDir,
 		CmdWatchList,
 		CmdWatchPrint,
