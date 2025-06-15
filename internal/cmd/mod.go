@@ -24,7 +24,7 @@ func Main(env Env, args []string, modBashPath string, modStdlib string, modVersi
 
 	err := CommandsDispatch(env, args)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, errorColor+"%sdirenv: error %v%s", errorColor, err, clearColor)
+		fmt.Fprintf(os.Stderr, "%sdirenv: error %v%s\n", errorColor, err, clearColor)
 	}
 	return err
 }
