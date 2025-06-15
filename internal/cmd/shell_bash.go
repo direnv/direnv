@@ -64,26 +64,31 @@ func (sh bash) escape(str string) string {
 
 // nolint
 const (
-	ACK           = 6
-	TAB           = 9
-	LF            = 10
-	CR            = 13
-	US            = 31
-	SPACE         = 32
-	AMPERSTAND    = 38
-	SINGLE_QUOTE  = 39
-	PLUS          = 43
-	NINE          = 57
-	QUESTION      = 63
-	UPPERCASE_Z   = 90
-	OPEN_BRACKET  = 91
-	BACKSLASH     = 92
-	UNDERSCORE    = 95
-	CLOSE_BRACKET = 93
-	BACKTICK      = 96
-	LOWERCASE_Z   = 122
-	TILDE         = 126
-	DEL           = 127
+	ACK               = 6
+	TAB               = 9
+	LF                = 10
+	CR                = 13
+	US                = 31
+	SPACE             = 32
+	AMPERSTAND        = 38
+	SINGLE_QUOTE      = 39
+	STAR              = 42
+	PLUS              = 43
+	NINE              = 57
+	COLON             = 58
+	EQUALS            = 61
+	QUESTION          = 63
+	UPPERCASE_Z       = 90
+	OPEN_BRACKET      = 91
+	BACKSLASH         = 92
+	UNDERSCORE        = 95
+	CLOSE_BRACKET     = 93
+	BACKTICK          = 96
+	LOWERCASE_Z       = 122
+	OPEN_CURLY_BRACE  = 123
+	CLOSE_CURLY_BRACE = 125
+	TILDE             = 126
+	DEL               = 127
 )
 
 // https://github.com/solidsnack/shell-escape/blob/master/Text/ShellEscape/Bash.hs
