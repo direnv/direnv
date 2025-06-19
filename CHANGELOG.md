@@ -1,3 +1,8 @@
+Unreleased
+==========
+
+  * feat: Add layout_pixi to stdlib
+
 v2.36.0 / 2025-04-11
 ==================
 
@@ -816,4 +821,3 @@ relatively backward-compatible.
  * robust eval/export loop, avoids retrys on every prompt if there is an error
  * stdlib: added the `dotenv [PATH]` command to load .env files
  * command: added `direnv reload` to force-reload your environment
-
