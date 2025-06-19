@@ -131,6 +131,49 @@ Add the following line to your `~/.murex_profile`:
 direnv hook murex -> source
 ```
 
+
+COMMANDS
+--------
+
+`direnv allow [PATH_TO_RC]`
+: Grants direnv permission to load the given .envrc or .env file.
+
+`direnv deny [PATH_TO_RC]`
+: Revokes the authorization of a given .envrc or .env file.
+
+`direnv edit [PATH_TO_RC]`
+: Opens PATH_TO_RC or the current .envrc or .env into an $EDITOR and allow the file to be loaded afterwards.
+
+`direnv exec DIR COMMAND [...ARGS]`
+: Executes a command after loading the first .envrc or .env found in DIR.
+
+`direnv export SHELL`
+: Loads an .envrc or .env and prints the diff in terms of exports. Supported shells: bash, zsh, fish, tcsh, elvish, pwsh, murex, json, vim, gha (GitHub Actions), gzenv, systemd.
+
+`direnv fetchurl <url> [<integrity-hash>]`
+: Fetches a given URL into direnv's CAS.
+
+`direnv help`
+: Shows this help.
+
+`direnv hook SHELL`
+: Used to setup the shell hook.
+
+`direnv prune`
+: Removes old allowed files.
+
+`direnv reload`
+: Triggers an env reload.
+
+`direnv status`
+: Prints some debug status information.
+
+`direnv stdlib`
+: Displays the stdlib available in the .envrc execution context.
+
+`direnv version`
+: Prints the version or checks that direnv is older than VERSION_AT_LEAST.
+
 USAGE
 -----
 
