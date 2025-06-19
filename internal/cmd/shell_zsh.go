@@ -26,7 +26,8 @@ func (sh zsh) Hook() (string, error) {
 	return zshHook, nil
 }
 
-func (sh zsh) Export(e ShellExport) (out string) {
+func (sh zsh) Export(e ShellExport) (string, error) {
+	var out string
 	for key, value := range e {
 		if value == nil {
 			out += sh.unset(key)
@@ -34,14 +35,15 @@ func (sh zsh) Export(e ShellExport) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
-	return out
+	return out, nil
 }
 
-func (sh zsh) Dump(env Env) (out string) {
+func (sh zsh) Dump(env Env) (string, error) {
+	var out string
 	for key, value := range env {
 		out += sh.export(key, value)
 	}
-	return out
+	return out, nil
 }
 
 func (sh zsh) export(key, value string) string {

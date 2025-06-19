@@ -20,7 +20,7 @@ func (sh gha) Hook() (string, error) {
 	return "", fmt.Errorf("Hook not implemented for GitHub Actions shell")
 }
 
-func (sh gha) Export(e ShellExport) string {
+func (sh gha) Export(e ShellExport) (string, error) {
 	var b strings.Builder
 	for key, value := range e {
 		if !validKeyPattern.MatchString(key) {
@@ -31,13 +31,15 @@ func (sh gha) Export(e ShellExport) string {
 		if value == nil {
 			sh.unset(&b, key)
 		} else {
-			sh.export(&b, key, *value)
+			if err := sh.export(&b, key, *value); err != nil {
+				return "", err
+			}
 		}
 	}
-	return b.String()
+	return b.String(), nil
 }
 
-func (sh gha) Dump(env Env) string {
+func (sh gha) Dump(env Env) (string, error) {
 	var b strings.Builder
 
 	for key, value := range env {
@@ -46,12 +48,14 @@ func (sh gha) Dump(env Env) string {
 			fmt.Fprintf(os.Stderr, "direnv: Skipping invalid environment variable key: %s\n", key)
 			continue
 		}
-		sh.export(&b, key, value)
+		if err := sh.export(&b, key, value); err != nil {
+			return "", err
+		}
 	}
-	return b.String()
+	return b.String(), nil
 }
 
-func (sh gha) export(b *strings.Builder, key, value string) {
+func (sh gha) export(b *strings.Builder, key, value string) error {
 	// Generate a random delimiter
 	delimiter := sh.generateDelimiter()
 
@@ -63,8 +67,7 @@ func (sh gha) export(b *strings.Builder, key, value string) {
 
 		// If still colliding (astronomically unlikely), error out
 		if strings.Contains(key, delimiter) || strings.Contains(value, delimiter) {
-			fmt.Fprintf(os.Stderr, "direnv: Error: Unexpected input: delimiter collision after regeneration for key %s\n", key)
-			return
+			return fmt.Errorf("delimiter collision after regeneration for key %s", key)
 		}
 	}
 
@@ -76,6 +79,7 @@ func (sh gha) export(b *strings.Builder, key, value string) {
 	b.WriteByte('\n')
 	b.WriteString(delimiter)
 	b.WriteByte('\n')
+	return nil
 }
 
 func (sh gha) unset(_ *strings.Builder, _ string) {

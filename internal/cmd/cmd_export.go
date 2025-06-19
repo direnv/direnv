@@ -104,7 +104,10 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logStatus(config, "export %s", out)
 	}
 
-	diffString := currentEnv.Diff(newEnv).ToShell(shell)
+	diffString, err := currentEnv.Diff(newEnv).ToShell(shell)
+	if err != nil {
+		return fmt.Errorf("ToShell() failed: %w", err)
+	}
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
 

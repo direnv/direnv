@@ -16,20 +16,18 @@ func (sh jsonShell) Hook() (string, error) {
 	return "", errors.New("this feature is not supported")
 }
 
-func (sh jsonShell) Export(e ShellExport) string {
+func (sh jsonShell) Export(e ShellExport) (string, error) {
 	out, err := json.MarshalIndent(e, "", "  ")
 	if err != nil {
-		// Should never happen
-		panic(err)
+		return "", err
 	}
-	return string(out)
+	return string(out), nil
 }
 
-func (sh jsonShell) Dump(env Env) string {
+func (sh jsonShell) Dump(env Env) (string, error) {
 	out, err := json.MarshalIndent(env, "", "  ")
 	if err != nil {
-		// Should never happen
-		panic(err)
+		return "", err
 	}
-	return string(out)
+	return string(out), nil
 }

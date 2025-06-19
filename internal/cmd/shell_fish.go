@@ -40,7 +40,8 @@ func (sh fish) Hook() (string, error) {
 	return fishHook, nil
 }
 
-func (sh fish) Export(e ShellExport) (out string) {
+func (sh fish) Export(e ShellExport) (string, error) {
+	var out string
 	for key, value := range e {
 		if value == nil {
 			out += sh.unset(key)
@@ -48,14 +49,15 @@ func (sh fish) Export(e ShellExport) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
-	return out
+	return out, nil
 }
 
-func (sh fish) Dump(env Env) (out string) {
+func (sh fish) Dump(env Env) (string, error) {
+	var out string
 	for key, value := range env {
 		out += sh.export(key, value)
 	}
-	return out
+	return out, nil
 }
 
 func (sh fish) export(key, value string) string {

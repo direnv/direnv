@@ -38,7 +38,8 @@ else {
 	return hook, nil
 }
 
-func (sh pwsh) Export(e ShellExport) (out string) {
+func (sh pwsh) Export(e ShellExport) (string, error) {
+	var out string
 	for key, value := range e {
 		if key != "" {
 			if value == nil {
@@ -48,14 +49,15 @@ func (sh pwsh) Export(e ShellExport) (out string) {
 			}
 		}
 	}
-	return out
+	return out, nil
 }
 
-func (sh pwsh) Dump(env Env) (out string) {
+func (sh pwsh) Dump(env Env) (string, error) {
+	var out string
 	for key, value := range env {
 		out += sh.export(key, value)
 	}
-	return
+	return out, nil
 }
 
 func (sh pwsh) export(key, value string) string {
