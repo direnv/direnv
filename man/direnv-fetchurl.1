@@ -1,15 +1,12 @@
 .nh
 .TH DIRENV-FETCHURL 1 "2019" direnv "User Manuals"
 .SH NAME
-.PP
-direnv fetchurl - Fetch a URL to disk
+direnv fetchurl \- Fetch a URL to disk
 
 .SH SYNOPSIS
-.PP
 \fIdirenv fetchurl\fP  []
 
 .SH DESCRIPTION
-.PP
 This command downloads the given URL into a fixed disk location, based on the
 content of the retrieved file.
 
@@ -20,14 +17,10 @@ of \fBcurl <url> | sh\fR\&.
 
 .PP
 This command has two modes of operation:
-
-.RS
 .IP "  1." 5
 Just pass the URL to discover the integrity hash.
 .IP "  2." 5
 Pass the URL \fIand\fP the integrity hash to get back the on-disk location.
-
-.RE
 
 .PP
 Since the on-disk location is based on the hash, it also acts as a cache. One
@@ -39,7 +32,6 @@ Downloaded files are marked as read-only and executable so it can also be used
 to fetch and execute static binaries.
 
 .SH OPTIONS
-.PP
 
     A HTTP URL that returns content on HTTP GET requests. 301 and other
     redirects are followed.
@@ -51,7 +43,6 @@ to fetch and execute static binaries.
     specification (see https://www.w3.org/TR/SRI/ ).
 
 .SH OUTPUT
-.PP
 \fIdirenv fetchurl\fP outputs different content based on the argument.
 
 .PP
@@ -72,20 +63,16 @@ Invoke fetchurl again with the hash as an argument to get the disk location:
 
   direnv fetchurl "https://releases.nixos.org/nix/nix-2.3.7/install" "sha256-7Gxl5GzI9juc/U30Igh/pY+p6+gj5Waohfwql3jHIds="
   #=> /home/zimbatm/.cache/direnv/cas/sha256-7Gxl5GzI9juc_U30Igh_pY+p6+gj5Waohfwql3jHIds=
-
 .EE
 
 .SH ENVIRONMENT VARIABLES
-.PP
 \fBXDG_CACHE_HOME\fP
     This variable is used to select the on-disk location of the fetched URLs
     as \fB$XDG_CACHE_HOME/direnv/cas\fR\&. If \fBXDG_CACHE_HOME\fP is unset or empty,
     defaults to \fB$HOME/.cache\fR\&.
 
 .SH COPYRIGHT
-.PP
 MIT licence - Copyright (C) 2019 @zimbatm and contributors
 
 .SH SEE ALSO
-.PP
 direnv-stdlib(1)
