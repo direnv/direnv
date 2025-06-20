@@ -26,22 +26,22 @@ func (sh murex) Hook() (string, error) {
 	return murexHook, nil
 }
 
-func (sh murex) Dump(env Env) (out string) {
+func (sh murex) Dump(env Env) (string, error) {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(env)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return buf.String()
+	return buf.String(), nil
 }
 
-func (sh murex) Export(e ShellExport) string {
+func (sh murex) Export(e ShellExport) (string, error) {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(e)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return buf.String()
+	return buf.String(), nil
 }
 
 var (

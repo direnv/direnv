@@ -28,7 +28,8 @@ func (sh bash) Hook() (string, error) {
 	return bashHook, nil
 }
 
-func (sh bash) Export(e ShellExport) (out string) {
+func (sh bash) Export(e ShellExport) (string, error) {
+	var out string
 	for key, value := range e {
 		if value == nil {
 			out += sh.unset(key)
@@ -36,14 +37,15 @@ func (sh bash) Export(e ShellExport) (out string) {
 			out += sh.export(key, *value)
 		}
 	}
-	return out
+	return out, nil
 }
 
-func (sh bash) Dump(env Env) (out string) {
+func (sh bash) Dump(env Env) (string, error) {
+	var out string
 	for key, value := range env {
 		out += sh.export(key, value)
 	}
-	return out
+	return out, nil
 }
 
 func (sh bash) export(key, value string) string {

@@ -11,10 +11,10 @@ type Shell interface {
 	Hook() (string, error)
 
 	// Export outputs the ShellExport as an evaluatable string on the host shell
-	Export(e ShellExport) string
+	Export(e ShellExport) (string, error)
 
 	// Dump outputs and evaluatable string that sets the env in the host shell
-	Dump(env Env) string
+	Dump(env Env) (string, error)
 }
 
 // ShellExport represents environment variables to add and remove on the host

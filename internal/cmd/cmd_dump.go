@@ -46,7 +46,11 @@ func cmdDumpAction(env Env, args []string) (err error) {
 		return fmt.Errorf("unknown target shell '%s'", target)
 	}
 
-	_, err = fmt.Fprintln(w, shell.Dump(env))
+	dumpStr, err := shell.Dump(env)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintln(w, dumpStr)
 
 	return
 }
