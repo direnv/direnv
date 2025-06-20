@@ -325,3 +325,59 @@ func TestVariableExpansionWithDefaults(t *testing.T) {
 	envShouldContain(t, env, "OPTION_R", "") // this is actually invalid in bash, but what to do here?
 	envShouldContain(t, env, "OPTION_S", ":-")
 }
+
+const TestMultilineEnv = `MULTILINE="line1
+line2
+line3"
+SINGLE=one`
+
+func TestDotEnvMultiline(t *testing.T) {
+	env := dotenv.MustParse(TestMultilineEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "MULTILINE", "line1\nline2\nline3")
+	envShouldContain(t, env, "SINGLE", "one")
+}
+
+func TestDotEnvUnclosedQuote(t *testing.T) {
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Error("should panic with unclosed quoted value")
+		}
+	}()
+	dotenv.MustParse(`FOO="line1
+line2`)
+}
+
+const TestMixedMultilineEnv = `A=1
+B="foo
+bar"
+C=3`
+
+func TestDotEnvMixedMultiline(t *testing.T) {
+	env := dotenv.MustParse(TestMixedMultilineEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "A", "1")
+	envShouldContain(t, env, "B", "foo\nbar")
+	envShouldContain(t, env, "C", "3")
+}
+
+const TestNestedJSONEnv = `CONFIG='{
+  "key1": "value1",
+  "key2": "value2",
+  "nested": {
+    "nested_key_1": "nested_value_1"
+  }
+}'
+OTHER=value`
+
+func TestDotEnvNestedJSON(t *testing.T) {
+	env := dotenv.MustParse(TestNestedJSONEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	expectedJSON := "{\n  \"key1\": \"value1\",\n  \"key2\": \"value2\",\n  \"nested\": {\n    \"nested_key_1\": \"nested_value_1\"\n  }\n}"
+	envShouldContain(t, env, "CONFIG", expectedJSON)
+	envShouldContain(t, env, "OTHER", "value")
+}
