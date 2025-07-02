@@ -16,6 +16,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: cachix/install-nix-action@v31
+      - uses: DeterminateSystems/magic-nix-cache-action@main
 
         # Run the more comprehensive test suite with nix because we have
         # access to all the build dependencies.
