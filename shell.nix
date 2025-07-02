@@ -26,9 +26,9 @@ stdenv.mkDerivation {
   name = "shell";
   nativeBuildInputs = with pkgs; [
 
-    (mkGoEnv { pwd = ./.; go = go_1_24; })
+    (mkGoEnv { pwd = ./.; go = go; })
 
-    go_1_24
+    go
 
     # Build
     git
