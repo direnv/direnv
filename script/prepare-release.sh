@@ -110,7 +110,7 @@ pr_url=$(gh pr create \
 pr_number=$(echo "$pr_url" | grep -oE '[0-9]+$')
 
 echo "Enabling auto-merge..."
-gh pr merge "$pr_number" --repo "$repo" --auto --merge --delete-branch
+gh pr merge "$pr_number" --repo "$repo" --auto --merge
 
 echo "Switching back to master..."
 git checkout master
