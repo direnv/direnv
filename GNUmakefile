@@ -199,3 +199,17 @@ dist:
 		-osarch windows/amd64 \
 		-osarch windows/arm64 \
 		&& true
+
+.PHONY: create-release
+create-release: dist
+	@if [ -z "$$GITHUB_REF_NAME" ]; then \
+		echo "GITHUB_REF_NAME is not set. This target is meant to be run in GitHub Actions."; \
+		exit 1; \
+	fi
+	@echo "Extracting release notes from CHANGELOG.md..."
+	@release_notes=$$(awk '/^======/{if(headers>0) exit} /^======/{headers++; next} headers>0' CHANGELOG.md); \
+	gh release create "$$GITHUB_REF_NAME" \
+		--title "Release $$GITHUB_REF_NAME" \
+		--notes "$$release_notes" \
+		--verify-tag
+	gh release upload "$$GITHUB_REF_NAME" $(DISTDIR)/direnv.*
