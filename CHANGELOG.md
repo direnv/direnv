@@ -1,3 +1,19 @@
+2.37.0 / 2025-07-02
+==================
+
+  * docs: add github-actions page
+  * docs: document sub-commands
+  * docs: fix link to guix manual (#1421)
+  * docs: re-generate manpages
+  * feat(direnv export gha): strengthen export format
+  * feat: add windows arm64 target (#1444)
+  * fix(powershell): "export pwsh" to resolve PowerShell special character issues (#1448)
+  * fix(python): do not include patch level in virtual environment names (#1423)
+  * fix(use_nix): always restore special variables (#1424)
+  * fix: accept true as valid DIRENV_DEBUG value (#1365)
+  * fix: add trailing newline to error messages (#1426)
+  * fix: delete duplicate ansi escape code
+
 v2.36.0 / 2025-04-11
 ==================
 
