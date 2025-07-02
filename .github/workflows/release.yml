@@ -4,25 +4,24 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-# TODO: also publish the dist
 name: Create Release
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
-    permissions:
-      contents: write  # for actions/create-release to create a release
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.16
+      - name: Set up Go 1.24
         uses: actions/setup-go@v5.5.0
         with:
           go-version: 1.24
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Install gox for cross-compilation
+        run: go install github.com/mitchellh/gox@latest
       - name: Get release notes
         id: release-notes
         run: |
@@ -30,14 +29,20 @@ jobs:
           go run ./script/issue-command/main.go set-output \
             --name=body \
             "$(go run ./script/release-changelog/main.go)"
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Build cross-platform binaries
+        run: make dist
+      - name: Create Release and Upload Assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: "${{ steps.release-notes.outputs.body }}"
-          draft: true
-          prerelease: false
+        run: |
+          # Extract tag name without refs/tags/
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          
+          # Create release
+          gh release create "$TAG_NAME" \
+            --title "Release $TAG_NAME" \
+            --notes "${{ steps.release-notes.outputs.body }}" \
+            --verify-tag
+          
+          # Upload all dist files
+          gh release upload "$TAG_NAME" dist/direnv.*
