@@ -24,7 +24,12 @@ SHELL = bash
 ############################################################################
 
 .PHONY: all
-all: build man
+all: build man ## Build direnv and generate man pages (default)
+
+.PHONY: help
+help: ## Show this help message
+	@echo "Available targets:"
+	@awk 'BEGIN {FS = ":.*##"; printf "\n"} /^[a-zA-Z_-]+:.*##/ { printf "  %-20s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 export GO111MODULE=on
 
@@ -33,10 +38,10 @@ export GO111MODULE=on
 ############################################################################
 
 .PHONY: build
-build: direnv
+build: direnv ## Build the direnv binary
 
 .PHONY: clean
-clean:
+clean: ## Remove build artifacts
 	rm -rf \
 		.gopath \
 		direnv
@@ -83,7 +88,7 @@ man_md = $(wildcard man/*.md)
 roffs = $(man_md:.md=)
 
 .PHONY: man
-man: $(roffs)
+man: $(roffs) ## Generate man pages
 
 %.1: %.1.md
 	@command -v go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing. Run: go install github.com/cpuguy83/go-md2man/v2@latest"; false)
@@ -117,7 +122,7 @@ ifeq ($(shell uname), OS/390)
 endif
 
 .PHONY: $(tests)
-test: build $(tests)
+test: build $(tests) ## Run all tests
 	@echo
 	@echo SUCCESS!
 
@@ -161,7 +166,7 @@ test-mx:
 ############################################################################
 
 .PHONY: install
-install: all
+install: all ## Install direnv to PREFIX (default: /usr/local)
 	install -d $(DESTDIR)$(BINDIR)
 	install $(exe) $(DESTDIR)$(BINDIR)
 	install -d $(DESTDIR)$(MANDIR)/man1
@@ -170,7 +175,7 @@ install: all
 	echo "$(BINDIR)/direnv hook fish | source" > $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d/direnv.fish
 
 .PHONY: dist
-dist:
+dist: ## Build cross-platform binaries
 	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
 	CGO_ENABLED=0 GOFLAGS="-trimpath" \
 		gox -rebuild -ldflags="-s -w" -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}" \
@@ -200,8 +205,12 @@ dist:
 		-osarch windows/arm64 \
 		&& true
 
+.PHONY: prepare-release
+prepare-release: ## Interactive release preparation (changelog, PR, tag)
+	./script/prepare-release.sh
+
 .PHONY: create-release
-create-release: dist
+create-release: dist ## Create GitHub release with binaries (CI only)
 	@if [ -z "$$GITHUB_REF_NAME" ]; then \
 		echo "GITHUB_REF_NAME is not set. This target is meant to be run in GitHub Actions."; \
 		exit 1; \
