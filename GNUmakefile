@@ -223,7 +223,7 @@ create-release: dist ## Create GitHub release with binaries (CI only)
 		exit 1; \
 	fi
 	@echo "Extracting release notes from CHANGELOG.md..."
-	@release_notes=$$(awk '/^======/{if(headers>0) exit} /^======/{headers++; next} headers>0' CHANGELOG.md); \
+	@release_notes=$$(awk '/^==================/{if(headers>0) exit} /^==================/{headers++; next} headers>0' CHANGELOG.md | sed '/^v[0-9]/d'); \
 	gh release create "$$GITHUB_REF_NAME" \
 		--title "Release $$GITHUB_REF_NAME" \
 		--notes "$$release_notes" \
