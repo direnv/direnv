@@ -20,15 +20,6 @@ jobs:
         uses: cachix/install-nix-action@v30
       - name: Setup Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
-      - name: Setup Go Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Build and Upload Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

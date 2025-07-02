@@ -7,6 +7,7 @@ import (
 
 type murex struct{}
 
+// Murex is the shell implementation for Murex shell.
 var Murex Shell = murex{}
 
 const murexHook = `event: onPrompt direnv_hook=before {

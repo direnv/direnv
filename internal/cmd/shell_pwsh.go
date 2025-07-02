@@ -72,6 +72,7 @@ func (pwsh) escapeEnvKey(str string) string {
 	return PowerShellEscapeEnvKey(str)
 }
 
+// PowerShellEscapeEnvKey escapes environment variable keys for PowerShell.
 func PowerShellEscapeEnvKey(str string) string {
 	if str == "" {
 		return "__DiReNv_UnReAcHaBlE__"
@@ -95,22 +96,22 @@ func PowerShellEscapeEnvKey(str string) string {
 
 	for i < l {
 		char := in[i]
-		switch {
-		case char == STAR:
+		switch char {
+		case STAR:
 			hex(char)
-		case char == COLON:
+		case COLON:
 			hex(char)
-		case char == EQUALS:
+		case EQUALS:
 			hex(char)
-		case char == QUESTION:
+		case QUESTION:
 			hex(char)
-		case char == OPEN_BRACKET:
+		case OPEN_BRACKET:
 			hex(char)
-		case char == CLOSE_BRACKET:
+		case CLOSE_BRACKET:
 			hex(char)
-		case char == OPEN_CURLY_BRACE:
+		case OPEN_CURLY_BRACE:
 			escaped("`{")
-		case char == CLOSE_CURLY_BRACE:
+		case CLOSE_CURLY_BRACE:
 			escaped("`}")
 		default:
 			literal(char)
@@ -125,6 +126,7 @@ func (pwsh) escapeVerbatimEnvKey(str string) string {
 	return PowerShellEscapeVerbatimEnvKey(str)
 }
 
+// PowerShellEscapeVerbatimEnvKey escapes environment variable keys using verbatim strings for PowerShell.
 func PowerShellEscapeVerbatimEnvKey(str string) string {
 	if str == "" {
 		return "__DiReNv_UnReAcHaBlE__"
@@ -144,8 +146,8 @@ func PowerShellEscapeVerbatimEnvKey(str string) string {
 
 	for i < l {
 		char := in[i]
-		switch {
-		case char == SINGLE_QUOTE:
+		switch char {
+		case SINGLE_QUOTE:
 			escaped("''")
 		default:
 			literal(char)
@@ -159,6 +161,7 @@ func (pwsh) escapeVerbatimString(str string) string {
 	return PowerShellEscapeVerbatimString(str)
 }
 
+// PowerShellEscapeVerbatimString escapes strings using verbatim string literals for PowerShell.
 func PowerShellEscapeVerbatimString(str string) string {
 	if str == "" {
 		return ""
@@ -178,8 +181,8 @@ func PowerShellEscapeVerbatimString(str string) string {
 
 	for i < l {
 		char := in[i]
-		switch {
-		case char == SINGLE_QUOTE:
+		switch char {
+		case SINGLE_QUOTE:
 			escaped("''")
 		default:
 			literal(char)
