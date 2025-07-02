@@ -1,14 +1,24 @@
 # Making a new release
 
-- `export version=v<version>`
-- `git changelog` to generate the CHANGELOG.md, do a bit of editing there.
-- Update the version.txt
-- `git add version.txt CHANGELOG.md`
-- `git commit -m "Release $version"`
-- Create a pull request for that and merge it.
-- `git tag $version`
-- `git push origin $version`
-- Wait for the draft release created by ci trigged by pushing the tag
-- `make dist`
-- `gh release upload $version dist/direnv.*`
-- Click the release button
+The release process is now fully automated. Simply run:
+
+```bash
+make prepare-release v2.37.0
+```
+
+This will:
+1. Generate and open the changelog for editing
+2. Prompt for confirmation to proceed
+3. Update version.txt with the new version
+4. Create a release branch and PR
+5. Wait for the PR to be merged
+6. Create and push the git tag
+7. Trigger CI to build and publish the release automatically
+
+## Testing releases
+
+To test the release process on your fork:
+
+```bash
+make prepare-release v2.37.0-test Mic92/direnv
+```
