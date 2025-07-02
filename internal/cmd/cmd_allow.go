@@ -1,3 +1,4 @@
+// Package cmd implements the direnv command-line interface.
 package cmd
 
 import (

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -23,7 +24,11 @@ func cmdPruneAction(_ Env, _ []string, config *Config) (err error) {
 	if dir, err = os.Open(allowed); err != nil {
 		return err
 	}
-	defer dir.Close()
+	defer func() {
+		if err := dir.Close(); err != nil {
+			log.Printf("Warning: failed to close directory: %v", err)
+		}
+	}()
 
 	if dirList, err = dir.Readdirnames(0); err != nil {
 		return err

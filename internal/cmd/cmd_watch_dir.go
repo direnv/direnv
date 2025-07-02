@@ -59,7 +59,7 @@ func watchDirCommand(env Env, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	os.Stdout.WriteString(exportStr)
+	_, _ = os.Stdout.WriteString(exportStr)
 
 	return
 }

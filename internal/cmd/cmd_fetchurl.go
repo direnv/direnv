@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -26,7 +27,7 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 	}
 
 	var (
-		algo          sri.Algo = sri.SHA256
+		algo = sri.SHA256
 		url           string
 		integrityHash string
 	)
@@ -63,8 +64,16 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(tmpfile.Name()) // clean up
-	defer tmpfile.Close()
+	defer func() {
+		if err := os.Remove(tmpfile.Name()); err != nil {
+			log.Printf("Warning: failed to remove temp file %s: %v", tmpfile.Name(), err)
+		}
+	}() // clean up
+	defer func() {
+		if err := tmpfile.Close(); err != nil {
+			log.Printf("Warning: failed to close temp file: %v", err)
+		}
+	}()
 
 	// Get the URL
 	// G107: Potential HTTP request made with variable url
@@ -73,7 +82,11 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("Warning: failed to close response body: %v", err)
+		}
+	}()
 
 	// Abort if we don't get a 200 back
 	if resp.StatusCode != 200 {

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -138,11 +139,15 @@ func (rc *RC) Deny() (err error) {
 	return os.Remove(rc.allowPath)
 }
 
+// AllowStatus represents the permission status of an RC file.
 type AllowStatus int
 
 const (
+	// Allowed indicates the RC file is permitted to load.
 	Allowed AllowStatus = iota
+	// NotAllowed indicates the RC file has not been granted permission.
 	NotAllowed
+	// Denied indicates the RC file has been explicitly denied.
 	Denied
 )
 
@@ -320,7 +325,11 @@ func fileExists(path string) bool {
 	if err != nil {
 		return false
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Printf("Warning: failed to close file: %v", err)
+		}
+	}()
 
 	// Next, check that the file is a regular file.
 	fi, err := f.Stat()

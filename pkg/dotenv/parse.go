@@ -32,10 +32,10 @@ const LINE = `
 \z
 `
 
-var linesRe = regexp.MustCompile("[\\r\\n]+")
+var linesRe = regexp.MustCompile(`[\r\n]+`)
 var lineRe = regexp.MustCompile(
-	regexp.MustCompile("\\s+").ReplaceAllLiteralString(
-		regexp.MustCompile("\\s+# .*").ReplaceAllLiteralString(LINE, ""), ""))
+	regexp.MustCompile(`\s+`).ReplaceAllLiteralString(
+		regexp.MustCompile(`\s+# .*`).ReplaceAllLiteralString(LINE, ""), ""))
 
 // Parse reads a string in the .env format and returns a map of the extracted key=values.
 //
@@ -100,15 +100,15 @@ func parseValue(key string, value string, dotenv map[string]string) {
 	dotenv[key] = value
 }
 
-var escRe = regexp.MustCompile("\\\\([^$])")
+var escRe = regexp.MustCompile(`\\([^$])`)
 
 func unescapeCharacters(value string) string {
 	return escRe.ReplaceAllString(value, "$1")
 }
 
 func expandNewLines(value string) string {
-	value = strings.Replace(value, "\\n", "\n", -1)
-	value = strings.Replace(value, "\\r", "\r", -1)
+	value = strings.ReplaceAll(value, "\\n", "\n")
+	value = strings.ReplaceAll(value, "\\r", "\r")
 	return value
 }
 
