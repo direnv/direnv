@@ -21,21 +21,5 @@ jobs:
       - uses: cachix/install-nix-action@v31
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-        # Run the more comprehensive test suite with nix because we have
-        # access to all the build dependencies.
-      - name: Test
-        run: nix develop --ignore-environment -c make test
-
-  dist:
-    name: Test Distribution Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: cachix/install-nix-action@v31
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-
-        # Test that the release generation works
-      - name: Test Dist
-        run: nix develop --ignore-environment -c make dist
+      - name: Run flake checks with nix-fast-build
+        run: nix run --inputs-from . nixpkgs#nix-fast-build -- --no-nom --skip-cached --flake .#checks

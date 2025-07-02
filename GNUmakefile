@@ -176,34 +176,41 @@ install: all ## Install direnv to PREFIX (default: /usr/local)
 
 .PHONY: dist
 dist: ## Build cross-platform binaries
-	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
-	CGO_ENABLED=0 GOFLAGS="-trimpath" \
-		gox -rebuild -ldflags="-s -w" -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}" \
-		-osarch darwin/amd64 \
-		-osarch darwin/arm64 \
-		-osarch freebsd/386 \
-		-osarch freebsd/amd64 \
-		-osarch freebsd/arm \
-		-osarch linux/386 \
-		-osarch linux/amd64 \
-		-osarch linux/arm \
-		-osarch linux/arm64 \
-		-osarch linux/mips \
-		-osarch linux/mips64 \
-		-osarch linux/mips64le \
-		-osarch linux/mipsle \
-		-osarch linux/ppc64 \
-		-osarch linux/ppc64le \
-		-osarch linux/s390x \
-		-osarch netbsd/386 \
-		-osarch netbsd/amd64 \
-		-osarch netbsd/arm \
-		-osarch openbsd/386 \
-		-osarch openbsd/amd64 \
-		-osarch windows/386 \
-		-osarch windows/amd64 \
-		-osarch windows/arm64 \
-		&& true
+	@mkdir -p $(DISTDIR)
+	@echo "Building cross-platform binaries..."
+	@platforms=" \
+		darwin/amd64 \
+		darwin/arm64 \
+		freebsd/386 \
+		freebsd/amd64 \
+		freebsd/arm \
+		linux/386 \
+		linux/amd64 \
+		linux/arm \
+		linux/arm64 \
+		linux/mips \
+		linux/mips64 \
+		linux/mips64le \
+		linux/mipsle \
+		linux/ppc64 \
+		linux/ppc64le \
+		linux/s390x \
+		netbsd/386 \
+		netbsd/amd64 \
+		netbsd/arm \
+		openbsd/386 \
+		openbsd/amd64 \
+		windows/386 \
+		windows/amd64 \
+		windows/arm64 \
+	"; \
+	for platform in $$platforms; do \
+		os=$${platform%/*}; \
+		arch=$${platform#*/}; \
+		echo "Building for $$os/$$arch..."; \
+		CGO_ENABLED=0 GOFLAGS="-trimpath" GOOS=$$os GOARCH=$$arch \
+			$(GO) build -ldflags="-s -w" -o "$(DISTDIR)/direnv.$$os-$$arch"; \
+	done
 
 .PHONY: prepare-release
 prepare-release: ## Interactive release preparation (changelog, PR, tag)
