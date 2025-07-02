@@ -3,6 +3,7 @@ on:
   push:
     branches: [ master ]
   pull_request: {}
+  merge_group:
 permissions:
   contents: read
 
@@ -10,20 +11,49 @@ jobs:
   build:
     name: Nix Build
     runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: cachix/install-nix-action@v31
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Setup Go Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
         # Run the more comprehensive test suite with nix because we have
         # access to all the build dependencies.
       - name: Test
         run: nix develop --ignore-environment -c make test
 
+  dist:
+    name: Test Distribution Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: cachix/install-nix-action@v31
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Setup Go Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
         # Test that the release generation works
       - name: Test Dist
         run: nix develop --ignore-environment -c make dist
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
