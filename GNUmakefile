@@ -207,7 +207,7 @@ dist: ## Build cross-platform binaries
 
 .PHONY: prepare-release
 prepare-release: ## Interactive release preparation (changelog, PR, tag)
-	./script/prepare-release.sh
+	./script/prepare-release.sh $(VERSION) $(REPO)
 
 .PHONY: create-release
 create-release: dist ## Create GitHub release with binaries (CI only)

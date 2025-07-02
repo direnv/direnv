@@ -3,7 +3,7 @@
 The release process is now fully automated. Simply run:
 
 ```bash
-make prepare-release v2.37.0
+make prepare-release VERSION=v2.37.0
 ```
 
 This will:
@@ -20,5 +20,5 @@ This will:
 To test the release process on your fork:
 
 ```bash
-make prepare-release v2.37.0-test Mic92/direnv
+make prepare-release VERSION=v2.37.0-test REPO=Mic92/direnv
 ```
