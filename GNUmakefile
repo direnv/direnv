@@ -208,8 +208,12 @@ dist: ## Build cross-platform binaries
 		os=$${platform%/*}; \
 		arch=$${platform#*/}; \
 		echo "Building for $$os/$$arch..."; \
+		suffix=""; \
+		if [ "$$os" = "windows" ]; then \
+			suffix=".exe"; \
+		fi; \
 		CGO_ENABLED=0 GOFLAGS="-trimpath" GOOS=$$os GOARCH=$$arch \
-			$(GO) build -ldflags="-s -w" -o "$(DISTDIR)/direnv.$$os-$$arch"; \
+			$(GO) build -ldflags="-s -w" -o "$(DISTDIR)/direnv.$$os-$$arch$$suffix"; \
 	done
 
 .PHONY: prepare-release
