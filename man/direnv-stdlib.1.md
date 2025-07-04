@@ -377,6 +377,23 @@ Example (.envrc):
 
     watch_file Gemfile
 
+### `watch_env <var>`
+
+Adds an environment variable to the list of commands that direnv will watch for changes.
+
+Example (.envrc):
+
+    watch_env FOOBAR
+
+### `watch_cmd "<cmd>"`
+
+Adds a command to the list of commands that direnv will watch for changes. Beware that it is run at each prompt, so it needs to be fast enough.
+The command is passed literally to `bash -c`
+
+Example (.envrc):
+
+    watch_cmd "date +%Y-%m-%d"
+
 ### `direnv_version <version_at_least>`
 
 Checks that the direnv version is at least old as `version_at_least`. This can
