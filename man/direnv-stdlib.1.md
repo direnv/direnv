@@ -162,7 +162,7 @@ Example:
 
 ### `MANPATH_add <path>`
 
-Prepends the expanded *path* to the MANPATH environment variable. It takes care of man-specific heuritic.
+Prepends the expanded *path* to the MANPATH environment variable. It takes care of man-specific heuristics.
 
 ### `path_add <varname> <path>`
 
