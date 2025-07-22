@@ -113,6 +113,7 @@ file next.
 * [Hook into your shell](docs/hook.md)
 * [Develop for direnv](docs/development.md)
 * [Manage your rubies with direnv and ruby-install](docs/ruby.md)
+* [Using direnv with GitHub Actions](docs/github-actions.md)
 * [Community Wiki](https://github.com/direnv/direnv/wiki)
 
 Make sure to take a look at the wiki! It contains all sorts of useful
