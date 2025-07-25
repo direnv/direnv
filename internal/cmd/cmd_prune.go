@@ -52,6 +52,15 @@ func cmdPruneAction(_ Env, _ []string, config *Config) (err error) {
 			}
 			if !fileExists(envrcStr) {
 				_ = os.Remove(filename)
+			} else {
+				// remove outdated hashes
+				h, err := fileHash(envrcStr)
+				if err != nil {
+					return err
+				}
+				if h != hash {
+					_ = os.Remove(filename)
+				}
 			}
 
 		}
