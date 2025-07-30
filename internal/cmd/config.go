@@ -155,8 +155,11 @@ func LoadConfig(env Env) (config *Config, err error) {
 		format, ok := env["DIRENV_LOG_FORMAT"]
 		if ok {
 			config.LogFormat = format
-		} else if global.LogFormat != "" {
-			config.LogFormat = global.LogFormat
+		} else if logFmt := global.LogFormat; logFmt != "" {
+			if logFmt == "-" {
+				logFmt = ""
+			}
+			config.LogFormat = logFmt
 		}
 
 		if global.LogFilter != "" {
