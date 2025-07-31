@@ -391,6 +391,31 @@ Example (.envrc):
 watch_file Gemfile
 .EE
 
+.SS \fBwatch_env <var>\fR
+.PP
+Adds an environment variable to the list of commands that direnv will watch for changes.
+
+.PP
+Example (.envrc):
+
+.EX
+watch_env FOOBAR
+
+.EE
+
+.SS \fBwatch_cmd "<cmd>"\fR
+.PP
+Adds a command to the list of commands that direnv will watch for changes. Beware that it is run at each prompt, so it needs to be fast enough.
+The command is passed literally to \fBbash -c\fR
+
+.PP
+Example (.envrc):
+
+.EX
+watch_cmd "date +%Y-%m-%d"
+
+.EE
+
 .SS \fBdirenv_version <version_at_least>\fR
 Checks that the direnv version is at least old as \fBversion_at_least\fR\&. This can
 be useful when sharing an \fB\&.envrc\fR and to make sure that the users are up to
