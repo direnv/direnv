@@ -32,6 +32,7 @@ type Config struct {
 	LogFilter       *regexp.Regexp
 	LogColor        bool
 	WarnTimeout     time.Duration
+	FlatSearchDirs  []string
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
 }
@@ -53,15 +54,16 @@ type tomlConfig struct {
 }
 
 type tomlGlobal struct {
-	BashPath     string        `toml:"bash_path"`
-	DisableStdin bool          `toml:"disable_stdin"`
-	StrictEnv    bool          `toml:"strict_env"`
-	SkipDotenv   bool          `toml:"skip_dotenv"` // deprecated, use load_dotenv
-	LoadDotenv   bool          `toml:"load_dotenv"`
-	WarnTimeout  *tomlDuration `toml:"warn_timeout"`
-	HideEnvDiff  bool          `toml:"hide_env_diff"`
-	LogFormat    string        `toml:"log_format"`
-	LogFilter    string        `toml:"log_filter"`
+	BashPath       string        `toml:"bash_path"`
+	DisableStdin   bool          `toml:"disable_stdin"`
+	StrictEnv      bool          `toml:"strict_env"`
+	SkipDotenv     bool          `toml:"skip_dotenv"` // deprecated, use load_dotenv
+	LoadDotenv     bool          `toml:"load_dotenv"`
+	WarnTimeout    *tomlDuration `toml:"warn_timeout"`
+	HideEnvDiff    bool          `toml:"hide_env_diff"`
+	LogFormat      string        `toml:"log_format"`
+	LogFilter      string        `toml:"log_filter"`
+	FlatSearchDirs []string      `toml:"flat_search_dirs"`
 }
 
 type tomlWhitelist struct {
@@ -196,6 +198,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		if tomlConf.WarnTimeout != nil {
 			config.WarnTimeout = tomlConf.WarnTimeout.Duration
 		}
+		config.FlatSearchDirs = tomlConf.FlatSearchDirs
 	}
 
 	if ts := env.Fetch("DIRENV_WARN_TIMEOUT", ""); ts != "" {
