@@ -73,18 +73,18 @@ the execution context of an envrc.
 And finally `layout ruby` who like `use` translates into the `layout_ruby`
 function call. It's used to describe common project layouts. In the stdlib, the
 ruby layout will configure rubygems (with the `GEM_HOME` environment variable)
-to install all the gems into the .direnv/ruby/RUBY_VERSION folder under the
+to install all the gems into the `.direnv/ruby/RUBY_VERSION` folder under the
 project root. This is a bit similar to rvm's gemsets except that they live
 inside your project's folder. It also configures bundler to install wrapper
-shims into the .direnv/bin folder which allows you to invoke the commands
+shims into the `.direnv/bin` folder which allows you to invoke the commands
 directly instead of prefixing your ruby programs with `bundle exec` all the
 time.
 
 ## Conclusion
 
 As you see this approach is not restricted to ruby. You could have various
-versions of python installed under ~/.pythons and a `use_python` defined in
-your ~/.direnvrc. Or perl, php, ...  This is the good thing about direnv, it's
+versions of python installed under `~/.pythons` and a `use_python` defined in
+your `~/.direnvrc`. Or perl, php, ...  This is the good thing about direnv, it's
 not restricted to a single language.
 
 Actually, wouldn't it be great to have all your project's dependencies
