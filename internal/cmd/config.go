@@ -256,8 +256,9 @@ func (config *Config) LoadedRC() *RC {
 	rcPath := config.Env[DIRENV_FILE]
 
 	timesString := config.Env[DIRENV_WATCHES]
+	commandString := config.Env[DIRENV_CMD_WATCHES]
 
-	return RCFromEnv(rcPath, timesString, config)
+	return RCFromEnv(rcPath, timesString, commandString, config)
 }
 
 // EnvFromRC loads an RC from a specified path and returns the new environment
