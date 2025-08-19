@@ -210,6 +210,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	direnv := config.SelfPath
 	newEnv = previousEnv.Copy()
 	newEnv[DIRENV_WATCHES] = rc.times.Marshal()
+	newEnv[DIRENV_STATUS] = "allowed"
 	defer func() {
 		// Record directory changes even if load is disallowed or fails
 		newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
@@ -221,9 +222,11 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	switch rc.Allowed() {
 	case NotAllowed:
 		err = fmt.Errorf(notAllowed, rc.Path())
+		newEnv[DIRENV_STATUS] = "denied"
 		return
 	case Allowed:
 	case Denied:
+		newEnv[DIRENV_STATUS] = "denied"
 		return
 	}
 
@@ -285,9 +288,11 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		newEnv2, err = LoadEnvJSON(out)
 		if err == nil {
 			newEnv = newEnv2
+			return
 		}
 	}
 
+	newEnv[DIRENV_STATUS] = "failed"
 	return
 }
 
