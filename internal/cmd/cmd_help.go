@@ -30,10 +30,14 @@ Available commands
 				}
 			} else {
 				fmt.Printf("%s%s:\n", cmd.Name, opts)
+				var aliases []string
 				for _, alias := range cmd.Aliases {
 					if alias[0:1] != "-" {
-						fmt.Printf("%s%s:\n", alias, opts)
+						aliases = append(aliases, alias)
 					}
+				}
+				if len(aliases) > 0 {
+					fmt.Printf("  aliases: %s\n", strings.Join(aliases, ", "))
 				}
 				fmt.Printf("  %s\n", cmd.Desc)
 			}
