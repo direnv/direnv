@@ -401,9 +401,18 @@ func findEnvUp(searchDir string, loadDotenv bool) (path string) {
 // but only returns files that are allowed to be loaded, maintaining security
 func findEnvUpWithPermissions(searchDir string, loadDotenv bool, config *Config) (path string) {
 	if loadDotenv {
-		return findUpWithPermissions(searchDir, config, ".envrc", ".env")
+		return findUpWithPermissions(searchDir, config, false, ".envrc", ".env")
 	}
-	return findUpWithPermissions(searchDir, config, ".envrc")
+	return findUpWithPermissions(searchDir, config, false, ".envrc")
+}
+
+// findEnvUpWithPermissionsAndReport is like findEnvUpWithPermissions but also reports skipped files
+// when shouldReport is true (indicating state has changed)
+func findEnvUpWithPermissionsAndReport(searchDir string, loadDotenv bool, config *Config, shouldReport bool) (path string) {
+	if loadDotenv {
+		return findUpWithPermissions(searchDir, config, shouldReport, ".envrc", ".env")
+	}
+	return findUpWithPermissions(searchDir, config, shouldReport, ".envrc")
 }
 
 func findUp(searchDir string, fileNames ...string) (path string) {
@@ -423,7 +432,7 @@ func findUp(searchDir string, fileNames ...string) (path string) {
 
 // findUpWithPermissions searches for files in parent directories but only
 // returns files that are allowed to be loaded, preserving security boundaries
-func findUpWithPermissions(searchDir string, config *Config, fileNames ...string) (path string) {
+func findUpWithPermissions(searchDir string, config *Config, shouldReport bool, fileNames ...string) (path string) {
 	if searchDir == "" {
 		return ""
 	}
@@ -448,23 +457,25 @@ func findUpWithPermissions(searchDir string, config *Config, fileNames ...string
 				switch status {
 				case Allowed:
 					// Report any skipped files in current dir before loading this one
-					reportSkippedFiles(config, skippedInCurrentDir)
+					if shouldReport {
+						reportSkippedFiles(config, skippedInCurrentDir)
+					}
 					return candidatePath
 				case NotAllowed:
-					if isCurrentDir {
+					if isCurrentDir && shouldReport {
 						skippedInCurrentDir = append(skippedInCurrentDir, fmt.Sprintf(notAllowed, candidatePath))
 					}
 				case Denied:
-					if isCurrentDir {
-						skippedInCurrentDir = append(skippedInCurrentDir, fmt.Sprintf(denied, candidatePath))
-					}
+					// Don't report denied files - user explicitly denied them, so stay silent
 				}
 			}
 		}
 	}
 	
 	// Report skipped files in current dir even if we don't find any allowed files
-	reportSkippedFiles(config, skippedInCurrentDir)
+	if shouldReport {
+		reportSkippedFiles(config, skippedInCurrentDir)
+	}
 	return ""
 }
 
