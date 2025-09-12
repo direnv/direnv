@@ -27,7 +27,7 @@ type RC struct {
 
 // FindRC looks for ".envrc" and ".env" files up in the file hierarchy.
 func FindRC(wd string, config *Config) (*RC, error) {
-	rcPath := findEnvUp(wd, config.LoadDotenv)
+	rcPath := findEnvUpWithPermissions(wd, config.LoadDotenv, config)
 	if rcPath == "" {
 		return nil, nil
 	}
@@ -396,6 +396,15 @@ func findEnvUp(searchDir string, loadDotenv bool) (path string) {
 	return findUp(searchDir, ".envrc")
 }
 
+// findEnvUpWithPermissions searches for .envrc/.env files in parent directories
+// but only returns files that are allowed to be loaded, maintaining security
+func findEnvUpWithPermissions(searchDir string, loadDotenv bool, config *Config) (path string) {
+	if loadDotenv {
+		return findUpWithPermissions(searchDir, config, ".envrc", ".env")
+	}
+	return findUpWithPermissions(searchDir, config, ".envrc")
+}
+
 func findUp(searchDir string, fileNames ...string) (path string) {
 	if searchDir == "" {
 		return ""
@@ -405,6 +414,33 @@ func findUp(searchDir string, fileNames ...string) (path string) {
 			path := filepath.Join(dir, fileName)
 			if fileExists(path) {
 				return path
+			}
+		}
+	}
+	return ""
+}
+
+// findUpWithPermissions searches for files in parent directories but only
+// returns files that are allowed to be loaded, preserving security boundaries
+func findUpWithPermissions(searchDir string, config *Config, fileNames ...string) (path string) {
+	if searchDir == "" {
+		return ""
+	}
+	for _, dir := range eachDir(searchDir) {
+		for _, fileName := range fileNames {
+			candidatePath := filepath.Join(dir, fileName)
+			if fileExists(candidatePath) {
+				// Check if this file is allowed to be loaded
+				rc, err := RCFromPath(candidatePath, config)
+				if err != nil {
+					// If there's an error creating RC, skip this file and continue
+					continue
+				}
+				// Only return files that are explicitly allowed
+				if rc.Allowed() == Allowed {
+					return candidatePath
+				}
+				// If file exists but is not allowed or denied, continue searching parents
 			}
 		}
 	}
