@@ -200,7 +200,6 @@ func (rc *RC) Touch() error {
 }
 
 const notAllowed = "%s is blocked. Run `direnv allow` to approve its content"
-const denied = "%s is denied. Run `direnv allow` to permit its content"
 
 // Load evaluates the RC file and returns the new Env or error.
 //
