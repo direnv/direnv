@@ -110,6 +110,10 @@ direnv hook murex -> source
 
 CMD does not have a hook mechanism so a bat script must be manually run in each new directory
 
+> **Note**
+> Either git bash or msys2 bash must be installed and DIRENV_BASH must point to bash.exe from one of these distributions. 
+> Windows bash does not seem to work.
+
 Run the following command to setup the bat script:
 
 ```cmd
@@ -121,4 +125,3 @@ Manual usage:
 cd mynewdir
 denv
 ```
-
