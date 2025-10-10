@@ -105,3 +105,20 @@ Add the following line to your `~/.murex_profile` file:
 ```sh
 direnv hook murex -> source
 ```
+
+## Windows CMD
+
+CMD does not have a hook mechanism so a bat script must be manually run in each new directory
+
+Run the following command to setup the bat script:
+
+```cmd
+direnv hook cmd> %USERPROFILE%\.local\bin\denv.bat
+```
+
+Manual usage:
+```cmd
+cd mynewdir
+denv
+```
+
