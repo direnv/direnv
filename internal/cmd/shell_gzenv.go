@@ -22,3 +22,7 @@ func (s gzenvShell) Export(e ShellExport) (string, error) {
 func (s gzenvShell) Dump(env Env) (string, error) {
 	return gzenv.Marshal(env), nil
 }
+
+func (sh gzenvShell) WindowsNative() bool {
+	return false
+}
