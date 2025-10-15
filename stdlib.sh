@@ -789,7 +789,8 @@ layout_node() {
 # Sets environment variables from `opam env`.
 layout_opam() {
   export OPAMSWITCH=$PWD
-  eval "$(opam env "$@")"
+  local result="$(opam env "$@")"
+  eval "$result"
 }
 
 # Usage: layout perl
@@ -996,7 +997,8 @@ layout_anaconda() {
     fi
   fi
 
-  eval "$("$conda" shell.bash activate "$env_loc")"
+  local result="$("$conda" shell.bash activate "$env_loc")"
+  eval "$result"
 }
 
 # Usage: layout pipenv
@@ -1163,7 +1165,8 @@ use_julia() {
 # Loads rbenv which add the ruby wrappers available on the PATH.
 #
 use_rbenv() {
-  eval "$(rbenv init -)"
+  local result="$(rbenv init -)"
+  eval "$result"
 }
 
 # Usage: rvm [...]
@@ -1327,7 +1330,8 @@ use_flake() {
   watch_file flake.nix
   watch_file flake.lock
   mkdir -p "$(direnv_layout_dir)"
-  eval "$(nix --extra-experimental-features "nix-command flakes" print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
+  local result="$(nix --extra-experimental-features "nix-command flakes" print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
+  eval "$result"
   nix --extra-experimental-features "nix-command flakes" profile wipe-history --profile "$(direnv_layout_dir)/flake-profile"
 }
 
@@ -1412,9 +1416,11 @@ use_guix() {
     if [ -f channels.scm ]
     then
 	log_status "Using Guix version from channels.scm"
-	eval "$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
+	local result="$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
+	eval "$result"
     else
-	eval "$(guix shell "$@" --search-paths)"
+	local result="$(guix shell "$@" --search-paths)"
+	eval "$result"
     fi
 }
 
