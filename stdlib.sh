@@ -1419,11 +1419,11 @@ use_guix() {
     if [ -f channels.scm ]
     then
 	log_status "Using Guix version from channels.scm"
-        local result
+	local result
 	result="$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
 	eval "$result"
     else
-        local result
+	local result
 	result="$(guix shell "$@" --search-paths)"
 	eval "$result"
     fi
