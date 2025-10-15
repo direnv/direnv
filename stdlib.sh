@@ -789,7 +789,8 @@ layout_node() {
 # Sets environment variables from `opam env`.
 layout_opam() {
   export OPAMSWITCH=$PWD
-  local result="$(opam env "$@")"
+  local result
+  result="$(opam env "$@")"
   eval "$result"
 }
 
