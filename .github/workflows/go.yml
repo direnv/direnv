@@ -3,6 +3,7 @@ on:
   push:
     branches: [ master ]
   pull_request: {}
+  merge_group:
 permissions:
   contents: read
 
@@ -19,21 +20,22 @@ jobs:
           - windows-latest
 
     steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v5
+
     - name: Set up Go
-      uses: actions/setup-go@v5.5.0
+      uses: actions/setup-go@v6.0.0
       with:
         go-version: '1.24'
+        cache: true
       id: go
 
     - name: Set up Python
       if: runner.os != 'Windows'
-      uses: actions/setup-python@v5.6.0
+      uses: actions/setup-python@v6.0.0
       with:
         python-version: "3.9"
       id: python
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
 
     - name: Build
       env:

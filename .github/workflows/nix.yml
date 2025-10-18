@@ -3,6 +3,7 @@ on:
   push:
     branches: [ master ]
   pull_request: {}
+  merge_group:
 permissions:
   contents: read
 
@@ -10,20 +11,40 @@ jobs:
   build:
     name: Nix Build
     runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: cachix/install-nix-action@v31
+      - uses: DeterminateSystems/magic-nix-cache-action@main
 
-        # Run the more comprehensive test suite with nix because we have
-        # access to all the build dependencies.
-      - name: Test
-        run: nix develop --ignore-environment -c make test
+      - name: Check Go version consistency
+        run: |
+          # Extract Go version from go.yml workflow
+          GO_WORKFLOW_VERSION=$(grep -A 2 "uses: actions/setup-go" .github/workflows/go.yml | grep "go-version:" | sed "s/.*go-version: *'\([^']*\)'.*/\1/")
 
-        # Test that the release generation works
-      - name: Test Dist
-        run: nix develop --ignore-environment -c make dist
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+          # Get Go version used in Nix
+          NIX_GO_VERSION=$(nix run --inputs-from . nixpkgs#go -- version | cut -d' ' -f3 | sed 's/go//')
+
+          # Extract major.minor version for comparison (e.g., "1.24.3" -> "1.24")
+          GO_WORKFLOW_MAJOR_MINOR=$(echo "$GO_WORKFLOW_VERSION" | cut -d. -f1,2)
+          NIX_GO_MAJOR_MINOR=$(echo "$NIX_GO_VERSION" | cut -d. -f1,2)
+
+          echo "go.yml uses Go version: $GO_WORKFLOW_VERSION"
+          echo "Nix uses Go version: $NIX_GO_VERSION"
+
+          # Check if major.minor versions match
+          if [ "$GO_WORKFLOW_MAJOR_MINOR" != "$NIX_GO_MAJOR_MINOR" ]; then
+            echo "WARNING: Go version mismatch between workflows!"
+            echo "go.yml uses Go $GO_WORKFLOW_MAJOR_MINOR, but Nix uses Go $NIX_GO_MAJOR_MINOR"
+            echo "Consider updating the go.yml workflow to use the same major.minor version."
+          else
+            echo "✓ Go versions are compatible: $GO_WORKFLOW_MAJOR_MINOR"
+          fi
+
+      - name: Run flake checks with nix-fast-build
+        run: nix run --inputs-from . nixpkgs#nix-fast-build -- --no-nom --skip-cached --flake .#checks

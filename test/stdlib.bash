@@ -151,7 +151,7 @@ test_name use_julia
     # Fake the existence of a julia binary
     julia=$JULIA_VERSIONS/$version_prefix$version/bin/julia
     mkdir -p "$(dirname "$julia")"
-    echo "#!/usr/bin/env bash
+    echo "#!$(command -v bash)
     echo \"test-julia $version\"" > "$julia"
     chmod +x "$julia"
     # Locally disable set -u (see https://github.com/direnv/direnv/pull/667)

@@ -1,5 +1,5 @@
-// the gzenv format: json+gzip+base64
-// a quickly designed format to export the whole environment back into itself
+// Package gzenv implements a compressed environment format using json+gzip+base64.
+// It provides a quickly designed format to export the whole environment back into itself.
 package gzenv
 
 import (
@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"io"
 	"strings"
 )
@@ -24,7 +25,9 @@ func Marshal(obj interface{}) string {
 	w := zlib.NewWriter(zlibData)
 	// we assume the zlib writer would never fail
 	_, _ = w.Write(jsonData)
-	w.Close()
+	if err := w.Close(); err != nil {
+		log.Printf("Warning: failed to close zlib writer: %v", err)
+	}
 
 	base64Data := base64.URLEncoding.EncodeToString(zlibData.Bytes())
 
@@ -53,7 +56,9 @@ func Unmarshal(gzenv string, obj interface{}) error {
 	if err != nil {
 		return fmt.Errorf("unmarshal() zlib decoding: %w", err)
 	}
-	w.Close()
+	if err := w.Close(); err != nil {
+		log.Printf("Warning: failed to close zlib reader: %v", err)
+	}
 
 	err = json.Unmarshal(envData.Bytes(), &obj)
 	if err != nil {

@@ -51,14 +51,19 @@ func cmdDotEnvAction(_ Env, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	os.Setenv("PWD", filepath.Dir(path))
+	if err := os.Setenv("PWD", filepath.Dir(path)); err != nil {
+		return err
+	}
 
 	newenv, err = dotenv.Parse(string(data))
 	if err != nil {
 		return err
 	}
 
-	str := newenv.ToShell(shell)
+	str, err := newenv.ToShell(shell)
+	if err != nil {
+		return err
+	}
 	fmt.Println(str)
 
 	return

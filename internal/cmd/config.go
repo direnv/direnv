@@ -106,7 +106,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		return
 	}
 	// Fix for mingsys
-	exePath = strings.Replace(exePath, "\\", "/", -1)
+	exePath = strings.ReplaceAll(exePath, "\\", "/")
 	config.SelfPath = exePath
 
 	var wdErr error
@@ -150,13 +150,16 @@ func LoadConfig(env Env) (config *Config, err error) {
 			return
 		}
 
-		config.LogColor = !(os.Getenv("TERM") == "dumb")
+		config.LogColor = os.Getenv("TERM") != "dumb"
 
 		format, ok := env["DIRENV_LOG_FORMAT"]
 		if ok {
 			config.LogFormat = format
-		} else if global.LogFormat != "" {
-			config.LogFormat = global.LogFormat
+		} else if logFmt := global.LogFormat; logFmt != "" {
+			if logFmt == "-" {
+				logFmt = ""
+			}
+			config.LogFormat = logFmt
 		}
 
 		if global.LogFilter != "" {
@@ -175,7 +178,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		}
 
 		for _, path := range tomlConf.Whitelist.Exact {
-			if !(strings.HasSuffix(path, "/.envrc") || strings.HasSuffix(path, "/.env")) {
+			if !strings.HasSuffix(path, "/.envrc") && !strings.HasSuffix(path, "/.env") {
 				path = filepath.Join(path, ".envrc")
 			}
 

@@ -4,40 +4,23 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-# TODO: also publish the dist
 name: Create Release
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
-    permissions:
-      contents: write  # for actions/create-release to create a release
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.16
-        uses: actions/setup-go@v5.5.0
-        with:
-          go-version: 1.24
       - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Get release notes
-        id: release-notes
-        run: |
-          go mod download golang.org/x/tools
-          go run ./script/issue-command/main.go set-output \
-            --name=body \
-            "$(go run ./script/release-changelog/main.go)"
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+        uses: actions/checkout@v5
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Build and Upload Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: "${{ steps.release-notes.outputs.body }}"
-          draft: true
-          prerelease: false
+        run: nix develop --command make create-release

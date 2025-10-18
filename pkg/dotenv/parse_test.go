@@ -43,7 +43,7 @@ func TestDotEnvExported(t *testing.T) {
 	if env["OPTION_C"] != "" {
 		t.Error("OPTION_C", env["OPTION_C"])
 	}
-	if v, ok := env["OPTION_D"]; !(v == "" && ok) {
+	if v, ok := env["OPTION_D"]; v != "" || !ok {
 		t.Error("OPTION_D")
 	}
 	if env["OPTION_E"] != "foo" {
@@ -80,10 +80,10 @@ func TestDotEnvPlain(t *testing.T) {
 	if env["OPTION_E"] != "5" {
 		t.Error("OPTION_E")
 	}
-	if v, ok := env["OPTION_F"]; !(v == "" && ok) {
+	if v, ok := env["OPTION_F"]; v != "" || !ok {
 		t.Error("OPTION_F")
 	}
-	if v, ok := env["OPTION_G"]; !(v == "" && ok) {
+	if v, ok := env["OPTION_G"]; v != "" || !ok {
 		t.Error("OPTION_G")
 	}
 	if env["SMTP_ADDRESS"] != "smtp" {
@@ -177,7 +177,7 @@ func TestDotEnvYAML(t *testing.T) {
 	if env["OPTION_E"] != "" {
 		t.Error("OPTION_E")
 	}
-	if v, ok := env["OPTION_F"]; !(v == "" && ok) {
+	if v, ok := env["OPTION_F"]; v != "" || !ok {
 		t.Error("OPTION_F")
 	}
 }
