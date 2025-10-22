@@ -424,6 +424,26 @@ watch_dir() {
   eval "$("$direnv" watch-dir bash "$1")"
 }
 
+# Usage: watch_cmd <cmd>
+#
+# Adds a command to the list of commands that direnv will watch for
+# changes. Beware that it is run at each prompt, so it needs to be fast
+# enough.
+# The command is passed literally to bash -c
+watch_cmd() {
+  command="$1"
+  eval "$("$direnv" watch-cmd bash "$command")"
+}
+
+# Usage: watch_env <varname>
+#
+# Adds an environment variable to the list of commands that direnv will
+# watch for changes.
+watch_env() {
+  command="printf '%s' \"\${$1}\""
+  eval "$("$direnv" watch-cmd bash "$command")"
+}
+
 # Usage: _source_up [<filename>] [true|false]
 #
 # Private helper function for source_up and source_up_if_exists. The second

@@ -22,6 +22,7 @@ type RC struct {
 	allowPath string
 	denyPath  string
 	times     FileTimes
+	commands  CmdValues
 	config    *Config
 }
 
@@ -68,11 +69,13 @@ func RCFromPath(path string, config *Config) (*RC, error) {
 		return nil, err
 	}
 
-	return &RC{path, allowPath, denyPath, times, config}, nil
+	commands := NewCmdValues()
+
+	return &RC{path, allowPath, denyPath, times, commands, config}, nil
 }
 
 // RCFromEnv inits the RC from the environment
-func RCFromEnv(path, marshalledTimes string, config *Config) *RC {
+func RCFromEnv(path, marshalledTimes string, marshalledCommands string, config *Config) *RC {
 	fileHash, err := fileHash(path)
 	if err != nil {
 		return nil
@@ -86,6 +89,12 @@ func RCFromEnv(path, marshalledTimes string, config *Config) *RC {
 		return nil
 	}
 
+	cmdValues := NewCmdValues()
+	err = cmdValues.Unmarshal(marshalledCommands)
+	if err != nil {
+		return nil
+	}
+
 	pathHash, err := pathHash(path)
 	if err != nil {
 		return nil
@@ -93,7 +102,7 @@ func RCFromEnv(path, marshalledTimes string, config *Config) *RC {
 
 	denyPath := filepath.Join(config.DenyDir(), pathHash)
 
-	return &RC{path, allowPath, denyPath, times, config}
+	return &RC{path, allowPath, denyPath, times, cmdValues, config}
 }
 
 // Allow grants the RC as allowed to load
@@ -210,6 +219,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	direnv := config.SelfPath
 	newEnv = previousEnv.Copy()
 	newEnv[DIRENV_WATCHES] = rc.times.Marshal()
+	newEnv[DIRENV_CMD_WATCHES] = rc.commands.Marshal()
 	defer func() {
 		// Record directory changes even if load is disallowed or fails
 		newEnv[DIRENV_DIR] = "-" + filepath.Dir(rc.path)
