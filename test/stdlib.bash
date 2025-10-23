@@ -40,6 +40,10 @@ test_name dotenv
   echo "export FOO=bar" > .env
   dotenv .env
   [[ $FOO = bar ]]
+
+  # Try to source a named pipe
+  dotenv <(echo "export BAR=baz")
+  [[ $BAR = baz ]]
 )
 
 test_name dotenv_if_exists
@@ -58,6 +62,10 @@ test_name dotenv_if_exists
   echo "export FOO=bar" > .env
   dotenv_if_exists .env
   [[ $FOO = bar ]]
+
+  # Try to source a named pipe
+  dotenv_if_exists <(echo "export BAR=baz")
+  [[ $BAR = baz ]]
 )
 
 test_name find_up

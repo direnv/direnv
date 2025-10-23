@@ -1,4 +1,9 @@
 
+Unreleased
+==================
+
+  * fix: stdlib: dotenv, dotenv_if_exists: support named pipes (#1313)
+
 2.37.1 / 2025-07-20
 ==================
 
