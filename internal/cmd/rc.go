@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -236,13 +238,6 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		cancel()
 	}()
 
-	// check what type of RC we're processing
-	// use different exec method for each
-	fn := "source_env"
-	if filepath.Base(rc.path) == ".env" {
-		fn = "dotenv"
-	}
-
 	// Set stdin based on the config
 	var stdin *os.File
 	if config.DisableStdin {
@@ -254,26 +249,114 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		stdin = os.Stdin
 	}
 
-	prelude := ""
-	if config.StrictEnv {
-		prelude = "set -euo pipefail && "
+	var cmd *exec.Cmd
+
+	if isPowerShellRC(rc.path, config) {
+		if config.PwshPath == "" {
+			err = fmt.Errorf("PowerShell file found but pwsh executable not available")
+			return
+		}
+
+		// Safe execution strategy:
+		// 1. Read windows.envrc content.
+		// 2. Write a temporary wrapper script that dot-sources the file (supports functions) then emits JSON.
+		// 3. Invoke pwsh with -File to avoid inline injection issues.
+		// 4. Remove the temp wrapper after execution.
+
+		envrcPath := rc.Path()
+		contentBytes, readErr := os.ReadFile(envrcPath)
+		if readErr != nil {
+			err = readErr
+			return
+		}
+
+		cacheDir := config.CacheDir
+		if cacheDir == "" {
+			err = fmt.Errorf("missing cache directory for PowerShell execution")
+			return
+		}
+
+		// Use hash of path+mtime to avoid re-writing every time unnecessarily.
+		stat, statErr := os.Stat(envrcPath)
+		if statErr != nil {
+			err = statErr
+			return
+		}
+		contentHash := sha256.Sum256(contentBytes)
+		hashInput := fmt.Sprintf("%s:%d:%x", envrcPath, stat.ModTime().UnixNano(), contentHash[:8])
+		sha := sha256.Sum256([]byte(hashInput))
+		wrapperName := fmt.Sprintf("direnv-pwsh-%x.ps1", sha[:8])
+		wrapperPath := filepath.Join(cacheDir, wrapperName)
+
+		// PowerShell wrapper now computes a delta (changed & removed) vs original env
+		wrapperContent := fmt.Sprintf(`$ErrorActionPreference='Stop'
+$ProgressPreference='SilentlyContinue'
+try {
+	$before = @{}
+	Get-ChildItem env: | ForEach-Object { $before[$_.Name] = $_.Value }
+	$envrcContent = @'
+%s
+'@
+	# Execute the envrc content while suppressing non-error output streams so that the
+	# only stdout produced by this wrapper is the final JSON payload. This prevents
+	# Write-Host / Write-Output / warnings etc. from corrupting the JSON.
+	# Streams: 1=Success, 3=Warning, 4=Verbose, 6=Information. Write-Host maps to Information.
+	& { Invoke-Expression $envrcContent } 1>$null 3>$null 4>$null 6>$null
+	$after = @{}
+	Get-ChildItem env: | ForEach-Object { $after[$_.Name] = $_.Value }
+	$changed = @{}
+	foreach ($k in $after.Keys) { if (-not $before.ContainsKey($k) -or $before[$k] -ne $after[$k]) { $changed[$k] = $after[$k] } }
+	$removed = @()
+	foreach ($k in $before.Keys) { if (-not $after.ContainsKey($k)) { $removed += $k } }
+	$result = @{ changed = $changed; removed = $removed }
+	$json = $result | ConvertTo-Json -Compress
+	[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+	Write-Output $json
+} catch {
+	$msg = "direnv pwsh error: $($_.Exception.Message)"
+	[Console]::Error.WriteLine($msg)
+	exit 1
+}`, string(contentBytes))
+
+		// Wrapper caching: reuse existing wrapper if contents match exact hash-generated name.
+		// Since wrapperName already includes contentHash prefix via hashInput, if file exists we can skip rewrite.
+		if _, statErr2 := os.Stat(wrapperPath); statErr2 != nil {
+			if writeErr := os.WriteFile(wrapperPath, []byte(wrapperContent), 0600); writeErr != nil { // #nosec G304 - controlled path
+				err = writeErr
+				return
+			}
+		}
+
+		cmd = exec.CommandContext(ctx, config.PwshPath, "-NoProfile", "-NonInteractive", "-File", wrapperPath)
+
+		// Schedule cleanup of wrapper after execution attempt.
+		defer func() {
+			_ = os.Remove(wrapperPath)
+		}()
+	} else {
+		// Execute bash .envrc or .env file (existing logic)
+		fn := "source_env"
+		if filepath.Base(rc.path) == ".env" {
+			fn = "dotenv"
+		}
+
+		prelude := ""
+		if config.StrictEnv {
+			prelude = "set -euo pipefail && "
+		}
+
+		slashSeparatedPath := filepath.ToSlash(rc.Path())
+		arg := fmt.Sprintf(
+			`%seval "$("%s" stdlib)" && __main__ %s %s`,
+			prelude,
+			direnv,
+			fn,
+			BashEscape(slashSeparatedPath),
+		)
+
+		cmd = exec.CommandContext(ctx, config.BashPath, "-c", arg)
 	}
 
-	// Non-Windows platforms will already use slashes. However, on Windows
-	// backslashes are used by default which can result in unexpected escapes
-	// like \b or \r in paths. Force slash usage to avoid issues on Windows.
-	slashSeparatedPath := filepath.ToSlash(rc.Path())
-	arg := fmt.Sprintf(
-		`%seval "$("%s" stdlib)" && __main__ %s %s`,
-		prelude,
-		direnv,
-		fn,
-		BashEscape(slashSeparatedPath),
-	)
-
-	// G204: Subprocess launched with function call as argument or cmd arguments
-	// #nosec
-	cmd := exec.CommandContext(ctx, config.BashPath, "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
 	cmd.Stdin = stdin
@@ -281,14 +364,45 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 
 	var out []byte
 	if out, err = cmd.Output(); err == nil && len(out) > 0 {
-		var newEnv2 Env
-		newEnv2, err = LoadEnvJSON(out)
-		if err == nil {
-			newEnv = newEnv2
+		if isPowerShellRC(rc.path, config) {
+			// Parse delta JSON {"changed": {..}, "removed": [..]}
+			type pwshDelta struct {
+				Changed map[string]string `json:"changed"`
+				Removed []string          `json:"removed"`
+			}
+			var delta pwshDelta
+			if perr := json.Unmarshal(out, &delta); perr == nil {
+				for k, v := range delta.Changed {
+					newEnv[k] = v
+				}
+				for _, k := range delta.Removed {
+					delete(newEnv, k)
+				}
+			} else {
+				logError(config, fmt.Sprintf("pwsh delta parse failed: %v; attempting snapshot fallback", perr))
+				// Fallback: try full snapshot parsing for backward-compatibility
+				if newEnv2, jerr := LoadEnvJSON(out); jerr == nil {
+					newEnv = newEnv2
+				}
+			}
+		} else {
+			var newEnv2 Env
+			newEnv2, err = LoadEnvJSON(out)
+			if err == nil {
+				newEnv = newEnv2
+			}
 		}
 	}
 
 	return
+}
+
+// isPowerShellRC determines if an RC file should be executed as PowerShell
+func isPowerShellRC(path string, config *Config) bool {
+	if !config.EnablePwsh || config.PwshPath == "" {
+		return false
+	}
+	return filepath.Base(path) == ".envrc.ps1"
 }
 
 /// Utils
@@ -340,15 +454,34 @@ func fileExists(path string) bool {
 	return fi.Mode().IsRegular()
 }
 
+func canonicalizeHashPath(path string) string {
+	// On Windows, file paths are case-insensitive. Normalize to lower-case to
+	// avoid generating distinct hashes for the same path differing only by case
+	// (e.g. C:\Proj vs c:\proj). Also attempt to resolve symlinks so that
+	// referencing a directory through a junction or symlink yields a stable
+	// canonical path component for hashing.
+	if runtime.GOOS == "windows" {
+		// Lower-case drive letter and the rest
+		path = strings.ToLower(path)
+		if real, err := filepath.EvalSymlinks(path); err == nil {
+			// EvalSymlinks returns path with native separators; lower-case again just in case
+			path = strings.ToLower(real)
+		}
+	}
+	return path
+}
+
 func fileHash(path string) (hash string, err error) {
 	if path, err = filepath.Abs(path); err != nil {
 		return
 	}
+	path = canonicalizeHashPath(path)
 
 	fd, err := os.Open(path)
 	if err != nil {
 		return
 	}
+	defer func() { _ = fd.Close() }()
 
 	hasher := sha256.New()
 	_, err = hasher.Write([]byte(path + "\n"))
@@ -366,6 +499,7 @@ func pathHash(path string) (hash string, err error) {
 	if path, err = filepath.Abs(path); err != nil {
 		return
 	}
+	path = canonicalizeHashPath(path)
 
 	hasher := sha256.New()
 	_, err = hasher.Write([]byte(path + "\n"))
@@ -390,6 +524,17 @@ func allow(path string, allowPath string) (err error) {
 }
 
 func findEnvUp(searchDir string, loadDotenv bool) (path string) {
+	if runtime.GOOS == "windows" {
+		// Only support .envrc.ps1 (PowerShell) plus standard .envrc/.env
+		path = findUp(searchDir, ".envrc.ps1")
+		if path != "" {
+			return path
+		}
+		if loadDotenv {
+			return findUp(searchDir, ".envrc", ".env")
+		}
+		return findUp(searchDir, ".envrc")
+	}
 	if loadDotenv {
 		return findUp(searchDir, ".envrc", ".env")
 	}

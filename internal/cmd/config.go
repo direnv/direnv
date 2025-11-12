@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -22,6 +23,8 @@ type Config struct {
 	DataDir         string
 	SelfPath        string
 	BashPath        string
+	PwshPath        string
+	EnablePwsh      bool
 	RCFile          string
 	TomlPath        string
 	HideEnvDiff     bool
@@ -54,6 +57,8 @@ type tomlConfig struct {
 
 type tomlGlobal struct {
 	BashPath     string        `toml:"bash_path"`
+	PwshPath     string        `toml:"pwsh_path"`
+	EnablePwsh   *bool         `toml:"enable_pwsh"`
 	DisableStdin bool          `toml:"disable_stdin"`
 	StrictEnv    bool          `toml:"strict_env"`
 	SkipDotenv   bool          `toml:"skip_dotenv"` // deprecated, use load_dotenv
@@ -96,9 +101,24 @@ func LoadConfig(env Env) (config *Config, err error) {
 		config.ConfDir = xdg.ConfigDir(env, "direnv")
 	}
 	if config.ConfDir == "" {
-		err = fmt.Errorf("couldn't find a configuration directory for direnv")
-		return
+		// Windows convenience fallback: if HOME and XDG vars are unset but USERPROFILE exists, synthesize ~/.config/direnv
+		if runtime.GOOS == "windows" {
+			if up := env["USERPROFILE"]; up != "" {
+				candidate := filepath.Join(up, ".config", "direnv")
+				config.ConfDir = candidate
+				// Populate HOME for downstream logic if missing
+				if env["HOME"] == "" {
+					config.Env["HOME"] = up
+				}
+			}
+		}
+		if config.ConfDir == "" {
+			err = fmt.Errorf("couldn't find a configuration directory for direnv (set HOME or DIRENV_CONFIG)")
+			return
+		}
 	}
+	// Ensure ConfDir exists
+	_ = os.MkdirAll(config.ConfDir, 0o755)
 
 	var exePath string
 	if exePath, err = os.Executable(); err != nil {
@@ -190,6 +210,10 @@ func LoadConfig(env Env) (config *Config, err error) {
 		}
 
 		config.BashPath = tomlConf.BashPath
+		config.PwshPath = tomlConf.PwshPath
+		if tomlConf.EnablePwsh != nil {
+			config.EnablePwsh = *tomlConf.EnablePwsh
+		}
 		config.DisableStdin = tomlConf.DisableStdin
 		config.LoadDotenv = tomlConf.LoadDotenv
 		config.StrictEnv = tomlConf.StrictEnv
@@ -218,21 +242,49 @@ func LoadConfig(env Env) (config *Config, err error) {
 		}
 	}
 
+	if config.PwshPath == "" {
+		if config.PwshPath, err = exec.LookPath("pwsh"); err != nil {
+			// PowerShell is optional, so don't fail if not found
+			config.PwshPath = ""
+		}
+	}
+
+	// If user did not set enable_pwsh explicitly and pwsh is found, default to true
+	if config.PwshPath != "" && !config.EnablePwsh {
+		config.EnablePwsh = true
+	}
+
 	if config.CacheDir == "" {
 		config.CacheDir = xdg.CacheDir(env, "direnv")
 	}
+	if config.CacheDir == "" && runtime.GOOS == "windows" {
+		if up := config.Env["HOME"]; up != "" { // we may have set HOME above
+			config.CacheDir = filepath.Join(up, ".cache", "direnv")
+		} else if up := config.Env["USERPROFILE"]; up != "" {
+			config.CacheDir = filepath.Join(up, ".cache", "direnv")
+		}
+	}
 	if config.CacheDir == "" {
-		err = fmt.Errorf("couldn't find a cache directory for direnv")
+		err = fmt.Errorf("couldn't find a cache directory for direnv (set HOME or XDG_CACHE_HOME)")
 		return
 	}
+	_ = os.MkdirAll(config.CacheDir, 0o755)
 
 	if config.DataDir == "" {
 		config.DataDir = xdg.DataDir(env, "direnv")
 	}
+	if config.DataDir == "" && runtime.GOOS == "windows" {
+		if up := config.Env["HOME"]; up != "" { // prefer HOME if we set it
+			config.DataDir = filepath.Join(up, ".local", "share", "direnv")
+		} else if up := config.Env["USERPROFILE"]; up != "" {
+			config.DataDir = filepath.Join(up, ".local", "share", "direnv")
+		}
+	}
 	if config.DataDir == "" {
-		err = fmt.Errorf("couldn't find a data directory for direnv")
+		err = fmt.Errorf("couldn't find a data directory for direnv (set HOME or XDG_DATA_HOME)")
 		return
 	}
+	_ = os.MkdirAll(config.DataDir, 0o755)
 
 	return
 }

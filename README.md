@@ -82,6 +82,34 @@ direnv: unloading
 # And now FOO is unset again
 $ echo ${FOO-nope}
 nope
+
+### PowerShell-specific .envrc.ps1 (Windows only)
+
+On Windows you can create a `.envrc.ps1` instead of `.envrc` to author your project environment in native PowerShell syntax. When present, `.envrc.ps1` takes precedence over `.envrc` and is executed via `pwsh` if available.
+
+Example:
+
+```powershell
+# .envrc.ps1
+$env:APP_ENV = "dev"
+$env:PATH = "$PWD\bin;$env:PATH"
+```
+
+After `direnv allow` the changed environment variables are applied to your current shell. The PowerShell loader computes a delta (only changed and removed variables) rather than emitting the full environment snapshot.
+
+Guidelines:
+* Normal Write-Host / Write-Output / Write-Warning / Write-Verbose output is suppressed; use `[Console]::Error.WriteLine()` for visible status lines.
+* Change variables with `$env:VAR = ...`.
+* Remove a variable with `Remove-Item Env:VAR -ErrorAction SilentlyContinue` or `$env:VAR = $null`.
+* Functions and aliases defined in `.envrc.ps1` are not exported (same limitation as bash `.envrc`).
+* If `pwsh` is not found or PowerShell support disabled (see `enable_pwsh`), `.envrc.ps1` is ignored and regular `.envrc` processing is used.
+
+Security: As with `.envrc`, the file must be explicitly allowed with `direnv allow` before it takes effect.
+
+Configuration: Disable PowerShell support by setting `enable_pwsh = false` under `[global]` in `direnv.toml`.
+
+Migration: The former `windows.envrc` filename is no longer recognized. Rename any existing `windows.envrc` to `.envrc.ps1`.
+
 ```
 
 ### The stdlib
