@@ -40,6 +40,7 @@ set -e DIRENV_DIR
 set -e DIRENV_FILE
 set -e DIRENV_WATCHES
 set -e DIRENV_DIFF
+set -e DIRENV_STATUS
 
 function direnv_eval
     #direnv export fish # for debugging
