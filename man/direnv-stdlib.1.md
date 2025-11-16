@@ -377,6 +377,16 @@ Example (.envrc):
 
     watch_file Gemfile
 
+### `watch_dir <dir>`
+
+Adds the directory to direnv's recursive watch-list. If any file within the
+directory or its subdirectories changes, direnv will reload the environment on
+the next prompt.
+
+Example (.envrc):
+
+    watch_dir src
+
 ### `direnv_version <version_at_least>`
 
 Checks that the direnv version is at least old as `version_at_least`. This can
