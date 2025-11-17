@@ -1,0 +1,6 @@
+{
+    "name": "Direnv devcontainer",
+    "build": {
+        "dockerfile": "Containerfile"
+    }
+}
