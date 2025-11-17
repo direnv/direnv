@@ -391,6 +391,18 @@ Example (.envrc):
 watch_file Gemfile
 .EE
 
+.SS \fBwatch_dir <dir>\fR
+Adds the directory to direnv's recursive watch-list. If any file within the
+directory or its subdirectories changes, direnv will reload the environment on
+the next prompt.
+
+.PP
+Example (.envrc):
+
+.EX
+watch_dir src
+.EE
+
 .SS \fBdirenv_version <version_at_least>\fR
 Checks that the direnv version is at least old as \fBversion_at_least\fR\&. This can
 be useful when sharing an \fB\&.envrc\fR and to make sure that the users are up to
