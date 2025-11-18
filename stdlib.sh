@@ -1331,6 +1331,22 @@ use_flake() {
   nix --extra-experimental-features "nix-command flakes" profile wipe-history --profile "$(direnv_layout_dir)/flake-profile"
 }
 
+# Usage: use_nix_installables [...]
+#
+# Load environment with `nix shell` for the given nix-installables.
+#
+# For example, 'nixpkgs#ruby' or 'github:NixOS/nixpkgs/nixpkgs-unstable/ruby'.
+# See also https://nix.dev/manual/nix/stable/command-ref/new-cli/nix#installables
+use_nix_installables() {
+  if [[ $# -lt 1 ]]; then
+    printf "direnv(use_nix_installables): expected at least one nix-installable.\n" >&2
+    printf "direnv(use_nix_installables): For example 'nixpkgs#ruby' or 'github:nixos/nixpkgs#ruby'.\n" >&2
+    printf "direnv(use_nix_installables): See also https://nix.dev/manual/nix/stable/command-ref/new-cli/nix#installables\n" >&2
+    return 1
+  fi
+  direnv_load nix shell "${@}" -c "$direnv" dump
+}
+
 # Usage: use_flox [...]
 #
 # Load environment variables from `flox activate`. By default uses the .flox
