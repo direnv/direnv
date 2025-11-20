@@ -193,6 +193,7 @@ test_name source_env_if_exists
   [[ $FOO = bar ]]
 
   # Expect correct path being logged
+  # shellcheck disable=SC2030
   export HOME=$workdir
   output="$(source_env_if_exists existing_file 2>&1 > /dev/null)"
   [[ "${output#*'loading ~/existing_file'}" != "$output" ]]
@@ -215,6 +216,104 @@ test_name env_vars_required
   [[ "${output#*'BAR is required'}" != "$output" ]]
   [[ "${output#*'BAZ is required'}" != "$output" ]]
   [[ "${output#*'MISSING is required'}" != "$output" ]]
+)
+
+test_name load_netrc
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  cd "$workdir"
+
+  # Create a test netrc file
+  cat > .netrc << 'EOF'
+machine api.example.com
+  login testuser
+  password testpass123
+
+machine api.github.com
+login ghuser
+password ghtoken456
+
+machine default.example.com login defaultuser password defaultpass
+EOF
+
+  # Test: Load credentials from netrc file
+  load_netrc api.example.com MY_USER MY_PASS .netrc 2>/dev/null
+  assert_eq "$MY_USER" "testuser"
+  assert_eq "$MY_PASS" "testpass123"
+
+  # Test: Load credentials with default ~/.netrc path
+  # shellcheck disable=SC2031
+  cp .netrc "$HOME/.netrc"
+  unset MY_USER MY_PASS
+  load_netrc api.github.com MY_USER MY_PASS 2>/dev/null
+  assert_eq "$MY_USER" "ghuser"
+  assert_eq "$MY_PASS" "ghtoken456"
+
+  # Test: Load credentials with single-line format
+  unset MY_USER MY_PASS
+  load_netrc default.example.com MY_USER MY_PASS .netrc 2>/dev/null
+  assert_eq "$MY_USER" "defaultuser"
+  assert_eq "$MY_PASS" "defaultpass"
+
+  # Test: Missing machine should fail
+  unset MY_USER MY_PASS
+  if load_netrc nonexistent.com MY_USER MY_PASS .netrc 2>/dev/null; then
+    echo "Expected load_netrc to fail for nonexistent machine"
+    return 1
+  fi
+
+  # Test: Missing netrc file should fail
+  if load_netrc api.example.com MY_USER MY_PASS missing.netrc 2>/dev/null; then
+    echo "Expected load_netrc to fail for missing netrc file"
+    return 1
+  fi
+
+  # Test: Missing machine argument should fail
+  if load_netrc "" MY_USER MY_PASS .netrc 2>/dev/null; then
+    echo "Expected load_netrc to fail for missing machine argument"
+    return 1
+  fi
+
+  # Test: Missing login_var argument should fail
+  if load_netrc api.example.com "" MY_PASS .netrc 2>/dev/null; then
+    echo "Expected load_netrc to fail for missing login_var argument"
+    return 1
+  fi
+
+  # Test: Missing password_var argument should fail
+  if load_netrc api.example.com MY_USER "" .netrc 2>/dev/null; then
+    echo "Expected load_netrc to fail for missing password_var argument"
+    return 1
+  fi
+
+  # Test: netrc with comments and empty lines
+  cat > .netrc2 << 'EOF'
+# This is a comment
+machine test.example.com
+  # Another comment
+  login commentuser
+
+  password commentpass
+EOF
+  unset MY_USER MY_PASS
+  load_netrc test.example.com MY_USER MY_PASS .netrc2 2>/dev/null
+  assert_eq "$MY_USER" "commentuser"
+  assert_eq "$MY_PASS" "commentpass"
+
+  # Test: netrc with only login (no password) should fail
+  cat > .netrc3 << 'EOF'
+machine nopw.example.com
+  login nopwuser
+EOF
+  unset MY_USER MY_PASS
+  if load_netrc nopw.example.com MY_USER MY_PASS .netrc3 2>/dev/null; then
+    echo "Expected load_netrc to fail for machine with no password"
+    return 1
+  fi
 )
 
 
