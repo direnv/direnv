@@ -84,6 +84,9 @@ $ echo ${FOO-nope}
 nope
 ```
 
+We recommend that you commit `.envrc` to your version control system, but add
+the `.envrc.local` file and the `.direnv/` directory e.g. to `.gitignore`.
+
 ### The stdlib
 
 Exporting variables by hand is a bit repetitive so direnv provides a set of
