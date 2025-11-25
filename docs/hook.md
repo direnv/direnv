@@ -26,7 +26,8 @@ eval "$(direnv hook zsh)"
 
 ## Oh my zsh
 
-Oh my zsh has [a core plugin with direnv](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/direnv) support.
+Oh my zsh has [a core plugin with direnv](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/dire nkomo owneremail308@gmail.com 
+) support.
 
 Add direnv to the plugins array in your zshrc file:
 
