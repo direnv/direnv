@@ -17,6 +17,7 @@ import (
 type Config struct {
 	Env             Env
 	WorkDir         string // Current directory
+	OriginDir       string
 	ConfDir         string
 	CacheDir        string
 	DataDir         string
@@ -114,6 +115,8 @@ func LoadConfig(env Env) (config *Config, err error) {
 		// handled by `findEnvUp`
 		return //nolint:nilnesserr
 	}
+
+	config.OriginDir = env[DIRENV_ORIGIN]
 
 	// Default Warn Timeout
 	config.WarnTimeout = 5 * time.Second
