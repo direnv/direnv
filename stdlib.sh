@@ -264,6 +264,41 @@ dotenv_if_exists() {
   eval "$("$direnv" dotenv bash "$@")"
 }
 
+# Usage: dotenv_context [defaultcontext]
+#
+# Loads .env.<context> just like `dotenv`, but selects
+# enviroment based on the context name given in .env.context
+#
+dotenv_context() {
+   # Default to empty context for plain .env
+   context=${1-}
+   context_file="${PWD}/.envrc.context"
+   if [[ -f "$context_file" ]]; then
+     context=$(< "$context_file" )
+   else
+       # Record the default context to make our behaviour more explicit.
+       echo "$context" > "$context_file"
+   fi
+   watch_file "$context_file"
+
+   export DIRENV_CONTEXT="$context"
+
+   context_env_file=".env${context:+.$context}"
+   if [[ -f "$context_env_file" ]]; then
+       log_status "applying $context_env_file"
+       dotenv "$context_env_file"
+   else
+       log_status "context: $context_env_file missing"
+   fi
+
+   # Help most common use case to track and multiplex
+   # mutually exclusive environments (DEV/PROD/TESTING/etc).
+   # Define "dev" as default, and override for example
+   # .env.prod: DIRENV_ENVIRONMENT=prod
+   #
+   export DIRENV_ENVIRONMENT="${DIRENV_ENVIRONMENT-dev}"
+}
+
 # Usage: user_rel_path <abs_path>
 #
 # Transforms an absolute path <abs_path> into a user-relative path if
@@ -1430,6 +1465,7 @@ use_vim() {
   local extra_vimrc=${1:-.vimrc.local}
   path_add DIRENV_EXTRA_VIMRC "$extra_vimrc"
 }
+
 
 # Usage: direnv_version <version_at_least>
 #
