@@ -186,3 +186,4 @@ jobs:
 - [GitHub Actions Environment Files](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files)
 - [direnv Documentation](https://direnv.net)
 - [direnv-stdlib(1)](../man/direnv-stdlib.1.md)
+- [direnv-load-and-mask](https://github.com/iloveitaly/github-action-direnv-load-and-mask) GitHub action to load direnv into the GitHub environment and intelligently mask sensitive variables.
