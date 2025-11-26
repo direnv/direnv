@@ -31,3 +31,7 @@ func (sh jsonShell) Dump(env Env) (string, error) {
 	}
 	return string(out), nil
 }
+
+func (sh jsonShell) WindowsNative() bool {
+	return false
+}

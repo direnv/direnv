@@ -55,6 +55,10 @@ func (sh gha) Dump(env Env) (string, error) {
 	return b.String(), nil
 }
 
+func (sh gha) WindowsNative() bool {
+	return false
+}
+
 func (sh gha) export(b *strings.Builder, key, value string) error {
 	// Generate a random delimiter
 	delimiter := sh.generateDelimiter()

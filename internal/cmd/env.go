@@ -22,9 +22,14 @@ func GetEnv() Env {
 	for _, kv := range os.Environ() {
 		kv2 := strings.SplitN(kv, "=", 2)
 
-		key := kv2[0]
+		// Windows reports mixed case env vars by default; our later call bash will uppercase them
+		// so we need to uppercase them here to avoid duplicates during bash env calculation
+		key := strings.ToUpper(kv2[0])
 		value := kv2[1]
-
+		// Windows has some special empty keys; ignore them
+		if key == "" {
+			continue
+		}
 		env[key] = value
 	}
 
@@ -72,12 +77,15 @@ func (env Env) Copy() Env {
 // ToGoEnv should really be named ToUnixEnv. It turns the env back into a list
 // of "key=value" strings like returns by os.Environ().
 func (env Env) ToGoEnv() []string {
-	goEnv := make([]string, len(env))
+	goEnv := make([]string, len(env)+2)
 	index := 0
 	for key, value := range env {
 		goEnv[index] = strings.Join([]string{key, value}, "=")
 		index++
 	}
+	// Always disable path conversion on MSYS2 (invoked for env computation on Windows CMD / Powershell)
+	goEnv[index] = "MSYS2_ENV_CONV_EXCL=\"*\""
+	goEnv[index+1] = "MSYS_NO_PATHCONV=1"
 	return goEnv
 }
 
