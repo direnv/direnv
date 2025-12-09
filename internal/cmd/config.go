@@ -247,6 +247,11 @@ func (config *Config) DenyDir() string {
 	return filepath.Join(config.DataDir, "deny")
 }
 
+// AllowedRequiredDir is the folder where all the "allowed required" files are stored.
+func (config *Config) AllowedRequiredDir() string {
+	return filepath.Join(config.DataDir, "allowed-required")
+}
+
 // LoadedRC returns a RC file if any has been loaded
 func (config *Config) LoadedRC() *RC {
 	if config.Env[DIRENV_FILE] == "" {

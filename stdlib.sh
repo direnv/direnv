@@ -264,6 +264,29 @@ dotenv_if_exists() {
   eval "$("$direnv" dotenv bash "$@")"
 }
 
+# Usage: require_allowed <filename> [<filename> ...]
+#
+# Requires that the specified files are approved before loading the .envrc.
+# If any files haven't been approved or have changed since approval, direnv
+# will prompt the user to run `direnv allow` again.
+#
+# This helps prevent supply chain attacks by ensuring that changes to
+# critical files (like pixi.toml, package.json, etc.) require explicit
+# user approval.
+#
+# Example:
+#
+#    require_allowed pixi.toml pixi.lock
+#
+require_allowed() {
+  # Also watch these files for changes
+  watch_file "$@"
+
+  # Check if files are in the allowed-required DB
+  # Pass $PWD/.envrc as the envrc path since we're executing in the .envrc's directory
+  eval "$("$direnv" check-required bash "$PWD/.envrc" "$@")"
+}
+
 # Usage: user_rel_path <abs_path>
 #
 # Transforms an absolute path <abs_path> into a user-relative path if
