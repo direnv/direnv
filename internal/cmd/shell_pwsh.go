@@ -20,7 +20,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -
 $hook = [EventHandler[LocationChangedEventArgs]] {
   param([object] $source, [LocationChangedEventArgs] $eventArgs)
   end {
-    $export = ({{.SelfPath}} export pwsh) -join [Environment]::NewLine;
+    $export = (direnv export pwsh) -join [Environment]::NewLine;
     if ($export) {
       Invoke-Expression -Command $export;
     }
