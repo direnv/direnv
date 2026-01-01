@@ -4,7 +4,6 @@ package callable
 import (
 	"context"
 	_ "embed"
-	"os"
 	"strings"
 
 	"github.com/direnv/direnv/v2/internal/cmd"
@@ -19,10 +18,7 @@ var (
 	version string
 )
 
-func CallableMain(_ context.Context, args []string, env map[string]string) {
+func CallableMain(_ context.Context, args []string, env map[string]string) error {
 
-	err := cmd.Main(env, args, bashPath, stdlib, strings.TrimSpace(version))
-	if err != nil {
-		os.Exit(1)
-	}
+	return cmd.Main(env, args, bashPath, stdlib, strings.TrimSpace(version))
 }
