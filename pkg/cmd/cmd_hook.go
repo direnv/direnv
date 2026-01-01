@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 	"text/template"
+
+	"github.com/samber/lo"
 )
 
 // HookContext are the variables available during hook template evaluation
@@ -28,10 +30,8 @@ func cmdHookAction(_ Env, args []string) (err error) {
 		target = args[1]
 	}
 
-	selfPath, err := os.Executable()
-	if err != nil {
-		return err
-	}
+	zeroArgParts := strings.Fields(os.Args[0])
+	selfPath := strings.Join(lo.Subset(zeroArgParts, 0, -1), " ")
 
 	// Convert Windows path if needed
 	selfPath = strings.ReplaceAll(selfPath, "\\", "/")
