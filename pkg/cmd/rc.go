@@ -199,7 +199,7 @@ func (rc *RC) Touch() error {
 	return touch(rc.path)
 }
 
-const notAllowed = "%s is blocked. Run `direnv allow` to approve its content"
+const notAllowed = "%s is blocked. Run `%s allow` to approve its content"
 
 // Load evaluates the RC file and returns the new Env or error.
 //
@@ -220,7 +220,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	// Abort if the file is not allowed
 	switch rc.Allowed() {
 	case NotAllowed:
-		err = fmt.Errorf(notAllowed, rc.Path())
+		err = fmt.Errorf(notAllowed, rc.Path(), os.Args[0])
 		return
 	case Allowed:
 	case Denied:
