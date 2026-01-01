@@ -55,7 +55,7 @@ ifeq ($(shell uname), Darwin)
 endif
 
 ifdef BASH_PATH
-	GO_LDFLAGS += -X main.bashPath=$(BASH_PATH)
+	GO_LDFLAGS += -X github.com/yaklabco/direnv/pkg/callable.bashPath=$(BASH_PATH)
 endif
 
 ifneq ($(strip $(GO_LDFLAGS)),)

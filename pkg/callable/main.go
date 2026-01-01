@@ -2,10 +2,12 @@
 package main
 
 import (
+	"context"
 	_ "embed"
-	"github.com/direnv/direnv/v2/internal/cmd"
 	"os"
 	"strings"
+
+	"github.com/direnv/direnv/v2/internal/cmd"
 )
 
 var (
@@ -17,11 +19,8 @@ var (
 	version string
 )
 
-func main() {
-	var (
-		env  = cmd.GetEnv()
-		args = os.Args
-	)
+func CallableMain(_ context.Context, args []string, env map[string]string) {
+
 	err := cmd.Main(env, args, bashPath, stdlib, strings.TrimSpace(version))
 	if err != nil {
 		os.Exit(1)
