@@ -11,7 +11,7 @@ type murex struct{}
 var Murex Shell = murex{}
 
 const murexHook = `event: onPrompt direnv_hook=before {
-	"{{.SelfPath}}" export murex -> set exports
+	{{.SelfPath}} export murex -> set exports
 	if { $exports != "" } {
 		$exports -> :json: formap key value {
 			if { is-null value } then {
