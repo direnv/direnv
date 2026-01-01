@@ -27,7 +27,7 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 	}
 
 	var (
-		algo = sri.SHA256
+		algo          = sri.SHA256
 		url           string
 		integrityHash string
 	)

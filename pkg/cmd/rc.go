@@ -291,7 +291,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	return
 }
 
-/// Utils
+// / Utils
 
 func eachDir(path string) (paths []string) {
 	path, err := filepath.Abs(path)

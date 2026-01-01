@@ -6,7 +6,7 @@ import (
 	_ "embed"
 	"strings"
 
-	"github.com/direnv/direnv/v2/internal/cmd"
+	"github.com/direnv/direnv/v2/pkg/cmd"
 )
 
 var (

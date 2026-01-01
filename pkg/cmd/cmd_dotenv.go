@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/direnv/direnv/v2/pkg/dotenv"
 	"os"
 	"path/filepath"
+
+	"github.com/direnv/direnv/v2/pkg/dotenv"
 )
 
 // CmdDotEnv is `direnv dotenv [SHELL [PATH_TO_DOTENV]]`

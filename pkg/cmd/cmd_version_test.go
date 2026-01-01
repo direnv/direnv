@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"golang.org/x/mod/semver"
 	"os"
 	"strings"
 	"testing"
+
+	"golang.org/x/mod/semver"
 )
 
 func TestVersionDotTxt(t *testing.T) {
