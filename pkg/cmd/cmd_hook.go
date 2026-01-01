@@ -30,7 +30,7 @@ func cmdHookAction(_ Env, args []string) (err error) {
 		target = args[1]
 	}
 
-	zeroArgParts := strings.Fields(os.Args[0])
+	zeroArgParts := strings.Fields(args[0])
 	selfPath := strings.Join(lo.Slice(zeroArgParts, 0, len(zeroArgParts)-1), " ")
 
 	// Convert Windows path if needed
