@@ -19,6 +19,5 @@ var (
 )
 
 func CallableMain(_ context.Context, args []string, env map[string]string) error {
-
 	return cmd.Main(env, args, bashPath, stdlib, strings.TrimSpace(version))
 }

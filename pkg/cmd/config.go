@@ -100,11 +100,8 @@ func LoadConfig(env Env) (config *Config, err error) {
 		return
 	}
 
-	var exePath string
-	if exePath, err = os.Executable(); err != nil {
-		err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
-		return
-	}
+	exePath := os.Args[0]
+
 	// Fix for mingsys
 	exePath = strings.ReplaceAll(exePath, "\\", "/")
 	config.SelfPath = exePath
