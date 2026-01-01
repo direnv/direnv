@@ -1,5 +1,5 @@
-// Package main implements the direnv command-line tool.
-package main
+// Package callable implements the direnv command-line tool.
+package callable
 
 import (
 	"context"
