@@ -3,10 +3,11 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"text/template"
 
-	"github.com/samber/lo"
+	"github.com/yaklabco/direnv/v2/internal/selfpath"
 )
 
 // HookContext are the variables available during hook template evaluation
@@ -23,6 +24,8 @@ var CmdHook = &Cmd{
 	Action: actionSimple(cmdHookAction),
 }
 
+var hookSubCommandRegexp = regexp.MustCompile(`\s+hook`)
+
 func cmdHookAction(_ Env, args []string) (err error) {
 	var target string
 
@@ -30,8 +33,11 @@ func cmdHookAction(_ Env, args []string) (err error) {
 		target = args[1]
 	}
 
-	zeroArgParts := strings.Fields(args[0])
-	selfPath := strings.Join(lo.Slice(zeroArgParts, 0, len(zeroArgParts)-1), " ")
+	selfPath := selfpath.SelfPath(args[0])
+	firstMatchIndices := hookSubCommandRegexp.FindStringIndex(selfPath)
+	if firstMatchIndices != nil {
+		selfPath = selfPath[:firstMatchIndices[0]]
+	}
 
 	// Convert Windows path if needed
 	selfPath = strings.ReplaceAll(selfPath, "\\", "/")

@@ -11,6 +11,7 @@ import (
 
 	toml "github.com/BurntSushi/toml"
 	"github.com/direnv/direnv/v2/xdg"
+	"github.com/yaklabco/direnv/v2/internal/selfpath"
 )
 
 // Config represents the direnv configuration and state.
@@ -100,7 +101,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		return
 	}
 
-	exePath := os.Args[0]
+	exePath := selfpath.SelfPath(os.Args[0])
 
 	// Fix for mingsys
 	exePath = strings.ReplaceAll(exePath, "\\", "/")
