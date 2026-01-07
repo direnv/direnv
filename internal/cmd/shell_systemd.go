@@ -34,6 +34,10 @@ func (sh systemdShell) Dump(env Env) (string, error) {
 	return out, nil
 }
 
+func (sh systemdShell) WindowsNative() bool {
+	return false
+}
+
 func cutEncapsulated(valueToTest, encapsulatingValue string) (cutValue string, wasEncapsulated bool) {
 	withoutPrefix, startsWithEncapsulatingValue := strings.CutPrefix(valueToTest, encapsulatingValue)
 	if startsWithEncapsulatingValue {
