@@ -29,7 +29,7 @@ set -euo pipefail
 
   kernel=$(uname -s | tr "[:upper:]" "[:lower:]")
   case "${kernel}" in
-    mingw*)
+    msys*|mingw*)
       kernel=windows
       ;;
   esac
