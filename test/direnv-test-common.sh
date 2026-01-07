@@ -291,6 +291,19 @@ test_start "aliases"
   direnv disallow && direnv_eval && test -z "${HELLO}"
 test_stop
 
+# Make sure that the direnv process is not kept alive by process forks spawned
+# by .envrc
+test_start "process-fork"
+  direnv_eval &
+  DIRENV_PID=$!
+  sleep 1
+  if kill -0 "$DIRENV_PID" 2>/dev/null; then
+    kill -9 "$DIRENV_PID"
+    false
+  fi
+  unset DIRENV_PID
+test_stop
+
 # shellcheck disable=SC2016
 test_start '$test'
   direnv_eval
