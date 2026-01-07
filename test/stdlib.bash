@@ -218,6 +218,30 @@ test_name env_vars_required
 )
 
 
+test_name require_allowed_security
+(
+  load_stdlib
+  set +e
+
+  # Test that absolute paths are rejected
+  output="$(require_allowed /etc/passwd 2>&1)"
+  result=$?
+  [[ $result -eq 1 ]]
+  [[ "${output#*'path must be relative'}" != "$output" ]]
+
+  # Test that parent traversal paths are rejected
+  output="$(require_allowed ../etc/passwd 2>&1)"
+  result=$?
+  [[ $result -eq 1 ]]
+  [[ "${output#*'must not contain'}" != "$output" ]]
+
+  # Test that paths with .. in the middle are rejected
+  output="$(require_allowed foo/../bar 2>&1)"
+  result=$?
+  [[ $result -eq 1 ]]
+  [[ "${output#*'must not contain'}" != "$output" ]]
+)
+
 # test strict_env and unstrict_env
 ./strict_env_test.bash
 

@@ -387,6 +387,21 @@ Example (.envrc):
 
     watch_dir src
 
+### `require_allowed <path> [<path> ...]`
+
+> direnv >= 2.38.0 is required
+
+Adds a list of files to the allow-list for `.envrc` using the `require_allowed` command.
+If any of the specified files are modified, removed, or new files in the list appear,
+direnv will require you to run `direnv allow` again to re-authorize the environment.
+This increases security by ensuring that only changes to files you have explicitly allowed will take effect.
+You should use this in direnv configurations where you execute code from the lockfile
+(for example pixi's activation scripts or npm postinstall scripts).
+
+Example (.envrc):
+
+    require_allowed pixi.toml pixi.lock
+
 ### `direnv_version <version_at_least>`
 
 Checks that the direnv version is at least old as `version_at_least`. This can
