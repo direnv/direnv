@@ -96,6 +96,14 @@ direnv >= 2.36.0 is required
 
 .RE
 
+.SS \fBflat_search_dirs\fR
+A list of directories that contain external (outside of the corresponding source tree) environment files. This is useful if the environment you use won't be added to the repository, and you don't want it to be a problem when dealing with version-control systems.
+
+Environment files in directories and in parent directories are prioritized over these.
+
+For example, if \fB/home/alice/envs\fR is added to the list, and the user enters the \fB/home/alice/project\fR directory, \fB/home/alice/envs\fR will be searched for \fBproject.envrc\fR, (\fBproject.env\fR), \fBproject/.envrc\fR and (\fBproject/.env\fR) in that order. The directories in parentheses are searched in respect to \fBload_dotenv\fR.
+
+
 .SH [whitelist]
 Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" -- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. \fBThis feature should be used with great care\fP, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.
 
