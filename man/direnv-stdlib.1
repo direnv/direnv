@@ -498,6 +498,26 @@ if on_git_branch; then
 fi
 .EE
 
+.SS \fBload_netrc <machine> <login_var> <password_var> [<netrc_file>]\fR
+Loads credentials from a netrc file for the specified machine into the given
+variable names. The netrc file defaults to \fB~/.netrc\fR if not specified.
+
+.PP
+The function will read the netrc file, find the entry for the specified
+machine, and export the login and password values into the variables named
+by \fIlogin_var\fP and \fIpassword_var\fP\&.
+
+.PP
+The netrc file is automatically added to the watch list.
+
+.PP
+Example (.envrc):
+
+.EX
+load_netrc api.github.com GITHUB_USER GITHUB_TOKEN
+load_netrc example.com MY_USER MY_PASS /path/to/custom/netrc
+.EE
+
 .SH COPYRIGHT
 MIT licence - Copyright (C) 2019 @zimbatm and contributors
 

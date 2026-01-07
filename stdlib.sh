@@ -1515,6 +1515,106 @@ on_git_branch() {
   fi
 }
 
+# Usage: load_netrc <machine> <login_var> <password_var> [<netrc_file>]
+#
+# Loads credentials from a netrc file for the specified machine into the given
+# variable names. The netrc file defaults to ~/.netrc if not specified.
+#
+# The function will read the netrc file, find the entry for the specified
+# machine, and export the login and password values into the variables named
+# by <login_var> and <password_var>.
+#
+# The netrc file is automatically added to the watch list.
+#
+# Example (.envrc):
+#
+#    load_netrc api.github.com GITHUB_USER GITHUB_TOKEN
+#    load_netrc example.com MY_USER MY_PASS /path/to/custom/netrc
+#
+load_netrc() {
+  local machine=$1
+  local login_var=$2
+  local password_var=$3
+  local netrc_file=${4:-$HOME/.netrc}
+
+  if [[ -z $machine ]]; then
+    log_error "load_netrc: <machine> argument is required"
+    return 1
+  fi
+
+  if [[ -z $login_var ]]; then
+    log_error "load_netrc: <login_var> argument is required"
+    return 1
+  fi
+
+  if [[ -z $password_var ]]; then
+    log_error "load_netrc: <password_var> argument is required"
+    return 1
+  fi
+
+  if [[ ! -f $netrc_file ]]; then
+    log_error "load_netrc: netrc file not found at '$netrc_file'"
+    return 1
+  fi
+
+  watch_file "$netrc_file"
+
+  local in_machine=false
+  local login=""
+  local password=""
+  local line word prev_word
+
+  while read -r line; do
+    # Skip comments and empty lines
+    [[ $line =~ ^[[:space:]]*# ]] && continue
+    [[ -z $line ]] && continue
+
+    prev_word=""
+    for word in $line; do
+      case "$prev_word" in
+        machine)
+          if [[ $word == "$machine" ]]; then
+            in_machine=true
+          else
+            in_machine=false
+          fi
+          ;;
+        login)
+          $in_machine && login=$word
+          ;;
+        password)
+          $in_machine && password=$word
+          ;;
+      esac
+
+      # Handle "default" keyword
+      [[ $word == "default" ]] && in_machine=false
+
+      prev_word=$word
+
+      # Early exit if we have both credentials
+      if $in_machine && [[ -n $login && -n $password ]]; then
+        break 2
+      fi
+    done
+  done <"$netrc_file"
+
+  if [[ -z $login ]]; then
+    log_error "load_netrc: no login found for machine '$machine' in '$netrc_file'"
+    return 1
+  fi
+
+  if [[ -z $password ]]; then
+    log_error "load_netrc: no password found for machine '$machine' in '$netrc_file'"
+    return 1
+  fi
+
+  export "$login_var=$login"
+  export "$password_var=$password"
+
+  log_status "loaded credentials for $machine from $(user_rel_path "$netrc_file")"
+}
+
 # Usage: __main__ <cmd> [...<args>]
 #
 # Used by rc.go
