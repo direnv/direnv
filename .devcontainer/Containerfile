@@ -1,0 +1,56 @@
+FROM docker.io/debian:latest
+
+# Update the OS
+RUN apt-get update > /dev/null
+
+ENV GOPATH=/go
+ENV PATH=$GOPATH/bin:$PATH
+
+# Install latest Go 
+RUN apt-get install -y \
+    golang-go \
+    git \
+    jq \
+    ca-certificates \
+    make \
+    curl \
+    wget \
+    # Needed to convert markdown to man pages
+    go-md2man \
+    shellcheck \
+    elvish \
+    fish \
+    tcsh \
+    zsh
+    
+# Install golangci-lint 
+RUN GOLANGCI_LINT_VERSION=$(curl  "https://api.github.com/repos/golangci/golangci-lint/tags" | jq -r '.[0].name') \
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
+    | sh -s -- -b $(go env GOPATH)/bin "${GOLANGCI_LINT_VERSION}"
+
+###################################
+# Murex installation
+
+RUN GOBIN="$(pwd)" go install -v github.com/lmorg/murex@latest
+RUN chmod +x murex
+RUN mv murex /usr/local/bin/murex
+
+###################################
+# Powershell installation 
+
+# OOfficial package below 
+# Broken until this issue is fixed 
+# https://github.com/PowerShell/PowerShell/issues/25415
+# VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | grep -Po '"tag_name":\s*"v?\K[0-9.]+')
+# curl -Lo powershell.deb "https://github.com/PowerShell/PowerShell/releases/latest/download/powershell_${VERSION}-1.deb_amd64.deb"
+# dpkg -i powershell.deb
+# rm -f powershell.deb
+
+# Temporary solution 
+RUN apt-get update -y
+RUN apt-get install -y curl libicu76
+RUN curl -L -o /tmp/pwsh.deb https://github.com/PowerShell/PowerShell/releases/download/v7.6.0-preview.5/powershell-preview_7.6.0-preview.5-1.deb_amd64.deb
+RUN dpkg -i /tmp/pwsh.deb
+RUN rm /tmp/pwsh.deb
+RUN mv /usr/bin/pwsh-preview /usr/bin/pwsh
+
