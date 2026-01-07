@@ -1336,18 +1336,19 @@ use_flake() {
 # Load environment variables from `flox activate`. By default uses the .flox
 # directory in the current directory.
 #
-# You can specify a remote environment with '--remote=<owner>/<name>' where
-# <owner>/<name> is the FloxHub environment name (e.g. `use_flox --remote=myorg/env`).
+# You can specify a FloxHub environment with '--reference=<owner>/<name>' 
+# or `-r=<owner>/<name>`, where <owner>/<name>
+# is the FloxHub environment name (e.g. `use_flox '--reference=myorg/env`).
 #
-# The '--trust' flag can be added to automatically trust remote environments:
-#    use_flox --trust --remote=myorg/env
+# The '--trust' flag can be added to automatically trust FloxHub environments:
+#    use_flox --trust '--reference=myorg/env
 #
 # An alternate local environment directory can be specified with '--dir=<path>',
 # where <path> contains a .flox directory.
 #
 # Example:
 #
-#    use_flox --remote=acme/production
+#    use_flox --reference=acme/production
 #    use_flox --dir=/path/to/env
 #
 # Note: Custom commands are not supported since flox activate is used for loading.
