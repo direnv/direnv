@@ -1351,6 +1351,9 @@ use_nix() {
 use_flake() {
   watch_file flake.nix
   watch_file flake.lock
+  # Updating the flake-profile’s mtime prevents nh from GC’ing the frequently used direnv environment.
+  # Also remove any stale layout directory beforehand for a clean, consistent state.
+  rm -rf "$(direnv_layout_dir)"
   mkdir -p "$(direnv_layout_dir)"
   eval "$(nix --extra-experimental-features "nix-command flakes" print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
   nix --extra-experimental-features "nix-command flakes" profile wipe-history --profile "$(direnv_layout_dir)/flake-profile"
