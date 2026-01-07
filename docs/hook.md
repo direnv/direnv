@@ -75,20 +75,30 @@ use direnv
 
 ## Nushell
 
-Add the following hook to your `$env.config.hooks.env_change.PWD` list in `config.nu`:
-```nushell
-{ ||
-    if (which direnv | is-empty) {
-        return
-    }
+The following `config.nu` snippet, requiring Nushell 0.104 or later, shows how to
+configure a hook that runs when the current working directory is changed:
 
-    direnv export json | from json | default {} | load-env
-}
+```nushell
+use std/config *
+
+# Initialize the PWD hook as an empty list if it doesn't exist
+$env.config.hooks.env_change.PWD = $env.config.hooks.env_change.PWD? | default []
+
+$env.config.hooks.env_change.PWD ++= [{||
+  if (which direnv | is-empty) {
+    # If direnv isn't installed, do nothing
+    return
+  }
+
+  direnv export json | from json | default {} | load-env
+  # If direnv changes the PATH, it will become a string and we need to re-convert it to a list
+  $env.PATH = do (env-conversions).path.from_string $env.PATH
+}]
 ```
 
 > **Note**
-> you can follow the [`nu_scripts` of Nushell](https://github.com/nushell/nu_scripts/blob/main/nu-hooks/nu-hooks/direnv/config.nu)
-> for the always up-to-date version of the hook above
+> you can follow the official [cookbook example](https://www.nushell.sh/cookbook/direnv.html)
+> for the always up-to-date version of the hook above.
 
 ## PowerShell
 
