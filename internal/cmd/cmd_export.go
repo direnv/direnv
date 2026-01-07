@@ -45,7 +45,9 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 
 	logDebug("loading RCs")
 	loadedRC := config.LoadedRC()
-	toLoad := findEnvUp(config.WorkDir, config.LoadDotenv)
+	
+	// First, determine what to load without reporting
+	toLoad := findEnvUpWithPermissions(config.WorkDir, config.LoadDotenv, config)
 
 	if loadedRC == nil && toLoad == "" {
 		return
@@ -75,6 +77,9 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logDebug("no update needed")
 		return
 	}
+	
+	// For now, always report - we'll improve this in a future iteration
+	toLoad = findEnvUpWithPermissionsAndReport(config.WorkDir, config.LoadDotenv, config, true)
 
 	var previousEnv, newEnv Env
 
