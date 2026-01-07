@@ -32,6 +32,12 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	log.SetPrefix(log.Prefix() + "export:")
 	logDebug("start")
 
+	_, set := currentEnv["DIRENV_DISABLE"]
+	if set {
+		logDebug("direnv is disabled by environment variable")
+		return nil
+	}
+
 	var target string
 
 	if len(args) > 1 {
