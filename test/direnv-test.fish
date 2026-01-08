@@ -41,9 +41,13 @@ set -e DIRENV_FILE
 set -e DIRENV_WATCHES
 set -e DIRENV_DIFF
 
+# Source the hook to get __direnv_update_fish_complete_path and other functions
+direnv hook fish | source
+
 function direnv_eval
     #direnv export fish # for debugging
     direnv export fish | source
+    __direnv_update_fish_complete_path
 end
 
 function test_start -a name
@@ -241,3 +245,31 @@ begin
     test_neq "$DIRENV_WATCHES" "$WATCHES"
 end
 test_stop
+
+test_start fish-completions
+begin
+    set -l completions_dir "$TEST_DIR/scenarios/fish-completions/data/fish/vendor_completions.d"
+
+    echo "Verify completion path doesn't have our dir yet"
+    if contains -- $completions_dir $fish_complete_path
+        echo "FAILED: completions_dir already in fish_complete_path before direnv_eval"
+        exit 1
+    end
+
+    direnv_eval
+
+    echo "Verify completion path was added"
+    if not contains -- $completions_dir $fish_complete_path
+        echo "FAILED: completions_dir not added to fish_complete_path after direnv_eval"
+        exit 1
+    end
+end
+test_stop
+
+# Verify cleanup after leaving
+set -l completions_dir "$TEST_DIR/scenarios/fish-completions/data/fish/vendor_completions.d"
+if contains -- $completions_dir $fish_complete_path
+    echo "FAILED: completions_dir still in fish_complete_path after leaving"
+    exit 1
+end
+echo "## fish-completions cleanup verified ##"
