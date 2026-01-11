@@ -146,6 +146,12 @@ confusing for users:
    of shells. It also means that aliases and functions are not exportable
    right now.
 
+### Translations
+
+The direnv documentation is also available in other languages:
+
+* [日本語 (Japanese)](https://gemmaro.github.io/direnv/)
+
 ## Contributing
 
 Bug reports, contributions and forks are welcome. All bugs or other forms of
