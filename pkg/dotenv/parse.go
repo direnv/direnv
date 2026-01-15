@@ -42,8 +42,56 @@ var lineRe = regexp.MustCompile(
 // Ported from https://github.com/bkeepers/dotenv/blob/84f33f48107c492c3a99bd41c1059e7b4c1bb67a/lib/dotenv/parser.rb
 func Parse(data string) (map[string]string, error) {
 	var dotenv = make(map[string]string)
+	var lines = linesRe.Split(data, -1)
+	var inMultiline bool
+	var multilineValue string
+	var quoteChar byte
 
-	for _, line := range linesRe.Split(data, -1) {
+	for i := 0; i < len(lines); i++ {
+		line := lines[i]
+
+		// Continue collecting a multi-line value
+		if inMultiline {
+			multilineValue += "\n" + line
+
+			// Check if this line completes the multi-line value
+			if strings.HasSuffix(strings.TrimSpace(line), string(quoteChar)) {
+				// Process the completed multi-line value
+				match := lineRe.FindStringSubmatch(multilineValue)
+				if len(match) > 1 && len(match[1]) > 0 {
+					key := match[1]
+					value := match[2]
+					parseValue(key, value, dotenv)
+				}
+				inMultiline = false
+			}
+			continue
+		}
+
+		// Check for the beginning of a multi-line value
+		if strings.Contains(line, "=") || strings.Contains(line, ":") {
+			sepIdx := strings.IndexAny(line, "=:")
+			if sepIdx > 0 && sepIdx+1 < len(line) {
+				// Extract the part after the separator
+				afterSep := line[sepIdx+1:]
+				trimmedAfterSep := strings.TrimLeft(afterSep, " \t")
+
+				// Check if value starts with a quote
+				if len(trimmedAfterSep) > 0 && (trimmedAfterSep[0] == '"' || trimmedAfterSep[0] == '\'') {
+					quoteChar = trimmedAfterSep[0]
+
+					// Count quotes to determine if it's multi-line
+					if strings.Count(trimmedAfterSep, string(quoteChar)) == 1 {
+						// Start multi-line collection
+						inMultiline = true
+						multilineValue = line
+						continue
+					}
+				}
+			}
+		}
+
+		// Normal line processing
 		if !lineRe.MatchString(line) {
 			return nil, fmt.Errorf("invalid line: %s", line)
 		}
@@ -61,6 +109,11 @@ func Parse(data string) (map[string]string, error) {
 		value := match[2]
 
 		parseValue(key, value, dotenv)
+	}
+
+	// If we end with an unclosed multi-line value, return an error
+	if inMultiline {
+		return nil, fmt.Errorf("unclosed quoted value in .env file")
 	}
 
 	return dotenv, nil

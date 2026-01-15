@@ -3,7 +3,7 @@
 ############################################################################
 
 # Set this to change the target installation path
-PREFIX   = /usr/local
+PREFIX   ?= /usr/local
 BINDIR   = ${PREFIX}/bin
 SHAREDIR = ${PREFIX}/share
 MANDIR   = ${SHAREDIR}/man
