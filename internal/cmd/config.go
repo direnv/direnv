@@ -91,13 +91,33 @@ func LoadConfig(env Env) (config *Config, err error) {
 		Env: env,
 	}
 
-	config.ConfDir = env[DIRENV_CONFIG]
-	if config.ConfDir == "" {
-		config.ConfDir = xdg.ConfigDir(env, "direnv")
+	var configDirs []string
+	if env[DIRENV_CONFIG] != "" {
+		configDirs = []string{env[DIRENV_CONFIG]}
+	} else {
+		configDirs = xdg.ConfigDirs(env, "direnv")
 	}
-	if config.ConfDir == "" {
+	if len(configDirs) == 0 {
 		err = fmt.Errorf("couldn't find a configuration directory for direnv")
 		return
+	}
+
+	for _, dir := range configDirs {
+		tomlPath := filepath.Join(dir, "direnv.toml")
+		if _, statErr := os.Stat(tomlPath); statErr == nil {
+			config.ConfDir = dir
+			config.TomlPath = tomlPath
+			break
+		}
+		tomlPath = filepath.Join(dir, "config.toml")
+		if _, statErr := os.Stat(tomlPath); statErr == nil {
+			config.ConfDir = dir
+			config.TomlPath = tomlPath
+			break
+		}
+	}
+	if config.ConfDir == "" {
+		config.ConfDir = configDirs[0]
 	}
 
 	var exePath string
@@ -125,15 +145,6 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
-
-	// Load the TOML config
-	config.TomlPath = filepath.Join(config.ConfDir, "direnv.toml")
-	if _, statErr := os.Stat(config.TomlPath); statErr != nil {
-		config.TomlPath = filepath.Join(config.ConfDir, "config.toml")
-		if _, statErr := os.Stat(config.TomlPath); statErr != nil {
-			config.TomlPath = ""
-		}
-	}
 
 	if config.TomlPath != "" {
 		// Declare global once and then share it between the top-level and Global
