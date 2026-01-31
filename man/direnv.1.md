@@ -233,10 +233,10 @@ CONTRIBUTE
 Bug reports, contributions and forks are welcome.
 
 All bugs or other forms of discussion happen on
-<http://github.com/direnv/direnv/issues>
+<http://github.com/yaklabco/direnv/issues>
 
 There is also a wiki available where you can share your usage patterns or
-other tips and tricks <https://github.com/direnv/direnv/wiki>
+other tips and tricks <https://github.com/yaklabco/direnv/wiki>
 
 Or drop by on the [#direnv channel on FreeNode](irc://#direnv@FreeNode) to
 have a chat.

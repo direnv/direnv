@@ -69,7 +69,7 @@ On macOS runners:
 ```yaml
 - name: Install direnv
   run: |
-    wget -O direnv https://github.com/direnv/direnv/releases/download/v2.34.0/direnv.linux-amd64
+    wget -O direnv https://github.com/yaklabco/direnv/releases/download/v2.34.0/direnv.linux-amd64
     chmod +x direnv
     sudo mv direnv /usr/local/bin/
 ```

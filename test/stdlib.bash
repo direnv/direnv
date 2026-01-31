@@ -10,7 +10,7 @@ export PATH=$root:$PATH
 
 load_stdlib() {
   # shellcheck disable=SC1090,SC1091
-  source "$root/stdlib.sh"
+  source "$root/pkg/callable/stdlib.sh"
 }
 
 assert_eq() {
@@ -78,6 +78,7 @@ test_name direnv_apply_dump
 (
   tmpfile=$(mktemp)
   # shellcheck disable=SC2317
+  # shellcheck disable=SC2329
   cleanup() { rm "$tmpfile"; }
   trap cleanup EXIT
 
@@ -154,7 +155,7 @@ test_name use_julia
     echo "#!$(command -v bash)
     echo \"test-julia $version\"" > "$julia"
     chmod +x "$julia"
-    # Locally disable set -u (see https://github.com/direnv/direnv/pull/667)
+    # Locally disable set -u (see https://github.com/yaklabco/direnv/pull/667)
     if ! [[ "$(set +u; use julia "$version" 2>&1)" =~ Successfully\ loaded\ test-julia\ $version ]]; then
       return 1
     fi

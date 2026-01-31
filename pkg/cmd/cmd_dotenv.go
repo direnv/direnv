@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/direnv/direnv/v2/pkg/dotenv"
+	"github.com/yaklabco/direnv/v2/pkg/dotenv"
 )
 
 // CmdDotEnv is `direnv dotenv [SHELL [PATH_TO_DOTENV]]`

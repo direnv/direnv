@@ -47,8 +47,8 @@
               ./go.mod
               ./go.sum
               ./GNUmakefile
-              ./stdlib.sh
-              ./version.txt
+              ./pkg/callable/stdlib.sh
+              ./pkg/callable/version.txt
               ./README.md
               (pkgs.lib.fileset.fileFilter (file: file.hasExt "go") ./.)
               ./test

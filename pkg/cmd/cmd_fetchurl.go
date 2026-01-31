@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/direnv/direnv/v2/pkg/sri"
 	"github.com/mattn/go-isatty"
+	"github.com/yaklabco/direnv/v2/pkg/sri"
 )
 
 // CmdFetchURL is `direnv fetchurl <url> [<integrity-hash>]`

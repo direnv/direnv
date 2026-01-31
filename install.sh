@@ -21,7 +21,7 @@ set -euo pipefail
       log "the script failed with error $ret.\n" \
         "\n" \
         "To report installation errors, submit an issue to\n" \
-        "    https://github.com/direnv/direnv/issues/new/choose"
+        "    https://github.com/yaklabco/direnv/issues/new/choose"
     fi
     exit "$ret"
   }

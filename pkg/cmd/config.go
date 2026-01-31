@@ -10,8 +10,8 @@ import (
 	"time"
 
 	toml "github.com/BurntSushi/toml"
-	"github.com/direnv/direnv/v2/xdg"
 	"github.com/yaklabco/direnv/v2/internal/selfpath"
+	"github.com/yaklabco/direnv/v2/xdg"
 )
 
 // Config represents the direnv configuration and state.

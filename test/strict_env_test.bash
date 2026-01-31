@@ -20,7 +20,7 @@ export PATH=$root:$PATH
 
 load_stdlib() {
   # shellcheck disable=SC1090
-  source "$root/stdlib.sh"
+  source "$root/pkg/callable/stdlib.sh"
 }
 
 test_fail() {

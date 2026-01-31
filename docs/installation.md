@@ -35,7 +35,7 @@ curl -sfL https://direnv.net/install.sh | bash
 ```
 
 Binary builds for a variety of architectures are also available for
-[each release](https://github.com/direnv/direnv/releases).
+[each release](https://github.com/yaklabco/direnv/releases).
 
 Fetch the binary, `chmod +x direnv` and put it somewhere in your `PATH`.
 

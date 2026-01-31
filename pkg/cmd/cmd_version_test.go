@@ -9,9 +9,9 @@ import (
 )
 
 func TestVersionDotTxt(t *testing.T) {
-	bs, err := os.ReadFile("../../version.txt")
+	bs, err := os.ReadFile("../callable/version.txt")
 	if err != nil {
-		t.Fatalf("failed to read ../../version.txt: %v", err)
+		t.Fatalf("failed to read ../callable/version.txt: %v", err)
 	}
 	version = strings.TrimSpace(string(bs))
 

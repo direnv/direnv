@@ -114,7 +114,7 @@ file next.
 * [Develop for direnv](docs/development.md)
 * [Manage your rubies with direnv and ruby-install](docs/ruby.md)
 * [Using direnv with GitHub Actions](docs/github-actions.md)
-* [Community Wiki](https://github.com/direnv/direnv/wiki)
+* [Community Wiki](https://github.com/yaklabco/direnv/wiki)
 
 Make sure to take a look at the wiki! It contains all sorts of useful
 information such as common recipes, editor integration, tips-and-tricks.
@@ -133,7 +133,7 @@ confusing for users:
 
 1. direnv has a standard library of functions, a collection of utilities that
    I found useful to have and accumulated over the years. You can find it
-   here: https://github.com/direnv/direnv/blob/master/stdlib.sh
+   here: https://github.com/yaklabco/direnv/blob/master/stdlib.sh
 
 2. It's possible to override the stdlib with your own set of function by
    adding a bash file to `~/.config/direnv/direnvrc`. This file is loaded and
@@ -149,7 +149,7 @@ confusing for users:
 ## Contributing
 
 Bug reports, contributions and forks are welcome. All bugs or other forms of
-discussion happen on http://github.com/direnv/direnv/issues .
+discussion happen on http://github.com/yaklabco/direnv/issues .
 
 Or drop by on [Matrix](https://matrix.to/#/#direnv:numtide.com) to
 have a chat. If you ask a question make sure to stay around as not everyone is
@@ -169,7 +169,7 @@ make test
 Here is a list of projects you might want to look into if you are using direnv.
 
 * [starship](https://starship.rs/) - A cross-shell prompt.
-* [Projects for Nix integration](https://github.com/direnv/direnv/wiki/Nix) - choose from one of a variety of projects offering improvements over Direnv's built-in `use_nix` implementation.
+* [Projects for Nix integration](https://github.com/yaklabco/direnv/wiki/Nix) - choose from one of a variety of projects offering improvements over Direnv's built-in `use_nix` implementation.
 
 ## Related projects
 
@@ -194,4 +194,4 @@ work with Open Source projects: <https://numtide.com/contact>
 
 ## COPYRIGHT
 
-[MIT licence](LICENSE) - Copyright (C) 2019 @zimbatm and [contributors](https://github.com/direnv/direnv/graphs/contributors)
+[MIT licence](LICENSE) - Copyright (C) 2019 @zimbatm and [contributors](https://github.com/yaklabco/direnv/graphs/contributors)

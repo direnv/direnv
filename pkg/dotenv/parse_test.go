@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	dotenv "github.com/direnv/direnv/v2/pkg/dotenv"
+	dotenv "github.com/yaklabco/direnv/v2/pkg/dotenv"
 )
 
 func shouldNotHaveEmptyKey(t *testing.T, env map[string]string) {

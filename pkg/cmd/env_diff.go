@@ -3,7 +3,7 @@ package cmd
 import (
 	"strings"
 
-	"github.com/direnv/direnv/v2/gzenv"
+	"github.com/yaklabco/direnv/v2/gzenv"
 )
 
 // IgnoredKeys is list of keys we don't want to deal with
@@ -131,7 +131,7 @@ func (diff *EnvDiff) Serialize() string {
 	return gzenv.Marshal(diff)
 }
 
-//// Utils
+// // Utils
 
 // IgnoredEnv returns true if the key should be ignored in environment diffs.
 func IgnoredEnv(key string) bool {

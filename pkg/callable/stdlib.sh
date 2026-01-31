@@ -1323,6 +1323,7 @@ use_nix() {
     ["TEMPDIR"]=${TEMPDIR:-__UNSET__}
     ["terminfo"]=${terminfo:-__UNSET__}
   )
+  # shellcheck disable=SC2086
   direnv_load nix-shell --show-trace "$@" --run "$(join_args $direnv dump)"
   for key in "${!values_to_restore[@]}"; do
     local value=${values_to_restore[$key]}
@@ -1410,6 +1411,7 @@ function use_flox() {
         return 1
     fi
 
+    # shellcheck disable=SC2086
     direnv_load flox activate "${args[@]}" -- $direnv dump
 
     if [[ ${#args[@]} -eq 0 ]]; then
@@ -1524,6 +1526,7 @@ __main__() {
   exec 1>&2
 
   # shellcheck disable=SC2317
+  # shellcheck disable=SC2329
   __dump_at_exit() {
     local ret=$?
     $direnv dump json "" >&3

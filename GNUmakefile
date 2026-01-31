@@ -50,7 +50,7 @@ GO_LDFLAGS =
 
 ifeq ($(shell uname), Darwin)
 	# Fixes DYLD_INSERT_LIBRARIES issues
-	# See https://github.com/direnv/direnv/issues/194
+	# See https://github.com/yaklabco/direnv/issues/194
 	GO_LDFLAGS += -linkmode=external
 endif
 
@@ -78,7 +78,7 @@ fmt-go:
 
 fmt-sh:
 	@command -v shfmt >/dev/null || (echo "Could not format stdlib.sh because shfmt is missing. Run: go install mvdan.cc/sh/cmd/shfmt@latest"; false)
-	shfmt -i 2 -w stdlib.sh
+	shfmt -i 2 -w pkg/callable/stdlib.sh
 
 ############################################################################
 # Documentation
@@ -127,7 +127,7 @@ test: build $(tests) ## Run all tests
 	@echo SUCCESS!
 
 test-shellcheck:
-	shellcheck stdlib.sh
+	shellcheck pkg/callable/stdlib.sh
 	shellcheck ./test/stdlib.bash
 
 test-stdlib: build
