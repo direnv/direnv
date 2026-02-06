@@ -465,6 +465,26 @@ Example (.envrc):
       echo "Thanks for contributing to a GitHub project!"
     fi
 
+### `load_netrc [--file <netrc_file>] <machine> <login_var> <password_var> [<account_var>]`
+
+Loads credentials from a netrc file for the specified machine into the given
+variable names. The netrc file defaults to `~/.netrc` if not specified.
+
+The function will read the netrc file, find the entry for the specified
+machine, and export the `login`, `password`, and optionally `account` values
+into the variables named by `login_var`, `password_var`, and `account_var`.
+
+Pass `default` as the machine name to load credentials from the `default`
+entry in the netrc file.
+
+The netrc file is automatically added to the watch list.
+
+Example (.envrc):
+
+    load_netrc api.github.com GITHUB_USER GITHUB_TOKEN
+    load_netrc --file /path/to/custom/netrc default MY_USER MY_PASS
+    load_netrc api.example.com MY_USER MY_PASS MY_ACCOUNT
+
 
 COPYRIGHT
 ---------
