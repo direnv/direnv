@@ -62,7 +62,7 @@ ifneq ($(strip $(GO_LDFLAGS)),)
 	GO_BUILD_FLAGS = -ldflags '$(GO_LDFLAGS)'
 endif
 
-SOURCES = $(wildcard *.go internal/*/*.go pkg/*/*.go)
+SOURCES = $(wildcard *.go internal/*/*.go pkg/*/*.go) stdlib.sh
 
 direnv: $(SOURCES)
 	$(GO) build $(GO_BUILD_FLAGS) -o $(exe)
