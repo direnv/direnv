@@ -21,6 +21,7 @@ unset DIRENV_DIR
 unset DIRENV_FILE
 unset DIRENV_WATCHES
 unset DIRENV_DIFF
+unset DIRENV_STATE
 
 mkdir -p "${XDG_CONFIG_HOME}/direnv"
 touch "${XDG_CONFIG_HOME}/direnv/direnvrc"

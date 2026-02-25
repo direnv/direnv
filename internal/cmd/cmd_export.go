@@ -102,6 +102,8 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 			// to put in the diff!
 			return
 		}
+
+		newEnv[DIRENV_STATE] = MakeState(newEnv).Marshal()
 	}
 
 	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" && !config.HideEnvDiff {
