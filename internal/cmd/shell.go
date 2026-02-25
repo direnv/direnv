@@ -24,6 +24,8 @@ type HookableShell interface {
 	Shell
 
 	ExportWithHooks(shellExport ShellExport, hooks map[string]string, setProcessMarker *bool) (string, error)
+
+	Escape(str string) string
 }
 
 // ShellExport represents environment variables to add and remove on the host

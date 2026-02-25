@@ -107,18 +107,18 @@ func (sh fish) export(key, value string) string {
 	if key == "PATH" {
 		command := "set -x -g PATH"
 		for _, path := range strings.Split(value, ":") {
-			command += " " + sh.escape(path)
+			command += " " + sh.Escape(path)
 		}
 		return command + ";"
 	}
-	return "set -x -g " + sh.escape(key) + " " + sh.escape(value) + ";"
+	return "set -x -g " + sh.Escape(key) + " " + sh.Escape(value) + ";"
 }
 
 func (sh fish) unset(key string) string {
-	return "set -e -g " + sh.escape(key) + ";"
+	return "set -e -g " + sh.Escape(key) + ";"
 }
 
-func (sh fish) escape(str string) string {
+func (sh fish) Escape(str string) string {
 	in := []byte(str)
 	out := "'"
 	i := 0

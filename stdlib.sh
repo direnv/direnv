@@ -782,6 +782,10 @@ add_to_hook() {
   fi
 }
 
+shell_escape() {
+  echo "{{{direnv-shell-escape $1 direnv-shell-escape}}}"
+}
+
 # Usage: layout <type>
 #
 # A semantic dispatch used to describe common project layouts.

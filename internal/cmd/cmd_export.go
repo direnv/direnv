@@ -255,7 +255,7 @@ func printExportWithHooks(hookableShell HookableShell, shellExport ShellExport, 
 }
 
 func addHookIfPresent(state *State, hookableShell HookableShell, hooks map[string]string, hookName string) {
-	hook := state.Hooks.Get(hookName, hookableShell.Name())
+	hook := state.Hooks.Get(hookName, hookableShell)
 	if hook != "" {
 		hooks[hookName] = hook
 	}
