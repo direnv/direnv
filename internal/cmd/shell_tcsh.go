@@ -10,6 +10,10 @@ type tcsh struct{}
 // Tcsh adds support for the tickle shell
 var Tcsh Shell = tcsh{}
 
+func (sh tcsh) Name() string {
+	return "tcsh"
+}
+
 func (sh tcsh) Hook() (string, error) {
 	return "alias precmd 'eval `{{.SelfPath}} export tcsh`'", nil
 }

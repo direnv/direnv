@@ -23,6 +23,10 @@ const murexHook = `event: onPrompt direnv_hook=before {
 	}
 }`
 
+func (sh murex) Name() string {
+	return "murex"
+}
+
 func (sh murex) Hook() (string, error) {
 	return murexHook, nil
 }

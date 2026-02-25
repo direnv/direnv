@@ -25,6 +25,10 @@ if [[ ";${PROMPT_COMMAND[*]:-};" != *";_direnv_hook;"* ]]; then
 fi
 `
 
+func (sh bash) Name() string {
+	return "bash"
+}
+
 func (sh bash) Hook() (string, error) {
 	return bashHook, nil
 }

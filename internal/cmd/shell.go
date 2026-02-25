@@ -6,6 +6,8 @@ import (
 
 // Shell is the interface that represents the interaction with the host shell.
 type Shell interface {
+	Name() string
+
 	// Hook is the string that gets evaluated into the host shell config and
 	// setups direnv as a prompt hook.
 	Hook() (string, error)
@@ -31,20 +33,14 @@ func (e ShellExport) Remove(key string) {
 	e[key] = nil
 }
 
-var supportedShellList = map[string]Shell{
-	"bash":    Bash,
-	"elvish":  Elvish,
-	"fish":    Fish,
-	"gha":     GitHubActions,
-	"gzenv":   GzEnv,
-	"json":    JSON,
-	"murex":   Murex,
-	"tcsh":    Tcsh,
-	"vim":     Vim,
-	"zsh":     Zsh,
-	"pwsh":    Pwsh,
-	"systemd": Systemd,
-}
+var supportedShellList = func() (shells map[string]Shell) {
+	shells = map[string]Shell{}
+	for _, shell := range []Shell{Bash, Elvish, Fish, GitHubActions, GzEnv, JSON, Murex, Tcsh, Vim, Zsh, Pwsh, Systemd} {
+		shells[shell.Name()] = shell
+	}
+
+	return
+}()
 
 // DetectShell returns a Shell instance from the given target.
 //

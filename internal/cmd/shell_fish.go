@@ -36,6 +36,10 @@ const fishHook = `
     end;
 `
 
+func (sh fish) Name() string {
+	return "fish"
+}
+
 func (sh fish) Hook() (string, error) {
 	return fishHook, nil
 }

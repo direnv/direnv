@@ -12,6 +12,10 @@ type jsonShell struct{}
 // other external tools that understand JSON as a format.
 var JSON Shell = jsonShell{}
 
+func (sh jsonShell) Name() string {
+	return "json"
+}
+
 func (sh jsonShell) Hook() (string, error) {
 	return "", errors.New("this feature is not supported")
 }
