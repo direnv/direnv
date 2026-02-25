@@ -122,43 +122,43 @@ ifeq ($(shell uname), OS/390)
 endif
 
 .PHONY: $(tests)
-test: build $(tests) ## Run all tests
+test: $(tests) ## Run all tests
 	@echo
 	@echo SUCCESS!
 
-test-shellcheck:
+test-shellcheck: build
 	shellcheck stdlib.sh
 	shellcheck ./test/stdlib.bash
 
 test-stdlib: build
 	./test/stdlib.bash
 
-test-go:
+test-go: build
 	$(GO) test -v ./...
 
-test-go-lint:
+test-go-lint: build
 	golangci-lint run
 
-test-bash:
+test-bash: build
 	bash ./test/direnv-test.bash
 
 # Needs elvish 0.12+
-test-elvish:
+test-elvish: build
 	elvish ./test/direnv-test.elv
 
-test-fish:
+test-fish: build
 	fish ./test/direnv-test.fish
 
-test-tcsh:
+test-tcsh: build
 	tcsh -e ./test/direnv-test.tcsh
 
-test-zsh:
+test-zsh: build
 	zsh ./test/direnv-test.zsh
 
-test-pwsh:
+test-pwsh: build
 	pwsh ./test/direnv-test.ps1
 
-test-mx:
+test-mx: build
 	murex -trypipe ./test/direnv-test.mx
 
 ############################################################################
