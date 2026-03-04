@@ -239,7 +239,7 @@ dotenv() {
     path=$path/.env
   fi
   watch_file "$path"
-  if ! [[ -f $path ]]; then
+  if ! [[ -f $path || -p $path ]]; then
     log_error ".env at $path not found"
     return 1
   fi
@@ -258,7 +258,7 @@ dotenv_if_exists() {
     path=$path/.env
   fi
   watch_file "$path"
-  if ! [[ -f $path ]]; then
+  if ! [[ -f $path || -p $path ]]; then
     return
   fi
   eval "$("$direnv" dotenv bash "$@")"
