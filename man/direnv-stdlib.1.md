@@ -117,6 +117,15 @@ found, nothing happens.
 
 NOTE: the other `.envrc` is not checked by the security framework.
 
+### `source_up_secure`
+
+Loads a `.env` or `.envrc` file from a parent directory by invoking direnv's
+security framework. Unlike `source_up`, the parent `.envrc` must be
+explicitly approved with `direnv allow` before it will be loaded, preventing
+unauthorized files from being silently sourced.
+
+NOTE: This function does not accept a custom filename argument.
+
 ### `source_url <url> <integrity-hash>`
 
 Loads another script from the given `url`. Before loading it will check the

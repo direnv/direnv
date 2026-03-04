@@ -119,6 +119,15 @@ found, nothing happens.
 .PP
 NOTE: the other \fB\&.envrc\fR is not checked by the security framework.
 
+.SS \fBsource_up_secure\fR
+Loads a \fB\&.env\fR or \fB\&.envrc\fR file from a parent directory by invoking direnv's
+security framework. Unlike \fBsource_up\fR, the parent \fB\&.envrc\fR must be
+explicitly approved with \fBdirenv allow\fR before it will be loaded, preventing
+unauthorized files from being silently sourced.
+
+.PP
+NOTE: This function does not accept a custom filename argument.
+
 .SS \fBsource_url <url> <integrity-hash>\fR
 Loads another script from the given \fBurl\fR\&. Before loading it will check the
 integrity using the provided \fBintegrity-hash\fR\&.
@@ -405,11 +414,17 @@ watch_dir src
 
 .SS \fBrequire_allowed <path> [<path> ...]\fR
 .PP
-(direnv >= 2.38.0 is required)
+.RS
+
 .PP
-Adds a list of files to the allow-list for .envrc using the require_allowed command.
+direnv >= 2.38.0 is required
+
+.RE
+
+.PP
+Adds a list of files to the allow-list for \fB\&.envrc\fR using the \fBrequire_allowed\fR command.
 If any of the specified files are modified, removed, or new files in the list appear,
-direnv will require you to run direnv allow again to re-authorize the environment.
+direnv will require you to run \fBdirenv allow\fR again to re-authorize the environment.
 This increases security by ensuring that only changes to files you have explicitly allowed will take effect.
 You should use this in direnv configurations where you execute code from the lockfile
 (for example pixi's activation scripts or npm postinstall scripts).
