@@ -19,6 +19,13 @@ type Shell interface {
 	Dump(env Env) (string, error)
 }
 
+// HookableShell is similar to the Shell interface, but with support for hooks
+type HookableShell interface {
+	Shell
+
+	ExportWithHooks(shellExport ShellExport, hooks map[string]string, setProcessMarker *bool) (string, error)
+}
+
 // ShellExport represents environment variables to add and remove on the host
 // shell.
 type ShellExport map[string]*string
