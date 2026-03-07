@@ -37,14 +37,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	log.SetPrefix(log.Prefix() + "export:")
 	logDebug("start")
 
-	var target, exportContext string
-
-	if len(args) > 1 {
-		target = args[1]
-	}
-	if len(args) > 3 {
-		exportContext = args[3]
-	}
+	target, exportContext := parseArgs(args)
 
 	shell := DetectShell(target)
 	if shell == nil {
@@ -67,25 +60,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	logDebug("toLoad: %#v", toLoad)
 	logDebug("loadedRC: %#v", loadedRC)
 
-	switch {
-	case toLoad == "":
-		logDebug("no RC found, unloading")
-	case loadedRC == nil:
-		logDebug("no RC (implies no DIRENV_DIFF),loading")
-	case loadedRC.path != toLoad:
-		logDebug("new RC, loading")
-	case loadedRC.times.Check() != nil:
-		logDebug("file changed, reloading")
-	case currentEnv[DIRENV_REQUIRED] != "":
-		// Force reload if required files were pending approval.
-		// The approval status might have changed even if file times haven't.
-		logDebug("required files pending, reloading")
-	case shellIsHookable && exportContext == exportContextExit:
-		logDebug("the shell is exiting, running hooks")
-	case shellIsHookable && exportContext == exportContextNoProcessMarker:
-		logDebug("a new shell was started, running hooks")
-	default:
-		logDebug("no update needed")
+	if !shouldUpdate(currentEnv, exportContext, shellIsHookable, loadedRC, toLoad) {
 		return
 	}
 
@@ -213,6 +188,44 @@ func diffStatus(oldDiff *EnvDiff) string {
 
 func direnvKey(key string) bool {
 	return strings.HasPrefix(key, "DIRENV_")
+}
+
+func parseArgs(args []string) (target string, exportContext string) {
+	if len(args) > 1 {
+		target = args[1]
+	}
+
+	if len(args) > 3 {
+		exportContext = args[3]
+	}
+
+	return
+}
+
+func shouldUpdate(currentEnv Env, exportContext string, shellIsHookable bool, loadedRC *RC, toLoad string) bool {
+	switch {
+	case toLoad == "":
+		logDebug("no RC found, unloading")
+	case loadedRC == nil:
+		logDebug("no RC (implies no DIRENV_DIFF),loading")
+	case loadedRC.path != toLoad:
+		logDebug("new RC, loading")
+	case loadedRC.times.Check() != nil:
+		logDebug("file changed, reloading")
+	case currentEnv[DIRENV_REQUIRED] != "":
+		// Force reload if required files were pending approval.
+		// The approval status might have changed even if file times haven't.
+		logDebug("required files pending, reloading")
+	case shellIsHookable && exportContext == exportContextExit:
+		logDebug("the shell is exiting, running hooks")
+	case shellIsHookable && exportContext == exportContextNoProcessMarker:
+		logDebug("a new shell was started, running hooks")
+	default:
+		logDebug("no update needed")
+		return false
+	}
+
+	return true
 }
 
 func printExport(shell Shell, envDiff *EnvDiff) error {
