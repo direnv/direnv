@@ -84,14 +84,15 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		return
 	}
 
+	var loadNewEnvErr error
 	if toLoad == "" {
 		logStatus(config, "unloading")
 		newEnv = previousEnv.Copy()
 		newEnv.CleanContext()
 	} else {
-		newEnv, err = config.EnvFromRC(toLoad, previousEnv)
-		if err != nil {
-			logDebug("err: %v", err)
+		newEnv, loadNewEnvErr = config.EnvFromRC(toLoad, previousEnv)
+		if loadNewEnvErr != nil {
+			logDebug("err: %v", loadNewEnvErr)
 			// If loading fails, fall through and deliver a diff anyway,
 			// but still exit with an error.  This prevents retrying on
 			// every prompt.
@@ -100,7 +101,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 			// unless of course, the error was in hashing and timestamp loading,
 			// in which case we have to abort because we don't know what timestamp
 			// to put in the diff!
-			return
+			return loadNewEnvErr
 		}
 
 		newEnv[DIRENV_STATE] = MakeState(newEnv).Marshal()
@@ -117,7 +118,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
 
-	return
+	return loadNewEnvErr
 }
 
 // Return a string of +/-/~ indicators of an environment diff
