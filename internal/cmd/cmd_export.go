@@ -111,12 +111,10 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logStatus(config, "export %s", out)
 	}
 
-	diffString, diffErr := currentEnv.Diff(newEnv).ToShell(shell)
-	if diffErr != nil {
-		return fmt.Errorf("ToShell() failed: %w", diffErr)
+	err = printExport(shell, currentEnv.Diff(newEnv))
+	if err != nil {
+		return err
 	}
-	logDebug("env diff %s", diffString)
-	fmt.Print(diffString)
 
 	return loadNewEnvErr
 }
@@ -152,4 +150,17 @@ func diffStatus(oldDiff *EnvDiff) string {
 
 func direnvKey(key string) bool {
 	return strings.HasPrefix(key, "DIRENV_")
+}
+
+func printExport(shell Shell, envDiff *EnvDiff) error {
+	diffString, diffErr := envDiff.ToShell(shell)
+	if diffErr != nil {
+		return fmt.Errorf("ToShell() failed: %w", diffErr)
+	}
+
+	logDebug("env diff %s", diffString)
+
+	fmt.Print(diffString)
+
+	return nil
 }
