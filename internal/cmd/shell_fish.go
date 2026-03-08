@@ -103,21 +103,6 @@ func (sh fish) Dump(env Env) (string, error) {
 	return out, nil
 }
 
-func (sh fish) export(key, value string) string {
-	if key == "PATH" {
-		command := "set -x -g PATH"
-		for _, path := range strings.Split(value, ":") {
-			command += " " + sh.Escape(path)
-		}
-		return command + ";"
-	}
-	return "set -x -g " + sh.Escape(key) + " " + sh.Escape(value) + ";"
-}
-
-func (sh fish) unset(key string) string {
-	return "set -e -g " + sh.Escape(key) + ";"
-}
-
 func (sh fish) Escape(str string) string {
 	in := []byte(str)
 	out := "'"
@@ -168,4 +153,19 @@ func (sh fish) Escape(str string) string {
 	out += "'"
 
 	return out
+}
+
+func (sh fish) export(key, value string) string {
+	if key == "PATH" {
+		command := "set -x -g PATH"
+		for _, path := range strings.Split(value, ":") {
+			command += " " + sh.Escape(path)
+		}
+		return command + ";"
+	}
+	return "set -x -g " + sh.Escape(key) + " " + sh.Escape(value) + ";"
+}
+
+func (sh fish) unset(key string) string {
+	return "set -e -g " + sh.Escape(key) + ";"
 }
