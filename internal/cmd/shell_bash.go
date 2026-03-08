@@ -123,16 +123,16 @@ func (sh bash) Dump(env Env) (string, error) {
 	return out, nil
 }
 
+func (sh bash) Escape(str string) string {
+	return BashEscape(str)
+}
+
 func (sh bash) export(key, value string) string {
 	return "export " + sh.Escape(key) + "=" + sh.Escape(value) + ";"
 }
 
 func (sh bash) unset(key string) string {
 	return "unset " + sh.Escape(key) + ";"
-}
-
-func (sh bash) Escape(str string) string {
-	return BashEscape(str)
 }
 
 /*
