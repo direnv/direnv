@@ -840,7 +840,7 @@ layout_php() {
 
 # Usage: layout pixi [args]
 #
-# Loads a pixi environmnt.
+# Loads a pixi environment.
 # If no additional arguments are given the `default` environment is loaded.
 # You can pass `-e <env_name>` to load a different environment instead.
 # For supported arguments see `pixi shell-hook --help`.
