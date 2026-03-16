@@ -850,6 +850,7 @@ layout_pixi() {
     exit 2
   fi
   watch_file pixi.lock
+  require_allowed pixi.lock
   eval "$(pixi shell-hook "$@")"
 }
 
