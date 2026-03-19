@@ -280,6 +280,19 @@ if has python; then
   test_stop
 fi
 
+test_start "deleted-envrc"
+  direnv_eval
+  test_eq "$HELLO" "world"
+
+  echo "Deleting .envrc (env should be unloaded on next eval)"
+  cp .envrc .envrc.bak
+  rm .envrc
+  direnv_eval
+  test -z "${HELLO}"
+
+  mv .envrc.bak .envrc
+test_stop
+
 test_start "aliases"
   direnv deny
   # check that allow/deny aliases work
