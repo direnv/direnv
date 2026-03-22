@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 	"text/template"
 )
 
@@ -18,33 +17,17 @@ var CmdHook = &Cmd{
 	Name:   "hook",
 	Desc:   "Used to setup the shell hook",
 	Args:   []string{"SHELL"},
-	Action: actionSimple(cmdHookAction),
+	Action: actionWithConfig(cmdHookAction),
 }
 
-func cmdHookAction(_ Env, args []string) (err error) {
+func cmdHookAction(_ Env, args []string, config *Config) (err error) {
 	var target string
 
 	if len(args) > 1 {
 		target = args[1]
 	}
 
-	// Prefer DIRENV_EXE_PATH if set
-	selfPath := os.Getenv("DIRENV_EXE_PATH")
-	if selfPath == "" {
-		selfPath, err = os.Executable()
-		if err != nil {
-			return err
-		}
-	}
-
-	// selfPath, err := os.Executable()
-	// if err != nil {
-	// 	return err
-	// }
-
-	// Convert Windows path if needed
-	selfPath = strings.ReplaceAll(selfPath, "\\", "/")
-	ctx := HookContext{selfPath}
+	ctx := HookContext{config.SelfPath}
 
 	shell := DetectShell(target)
 	if shell == nil {
