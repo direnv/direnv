@@ -1,7 +1,6 @@
 {
   stdenv,
   pkgs,
-  mkGoEnv,
   gomod2nix,
   git,
   git-extras,
@@ -26,12 +25,6 @@
 stdenv.mkDerivation {
   name = "shell";
   nativeBuildInputs = with pkgs; [
-
-    (mkGoEnv {
-      pwd = ./.;
-      go = go;
-    })
-
     go
 
     # Build

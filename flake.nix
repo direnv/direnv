@@ -39,7 +39,7 @@
       devShells = eachSystem (
         { callPackage, gomod2nixPkgs, ... }:
         {
-          default = callPackage ./shell.nix { inherit (gomod2nixPkgs) mkGoEnv gomod2nix; };
+          default = callPackage ./shell.nix { inherit (gomod2nixPkgs) gomod2nix; };
         }
       );
 
