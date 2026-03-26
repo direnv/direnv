@@ -19,7 +19,7 @@
         nixpkgs.lib.genAttrs (import systems) (
           system:
           f rec {
-            callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
+            inherit (pkgs) callPackage;
             gomod2nixPkgs = gomod2nix.legacyPackages.${system};
             inherit system;
             pkgs = nixpkgs.legacyPackages.${system};

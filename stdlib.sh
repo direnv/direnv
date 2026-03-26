@@ -1523,7 +1523,7 @@ __main__() {
   exec 3>&1
   exec 1>&2
 
-  # shellcheck disable=SC2317
+  # shellcheck disable=SC2329
   __dump_at_exit() {
     local ret=$?
     "$direnv" dump json "" >&3

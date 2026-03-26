@@ -77,7 +77,7 @@ test_name source_up
 test_name direnv_apply_dump
 (
   tmpfile=$(mktemp)
-  # shellcheck disable=SC2317
+  # shellcheck disable=SC2329
   cleanup() { rm "$tmpfile"; }
   trap cleanup EXIT
 

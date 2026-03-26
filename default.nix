@@ -24,6 +24,10 @@ buildGoApplication {
     make install PREFIX=$out
   '';
 
+  checkPhase = ''
+    make test-go
+  '';
+
   meta = {
     description = "A shell extension that manages your environment";
     homepage = "https://direnv.net";
