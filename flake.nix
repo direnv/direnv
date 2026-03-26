@@ -66,6 +66,7 @@
         {
           package = self.packages.${system}.default;
           tests = self.packages.${system}.default.overrideAttrs (old: {
+            name = "direnv-tests";
             src = sourceFiles;
             nativeBuildInputs =
               (old.nativeBuildInputs or [ ]) ++ self.devShells.${system}.default.nativeBuildInputs;
@@ -86,6 +87,7 @@
             '';
           });
           dist = self.packages.${system}.default.overrideAttrs (old: {
+            name = "direnv-dist";
             src = sourceFiles;
             nativeBuildInputs =
               (old.nativeBuildInputs or [ ]) ++ self.devShells.${system}.default.nativeBuildInputs;
