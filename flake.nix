@@ -45,29 +45,10 @@
 
       checks = eachSystem (
         { pkgs, system, ... }:
-        let
-          sourceFiles = pkgs.lib.fileset.toSource {
-            root = ./.;
-            fileset = pkgs.lib.fileset.unions [
-              ./go.mod
-              ./go.sum
-              ./GNUmakefile
-              ./stdlib.sh
-              ./version.txt
-              ./README.md
-              (pkgs.lib.fileset.fileFilter (file: file.hasExt "go") ./.)
-              ./test
-              ./internal
-              ./pkg
-              (pkgs.lib.fileset.fileFilter (file: file.name == ".envrc") ./.)
-            ];
-          };
-        in
         {
           package = self.packages.${system}.default;
-          tests = self.packages.${system}.default.overrideAttrs (old: {
+          tests = (self.packages.${system}.default.override { __includeMan = false; }).overrideAttrs (old: {
             name = "direnv-tests";
-            src = sourceFiles;
             nativeBuildInputs =
               (old.nativeBuildInputs or [ ]) ++ self.devShells.${system}.default.nativeBuildInputs;
             buildPhase = ''
@@ -90,9 +71,8 @@
               (allow file-read* (subpath "/usr/share/icu"))
             '';
           });
-          dist = self.packages.${system}.default.overrideAttrs (old: {
+          dist = (self.packages.${system}.default.override { __includeMan = false; }).overrideAttrs (old: {
             name = "direnv-dist";
-            src = sourceFiles;
             nativeBuildInputs =
               (old.nativeBuildInputs or [ ]) ++ self.devShells.${system}.default.nativeBuildInputs;
             buildPhase = ''

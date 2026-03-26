@@ -3,14 +3,34 @@
   lib,
   stdenv,
   bash,
+  __includeMan ? true,
 }:
 buildGoApplication {
   pname = "direnv";
   version = lib.fileContents ./version.txt;
   subPackages = [ "." ];
 
-  src = ./.;
-  pwd = ./.;
+  src = lib.fileset.toSource {
+    root = ./.;
+    fileset = lib.fileset.unions (
+      [
+        ./go.mod
+        ./go.sum
+        ./gomod2nix.toml
+        ./GNUmakefile
+        ./stdlib.sh
+        ./version.txt
+        ./README.md
+        (lib.fileset.fileFilter (file: file.hasExt "go") ./.)
+        ./test
+        ./internal
+        ./pkg
+        (lib.fileset.fileFilter (file: file.name == ".envrc") ./.)
+      ]
+      ++ lib.optional __includeMan ./man
+    );
+  };
+
   modules = ./gomod2nix.toml;
 
   # we have no bash at the moment for windows
