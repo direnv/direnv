@@ -85,6 +85,10 @@
               mkdir -p $out
               touch $out/tests-passed
             '';
+            # Fixes pwsh tests on (sandboxed) macOS
+            sandboxProfile = ''
+              (allow file-read* (subpath "/usr/share/icu"))
+            '';
           });
           dist = self.packages.${system}.default.overrideAttrs (old: {
             name = "direnv-dist";
