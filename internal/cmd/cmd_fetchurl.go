@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -65,12 +67,12 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 		return err
 	}
 	defer func() {
-		if err := os.Remove(tmpfile.Name()); err != nil {
+		if err := os.Remove(tmpfile.Name()); err != nil && !errors.Is(err, fs.ErrNotExist) {
 			log.Printf("Warning: failed to remove temp file %s: %v", tmpfile.Name(), err)
 		}
 	}() // clean up
 	defer func() {
-		if err := tmpfile.Close(); err != nil {
+		if err := tmpfile.Close(); err != nil && !errors.Is(err, fs.ErrClosed) {
 			log.Printf("Warning: failed to close temp file: %v", err)
 		}
 	}()
