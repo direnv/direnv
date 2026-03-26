@@ -28,18 +28,23 @@
     in
     {
 
-      packages = eachSystem ({ callPackage, gomod2nixPkgs, ... }: {
+      packages = eachSystem (
+        { callPackage, gomod2nixPkgs, ... }:
+        {
 
           default = callPackage ./. { inherit (gomod2nixPkgs) buildGoApplication; };
         }
       );
 
-      devShells = eachSystem ({ callPackage, gomod2nixPkgs, ... }: {
+      devShells = eachSystem (
+        { callPackage, gomod2nixPkgs, ... }:
+        {
           default = callPackage ./shell.nix { inherit (gomod2nixPkgs) mkGoEnv gomod2nix; };
         }
       );
 
-      checks = eachSystem ({ pkgs, system, ... }:
+      checks = eachSystem (
+        { pkgs, system, ... }:
         let
           sourceFiles = pkgs.lib.fileset.toSource {
             root = ./.;
@@ -57,11 +62,13 @@
               (pkgs.lib.fileset.fileFilter (file: file.name == ".envrc") ./.)
             ];
           };
-        in {
+        in
+        {
           package = self.packages.${system}.default;
           tests = self.packages.${system}.default.overrideAttrs (old: {
             src = sourceFiles;
-            nativeBuildInputs = (old.nativeBuildInputs or []) ++ self.devShells.${system}.default.nativeBuildInputs;
+            nativeBuildInputs =
+              (old.nativeBuildInputs or [ ]) ++ self.devShells.${system}.default.nativeBuildInputs;
             buildPhase = ''
               export GOLANGCI_LINT_CACHE=$TMPDIR/golangci-cache
               export XDG_CACHE_HOME=$TMPDIR/cache
@@ -80,7 +87,8 @@
           });
           dist = self.packages.${system}.default.overrideAttrs (old: {
             src = sourceFiles;
-            nativeBuildInputs = (old.nativeBuildInputs or []) ++ self.devShells.${system}.default.nativeBuildInputs;
+            nativeBuildInputs =
+              (old.nativeBuildInputs or [ ]) ++ self.devShells.${system}.default.nativeBuildInputs;
             buildPhase = ''
               make dist
             '';

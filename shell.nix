@@ -1,32 +1,36 @@
-{ stdenv
-, pkgs
-, mkGoEnv
-, gomod2nix
-, git
-, git-extras
-, gnumake
-, go
-, go-md2man
-, gox
-, bashInteractive
-, elvish
-, fish
-, tcsh
-, zsh
-, powershell
-, murex
-, golangci-lint
-, python3
-, ruby
-, shellcheck
-, shfmt
-, cacert
+{
+  stdenv,
+  pkgs,
+  mkGoEnv,
+  gomod2nix,
+  git,
+  git-extras,
+  gnumake,
+  go,
+  go-md2man,
+  gox,
+  bashInteractive,
+  elvish,
+  fish,
+  tcsh,
+  zsh,
+  powershell,
+  murex,
+  golangci-lint,
+  python3,
+  ruby,
+  shellcheck,
+  shfmt,
+  cacert,
 }:
 stdenv.mkDerivation {
   name = "shell";
   nativeBuildInputs = with pkgs; [
 
-    (mkGoEnv { pwd = ./.; go = go; })
+    (mkGoEnv {
+      pwd = ./.;
+      go = go;
+    })
 
     go
 

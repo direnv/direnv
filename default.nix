@@ -1,4 +1,9 @@
-{ buildGoApplication, lib, stdenv, bash }:
+{
+  buildGoApplication,
+  lib,
+  stdenv,
+  bash,
+}:
 buildGoApplication {
   pname = "direnv";
   version = lib.fileContents ./version.txt;
@@ -9,9 +14,7 @@ buildGoApplication {
   modules = ./gomod2nix.toml;
 
   # we have no bash at the moment for windows
-  BASH_PATH =
-    lib.optionalString (!stdenv.hostPlatform.isWindows)
-      "${bash}/bin/bash";
+  BASH_PATH = lib.optionalString (!stdenv.hostPlatform.isWindows) "${bash}/bin/bash";
 
   # replace the build phase to use the GNUMakefile instead
   buildPhase = ''
