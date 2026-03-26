@@ -34,7 +34,20 @@ direnv_eval() {
 }
 
 test_start() {
-  cd "$TEST_DIR/scenarios/$1"
+  local isolated=false
+  if [[ "$2" == "isolated" ]]; then
+    isolated=true
+  fi
+
+  if [[ "$isolated" == false ]]; then
+    cd "$TEST_DIR/scenarios/$1"
+  else
+    export DIRENV_TEST_DIR=$(mktemp -d)
+
+    trap '[[ -n "$DIRENV_TEST_DIR" ]] && rm -r "$DIRENV_TEST_DIR"' EXIT
+    cp -r "$TEST_DIR/scenarios/$1" "$DIRENV_TEST_DIR"
+    cd "$DIRENV_TEST_DIR/$1"
+  fi
   direnv allow
   if [[ "$DIRENV_DEBUG" == "1" ]]; then
     echo
@@ -49,6 +62,12 @@ test_stop() {
   rm -f "${XDG_CONFIG_HOME}/direnv/direnv.toml"
   cd /
   direnv_eval
+  if [[ -n "$DIRENV_TEST_DIR" ]]; then
+    trap - EXIT
+
+    rm -r "$DIRENV_TEST_DIR"
+    unset DIRENV_TEST_DIR
+  fi
 }
 
 test_eq() {
@@ -95,6 +114,16 @@ test_start base
   test -z "${HELLO}"
 
   unset WATCHES
+test_stop
+
+test_start rm isolated
+  direnv_eval
+  test_eq "$HELLO" "world"
+
+  echo "Removing .envrc (should unload)"
+  mv .envrc .envrc.old
+  direnv_eval
+  test_eq "$HELLO" ""
 test_stop
 
 test_start inherit
