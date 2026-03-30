@@ -109,6 +109,19 @@ Ensure direnv is executable and in your PATH:
     direnv export gha >> "$GITHUB_ENV"
 ```
 
+### Intermittent 403 errors
+
+When downloading from `direnv.net` gives intermittent 403 errors, you might be hitting the GitHub rate limit. Supply a GITHUB_TOKEN for higher limits:
+
+```yaml
+- name: Install direnv
+  run: |
+    curl -sfL https://direnv.net/install.sh | DIRENV_GITHUB_API_TOKEN=$GITHUB_TOKEN bash
+    echo "$HOME/.local/bin" >> $GITHUB_PATH
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
 ### Debugging
 
 To debug issues, you can examine what direnv is doing:
