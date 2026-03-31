@@ -126,6 +126,11 @@ func LoadConfig(env Env) (config *Config, err error) {
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
 
+	// Auto-whitelist ~/.direnv/ so global env files don't need approval
+	if homeDir, homeErr := os.UserHomeDir(); homeErr == nil {
+		config.WhitelistPrefix = append(config.WhitelistPrefix, filepath.Join(homeDir, ".direnv")+"/")
+	}
+
 	// Load the TOML config
 	config.TomlPath = filepath.Join(config.ConfDir, "direnv.toml")
 	if _, statErr := os.Stat(config.TomlPath); statErr != nil {

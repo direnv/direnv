@@ -239,7 +239,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	// check what type of RC we're processing
 	// use different exec method for each
 	fn := "source_env"
-	if filepath.Base(rc.path) == ".env" {
+	if strings.HasSuffix(rc.path, ".env") {
 		fn = "dotenv"
 	}
 
@@ -391,9 +391,33 @@ func allow(path string, allowPath string) (err error) {
 
 func findEnvUp(searchDir string, loadDotenv bool) (path string) {
 	if loadDotenv {
-		return findUp(searchDir, ".envrc", ".env")
+		path = findUp(searchDir, ".envrc", ".env")
+	} else {
+		path = findUp(searchDir, ".envrc")
 	}
-	return findUp(searchDir, ".envrc")
+	if path != "" {
+		return path
+	}
+	// Fall back to ~/.direnv/<basename>.env
+	return findGlobalEnv(searchDir)
+}
+
+func findGlobalEnv(searchDir string) string {
+	if searchDir == "" {
+		return ""
+	}
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	direnvDir := filepath.Join(homeDir, ".direnv")
+	for _, dir := range eachDir(searchDir) {
+		globalEnv := filepath.Join(direnvDir, filepath.Base(dir)+".env")
+		if fileExists(globalEnv) {
+			return globalEnv
+		}
+	}
+	return ""
 }
 
 func findUp(searchDir string, fileNames ...string) (path string) {
