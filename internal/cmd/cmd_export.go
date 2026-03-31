@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log"
 	"sort"
@@ -91,6 +93,10 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	} else {
 		newEnv, err = config.EnvFromRC(toLoad, previousEnv)
 		if err != nil {
+			if errors.Is(err, context.Canceled) {
+				logStatus(config, "canceled, preserving environment")
+				return nil
+			}
 			logDebug("err: %v", err)
 			// If loading fails, fall through and deliver a diff anyway,
 			// but still exit with an error.  This prevents retrying on
