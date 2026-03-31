@@ -27,7 +27,7 @@ type RC struct {
 
 // FindRC looks for ".envrc" and ".env" files up in the file hierarchy.
 func FindRC(wd string, config *Config) (*RC, error) {
-	rcPath := findEnvUp(wd, config.LoadDotenv)
+	rcPath := findEnv(wd, config.LoadDotenv, config.FlatSearchDirs)
 	if rcPath == "" {
 		return nil, nil
 	}
@@ -389,24 +389,72 @@ func allow(path string, allowPath string) (err error) {
 	return os.WriteFile(allowPath, []byte(path+"\n"), 0644)
 }
 
-func findEnvUp(searchDir string, loadDotenv bool) (path string) {
-	if loadDotenv {
-		return findUp(searchDir, ".envrc", ".env")
-	}
-	return findUp(searchDir, ".envrc")
-}
-
-func findUp(searchDir string, fileNames ...string) (path string) {
+// findEnv finds a .envrc or .env file
+//
+// searchDir - the sepcified directory is checked first, and if there are no matches, its parents are checked bottom-up as well
+//
+// loadDotenv - whether to accept .env files as well (.envrc is always tried first, but if the parent has .envrc, and the child has .env, the child's .env is used)
+//
+// extraSearchPath
+//   - a list of directories checked (after all parents) for an env file or directory with an env file that matches the basename of searchDir
+//   - for example, if searchDir is /home/alice/project, the directories in extraSearchPath are searched for
+//   - <directory>/{project.envrc,project.env,project/.envrc,project/.envrc} in that order
+func findEnv(searchDir string, loadDotenv bool, flatSearchDirs []string) (path string) {
 	if searchDir == "" {
 		return ""
 	}
-	for _, dir := range eachDir(searchDir) {
-		for _, fileName := range fileNames {
-			path := filepath.Join(dir, fileName)
-			if fileExists(path) {
-				return path
-			}
+
+	components := eachDir(searchDir)
+	if loadDotenv {
+		path = findUp(components, ".envrc", ".env")
+	} else {
+		path = findUp(components, ".envrc")
+	}
+	if path != "" {
+		return path
+	}
+
+	dirName := filepath.Base(searchDir)
+	for _, dir := range flatSearchDirs {
+		if loadDotenv {
+			path = checkDir(dir,
+				dirName + ".envrc",
+				dirName + ".env",
+				dirName + "/.envrc",
+				dirName + "/.env",
+			)
+		} else {
+			path = checkDir(dir,
+				dirName + ".envrc",
+				dirName + "/.envrc",
+			)
+		}
+		if path != "" {
+			return path
 		}
 	}
+
+	return ""
+}
+
+func findUp(components []string, fileNames ...string) (path string) {
+	for _, dir := range components {
+		path = checkDir(dir, fileNames...)
+		if path != "" {
+			return path
+		}
+	}
+
+	return ""
+}
+
+func checkDir(dir string, fileNames ...string) (path string) {
+	for _, fileName := range fileNames {
+		path = filepath.Join(dir, fileName)
+		if fileExists(path) {
+			return path
+		}
+	}
+
 	return ""
 }
