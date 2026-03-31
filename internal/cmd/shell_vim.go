@@ -34,6 +34,10 @@ func (sh vim) Dump(env Env) (string, error) {
 	return out, nil
 }
 
+func (sh vim) WindowsNative() bool {
+	return false
+}
+
 func (sh vim) export(key, value string) string {
 	return "call setenv(" + sh.escapeKey(key) + "," + sh.escapeValue(value) + ")\n"
 }

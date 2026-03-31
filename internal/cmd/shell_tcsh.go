@@ -34,6 +34,10 @@ func (sh tcsh) Dump(env Env) (string, error) {
 	return out, nil
 }
 
+func (sh tcsh) WindowsNative() bool {
+	return false
+}
+
 func (sh tcsh) export(key, value string) string {
 	if key == "PATH" {
 		command := "set path = ("

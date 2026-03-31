@@ -60,6 +60,10 @@ func (sh fish) Dump(env Env) (string, error) {
 	return out, nil
 }
 
+func (sh fish) WindowsNative() bool {
+	return false
+}
+
 func (sh fish) export(key, value string) string {
 	if key == "PATH" {
 		command := "set -x -g PATH"

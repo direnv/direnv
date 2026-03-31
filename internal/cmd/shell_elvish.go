@@ -50,6 +50,10 @@ func (sh elvish) Dump(env Env) (string, error) {
 	return buf.String(), nil
 }
 
+func (sh elvish) WindowsNative() bool {
+	return false
+}
+
 var (
 	_ Shell = (*elvish)(nil)
 )
