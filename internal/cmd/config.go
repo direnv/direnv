@@ -118,8 +118,11 @@ func LoadConfig(env Env) (config *Config, err error) {
 	// Default Warn Timeout
 	config.WarnTimeout = 5 * time.Second
 
-	// Default log format
-	config.LogFormat = defaultLogFormat
+	if logFmt, ok := env[DIRENV_LOG_FORMAT]; ok {
+		config.LogFormat = logFmt
+	} else {
+		config.LogFormat = defaultLogFormat
+	}
 
 	config.RCFile = env[DIRENV_FILE]
 
@@ -152,14 +155,13 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 		config.LogColor = os.Getenv("TERM") != "dumb"
 
-		format, ok := env["DIRENV_LOG_FORMAT"]
-		if ok {
-			config.LogFormat = format
-		} else if logFmt := global.LogFormat; logFmt != "" {
-			if logFmt == "-" {
-				logFmt = ""
+		if _, hasEnvLogFmt := env[DIRENV_LOG_FORMAT]; !hasEnvLogFmt {
+			if logFmt := global.LogFormat; logFmt != "" {
+				if logFmt == "-" {
+					logFmt = ""
+				}
+				config.LogFormat = logFmt
 			}
-			config.LogFormat = logFmt
 		}
 
 		if global.LogFilter != "" {
