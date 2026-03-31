@@ -82,6 +82,16 @@ A Regexp that can be used to filter out some of the logs.
 
 > direnv >= 2.36.0 is required
 
+### `ignore_paths`
+
+A list of directories to be ignored from being evaluated by direnv. This can be useful to avoid evaluating .envrc files in directories that are known to be slow or that contain untrusted code.
+
+Example:
+
+```toml
+ignore_paths = [ "/run", "/tmp" ]
+```
+
 ## [whitelist]
 
 Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" -- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. **This feature should be used with great care**, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.

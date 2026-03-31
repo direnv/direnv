@@ -34,6 +34,7 @@ type Config struct {
 	WarnTimeout     time.Duration
 	WhitelistPrefix []string
 	WhitelistExact  map[string]bool
+	IgnorePaths     []string
 }
 
 type tomlDuration struct {
@@ -62,6 +63,7 @@ type tomlGlobal struct {
 	HideEnvDiff  bool          `toml:"hide_env_diff"`
 	LogFormat    string        `toml:"log_format"`
 	LogFilter    string        `toml:"log_filter"`
+	IgnorePaths  []string      `toml:"ignore_paths"`
 }
 
 type tomlWhitelist struct {
@@ -126,6 +128,8 @@ func LoadConfig(env Env) (config *Config, err error) {
 	config.WhitelistPrefix = make([]string, 0)
 	config.WhitelistExact = make(map[string]bool)
 
+	config.IgnorePaths = make([]string, 0)
+
 	// Load the TOML config
 	config.TomlPath = filepath.Join(config.ConfDir, "direnv.toml")
 	if _, statErr := os.Stat(config.TomlPath); statErr != nil {
@@ -183,6 +187,13 @@ func LoadConfig(env Env) (config *Config, err error) {
 			}
 
 			config.WhitelistExact[expandTildePath(path)] = true
+		}
+
+		for _, path := range tomlConf.IgnorePaths {
+			if !strings.HasSuffix(path, "/") {
+				path += "/"
+			}
+			config.IgnorePaths = append(config.IgnorePaths, expandTildePath(path))
 		}
 
 		if tomlConf.SkipDotenv {
