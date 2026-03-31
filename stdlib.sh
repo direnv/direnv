@@ -476,6 +476,18 @@ source_up() {
   _source_up "${1:-}" false
 }
 
+# Usage: source_up_secure
+#
+# Loads a ".env" or ".envrc" file from a parent directory by invoking direnv's
+# security framework. Unlike "source_up", the parent ".envrc" must be
+# explicitly approved with "direnv allow" before it will be loaded, preventing
+# unauthorized files from being silently sourced.
+#
+# NOTE: This function does not accept a custom filename argument.
+source_up_secure() {
+  eval "$(cd .. && env -uDIRENV_{DIR,FILE,WATCHES,DIFF} direnv export bash)"
+}
+
 # Usage: source_up_if_exists [<filename>]
 #
 # Loads another ".envrc" if found with the find_up command. If one is not
