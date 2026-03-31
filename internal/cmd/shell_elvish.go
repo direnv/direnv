@@ -10,6 +10,10 @@ type elvish struct{}
 // Elvish add support for the elvish shell
 var Elvish Shell = elvish{}
 
+func (elvish) Name() string {
+	return "elvish"
+}
+
 func (elvish) Hook() (string, error) {
 	return `## hook for direnv
 set @edit:before-readline = $@edit:before-readline {

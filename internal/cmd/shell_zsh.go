@@ -23,6 +23,10 @@ if (( ! ${chpwd_functions[(I)_direnv_hook]} )); then
 fi
 `
 
+func (sh zsh) Name() string {
+	return "zsh"
+}
+
 func (sh zsh) Hook() (string, error) {
 	return zshHook, nil
 }

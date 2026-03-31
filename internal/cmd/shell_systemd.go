@@ -12,6 +12,10 @@ type systemdShell struct{}
 // to systemd EnvironmentFile(https://0pointer.de/public/systemd-man/systemd.exec.html#EnvironmentFile=)
 var Systemd Shell = systemdShell{}
 
+func (sh systemdShell) Name() string {
+	return "systemd"
+}
+
 func (sh systemdShell) Hook() (string, error) {
 	return "", errors.New("this feature is not supported")
 }

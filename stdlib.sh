@@ -770,6 +770,22 @@ semver_search() {
     head -1
 }
 
+# Usage: add_to_hook <hook_name> <shell> <hook_code>
+add_to_hook() {
+  local -r hook_name="$1" shell="$2" hook_code="$3"
+
+  local -n hook_env_var="DIRENV_HOOK_${hook_name^^}_$shell"
+  if [[ -z "${hook_env_var:-}" ]]; then
+    export hook_env_var="$hook_code"
+  else
+    hook_env_var+=$'\n'"$hook_code"
+  fi
+}
+
+shell_escape() {
+  echo "{{{direnv-shell-escape $1 direnv-shell-escape}}}"
+}
+
 # Usage: layout <type>
 #
 # A semantic dispatch used to describe common project layouts.

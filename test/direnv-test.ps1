@@ -18,6 +18,7 @@ $envVarsToReset = @(
   "DIRENV_FILE",
   "DIRENV_WATCHES",
   "DIRENV_DIFF"
+  "DIRENV_STATE"
 )
 foreach ($var in $envVarsToReset) {
   if (Get-Item "env:/$var" -ErrorAction SilentlyContinue) {

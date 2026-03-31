@@ -85,6 +85,11 @@ func (diff *EnvDiff) Any() bool {
 // the target `shell`. The outputted string is then meant to be evaluated in
 // the target shell.
 func (diff *EnvDiff) ToShell(shell Shell) (string, error) {
+	return shell.Export(diff.ToShellExport())
+}
+
+// ToShellExport returns the diff as a ShellExport
+func (diff *EnvDiff) ToShellExport() ShellExport {
 	e := make(ShellExport)
 
 	for key := range diff.Prev {
@@ -98,7 +103,7 @@ func (diff *EnvDiff) ToShell(shell Shell) (string, error) {
 		e.Add(key, value)
 	}
 
-	return shell.Export(e)
+	return e
 }
 
 // Patch applies the diff to the given env and returns a new env with the
@@ -139,6 +144,9 @@ func IgnoredEnv(key string) bool {
 		return true
 	}
 	if strings.HasPrefix(key, "BASH_FUNC_") {
+		return true
+	}
+	if strings.HasPrefix(key, DIRENV_HOOK_PREFIX) {
 		return true
 	}
 	_, found := IgnoredKeys[key]

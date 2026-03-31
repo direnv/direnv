@@ -16,6 +16,10 @@ var GitHubActions Shell = gha{}
 
 var validKeyPattern = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 
+func (sh gha) Name() string {
+	return "gha"
+}
+
 func (sh gha) Hook() (string, error) {
 	return "", fmt.Errorf("Hook not implemented for GitHub Actions shell")
 }

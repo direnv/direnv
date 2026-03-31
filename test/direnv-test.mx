@@ -17,6 +17,7 @@ unsafe {
 	!set <!null> DIRENV_FILE
 	!set <!null> DIRENV_WATCHES
 	!set <!null> DIRENV_DIFF
+	!set <!null> DIRENV_STATE
 }
 
 mkdir -p $XDG_CONFIG_HOME/direnv

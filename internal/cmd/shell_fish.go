@@ -11,30 +11,42 @@ type fish struct{}
 var Fish Shell = fish{}
 
 const fishHook = `
-    function __direnv_export_eval --on-event fish_prompt;
-        "{{.SelfPath}}" export fish | source;
+	function __direnv_export_eval --on-event fish_prompt;
+		if not set --query --global _direnv_loaded;
+			"{{.SelfPath}}" export fish --context no_process_marker | source;
+		else;
+			"{{.SelfPath}}" export fish | source;
+		end;
 
-        if test "$direnv_fish_mode" != "disable_arrow";
-            function __direnv_cd_hook --on-variable PWD;
-                if test "$direnv_fish_mode" = "eval_after_arrow";
-                    set -g __direnv_export_again 0;
-                else;
-                    "{{.SelfPath}}" export fish | source;
-                end;
-            end;
-        end;
-    end;
+		if test "$direnv_fish_mode" != "disable_arrow";
+			function __direnv_cd_hook --on-variable PWD;
+				if test "$direnv_fish_mode" = "eval_after_arrow";
+					set -g __direnv_export_again 0;
+				else;
+					"{{.SelfPath}}" export fish | source;
+				end;
+			end;
+		end;
+	end;
 
-    function __direnv_export_eval_2 --on-event fish_preexec;
-        if set -q __direnv_export_again;
-            set -e __direnv_export_again;
-            "{{.SelfPath}}" export fish | source;
-            echo;
-        end;
+	function __direnv_export_eval_2 --on-event fish_preexec;
+		if set -q __direnv_export_again;
+			set -e __direnv_export_again;
+			"{{.SelfPath}}" export fish | source;
+			echo;
+		end;
 
-        functions --erase __direnv_cd_hook;
-    end;
+		functions --erase __direnv_cd_hook;
+	end;
+
+	function __direnv_exit --on-event fish_exit;
+		"{{.SelfPath}}" export fish --context exit | source;
+	end;
 `
+
+func (sh fish) Name() string {
+	return "fish"
+}
 
 func (sh fish) Hook() (string, error) {
 	return fishHook, nil
@@ -52,6 +64,37 @@ func (sh fish) Export(e ShellExport) (string, error) {
 	return out, nil
 }
 
+func (sh fish) ExportWithHooks(shellExport ShellExport, hooks map[string]string, setProcessMarker *bool) (string, error) {
+	var builder strings.Builder
+
+	var processMarker = "_direnv_loaded"
+	if setProcessMarker != nil {
+		if *setProcessMarker {
+			builder.WriteString("set --global " + processMarker + " true; ")
+		} else {
+			builder.WriteString("set --erase --global " + processMarker + "; ")
+		}
+	}
+
+	if unloadHook, ok := hooks[HOOK_UNLOAD]; ok {
+		builder.WriteString(unloadHook + "\n")
+	}
+
+	if shellExport != nil {
+		shellExportString, err := sh.Export(shellExport)
+		if err != nil {
+			return "", err
+		}
+		builder.WriteString(shellExportString)
+	}
+
+	if loadHook, ok := hooks[HOOK_LOAD]; ok {
+		builder.WriteString(loadHook + "\n")
+	}
+
+	return builder.String(), nil
+}
+
 func (sh fish) Dump(env Env) (string, error) {
 	var out string
 	for key, value := range env {
@@ -60,22 +103,7 @@ func (sh fish) Dump(env Env) (string, error) {
 	return out, nil
 }
 
-func (sh fish) export(key, value string) string {
-	if key == "PATH" {
-		command := "set -x -g PATH"
-		for _, path := range strings.Split(value, ":") {
-			command += " " + sh.escape(path)
-		}
-		return command + ";"
-	}
-	return "set -x -g " + sh.escape(key) + " " + sh.escape(value) + ";"
-}
-
-func (sh fish) unset(key string) string {
-	return "set -e -g " + sh.escape(key) + ";"
-}
-
-func (sh fish) escape(str string) string {
+func (sh fish) Escape(str string) string {
 	in := []byte(str)
 	out := "'"
 	i := 0
@@ -125,4 +153,19 @@ func (sh fish) escape(str string) string {
 	out += "'"
 
 	return out
+}
+
+func (sh fish) export(key, value string) string {
+	if key == "PATH" {
+		command := "set -x -g PATH"
+		for _, path := range strings.Split(value, ":") {
+			command += " " + sh.Escape(path)
+		}
+		return command + ";"
+	}
+	return "set -x -g " + sh.Escape(key) + " " + sh.Escape(value) + ";"
+}
+
+func (sh fish) unset(key string) string {
+	return "set -e -g " + sh.Escape(key) + ";"
 }

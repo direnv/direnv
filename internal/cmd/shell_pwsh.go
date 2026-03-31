@@ -9,6 +9,10 @@ type pwsh struct{}
 // Pwsh shell instance
 var Pwsh Shell = pwsh{}
 
+func (sh pwsh) Name() string {
+	return "pwsh"
+}
+
 func (sh pwsh) Hook() (string, error) {
 	const hook = `using namespace System;
 using namespace System.Management.Automation;
