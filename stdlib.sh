@@ -1515,6 +1515,178 @@ on_git_branch() {
   fi
 }
 
+# Usage: load_netrc [--file <netrc_file>] <machine> <login_var> <password_var> [<account_var>]
+#
+# Loads credentials from a netrc file for the specified machine into the given
+# variable names. The netrc file defaults to `~/.netrc` if not specified.
+#
+# The function will read the netrc file, find the entry for the specified
+# machine, and export the `login`, `password`, and optionally `account` values
+# into the variables named by `login_var`, `password_var`, and `account_var`.
+#
+# Pass `default` as the machine name to load credentials from the `default`
+# entry in the netrc file.
+#
+# The netrc file is automatically added to the watch list.
+#
+# Example (.envrc):
+#
+#    load_netrc api.github.com GITHUB_USER GITHUB_TOKEN
+#    load_netrc --file /path/to/custom/netrc default MY_USER MY_PASS
+#    load_netrc api.example.com MY_USER MY_PASS MY_ACCOUNT
+#
+load_netrc() {
+  local netrc_file="$HOME/.netrc"
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    --file=*)
+      netrc_file="${1#*=}"
+      shift
+      ;;
+    --file)
+      if [[ $# -lt 2 ]]; then
+        log_error "load_netrc: --file requires a path argument"
+        return 1
+      fi
+      netrc_file="$2"
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+    esac
+  done
+
+  local machine=${1:-}
+  local login_var=${2:-}
+  local password_var=${3:-}
+  local account_var=${4:-}
+
+  if [[ -z $machine ]]; then
+    log_error "load_netrc: <machine> argument is required"
+    return 1
+  fi
+
+  if [[ -z $login_var ]]; then
+    log_error "load_netrc: <login_var> argument is required"
+    return 1
+  fi
+
+  if [[ -z $password_var ]]; then
+    log_error "load_netrc: <password_var> argument is required"
+    return 1
+  fi
+
+  if [[ ! -f $netrc_file ]]; then
+    log_error "load_netrc: netrc file not found at '$netrc_file'"
+    return 1
+  fi
+
+  local netrc_file_display
+  netrc_file_display=$(user_rel_path "$netrc_file")
+
+  watch_file "$netrc_file"
+
+  local in_machine=false
+  local in_macdef=false
+  local login=""
+  local password=""
+  local account=""
+  local line word keyword=""
+
+  while read -r line; do
+    # Skip comments
+    [[ $line =~ ^[[:space:]]*# ]] && continue
+
+    # Handle macdef blocks: skip lines until a blank line ends the macro
+    if $in_macdef; then
+      [[ -z $line ]] && in_macdef=false
+      continue
+    fi
+
+    # Skip empty lines
+    [[ -z $line ]] && continue
+
+    for word in $line; do
+      if [[ -n $keyword ]]; then
+        # This word is the value for the preceding keyword
+        case "$keyword" in
+        machine)
+          if [[ $word == "$machine" ]]; then
+            in_machine=true
+          else
+            in_machine=false
+          fi
+          ;;
+        login)
+          $in_machine && login=$word
+          ;;
+        password)
+          $in_machine && password=$word
+          ;;
+        account)
+          $in_machine && account=$word
+          ;;
+        macdef)
+          # Remaining lines until blank line are the macro body
+          in_macdef=true
+          keyword=""
+          continue 2
+          ;;
+        *) ;; # Ignore unknown keywords
+        esac
+        keyword=""
+      else
+        # This word is in keyword position
+        case "$word" in
+        machine | login | password | account | macdef)
+          keyword=$word
+          ;;
+        default)
+          if [[ $machine == "default" ]]; then
+            in_machine=true
+          else
+            in_machine=false
+          fi
+          ;;
+        *) ;; # Ignore unknown keywords
+        esac
+      fi
+
+      # Early exit if we have all requested credentials
+      if $in_machine && [[ -n $login && -n $password ]]; then
+        if [[ -z $account_var || -n $account ]]; then
+          break 2
+        fi
+      fi
+    done
+  done <"$netrc_file"
+
+  if [[ -z $login ]]; then
+    log_error "load_netrc: no login found for machine '$machine' in $netrc_file_display"
+    return 1
+  fi
+
+  if [[ -z $password ]]; then
+    log_error "load_netrc: no password found for machine '$machine' in $netrc_file_display"
+    return 1
+  fi
+
+  if [[ -n $account_var && -z $account ]]; then
+    log_error "load_netrc: no account found for machine '$machine' in $netrc_file_display"
+    return 1
+  fi
+
+  export "$login_var=$login"
+  export "$password_var=$password"
+  if [[ -n $account_var ]]; then
+    export "$account_var=$account"
+  fi
+
+  log_status "loaded credentials for $machine from $netrc_file_display"
+}
+
 # Usage: __main__ <cmd> [...<args>]
 #
 # Used by rc.go

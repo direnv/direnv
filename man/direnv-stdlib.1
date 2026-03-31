@@ -498,6 +498,31 @@ if on_git_branch; then
 fi
 .EE
 
+.SS \fBload_netrc [--file <netrc_file>] <machine> <login_var> <password_var> [<account_var>]\fR
+Loads credentials from a netrc file for the specified machine into the given
+variable names. The netrc file defaults to \fB~/.netrc\fR if not specified.
+
+.PP
+The function will read the netrc file, find the entry for the specified
+machine, and export the \fBlogin\fR, \fBpassword\fR, and optionally \fBaccount\fR values
+into the variables named by \fBlogin_var\fR, \fBpassword_var\fR, and \fBaccount_var\fR\&.
+
+.PP
+Pass \fBdefault\fR as the machine name to load credentials from the \fBdefault\fR
+entry in the netrc file.
+
+.PP
+The netrc file is automatically added to the watch list.
+
+.PP
+Example (.envrc):
+
+.EX
+load_netrc api.github.com GITHUB_USER GITHUB_TOKEN
+load_netrc --file /path/to/custom/netrc default MY_USER MY_PASS
+load_netrc api.example.com MY_USER MY_PASS MY_ACCOUNT
+.EE
+
 .SH COPYRIGHT
 MIT licence - Copyright (C) 2019 @zimbatm and contributors
 
