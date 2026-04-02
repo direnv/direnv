@@ -3,7 +3,10 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 // CmdStatus is `direnv status`
@@ -56,6 +59,8 @@ var CmdStatus = &Cmd{
 			fmt.Println("warn_timeout", config.WarnTimeout)
 			fmt.Println("whitelist.prefix", config.WhitelistPrefix)
 			fmt.Println("whitelist.exact", config.WhitelistExact)
+			fmt.Println("allowed.files", getAllowedFiles(config))
+			fmt.Println("denied.files", getDeniedFiles(config))
 
 			loadedRC := config.LoadedRC()
 			foundRC, err := config.FindRC()
@@ -88,4 +93,72 @@ func formatRC(desc string, rc *RC) {
 	}
 	fmt.Println(desc, "RC allowed", rc.Allowed())
 	fmt.Println(desc, "RC allowPath", rc.allowPath)
+}
+
+// getAllowedFiles reads all files from the allow directory and returns their original paths
+func getAllowedFiles(config *Config) []string {
+	var allowed []string
+	allowDir := config.AllowDir()
+	
+	err := filepath.WalkDir(allowDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return nil // Skip errors, continue walking
+		}
+		if d.IsDir() {
+			return nil // Skip directories
+		}
+		
+		// Read the file content to get the original path
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return nil // Skip files we can't read
+		}
+		
+		// The file contains the original path, trim whitespace
+		originalPath := strings.TrimSpace(string(content))
+		if originalPath != "" {
+			allowed = append(allowed, originalPath)
+		}
+		return nil
+	})
+	
+	if err != nil {
+		return []string{} // Return empty slice on error
+	}
+	
+	return allowed
+}
+
+// getDeniedFiles reads all files from the deny directory and returns their original paths
+func getDeniedFiles(config *Config) []string {
+	var denied []string
+	denyDir := config.DenyDir()
+	
+	err := filepath.WalkDir(denyDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return nil // Skip errors, continue walking
+		}
+		if d.IsDir() {
+			return nil // Skip directories
+		}
+		
+		// Read the file content to get the original path
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return nil // Skip files we can't read
+		}
+		
+		// The file contains the original path, trim whitespace
+		originalPath := strings.TrimSpace(string(content))
+		if originalPath != "" {
+			denied = append(denied, originalPath)
+		}
+		return nil
+	})
+	
+	if err != nil {
+		return []string{} // Return empty slice on error
+	}
+	
+	return denied
 }

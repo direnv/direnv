@@ -396,6 +396,24 @@ func findEnvUp(searchDir string, loadDotenv bool) (path string) {
 	return findUp(searchDir, ".envrc")
 }
 
+// findEnvUpWithPermissions searches for .envrc/.env files in parent directories
+// but only returns files that are allowed to be loaded, maintaining security
+func findEnvUpWithPermissions(searchDir string, loadDotenv bool, config *Config) (path string) {
+	if loadDotenv {
+		return findUpWithPermissions(searchDir, config, false, ".envrc", ".env")
+	}
+	return findUpWithPermissions(searchDir, config, false, ".envrc")
+}
+
+// findEnvUpWithPermissionsAndReport is like findEnvUpWithPermissions but also reports skipped files
+// when shouldReport is true (indicating state has changed)
+func findEnvUpWithPermissionsAndReport(searchDir string, loadDotenv bool, config *Config, shouldReport bool) (path string) {
+	if loadDotenv {
+		return findUpWithPermissions(searchDir, config, shouldReport, ".envrc", ".env")
+	}
+	return findUpWithPermissions(searchDir, config, shouldReport, ".envrc")
+}
+
 func findUp(searchDir string, fileNames ...string) (path string) {
 	if searchDir == "" {
 		return ""
@@ -409,4 +427,62 @@ func findUp(searchDir string, fileNames ...string) (path string) {
 		}
 	}
 	return ""
+}
+
+// findUpWithPermissions searches for files in parent directories but only
+// returns files that are allowed to be loaded, preserving security boundaries
+func findUpWithPermissions(searchDir string, config *Config, shouldReport bool, fileNames ...string) (path string) {
+	if searchDir == "" {
+		return ""
+	}
+	
+	var skippedInCurrentDir []string
+	dirs := eachDir(searchDir)
+	
+	for dirIndex, dir := range dirs {
+		isCurrentDir := dirIndex == 0 // First directory is the current directory
+		
+		for _, fileName := range fileNames {
+			candidatePath := filepath.Join(dir, fileName)
+			if fileExists(candidatePath) {
+				// Check if this file is allowed to be loaded
+				rc, err := RCFromPath(candidatePath, config)
+				if err != nil {
+					// If there's an error creating RC, skip this file and continue
+					continue
+				}
+				
+				status := rc.Allowed()
+				switch status {
+				case Allowed:
+					// Report any skipped files in current dir before loading this one
+					if shouldReport {
+						reportSkippedFiles(config, skippedInCurrentDir)
+					}
+					return candidatePath
+				case NotAllowed:
+					if isCurrentDir && shouldReport {
+						skippedInCurrentDir = append(skippedInCurrentDir, fmt.Sprintf(notAllowed, candidatePath))
+					}
+				case Denied:
+					// Don't report denied files - user explicitly denied them, so stay silent
+				}
+			}
+		}
+	}
+	
+	// Report skipped files in current dir even if we don't find any allowed files
+	if shouldReport {
+		reportSkippedFiles(config, skippedInCurrentDir)
+	}
+	return ""
+}
+
+// reportSkippedFiles reports to the user about .envrc files that were found but skipped
+func reportSkippedFiles(config *Config, skippedFiles []string) {
+	if len(skippedFiles) > 0 {
+		for _, message := range skippedFiles {
+			logStatus(config, "%s", message)
+		}
+	}
 }
