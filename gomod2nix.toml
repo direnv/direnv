@@ -2,8 +2,8 @@ schema = 3
 
 [mod]
   [mod."github.com/BurntSushi/toml"]
-    version = "v1.5.0"
-    hash = "sha256-wX8bEVo7swuuAlm0awTIiV1KNCAXnm7Epzwl+wzyqhw="
+    version = "v1.6.0"
+    hash = "sha256-ptdUJvuc21ixeLt+M5way/na3aCnCO4MYHWulWp8NEY="
   [mod."github.com/mattn/go-isatty"]
     version = "v0.0.20"
     hash = "sha256-qhw9hWtU5wnyFyuMbKx+7RB8ckQaFQ8D+8GKPkN3HHQ="
