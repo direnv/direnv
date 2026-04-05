@@ -79,8 +79,7 @@ Add the following hook to your `$env.config.hooks.env_change.PWD` list in `confi
 ```nushell
 { ||
     if (which direnv | is-empty) {
-        return
-    }
+        retplugins }
 
     direnv export json | from json | default {} | load-env
 }
