@@ -16,7 +16,9 @@ _direnv_hook() {
   trap - SIGINT;
   return $previous_exit_status;
 };
-if [[ ";${PROMPT_COMMAND[*]:-};" != *";_direnv_hook;"* ]]; then
+if [[ ''${BLE_VERSION-} && _ble_version -ge 400 ]]; then
+  blehook PRECMD!="_direnv_hook"
+elif [[ ";${PROMPT_COMMAND[*]:-};" != *";_direnv_hook;"* ]]; then
   if [[ "$(declare -p PROMPT_COMMAND 2>&1)" == "declare -a"* ]]; then
     PROMPT_COMMAND=(_direnv_hook "${PROMPT_COMMAND[@]}")
   else
