@@ -862,15 +862,13 @@ layout_python() {
     # shellcheck disable=SC2046
     read -r python_version ve <<<$($python <<EOF
 import platform as p
-try:
- import venv
- ve="venv"
-except Exception:
- try:
-   import virtualenv
-   ve="virtualenv"
- except Exception:
-   ve=""
+import importlib.util
+if importlib.util.find_spec("venv"):
+  ve="venv"
+elif importlib.util.find_spec("virtualenv"):
+  ve="virtualenv"
+else:
+  ve=""
 print(".".join(p.python_version_tuple()[:2])+" "+ve)
 EOF
 )
