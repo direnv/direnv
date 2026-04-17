@@ -24,7 +24,11 @@ func Main(env Env, args []string, modBashPath string, modStdlib string, modVersi
 
 	err := CommandsDispatch(env, args)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%sdirenv: error %v%s\n", errorColor, err, clearColor)
+		if termSupportsANSI(env) {
+			fmt.Fprintf(os.Stderr, "%sdirenv: error %v%s\n", errorColor, err, clearColor)
+		} else {
+			fmt.Fprintf(os.Stderr, "direnv: error %v\n", err)
+		}
 	}
 	return err
 }

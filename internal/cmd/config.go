@@ -120,6 +120,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 	// Default log format
 	config.LogFormat = defaultLogFormat
+	config.LogColor = termSupportsANSI(env)
 
 	config.RCFile = env[DIRENV_FILE]
 
@@ -149,8 +150,6 @@ func LoadConfig(env Env) (config *Config, err error) {
 			err = fmt.Errorf("LoadConfig() failed to parse %s: %w", config.TomlPath, err)
 			return
 		}
-
-		config.LogColor = os.Getenv("TERM") != "dumb"
 
 		format, ok := env["DIRENV_LOG_FORMAT"]
 		if ok {
