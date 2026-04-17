@@ -17,21 +17,21 @@ func (sh systemdShell) Hook() (string, error) {
 }
 
 func (sh systemdShell) Export(e ShellExport) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range e {
 		if value != nil {
-			out += sh.export(key, *value)
+			out.WriteString(sh.export(key, *value))
 		}
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh systemdShell) Dump(env Env) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func cutEncapsulated(valueToTest, encapsulatingValue string) (cutValue string, wasEncapsulated bool) {

@@ -38,11 +38,11 @@ func TestRoundTrip(t *testing.T) {
 	rtChk := NewFileTimes()
 	_ = rtChk.Unmarshal(watches.Marshal())
 
-	compareFTs(t, watches, rtChk, "length", func(ft FileTimes) interface{} { return len(*ft.list) })
-	compareFTs(t, watches, rtChk, "first path", func(ft FileTimes) interface{} { return (*ft.list)[0].Path })
+	compareFTs(t, watches, rtChk, "length", func(ft FileTimes) any { return len(*ft.list) })
+	compareFTs(t, watches, rtChk, "first path", func(ft FileTimes) any { return (*ft.list)[0].Path })
 }
 
-func compareFTs(t *testing.T, left, right FileTimes, desc string, compare func(ft FileTimes) (res interface{})) {
+func compareFTs(t *testing.T, left, right FileTimes, desc string, compare func(ft FileTimes) (res any)) {
 	lc, rc := compare(left), compare(right)
 	if lc != rc {
 		t.Error("FileTimes didn't round trip.",

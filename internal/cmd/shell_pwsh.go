@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 )
 
 type pwsh struct{}
@@ -39,25 +40,25 @@ else {
 }
 
 func (sh pwsh) Export(e ShellExport) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range e {
 		if key != "" {
 			if value == nil {
-				out += sh.unset(key)
+				out.WriteString(sh.unset(key))
 			} else {
-				out += sh.export(key, *value)
+				out.WriteString(sh.export(key, *value))
 			}
 		}
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh pwsh) Dump(env Env) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh pwsh) export(key, value string) string {

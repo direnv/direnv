@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"maps"
 	"strings"
 
 	"github.com/direnv/direnv/v2/gzenv"
@@ -106,17 +107,13 @@ func (diff *EnvDiff) ToShell(shell Shell) (string, error) {
 func (diff *EnvDiff) Patch(env Env) (newEnv Env) {
 	newEnv = make(Env)
 
-	for k, v := range env {
-		newEnv[k] = v
-	}
+	maps.Copy(newEnv, env)
 
 	for key := range diff.Prev {
 		delete(newEnv, key)
 	}
 
-	for key, value := range diff.Next {
-		newEnv[key] = value
-	}
+	maps.Copy(newEnv, diff.Next)
 
 	return newEnv
 }
