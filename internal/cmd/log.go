@@ -24,7 +24,7 @@ func setupLogging(env Env) {
 	}
 }
 
-func logError(c *Config, msg string, a ...interface{}) {
+func logError(c *Config, msg string, a ...any) {
 	if c.LogColor {
 		logMsg(defaultLogFormat, msg, a...)
 	} else {
@@ -32,7 +32,7 @@ func logError(c *Config, msg string, a ...interface{}) {
 	}
 }
 
-func logStatus(c *Config, msg string, a ...interface{}) {
+func logStatus(c *Config, msg string, a ...any) {
 	format := c.LogFormat
 	shouldLog := true
 	if c.LogFilter != nil {
@@ -47,7 +47,7 @@ func logStatus(c *Config, msg string, a ...interface{}) {
 	}
 }
 
-func logDebug(msg string, a ...interface{}) {
+func logDebug(msg string, a ...any) {
 	if !debugging {
 		return
 	}
@@ -57,7 +57,7 @@ func logDebug(msg string, a ...interface{}) {
 	_ = log.Output(2, msg)
 }
 
-func logMsg(format, msg string, a ...interface{}) {
+func logMsg(format, msg string, a ...any) {
 	defer log.SetFlags(log.Flags())
 	defer log.SetPrefix(log.Prefix())
 	log.SetFlags(0)

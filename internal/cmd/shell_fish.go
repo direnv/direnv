@@ -41,32 +41,33 @@ func (sh fish) Hook() (string, error) {
 }
 
 func (sh fish) Export(e ShellExport) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range e {
 		if value == nil {
-			out += sh.unset(key)
+			out.WriteString(sh.unset(key))
 		} else {
-			out += sh.export(key, *value)
+			out.WriteString(sh.export(key, *value))
 		}
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh fish) Dump(env Env) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh fish) export(key, value string) string {
 	if key == "PATH" {
-		command := "set -x -g PATH"
-		for _, path := range strings.Split(value, ":") {
-			command += " " + sh.escape(path)
+		var command strings.Builder
+		command.WriteString("set -x -g PATH")
+		for path := range strings.SplitSeq(value, ":") {
+			command.WriteString(" " + sh.escape(path))
 		}
-		return command + ";"
+		return command.String() + ";"
 	}
 	return "set -x -g " + sh.escape(key) + " " + sh.escape(value) + ";"
 }
