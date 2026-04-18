@@ -47,7 +47,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	loadedRC := config.LoadedRC()
 	toLoad := findEnvUp(config.WorkDir, config.LoadDotenv)
 
-	if loadedRC == nil && toLoad == "" {
+	if loadedRC == nil && toLoad == "" && currentEnv[DIRENV_DIFF] == "" {
 		return
 	}
 
