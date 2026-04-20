@@ -16,7 +16,13 @@ shopt -s extglob
 direnv="$(command -v direnv)"
 
 # Where direnv configuration should be stored
-direnv_config_dir="${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}"
+IFS=: xdg_config_dirs=( ${XDG_CONFIG_DIRS:-/etc/xdg} )
+
+declare -a direnv_config_dirs
+for dir in "${xdg_config_dirs[@]}"; do
+  direnv_config_dirs+=( "$dir/direnv" )
+done
+direnv_config_dirs+=( "${DIRENV_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/direnv}" )
 
 # This variable can be used by programs to detect when they are running inside
 # of a .envrc evaluation context. It is ignored by the direnv diffing
@@ -1533,16 +1539,28 @@ __main__() {
   trap __dump_at_exit EXIT
 
   # load direnv libraries
-  for lib in "$direnv_config_dir/lib/"*.sh; do
-    # shellcheck disable=SC1090
-    source "$lib"
+  for direnv_config_dir in "${direnv_config_dirs[@]}"; do
+    for lib in "$direnv_config_dir/lib/"*.sh; do
+      # shellcheck disable=SC1090
+      source "$lib"
+    done
   done
 
-  # load the global ~/.direnvrc if present
-  if [[ -f $direnv_config_dir/direnvrc ]]; then
-    # shellcheck disable=SC1090,SC1091
-    source "$direnv_config_dir/direnvrc" >&2
-  elif [[ -f $HOME/.direnvrc ]]; then
+  # By default load the legacy ~/.direnvrc
+  local load_legacy=1
+
+  # load global direnvrc's if present
+  for direnv_config_dir in "${direnv_config_dirs[@]}"; do
+    if [[ -f $direnv_config_dir/direnvrc ]]; then
+      # shellcheck disable=SC1090,SC1091
+      source "$direnv_config_dir/direnvrc" >&2
+      # Don't load legacy ~/.direnvrc if a new-style direnvrc exists
+      load_legacy=
+    fi
+  done
+
+  # Legacy .direnvrc
+  if [[ -n "$load_legacy" && -f $HOME/.direnvrc ]]; then
     # shellcheck disable=SC1090,SC1091
     source "$HOME/.direnvrc" >&2
   fi
