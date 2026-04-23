@@ -1410,7 +1410,7 @@ function use_flox() {
         return 1
     fi
 
-    direnv_load flox activate "${args[@]}" -- "$direnv" dump
+    direnv_load flox activate "${args[@]}" -c "$direnv dump"
 
     if [[ ${#args[@]} -eq 0 ]]; then
         watch_dir "$flox_dir/env/"
