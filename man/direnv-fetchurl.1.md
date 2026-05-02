@@ -4,7 +4,7 @@ DIRENV-FETCHURL 1 "2019" direnv "User Manuals"
 NAME
 ----
 
-direnv fetchurl - Fetch a URL to disk
+direnv-fetchurl - Fetch a URL to disk
 
 SYNOPSIS
 --------
