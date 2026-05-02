@@ -8,6 +8,13 @@ var Zsh Shell = zsh{}
 
 const zshHook = `
 _direnv_hook() {
+  # break if chpwd is triggered by e.g. a completion call.
+  # ref: src:zsh/Functions/Chpwd/chpwd_recent_dirs
+  if [[ ! -o interactive  || $ZSH_SUBSHELL -ne 0 || \
+    ( -n $ZSH_EVAL_CONTEXT && \
+    $ZSH_EVAL_CONTEXT != toplevel(:[a-z]#func|)# ) ]]; then
+    return
+  fi
   vars="$("{{.SelfPath}}" export zsh)"
   trap -- '' SIGINT
   eval "$vars"
