@@ -264,6 +264,14 @@ dotenv_if_exists() {
   eval "$("$direnv" dotenv bash "$@")"
 }
 
+# Usage: sops_dotenv <filename>
+#
+# Loads a ".env" file after decrypting it with SOPS
+#
+sops_dotenv() {
+    eval "$("$direnv" dotenv bash <(sops decrypt "$1"))"
+}
+
 # Usage: require_allowed <filename> [<filename> ...]
 #
 # Requires that the specified files are approved before loading the .envrc.

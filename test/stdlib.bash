@@ -60,6 +60,22 @@ test_name dotenv_if_exists
   [[ $FOO = bar ]]
 )
 
+test_name sops_dotenv
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  cd "$workdir"
+
+  # Try to source an encrypted file
+  echo "export FOO=bar" | sops encrypt --filename-override .secret.env --age age1th8stu0v6vhl6348s436c7ldtwj62m6s27npp62y8cgp5hpfz4pq2t325l --output .secret.env
+  export SOPS_AGE_KEY_FILE="$root/test/config/keys.txt"
+  sops_dotenv .secret.env
+  [[ $FOO = bar ]]
+)
+
 test_name find_up
 (
   load_stdlib

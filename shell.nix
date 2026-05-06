@@ -51,6 +51,7 @@ stdenv.mkDerivation {
     ruby
     shellcheck
     shfmt
+    sops age
   ];
 
   shellHook = ''
