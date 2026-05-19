@@ -111,6 +111,7 @@ file next.
 
 * [Install direnv](docs/installation.md)
 * [Hook into your shell](docs/hook.md)
+* [Don’t check in `.envrc` files](docs/dont-check-in-dotenvrc.md)
 * [Develop for direnv](docs/development.md)
 * [Manage your rubies with direnv and ruby-install](docs/ruby.md)
 * [Using direnv with GitHub Actions](docs/github-actions.md)
