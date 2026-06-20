@@ -85,7 +85,10 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	}
 
 	if toLoad == "" {
-		logStatus(config, "unloading")
+		// Only report unloading if something was actually loaded in the first place.
+		if loadedRC != nil && loadedRC.Allowed() == Allowed {
+			logStatus(config, "unloading")
+		}
 		newEnv = previousEnv.Copy()
 		newEnv.CleanContext()
 	} else {
