@@ -242,6 +242,38 @@ test_name require_allowed_security
   [[ "${output#*'must not contain'}" != "$output" ]]
 )
 
+test_name layout_uv
+(
+  load_stdlib
+
+  if ! has uv; then
+    echo "WARN: uv not found, skipping layout_uv test"
+    exit 0
+  fi
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+  cd "$workdir"
+
+  # fails without a pyproject.toml
+  output=$(layout_uv 2>&1 || true)
+  [[ "${output#*'no pyproject.toml'}" != "$output" ]]
+
+  # succeeds with a valid project and lockfile
+  cat <<EOF >pyproject.toml
+[project]
+name = "test-direnv-uv"
+version = "0.1.0"
+dependencies = []
+EOF
+  uv lock
+  layout_uv
+
+  [[ -d .venv ]]
+  [[ "$VIRTUAL_ENV" == "$workdir/.venv" ]]
+  [[ "$UV_PROJECT_ENVIRONMENT" == "$workdir/.venv" ]]
+)
+
 # test strict_env and unstrict_env
 ./strict_env_test.bash
 

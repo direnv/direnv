@@ -265,6 +265,10 @@ Similar to `layout python`, but uses pyenv to build a virtualenv with the specif
 
 Multiple versions may be specified separated by spaces; please refer to the pyenv documentation for more information.
 
+### `layout uv [<python>]`
+
+Similar to `layout python`, but uses uv to sync the project's dependencies and activate the virtual environment. Requires a `pyproject.toml`. An optional Python version or interpreter path may be passed; otherwise uv reads it from `.python-version` or `pyproject.toml`. The virtual environment path can be overridden with `UV_PROJECT_ENVIRONMENT`.
+
 ### `layout python [<python_exe>]`
 
 Creates and loads a virtualenv environment under `$PWD/.direnv/python-$python_version`. This forces the installation of any egg into the project's sub-folder.

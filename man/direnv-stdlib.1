@@ -271,6 +271,9 @@ Similar to \fBlayout python\fR, but uses pyenv to build a virtualenv with the sp
 .PP
 Multiple versions may be specified separated by spaces; please refer to the pyenv documentation for more information.
 
+.SS \fBlayout uv [<python>]\fR
+Similar to \fBlayout python\fR, but uses uv to sync the project's dependencies and activate the virtual environment. Requires a \fBpyproject.toml\fR. An optional Python version or interpreter path may be passed; otherwise uv reads it from \fB.python-version\fR or \fBpyproject.toml\fR. The virtual environment path can be overridden with \fBUV_PROJECT_ENVIRONMENT\fR.
+
 .SS \fBlayout python [<python_exe>]\fR
 Creates and loads a virtualenv environment under \fB$PWD/.direnv/python-$python_version\fR\&. This forces the installation of any egg into the project's sub-folder.
 
