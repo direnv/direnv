@@ -1117,12 +1117,18 @@ layout_uv() {
   export UV_PROJECT_ENVIRONMENT="$venv_path"
 
   local python_arg=()
-  if [[ -n "${1:-}" ]]; then
+  local sync_args=()
+  # uv python specifiers (versions, paths, implementations) never start with
+  # "--", so this distinguishes a python specifier from arguments intended for `uv sync`.
+  if [[ -n "${1:-}" && "${1:-}" != --* ]]; then
     python_arg=(--python "$1")
+    sync_args=("${@:2}")
+  else
+    sync_args=("$@")
   fi
 
   # must use --frozen: we don't want to modify the lock file
-  uv sync --frozen "${python_arg[@]}"
+  uv sync --frozen "${python_arg[@]}" "${sync_args[@]}"
 
   export VIRTUAL_ENV="$venv_path"
   if [[ -d "$venv_path/bin" ]]; then
