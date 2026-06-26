@@ -115,6 +115,18 @@ if has ruby; then
   test_stop
 fi
 
+if has uv; then
+  test_start "uv-layout"
+    rm -rf .venv
+    direnv_eval
+    test -n "${VIRTUAL_ENV:-}"
+    if [[ ":$PATH:" != *":${VIRTUAL_ENV}/bin:"* ]]; then
+      echo "FAILED: VIRTUAL_ENV/bin not added to PATH"
+      exit 1
+    fi
+  test_stop
+fi
+
 # Make sure directories with spaces are fine
 test_start "space dir"
   direnv_eval

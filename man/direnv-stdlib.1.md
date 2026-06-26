@@ -265,9 +265,9 @@ Similar to `layout python`, but uses pyenv to build a virtualenv with the specif
 
 Multiple versions may be specified separated by spaces; please refer to the pyenv documentation for more information.
 
-### `layout uv [<python>]`
+### `layout uv [<python>] [<uv-sync-args>...]`
 
-Similar to `layout python`, but uses uv to sync the project's dependencies and activate the virtual environment. Requires a `pyproject.toml`. An optional Python version or interpreter path may be passed; otherwise uv reads it from `.python-version` or `pyproject.toml`. The virtual environment path can be overridden with `UV_PROJECT_ENVIRONMENT`.
+Similar to `layout python`, but uses uv to sync the project's dependencies and activate the virtual environment. Requires a `pyproject.toml`. An optional Python version or interpreter path may be passed as the first argument (e.g. `layout uv 3.12`); otherwise uv reads it from `.python-version` or `pyproject.toml`. Any argument beginning with `--` and all arguments after the Python specifier are passed through to `uv sync` (e.g. `layout uv 3.12 --no-dev`). The virtual environment path can be overridden with `UV_PROJECT_ENVIRONMENT`.
 
 ### `layout python [<python_exe>]`
 

@@ -1084,14 +1084,15 @@ layout_pyenv() {
   [[ -n "$PYENV_VERSION" ]] && export PYENV_VERSION
 }
 
-# Usage: layout uv [<python>]
+# Usage: layout uv [<python>] [<uv-sync-args>...]
 #
 # Similar to layout_python, but uses uv to sync the project's dependencies
 # and activate the virtual environment. Requires a pyproject.toml.
 #
-# An optional Python version or interpreter path can be passed, e.g.:
-#   layout uv 3.12
-# Otherwise uv reads the version from .python-version or pyproject.toml.
+# An optional Python version or interpreter path can be passed as the first
+# argument (e.g. layout uv 3.12); otherwise uv reads the version from
+# .python-version or pyproject.toml. Any argument starting with "--" and all
+# arguments after the python specifier are passed through to `uv sync`.
 #
 # The virtual environment path can be overridden by setting
 # UV_PROJECT_ENVIRONMENT before calling this layout.
