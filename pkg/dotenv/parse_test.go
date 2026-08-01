@@ -381,3 +381,111 @@ func TestDotEnvNestedJSON(t *testing.T) {
 	envShouldContain(t, env, "CONFIG", expectedJSON)
 	envShouldContain(t, env, "OTHER", "value")
 }
+
+// Exact file from https://github.com/direnv/direnv/issues/1519
+const TestIssue1519Env = `# This is a comment export FOO=99
+export BAR=bleh
+`
+
+func TestDotEnvIssue1519(t *testing.T) {
+	env := dotenv.MustParse(TestIssue1519Env)
+	shouldNotHaveEmptyKey(t, env)
+
+	if _, ok := env["FOO"]; ok {
+		t.Error("FOO must not be parsed from a comment line, got", env["FOO"])
+	}
+	envShouldContain(t, env, "BAR", "bleh")
+}
+
+// A commented-out export whose truncated quote must not start a multi-line
+// value (issue #1519): previously this failed the whole file with
+// "unclosed quoted value in .env file".
+const TestCommentedUnbalancedQuoteEnv = `# export FOO="99
+export BAR=bleh
+REAL=value
+`
+
+func TestDotEnvCommentedUnbalancedQuote(t *testing.T) {
+	env := dotenv.MustParse(TestCommentedUnbalancedQuoteEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	if _, ok := env["FOO"]; ok {
+		t.Error("FOO must not be parsed from a comment line, got", env["FOO"])
+	}
+	envShouldContain(t, env, "BAR", "bleh")
+	envShouldContain(t, env, "REAL", "value")
+}
+
+const TestCommentedUnbalancedSingleQuoteEnv = `# export FOO='99
+export BAR=bleh
+`
+
+func TestDotEnvCommentedUnbalancedSingleQuote(t *testing.T) {
+	env := dotenv.MustParse(TestCommentedUnbalancedSingleQuoteEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	if _, ok := env["FOO"]; ok {
+		t.Error("FOO must not be parsed from a comment line, got", env["FOO"])
+	}
+	envShouldContain(t, env, "BAR", "bleh")
+}
+
+// An unbalanced quote in a trailing comment line must not fail the file.
+const TestCommentedUnbalancedQuoteEOFEnv = `export BAR=bleh
+# export FOO="99
+`
+
+func TestDotEnvCommentedUnbalancedQuoteEOF(t *testing.T) {
+	env := dotenv.MustParse(TestCommentedUnbalancedQuoteEOFEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	if _, ok := env["FOO"]; ok {
+		t.Error("FOO must not be parsed from a comment line, got", env["FOO"])
+	}
+	envShouldContain(t, env, "BAR", "bleh")
+}
+
+// A comment line that opens a fake multi-line value must not swallow the
+// following real variable definitions (issue #1519).
+const TestCommentedQuoteSwallowEnv = `# export FOO="99
+BAR=bleh
+REAL="value"
+`
+
+func TestDotEnvCommentedQuoteSwallow(t *testing.T) {
+	env := dotenv.MustParse(TestCommentedQuoteSwallowEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	if _, ok := env["FOO"]; ok {
+		t.Error("FOO must not be parsed from a comment line, got", env["FOO"])
+	}
+	envShouldContain(t, env, "BAR", "bleh")
+	envShouldContain(t, env, "REAL", "value")
+}
+
+// Escaped quotes must not confuse the multi-line detection.
+const TestEscapedQuoteEnv = `OPTION_A="bar\"baz"
+SINGLE=one
+`
+
+func TestDotEnvEscapedQuote(t *testing.T) {
+	env := dotenv.MustParse(TestEscapedQuoteEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "OPTION_A", "bar\"baz")
+	envShouldContain(t, env, "SINGLE", "one")
+}
+
+// An escaped quote does not close a multi-line value either.
+const TestEscapedQuoteMultilineEnv = `MULTI="a\"b
+c"
+AFTER=done
+`
+
+func TestDotEnvEscapedQuoteMultiline(t *testing.T) {
+	env := dotenv.MustParse(TestEscapedQuoteMultilineEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "MULTI", "a\"b\nc")
+	envShouldContain(t, env, "AFTER", "done")
+}
