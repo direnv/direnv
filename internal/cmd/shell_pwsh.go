@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 )
 
 type pwsh struct{}
@@ -39,10 +40,30 @@ else {
 }
 
 func (sh pwsh) Export(e ShellExport) (string, error) {
+	// PowerShell environment variables are backed directly by the Windows
+	// process environment block, which is case-insensitive. A key can end up
+	// in `e` under two different casings for the same underlying variable,
+	// e.g. `Path` (as inherited from the native Windows process) being
+	// removed while `PATH` (as normalized by a POSIX shell like Bash, which
+	// direnv uses to evaluate .envrc) is added. Since `e` is a Go map, the
+	// order in which the resulting `Remove-Item`/`${env:...}=` statements are
+	// emitted is non-deterministic, so a removal could run after the
+	// addition and wipe out the variable that was just set. Case-insensitive
+	// additions always take precedence over removals to avoid this.
+	added := make(map[string]bool, len(e))
+	for key, value := range e {
+		if value != nil {
+			added[strings.ToUpper(key)] = true
+		}
+	}
+
 	var out string
 	for key, value := range e {
 		if key != "" {
 			if value == nil {
+				if added[strings.ToUpper(key)] {
+					continue
+				}
 				out += sh.unset(key)
 			} else {
 				out += sh.export(key, *value)
