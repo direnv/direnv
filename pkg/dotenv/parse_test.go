@@ -296,6 +296,38 @@ OPTION_R="${:-}"
 OPTION_S="${BAR:-:-}"
 `
 
+const TestEscapedDollarEnv = `
+OPTION_A=\$FOO
+OPTION_B="\$FOO"
+OPTION_C='\$FOO'
+OPTION_D="\${FOO}"
+OPTION_E="cost is \$5"
+OPTION_F="a\$b$FOO"
+OPTION_G="literal \$"
+OPTION_H="$FOO"
+`
+
+// A backslash escapes a dollar sign. Expected values are those of the canonical
+// implementation, https://github.com/bkeepers/dotenv, on the same input.
+func TestEscapedDollar(t *testing.T) {
+	err := os.Setenv("FOO", "foo")
+	if err != nil {
+		t.Fatalf("unable to set environment variable for testing: %s", err)
+	}
+
+	env := dotenv.MustParse(TestEscapedDollarEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "OPTION_A", "$FOO")
+	envShouldContain(t, env, "OPTION_B", "$FOO")
+	envShouldContain(t, env, "OPTION_C", `\$FOO`) // single quotes are literal
+	envShouldContain(t, env, "OPTION_D", "${FOO}")
+	envShouldContain(t, env, "OPTION_E", "cost is $5")
+	envShouldContain(t, env, "OPTION_F", "a$bfoo")
+	envShouldContain(t, env, "OPTION_G", "literal $")
+	envShouldContain(t, env, "OPTION_H", "foo") // control: an unescaped variable still expands
+}
+
 func TestVariableExpansionWithDefaults(t *testing.T) {
 	err := os.Setenv("FOO", "foo")
 	if err != nil {

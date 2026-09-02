@@ -176,7 +176,23 @@ func expandEnv(value string, dotenv map[string]string) string {
 		return getFromEnvOrDefault(envKey, defaultValue, hasDefault)
 	}
 
-	return os.Expand(value, expander)
+	// A backslash before a dollar sign escapes it, as in the canonical
+	// implementation. unescapeCharacters deliberately leaves `\$` alone for this
+	// step, and os.Expand knows nothing about escaping, so the escape has to be
+	// resolved here or the backslash is kept and the variable expands anyway.
+	var expanded strings.Builder
+	for {
+		i := strings.Index(value, `\$`)
+		if i < 0 {
+			break
+		}
+		expanded.WriteString(os.Expand(value[:i], expander))
+		expanded.WriteString("$")
+		value = value[i+2:]
+	}
+	expanded.WriteString(os.Expand(value, expander))
+
+	return expanded.String()
 }
 
 func splitKeyAndDefault(value string, sep string) (string, string, bool) {
