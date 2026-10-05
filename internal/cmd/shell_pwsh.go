@@ -39,17 +39,17 @@ else {
 }
 
 func (sh pwsh) Export(e ShellExport) (string, error) {
-	var out string
+	var unsets, exports string
 	for key, value := range e {
 		if key != "" {
 			if value == nil {
-				out += sh.unset(key)
+				unsets += sh.unset(key)
 			} else {
-				out += sh.export(key, *value)
+				exports += sh.export(key, *value)
 			}
 		}
 	}
-	return out, nil
+	return unsets + exports, nil
 }
 
 func (sh pwsh) Dump(env Env) (string, error) {
