@@ -1410,7 +1410,7 @@ function use_flox() {
         return 1
     fi
 
-    direnv_load flox activate "${args[@]}" -- "$direnv" dump
+    direnv_load flox activate "${args[@]}" -c "$direnv dump"
 
     if [[ ${#args[@]} -eq 0 ]]; then
         watch_dir "$flox_dir/env/"
@@ -1534,6 +1534,10 @@ __main__() {
 
   # load direnv libraries
   for lib in "$direnv_config_dir/lib/"*.sh; do
+    # Skip the unexpanded glob. nullglob only drops a non-matching pattern
+    # while pathname expansion is enabled; under `set -f` (noglob) the literal
+    # "*.sh" survives and would otherwise be sourced as a missing file.
+    [[ -f $lib ]] || continue
     # shellcheck disable=SC1090
     source "$lib"
   done

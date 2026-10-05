@@ -40,17 +40,18 @@ else {
 }
 
 func (sh pwsh) Export(e ShellExport) (string, error) {
-	var out strings.Builder
+
+	var unsets, exports strings.Builder
 	for key, value := range e {
 		if key != "" {
 			if value == nil {
-				out.WriteString(sh.unset(key))
+        unsets.WriteString(sh.unset(key))
 			} else {
-				out.WriteString(sh.export(key, *value))
+        exports.WriteString(sh.export(key, *value))
 			}
 		}
 	}
-	return out.String(), nil
+  return unsets.String() + exports.String(), nil
 }
 
 func (sh pwsh) Dump(env Env) (string, error) {
