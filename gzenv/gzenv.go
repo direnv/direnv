@@ -8,13 +8,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"io"
+	"log"
 	"strings"
 )
 
 // Marshal encodes the object into the gzenv format
-func Marshal(obj interface{}) string {
+func Marshal(obj any) string {
 	jsonData, err := json.Marshal(obj)
 
 	if err != nil {
@@ -35,7 +35,7 @@ func Marshal(obj interface{}) string {
 }
 
 // Unmarshal restores the gzenv format back into a Go object
-func Unmarshal(gzenv string, obj interface{}) error {
+func Unmarshal(gzenv string, obj any) error {
 	gzenv = strings.TrimSpace(gzenv)
 
 	data, err := base64.URLEncoding.DecodeString(gzenv)

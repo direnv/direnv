@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"maps"
 	"os"
 	"strings"
 
@@ -62,9 +63,7 @@ func LoadEnvJSON(jsonBytes []byte) (env Env, err error) {
 func (env Env) Copy() Env {
 	newEnv := make(Env)
 
-	for key, value := range env {
-		newEnv[key] = value
-	}
+	maps.Copy(newEnv, env)
 
 	return newEnv
 }

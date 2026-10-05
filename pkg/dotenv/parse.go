@@ -47,7 +47,7 @@ func Parse(data string) (map[string]string, error) {
 	var multilineValue string
 	var quoteChar byte
 
-	for i := 0; i < len(lines); i++ {
+	for i := range lines {
 		line := lines[i]
 
 		// Continue collecting a multi-line value
@@ -180,12 +180,12 @@ func expandEnv(value string, dotenv map[string]string) string {
 }
 
 func splitKeyAndDefault(value string, sep string) (string, string, bool) {
-	var i = strings.Index(value, sep)
+	var before, after, ok = strings.Cut(value, sep)
 
-	if i == -1 {
+	if !ok {
 		return value, "", false
 	}
-	return value[0:i], value[i+len(sep):], true
+	return before, after, true
 }
 
 func lookupDotenv(value string, dotenv map[string]string) (string, bool) {
