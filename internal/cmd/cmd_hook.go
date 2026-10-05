@@ -34,7 +34,7 @@ func cmdHookAction(_ Env, args []string) (err error) {
 	}
 
 	// Convert Windows path if needed
-	selfPath = strings.Replace(selfPath, "\\", "/", -1)
+	selfPath = strings.ReplaceAll(selfPath, "\\", "/")
 	ctx := HookContext{selfPath}
 
 	shell := DetectShell(target)

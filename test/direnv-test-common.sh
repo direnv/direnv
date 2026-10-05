@@ -323,3 +323,43 @@ test_stop
 #   NEW_LINK_TIME=`direnv file-mtime link-to-somefile`
 #   test "$LINK_TIME" = "$NEW_LINK_TIME"
 # test_stop
+
+test_start "require-allowed"
+  # First, deny to start fresh
+  direnv deny
+  unset REQUIRE_ALLOWED_TEST
+  unset DIRENV_REQUIRED
+
+  echo "Test 1: First allow permits .envrc but not required files"
+  direnv allow
+  direnv_eval
+  # REQUIRE_ALLOWED_TEST should NOT be set because required files aren't approved yet
+  test -z "${REQUIRE_ALLOWED_TEST:-}"
+  # DIRENV_REQUIRED should be set with the files needing approval
+  test -n "${DIRENV_REQUIRED:-}"
+
+  echo "Test 2: Second allow approves required files"
+  direnv allow
+  direnv_eval
+  test_eq "$REQUIRE_ALLOWED_TEST" "success"
+
+  echo "Test 3: Modifying a required file triggers re-approval"
+  sleep 1
+  # Save original content
+  ORIG_CONTENT=$(cat config.toml)
+  # Modify the file
+  echo "modified = true" >> config.toml
+  direnv_eval
+  # After modifying a required file, REQUIRE_ALLOWED_TEST should be unset
+  # because the file needs re-approval
+  test -z "${REQUIRE_ALLOWED_TEST:-}"
+
+  echo "Test 4: Re-allowing after modification works"
+  direnv allow
+  direnv_eval
+  test_eq "$REQUIRE_ALLOWED_TEST" "success"
+
+  # Restore original content for future test runs
+  echo "$ORIG_CONTENT" > config.toml
+  direnv allow
+test_stop

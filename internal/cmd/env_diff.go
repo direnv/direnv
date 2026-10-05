@@ -84,7 +84,7 @@ func (diff *EnvDiff) Any() bool {
 // ToShell applies the env diff as a set of commands that are understood by
 // the target `shell`. The outputted string is then meant to be evaluated in
 // the target shell.
-func (diff *EnvDiff) ToShell(shell Shell) string {
+func (diff *EnvDiff) ToShell(shell Shell) (string, error) {
 	e := make(ShellExport)
 
 	for key := range diff.Prev {

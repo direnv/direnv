@@ -16,20 +16,22 @@ func (sh systemdShell) Hook() (string, error) {
 	return "", errors.New("this feature is not supported")
 }
 
-func (sh systemdShell) Export(e ShellExport) (out string) {
+func (sh systemdShell) Export(e ShellExport) (string, error) {
+	var out string
 	for key, value := range e {
 		if value != nil {
 			out += sh.export(key, *value)
 		}
 	}
-	return out
+	return out, nil
 }
 
-func (sh systemdShell) Dump(env Env) (out string) {
+func (sh systemdShell) Dump(env Env) (string, error) {
+	var out string
 	for key, value := range env {
 		out += sh.export(key, value)
 	}
-	return out
+	return out, nil
 }
 
 func cutEncapsulated(valueToTest, encapsulatingValue string) (cutValue string, wasEncapsulated bool) {

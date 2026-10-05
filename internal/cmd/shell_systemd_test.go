@@ -39,7 +39,10 @@ func TestExport_ok(t *testing.T) {
 	}
 
 	systemdExporter := Systemd
-	actualOutput := env.ToShell(systemdExporter)
+	actualOutput, err := env.ToShell(systemdExporter)
+	if err != nil {
+		t.Fatalf("ToShell() failed: %v", err)
+	}
 
 	expectedOutputMap := map[string]string{
 		"Key":  " just a Value",

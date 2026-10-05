@@ -90,7 +90,7 @@ Add the following hook to your `$env.config.hooks.env_change.PWD` list in `confi
 > you can follow the [`nu_scripts` of Nushell](https://github.com/nushell/nu_scripts/blob/main/nu-hooks/nu-hooks/direnv/config.nu)
 > for the always up-to-date version of the hook above
 
-### PowerShell
+## PowerShell
 
 Add the following line to your `$PROFILE`:
 

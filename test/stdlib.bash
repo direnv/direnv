@@ -151,7 +151,7 @@ test_name use_julia
     # Fake the existence of a julia binary
     julia=$JULIA_VERSIONS/$version_prefix$version/bin/julia
     mkdir -p "$(dirname "$julia")"
-    echo "#!/usr/bin/env bash
+    echo "#!$(command -v bash)
     echo \"test-julia $version\"" > "$julia"
     chmod +x "$julia"
     # Locally disable set -u (see https://github.com/direnv/direnv/pull/667)
@@ -217,6 +217,60 @@ test_name env_vars_required
   [[ "${output#*'MISSING is required'}" != "$output" ]]
 )
 
+
+test_name require_allowed_security
+(
+  load_stdlib
+  set +e
+
+  # Test that absolute paths are rejected
+  output="$(require_allowed /etc/passwd 2>&1)"
+  result=$?
+  [[ $result -eq 1 ]]
+  [[ "${output#*'path must be relative'}" != "$output" ]]
+
+  # Test that parent traversal paths are rejected
+  output="$(require_allowed ../etc/passwd 2>&1)"
+  result=$?
+  [[ $result -eq 1 ]]
+  [[ "${output#*'must not contain'}" != "$output" ]]
+
+  # Test that paths with .. in the middle are rejected
+  output="$(require_allowed foo/../bar 2>&1)"
+  result=$?
+  [[ $result -eq 1 ]]
+  [[ "${output#*'must not contain'}" != "$output" ]]
+)
+
+test_name global_lib_noglob
+(
+  # Regression test for https://github.com/direnv/direnv/issues/1610
+  # With pathname expansion disabled (set -f / noglob) and no global library
+  # files present, direnv must not source the literal "*.sh" glob and emit a
+  # spurious missing-file diagnostic for the optional lib directory.
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  mkdir -p "$workdir/home" "$workdir/project" "$workdir/config/direnv"
+  echo "export DIRENV_NOGLOB_TEST=1" > "$workdir/project/.envrc"
+
+  HOME="$workdir/home" XDG_CONFIG_HOME="$workdir/config" \
+    DIRENV_CONFIG="$workdir/config/direnv" \
+    direnv allow "$workdir/project/.envrc" >/dev/null 2>&1
+
+  output="$(
+    cd "$workdir/project"
+    env HOME="$workdir/home" XDG_CONFIG_HOME="$workdir/config" \
+      DIRENV_CONFIG="$workdir/config/direnv" \
+      SHELLOPTS=braceexpand:hashall:interactive-comments:noglob \
+      direnv export bash 2>&1 >/dev/null
+  )"
+
+  if [[ "$output" == *"lib/*.sh"* ]]; then
+    echo "unexpected missing-library diagnostic under noglob: $output"
+    return 1
+  fi
+)
 
 # test strict_env and unstrict_env
 ./strict_env_test.bash

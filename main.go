@@ -1,3 +1,4 @@
+// Package main implements the direnv command-line tool.
 package main
 
 import (

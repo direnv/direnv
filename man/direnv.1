@@ -1,15 +1,12 @@
 .nh
 .TH DIRENV 1 "2019" direnv "User Manuals"
 .SH NAME
-.PP
-direnv - unclutter your .profile
+direnv \- unclutter your .profile
 
 .SH SYNOPSIS
-.PP
 \fBdirenv\fR \fIcommand\fP ...
 
 .SH DESCRIPTION
-.PP
 \fBdirenv\fR is an environment variable manager for your shell. It knows how to
 hook into bash, zsh and fish shell to load or unload environment variables
 depending on your current directory. This allows you to have project-specific
@@ -47,12 +44,10 @@ nope
 .EE
 
 .SH SETUP
-.PP
 For direnv to work properly it needs to be hooked into the shell. Each shell
 has its own extension mechanism:
 
 .SS BASH
-.PP
 Add the following line at the end of the \fB~/.bashrc\fR file:
 
 .EX
@@ -64,7 +59,6 @@ Make sure it appears even after rvm, git-prompt and other shell extensions
 that manipulate the prompt.
 
 .SS ZSH
-.PP
 Add the following line at the end of the \fB~/.zshrc\fR file:
 
 .EX
@@ -72,7 +66,6 @@ eval "$(direnv hook zsh)"
 .EE
 
 .SS FISH
-.PP
 Add the following line at the end of the \fB$XDG_CONFIG_HOME/fish/config.fish\fR file:
 
 .EX
@@ -89,7 +82,6 @@ set -g direnv_fish_mode disable_arrow    # trigger direnv at prompt only, this i
 .EE
 
 .SS TCSH
-.PP
 Add the following line at the end of the \fB~/.cshrc\fR file:
 
 .EX
@@ -97,7 +89,6 @@ eval `direnv hook tcsh`
 .EE
 
 .SS Elvish
-.PP
 Run:
 
 .EX
@@ -113,7 +104,6 @@ use direnv
 .EE
 
 .SS PowerShell
-.PP
 Add the following line to your \fB$PROFILE\fR:
 
 .EX
@@ -121,15 +111,66 @@ Invoke-Expression "$(direnv hook pwsh)"
 .EE
 
 .SS Murex
-.PP
 Add the following line to your \fB~/.murex_profile\fR:
 
 .EX
 direnv hook murex -> source
 .EE
 
+.SH COMMANDS
+.TP
+\fBdirenv allow [PATH_TO_RC]\fR
+Grants direnv permission to load the given .envrc or .env file.
+
+.TP
+\fBdirenv deny [PATH_TO_RC]\fR
+Revokes the authorization of a given .envrc or .env file.
+
+.TP
+\fBdirenv edit [PATH_TO_RC]\fR
+Opens PATH_TO_RC or the current .envrc or .env into an $EDITOR and allow the file to be loaded afterwards.
+
+.TP
+\fBdirenv exec DIR COMMAND [...ARGS]\fR
+Executes a command after loading the first .envrc or .env found in DIR.
+
+.TP
+\fBdirenv export SHELL\fR
+Loads an .envrc or .env and prints the diff in terms of exports. Supported shells: bash, zsh, fish, tcsh, elvish, pwsh, murex, json, vim, gha (GitHub Actions), gzenv, systemd.
+
+.TP
+\fBdirenv fetchurl <url> [<integrity-hash>]\fR
+Fetches a given URL into direnv's CAS.
+
+.TP
+\fBdirenv help\fR
+Shows this help.
+
+.TP
+\fBdirenv hook SHELL\fR
+Used to setup the shell hook.
+
+.TP
+\fBdirenv prune\fR
+Removes old allowed files.
+
+.TP
+\fBdirenv reload\fR
+Triggers an env reload.
+
+.TP
+\fBdirenv status\fR
+Prints some debug status information.
+
+.TP
+\fBdirenv stdlib\fR
+Displays the stdlib available in the .envrc execution context.
+
+.TP
+\fBdirenv version\fR
+Prints the version or checks that direnv is older than VERSION_AT_LEAST.
+
 .SH USAGE
-.PP
 In some target folder, create an \fB\&.envrc\fR file and add some export(1)
 and unset(1) directives in it.
 
@@ -188,7 +229,6 @@ Bash code loaded before every \fB\&.envrc\fR\&. Good for third-party extensions.
 Records which \fB\&.envrc\fR files have been \fBdirenv allow\fRed.
 
 .SH CONTRIBUTE
-.PP
 Bug reports, contributions and forks are welcome.
 
 .PP
@@ -207,9 +247,7 @@ Or drop by on the #direnv channel on FreeNode
 have a chat.
 
 .SH COPYRIGHT
-.PP
 MIT licence - Copyright (C) 2019 @zimbatm and contributors
 
 .SH SEE ALSO
-.PP
 direnv-stdlib(1), direnv.toml(1), direnv-fetchurl(1)

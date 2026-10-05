@@ -83,7 +83,7 @@ func (env Env) ToGoEnv() []string {
 
 // ToShell outputs the environment into an evaluatable string that is
 // understood by the target shell
-func (env Env) ToShell(shell Shell) string {
+func (env Env) ToShell(shell Shell) (string, error) {
 	e := make(ShellExport)
 
 	for key, value := range env {
