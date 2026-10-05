@@ -101,10 +101,15 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 
 	var exePath string
-	if exePath, err = os.Executable(); err != nil {
-		err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
-		return
-	}
+	// Check env variable first
+	if envPath := os.Getenv("DIRENV_EXE_PATH"); envPath != "" {
+		exePath = envPath
+	} else {
+		if exePath, err = os.Executable(); err != nil {
+			err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
+			return
+		}
+	}	
 	// Fix for mingsys
 	exePath = strings.ReplaceAll(exePath, "\\", "/")
 	config.SelfPath = exePath
