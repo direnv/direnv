@@ -92,7 +92,7 @@ Example:
 
 ### `env_vars_required <varname> [<varname> ...]`
 
-Logs error for every variable not present in the environment or having an empty value.  
+Logs error for every variable not present in the environment or having an empty value.
 Typically this is used in combination with source_env and source_env_if_exists.
 
 Example:
@@ -248,6 +248,12 @@ Sets environment variables from `opam env`.
 ### `layout php`
 
 Adds "$PWD/vendor/bin" to the PATH environment variable.
+
+### `layout pixi`
+
+Loads a pixi environment. If no additional arguments are given the `default` environment is loaded.
+
+You can pass `-e <env_name>` to load a different environment instead. For supported arguments see `pixi shell-hook --help`.
 
 ### `layout perl`
 
