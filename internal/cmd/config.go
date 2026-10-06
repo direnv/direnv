@@ -101,12 +101,17 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 
 	var exePath string
-	if exePath, err = os.Executable(); err != nil {
-		err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
-		return
-	}
+	// Check env variable first
+	if envPath := os.Getenv("DIRENV_EXE_PATH"); envPath != "" {
+		exePath = envPath
+	} else {
+		if exePath, err = os.Executable(); err != nil {
+			err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
+			return
+		}
+	}	
 	// Fix for mingsys
-	exePath = strings.Replace(exePath, "\\", "/", -1)
+	exePath = strings.ReplaceAll(exePath, "\\", "/")
 	config.SelfPath = exePath
 
 	var wdErr error
@@ -120,6 +125,9 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 	// Default log format
 	config.LogFormat = defaultLogFormat
+
+	// Color logs unless TERM=dumb (also applies when no direnv.toml exists)
+	config.LogColor = os.Getenv("TERM") != "dumb"
 
 	config.RCFile = env[DIRENV_FILE]
 
@@ -150,13 +158,14 @@ func LoadConfig(env Env) (config *Config, err error) {
 			return
 		}
 
-		config.LogColor = !(os.Getenv("TERM") == "dumb")
-
 		format, ok := env["DIRENV_LOG_FORMAT"]
 		if ok {
 			config.LogFormat = format
-		} else if global.LogFormat != "" {
-			config.LogFormat = global.LogFormat
+		} else if logFmt := global.LogFormat; logFmt != "" {
+			if logFmt == "-" {
+				logFmt = ""
+			}
+			config.LogFormat = logFmt
 		}
 
 		if global.LogFilter != "" {
@@ -175,7 +184,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 		}
 
 		for _, path := range tomlConf.Whitelist.Exact {
-			if !(strings.HasSuffix(path, "/.envrc") || strings.HasSuffix(path, "/.env")) {
+			if !strings.HasSuffix(path, "/.envrc") && !strings.HasSuffix(path, "/.env") {
 				path = filepath.Join(path, ".envrc")
 			}
 
@@ -242,6 +251,11 @@ func (config *Config) AllowDir() string {
 // DenyDir is the folder where all the "deny" files are stored.
 func (config *Config) DenyDir() string {
 	return filepath.Join(config.DataDir, "deny")
+}
+
+// AllowedRequiredDir is the folder where all the "allowed required" files are stored.
+func (config *Config) AllowedRequiredDir() string {
+	return filepath.Join(config.DataDir, "allowed-required")
 }
 
 // LoadedRC returns a RC file if any has been loaded

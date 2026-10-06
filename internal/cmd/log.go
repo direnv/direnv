@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"strings"
 )
 
 const (
@@ -16,22 +17,22 @@ var debugging bool
 func setupLogging(env Env) {
 	log.SetFlags(0)
 	log.SetPrefix("")
-	if val, ok := env[DIRENV_DEBUG]; ok && val == "1" {
+	if val, ok := env[DIRENV_DEBUG]; ok && (val == "1" || strings.EqualFold(val, "true")) {
 		debugging = true
 		log.SetFlags(log.Ltime)
 		log.SetPrefix("direnv: ")
 	}
 }
 
-func logError(c *Config, msg string, a ...interface{}) {
+func logError(c *Config, msg string, a ...any) {
 	if c.LogColor {
-		logMsg(defaultLogFormat, msg, a...)
-	} else {
 		logMsg(errorColor+defaultLogFormat+clearColor, msg, a...)
+	} else {
+		logMsg(defaultLogFormat, msg, a...)
 	}
 }
 
-func logStatus(c *Config, msg string, a ...interface{}) {
+func logStatus(c *Config, msg string, a ...any) {
 	format := c.LogFormat
 	shouldLog := true
 	if c.LogFilter != nil {
@@ -39,14 +40,14 @@ func logStatus(c *Config, msg string, a ...interface{}) {
 	}
 	if shouldLog && format != "" {
 		if c.LogColor {
-			logMsg(format, msg, a...)
-		} else {
 			logMsg(fmt.Sprintf("%s%s", clearColor, format), msg, a...)
+		} else {
+			logMsg(format, msg, a...)
 		}
 	}
 }
 
-func logDebug(msg string, a ...interface{}) {
+func logDebug(msg string, a ...any) {
 	if !debugging {
 		return
 	}
@@ -56,7 +57,7 @@ func logDebug(msg string, a ...interface{}) {
 	_ = log.Output(2, msg)
 }
 
-func logMsg(format, msg string, a ...interface{}) {
+func logMsg(format, msg string, a ...any) {
 	defer log.SetFlags(log.Flags())
 	defer log.SetPrefix(log.Prefix())
 	log.SetFlags(0)
