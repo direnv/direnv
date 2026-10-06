@@ -28,9 +28,11 @@ set -euo pipefail
   trap at_exit EXIT
 
   kernel=$(uname -s | tr "[:upper:]" "[:lower:]")
+  exe=
   case "${kernel}" in
     msys*|mingw*)
       kernel=windows
+      exe=.exe
       ;;
   esac
   case "$(uname -m)" in
@@ -95,19 +97,19 @@ set -euo pipefail
     curl "${curl_args[@]}" \
     | grep browser_download_url \
     | cut -d '"' -f 4 \
-    | grep "direnv.$kernel.$machine\$"
+    | grep -E "direnv.$kernel.$machine(\.exe)?\$"
   )
   echo "download_url=$download_url"
 
   log "downloading"
-  curl -o "$bin_path/direnv" -fL "$download_url"
-  chmod a+x "$bin_path/direnv"
+  curl -o "$bin_path/direnv$exe" -fL "$download_url"
+  chmod a+x "$bin_path/direnv$exe"
 
   cat <<DONE
 
 The direnv binary is now available in:
 
-    $bin_path/direnv
+    $bin_path/direnv$exe
 
 The last step is to configure your shell to use it. For example for bash, add
 the following lines at the end of your ~/.bashrc:

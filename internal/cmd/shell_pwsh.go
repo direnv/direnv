@@ -21,7 +21,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -
 $hook = [EventHandler[LocationChangedEventArgs]] {
   param([object] $source, [LocationChangedEventArgs] $eventArgs)
   end {
-    $export = ({{.SelfPath}} export pwsh) -join [Environment]::NewLine;
+    $export = (& '{{.PwshSelfPath}}' export pwsh) -join [Environment]::NewLine;
     if ($export) {
       Invoke-Expression -Command $export;
     }
@@ -37,6 +37,11 @@ else {
 
 `
 	return hook, nil
+}
+
+// PwshSelfPath returns SelfPath escaped for a PowerShell verbatim string.
+func (ctx HookContext) PwshSelfPath() string {
+	return PowerShellEscapeVerbatimString(ctx.SelfPath)
 }
 
 func (sh pwsh) Export(e ShellExport) (string, error) {

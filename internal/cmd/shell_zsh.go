@@ -18,7 +18,7 @@ _direnv_hook() {
     $ZSH_EVAL_CONTEXT != toplevel(:[a-z]#func|)# ) ]]; then
     return
   fi
-  vars="$("{{.SelfPath}}" export zsh)"
+  vars="$({{.BashSelfPath}} export zsh)"
   trap -- '' SIGINT
   eval "$vars"
   trap - SIGINT
