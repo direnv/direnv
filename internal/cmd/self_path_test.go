@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 	"text/template"
 )
@@ -22,8 +23,9 @@ func TestStdlibEscapesSelfPath(t *testing.T) {
 	stdlib = `direnv="$(command -v direnv)"`
 
 	selfPath := filepath.Join(t.TempDir(), weirdDirName, "direnv")
-	script := getStdlib(&Config{SelfPath: selfPath}) + "\nprintf %s \"$direnv\""
-	out, err := exec.Command(bashPath, "--noprofile", "--norc", "-c", script).Output()
+	cmd := exec.Command(bashPath, "--noprofile", "--norc", "-s")
+	cmd.Stdin = strings.NewReader(getStdlib(&Config{SelfPath: selfPath}) + "\nprintf %s \"$direnv\"")
+	out, err := cmd.Output()
 	if err != nil {
 		t.Fatal(err)
 	}
