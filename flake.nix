@@ -81,6 +81,7 @@
                 ln -s ${direnv}/bin/direnv direnv
                 export HOME=$TMPDIR/home
                 mkdir -p $HOME
+                export UV_OFFLINE=1 UV_PYTHON_DOWNLOADS=never UV_PYTHON_PREFERENCE=only-system
                 ${command}
                 touch $out
               '';
@@ -91,6 +92,7 @@
               inputs = [
                 pkgs.python3
                 pkgs.ruby
+                pkgs.uv
                 shell
               ];
               inherit command;
@@ -116,6 +118,10 @@
               ./README.md
               ./stdlib.sh
               ./test
+            ];
+            inputs = [
+              pkgs.python3
+              pkgs.uv
             ];
             command = "./test/stdlib.bash";
           };

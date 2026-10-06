@@ -1,0 +1,4 @@
+[project]
+name = "test-direnv-uv"
+version = "0.1.0"
+dependencies = []

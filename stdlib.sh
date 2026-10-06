@@ -1118,6 +1118,44 @@ layout_pyenv() {
   [[ -n "$PYENV_VERSION" ]] && export PYENV_VERSION
 }
 
+# Usage: layout uv [<uv-sync-args>...]
+#
+# Similar to layout_python, but syncs the uv project with `uv sync --frozen`
+# and activates its virtual environment. Requires a pyproject.toml.
+#
+# Arguments are passed to `uv sync`. The Python version comes from
+# .python-version, pyproject.toml or UV_PYTHON, e.g. `UV_PYTHON=3.12 layout uv`.
+# The virtual environment path can be overridden with UV_PROJECT_ENVIRONMENT.
+#
+layout_uv() {
+  watch_file .python-version pyproject.toml uv.lock
+
+  if ! has uv; then
+    log_error "uv: command not found. Install from https://docs.astral.sh/uv/"
+    return 1
+  fi
+
+  if [[ ! -f pyproject.toml ]]; then
+    log_error "uv: no pyproject.toml found. Run \`uv init\` to create a project."
+    return 1
+  fi
+
+  local venv_path
+  venv_path=$(expand_path "${UV_PROJECT_ENVIRONMENT:-.venv}")
+  export UV_PROJECT_ENVIRONMENT=$venv_path
+
+  # never modify uv.lock from an .envrc
+  uv sync --frozen "$@" || return
+
+  export VIRTUAL_ENV=$venv_path
+  if [[ -d "$venv_path/bin" ]]; then
+    PATH_add "$venv_path/bin"
+  fi
+  if [[ -d "$venv_path/Scripts" ]]; then
+    PATH_add "$venv_path/Scripts"
+  fi
+}
+
 # Usage: layout ruby
 #
 # Sets the GEM_HOME environment variable to "$(direnv_layout_dir)/ruby/RUBY_VERSION".
