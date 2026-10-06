@@ -101,10 +101,15 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 
 	var exePath string
-	if exePath, err = os.Executable(); err != nil {
-		err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
-		return
-	}
+	// Check env variable first
+	if envPath := os.Getenv("DIRENV_EXE_PATH"); envPath != "" {
+		exePath = envPath
+	} else {
+		if exePath, err = os.Executable(); err != nil {
+			err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
+			return
+		}
+	}	
 	// Fix for mingsys
 	exePath = strings.ReplaceAll(exePath, "\\", "/")
 	config.SelfPath = exePath
@@ -120,6 +125,9 @@ func LoadConfig(env Env) (config *Config, err error) {
 
 	// Default log format
 	config.LogFormat = defaultLogFormat
+
+	// Color logs unless TERM=dumb (also applies when no direnv.toml exists)
+	config.LogColor = os.Getenv("TERM") != "dumb"
 
 	config.RCFile = env[DIRENV_FILE]
 
@@ -149,8 +157,6 @@ func LoadConfig(env Env) (config *Config, err error) {
 			err = fmt.Errorf("LoadConfig() failed to parse %s: %w", config.TomlPath, err)
 			return
 		}
-
-		config.LogColor = os.Getenv("TERM") != "dumb"
 
 		format, ok := env["DIRENV_LOG_FORMAT"]
 		if ok {

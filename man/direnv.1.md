@@ -172,7 +172,7 @@ COMMANDS
 : Displays the stdlib available in the .envrc execution context.
 
 `direnv version`
-: Prints the version or checks that direnv is older than VERSION_AT_LEAST.
+: Prints the version or checks that direnv is no older than VERSION_AT_LEAST.
 
 USAGE
 -----

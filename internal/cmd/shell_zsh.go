@@ -10,6 +10,7 @@ var Zsh Shell = zsh{}
 
 const zshHook = `
 _direnv_hook() {
+  setopt localoptions localtraps
   vars="$("{{.SelfPath}}" export zsh)"
   trap -- '' SIGINT
   eval "$vars"

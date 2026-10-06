@@ -38,12 +38,10 @@ func (sh tcsh) export(key, value string) string {
 	if key == "PATH" {
 		var command strings.Builder
 		command.WriteString("set path = (")
-		for _, path := range strings.Split(value, ":") {
-			command.WriteString(" ")
-			command.WriteString(sh.escape(path))
+		for path := range strings.SplitSeq(value, ":") {
+			command.WriteString(" " + sh.escape(path))
 		}
-		command.WriteString(" );")
-		return command.String()
+		return command.String() + " );"
 	}
 	return "setenv " + sh.escape(key) + " " + sh.escape(value) + " ;"
 }

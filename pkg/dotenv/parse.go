@@ -47,7 +47,7 @@ func Parse(data string) (map[string]string, error) {
 	var multilineValue string
 	var quoteChar byte
 
-	for i := 0; i < len(lines); i++ {
+	for i := range lines {
 		line := lines[i]
 
 		// Continue collecting a multi-line value
@@ -176,16 +176,32 @@ func expandEnv(value string, dotenv map[string]string) string {
 		return getFromEnvOrDefault(envKey, defaultValue, hasDefault)
 	}
 
-	return os.Expand(value, expander)
+	// A backslash before a dollar sign escapes it, as in the canonical
+	// implementation. unescapeCharacters deliberately leaves `\$` alone for this
+	// step, and os.Expand knows nothing about escaping, so the escape has to be
+	// resolved here or the backslash is kept and the variable expands anyway.
+	var expanded strings.Builder
+	for {
+		i := strings.Index(value, `\$`)
+		if i < 0 {
+			break
+		}
+		expanded.WriteString(os.Expand(value[:i], expander))
+		expanded.WriteString("$")
+		value = value[i+2:]
+	}
+	expanded.WriteString(os.Expand(value, expander))
+
+	return expanded.String()
 }
 
 func splitKeyAndDefault(value string, sep string) (string, string, bool) {
-	var i = strings.Index(value, sep)
+	var before, after, ok = strings.Cut(value, sep)
 
-	if i == -1 {
+	if !ok {
 		return value, "", false
 	}
-	return value[0:i], value[i+len(sep):], true
+	return before, after, true
 }
 
 func lookupDotenv(value string, dotenv map[string]string) (string, bool) {
