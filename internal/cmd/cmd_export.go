@@ -32,6 +32,11 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	log.SetPrefix(log.Prefix() + "export:")
 	logDebug("start")
 
+	if currentEnv.IsTrue(DIRENV_DISABLE) {
+		logDebug("direnv is disabled by environment variable")
+		return nil
+	}
+
 	var target string
 
 	if len(args) > 1 {
@@ -85,7 +90,9 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	}
 
 	if toLoad == "" {
-		logStatus(config, "unloading")
+		if diffStatus(currentEnv.Diff(previousEnv)) != "" {
+			logStatus(config, "unloading")
+		}
 		newEnv = previousEnv.Copy()
 		newEnv.CleanContext()
 	} else {

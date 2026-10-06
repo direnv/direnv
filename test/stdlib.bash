@@ -265,6 +265,34 @@ test_name use_julia
   test_julia ""    "1.5"
 )
 
+test_name use_guix
+(
+  load_stdlib
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+  cd "$workdir"
+
+  # shellcheck disable=SC2329
+  guix() { echo "mode=search"; }
+  # shellcheck disable=SC2329
+  direnv_load() { mode=load; }
+  # shellcheck disable=SC2329
+  watch_file() { :; }
+
+  for args in --container -C -NC --emulate-fhs -F "-m m.scm -CF"; do
+    mode=
+    # shellcheck disable=SC2086
+    use_guix $args
+    assert_eq "$mode" search
+  done
+  for args in --file=Config.scm "-f Foo.scm" --development hello; do
+    mode=
+    # shellcheck disable=SC2086
+    use_guix $args
+    assert_eq "$mode" load
+  done
+)
+
 test_name source_env_if_exists
 (
   load_stdlib
