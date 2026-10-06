@@ -18,28 +18,28 @@ var CmdStatus = &Cmd{
 			if err != nil {
 				return err
 			}
-			jsonOutput := map[string]interface{}{
+			jsonOutput := map[string]any{
 				"config": map[string]string{
 					"SelfPath":  config.SelfPath,
 					"ConfigDir": config.ConfDir,
 				},
-				"state": map[string]interface{}{},
+				"state": map[string]any{},
 			}
 			if loadedRC != nil {
-				jsonOutput["state"].(map[string]interface{})["loadedRC"] = map[string]interface{}{
+				jsonOutput["state"].(map[string]any)["loadedRC"] = map[string]any{
 					"path":    loadedRC.path,
 					"allowed": loadedRC.Allowed(),
 				}
 			} else {
-				jsonOutput["state"].(map[string]interface{})["loadedRC"] = nil
+				jsonOutput["state"].(map[string]any)["loadedRC"] = nil
 			}
 			if foundRC != nil {
-				jsonOutput["state"].(map[string]interface{})["foundRC"] = map[string]interface{}{
+				jsonOutput["state"].(map[string]any)["foundRC"] = map[string]any{
 					"path":    foundRC.path,
 					"allowed": foundRC.Allowed(),
 				}
 			} else {
-				jsonOutput["state"].(map[string]interface{})["foundRC"] = nil
+				jsonOutput["state"].(map[string]any)["foundRC"] = nil
 			}
 			jsonBytes, err := json.MarshalIndent(jsonOutput, "", "  ")
 			if err != nil {

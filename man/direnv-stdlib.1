@@ -256,6 +256,12 @@ Sets environment variables from \fBopam env\fR\&.
 .SS \fBlayout php\fR
 Adds "$PWD/vendor/bin" to the PATH environment variable.
 
+.SS \fBlayout pixi\fR
+Loads a pixi environment. If no additional arguments are given the \fBdefault\fR environment is loaded.
+
+.PP
+You can pass \fB-e <env_name>\fR to load a different environment instead. For supported arguments see \fBpixi shell-hook --help\fR\&.
+
 .SS \fBlayout perl\fR
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
 
@@ -391,8 +397,38 @@ Example (.envrc):
 watch_file Gemfile
 .EE
 
+.SS \fBwatch_dir <dir>\fR
+Adds the directory to direnv's recursive watch-list. If any file within the
+directory or its subdirectories changes, direnv will reload the environment on
+the next prompt.
+
+.PP
+Example (.envrc):
+
+.EX
+watch_dir src
+.EE
+
+.SS \fBrequire_allowed <path> [<path> ...]\fR
+.PP
+(direnv >= 2.38.0 is required)
+.PP
+Adds a list of files to the allow-list for .envrc using the require_allowed command.
+If any of the specified files are modified, removed, or new files in the list appear,
+direnv will require you to run direnv allow again to re-authorize the environment.
+This increases security by ensuring that only changes to files you have explicitly allowed will take effect.
+You should use this in direnv configurations where you execute code from the lockfile
+(for example pixi's activation scripts or npm postinstall scripts).
+
+.PP
+Example (.envrc):
+
+.EX
+require_allowed pixi.toml pixi.lock
+.EE
+
 .SS \fBdirenv_version <version_at_least>\fR
-Checks that the direnv version is at least old as \fBversion_at_least\fR\&. This can
+Checks that the direnv version is no older than \fBversion_at_least\fR\&. This can
 be useful when sharing an \fB\&.envrc\fR and to make sure that the users are up to
 date.
 

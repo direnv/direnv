@@ -22,7 +22,7 @@ func cmdShowDumpAction(_ Env, args []string) (err error) {
 		return fmt.Errorf("missing DUMP argument")
 	}
 
-	var f interface{}
+	var f any
 	err = gzenv.Unmarshal(args[1], &f)
 	if err != nil {
 		return err

@@ -3,7 +3,7 @@
 ############################################################################
 
 # Set this to change the target installation path
-PREFIX   = /usr/local
+PREFIX   ?= /usr/local
 BINDIR   = ${PREFIX}/bin
 SHAREDIR = ${PREFIX}/share
 MANDIR   = ${SHAREDIR}/man
@@ -49,9 +49,11 @@ clean: ## Remove build artifacts
 GO_LDFLAGS =
 
 ifeq ($(shell uname), Darwin)
+  ifneq ($(CGO_ENABLED), 0)
 	# Fixes DYLD_INSERT_LIBRARIES issues
 	# See https://github.com/direnv/direnv/issues/194
 	GO_LDFLAGS += -linkmode=external
+  endif
 endif
 
 ifdef BASH_PATH
