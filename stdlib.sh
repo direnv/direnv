@@ -1475,7 +1475,7 @@ use_vim() {
 
 # Usage: direnv_version <version_at_least>
 #
-# Checks that the direnv version is at least old as <version_at_least>.
+# Checks that the direnv version is no older than <version_at_least>.
 direnv_version() {
   "$direnv" version "$@"
 }

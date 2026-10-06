@@ -410,7 +410,7 @@ Example (.envrc):
 
 ### `direnv_version <version_at_least>`
 
-Checks that the direnv version is at least old as `version_at_least`. This can
+Checks that the direnv version is no older than `version_at_least`. This can
 be useful when sharing an `.envrc` and to make sure that the users are up to
 date.
 
