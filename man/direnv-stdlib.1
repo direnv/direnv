@@ -92,7 +92,6 @@ source_env_if_exists .envrc.private
 
 .SS \fBenv_vars_required <varname> [<varname> ...]\fR
 Logs error for every variable not present in the environment or having an empty value.
-.br
 Typically this is used in combination with source_env and source_env_if_exists.
 
 .PP
@@ -346,6 +345,16 @@ of the hello package from the latest nixpkgs.
 Note that the flakes feature is hidden behind an experimental flag, which you
 will have to enable on your own. Flakes is not considered stable yet.
 
+.SS \fBuse nix_installables <installable> [<installable> ...]\fR
+Load environment variables from \fBnix shell\fR with the given installables.
+
+.PP
+For example, \fBuse nix_installables nixpkgs#nodejs nixpkgs#ruby\fR adds nodejs and
+ruby to the environment.
+
+.PP
+See https://nix.dev/manual/nix/stable/command-ref/new-cli/nix#installables
+
 .SS \fBuse guix [...]\fR
 Load environment variables from \fBguix shell\fR\&.
 
@@ -411,11 +420,17 @@ watch_dir src
 
 .SS \fBrequire_allowed <path> [<path> ...]\fR
 .PP
-(direnv >= 2.38.0 is required)
+.RS
+
 .PP
-Adds a list of files to the allow-list for .envrc using the require_allowed command.
+direnv >= 2.38.0 is required
+
+.RE
+
+.PP
+Adds a list of files to the allow-list for \fB\&.envrc\fR using the \fBrequire_allowed\fR command.
 If any of the specified files are modified, removed, or new files in the list appear,
-direnv will require you to run direnv allow again to re-authorize the environment.
+direnv will require you to run \fBdirenv allow\fR again to re-authorize the environment.
 This increases security by ensuring that only changes to files you have explicitly allowed will take effect.
 You should use this in direnv configurations where you execute code from the lockfile
 (for example pixi's activation scripts or npm postinstall scripts).

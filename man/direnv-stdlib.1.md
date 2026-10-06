@@ -336,6 +336,15 @@ of the hello package from the latest nixpkgs.
 Note that the flakes feature is hidden behind an experimental flag, which you
 will have to enable on your own. Flakes is not considered stable yet.
 
+### `use nix_installables <installable> [<installable> ...]`
+
+Load environment variables from `nix shell` with the given installables.
+
+For example, `use nix_installables nixpkgs#nodejs nixpkgs#ruby` adds nodejs and
+ruby to the environment.
+
+See https://nix.dev/manual/nix/stable/command-ref/new-cli/nix#installables
+
 ### `use guix [...]`
 
 Load environment variables from `guix shell`.

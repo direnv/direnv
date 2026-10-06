@@ -1409,7 +1409,7 @@ use_nix_installables() {
     printf "direnv(use_nix_installables): See also https://nix.dev/manual/nix/stable/command-ref/new-cli/nix#installables\n" >&2
     return 1
   fi
-  direnv_load nix shell "${@}" -c "$direnv" dump
+  direnv_load nix --extra-experimental-features "nix-command flakes" shell "$@" -c "$direnv" dump
 }
 
 # Usage: use_flox [...]
