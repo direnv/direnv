@@ -2,10 +2,10 @@
 
 use path
 
-E:TEST_DIR = (path:dir (src)[name])
+set E:TEST_DIR = (path:dir (src)[name])
 set-env XDG_CONFIG_HOME $E:TEST_DIR/config
 set-env XDG_DATA_HOME $E:TEST_DIR/data
-E:PATH = (path:dir $E:TEST_DIR):$E:PATH
+set E:PATH = (path:dir $E:TEST_DIR):$E:PATH
 
 cd $E:TEST_DIR
 
@@ -22,15 +22,16 @@ touch $E:XDG_CONFIG_HOME/direnv/direnvrc
 
 fn direnv-eval {
 	try {
-		m = (direnv export elvish | from-json)
-		keys $m | each [k]{
+		var m = (direnv export elvish | from-json)
+		var k
+		keys $m | each {|k|
 			if $m[$k] {
 				set-env $k $m[$k]
 			} else {
 				unset-env $k
 			}
 		}
-	} except e {
+	} catch e {
 		nop
 	}
 }
@@ -41,19 +42,19 @@ fn test-debug {
 	}
 }
 
-fn test-eq [a b]{
+fn test-eq {|a b|
 	if (!=s $a $b) {
 		fail "FAILED: '"$a"' == '"$b"'"
 	}
 }
 
-fn test-neq [a b]{
+fn test-neq {|a b|
 	if (==s $a $b) {
 		fail "FAILED: '"$a"' != '"$b"'"
 	}
 }
 
-fn test-scenario [name fct]{
+fn test-scenario {|name fct|
 	cd $E:TEST_DIR/scenarios/$name
 	direnv allow
 	test-debug
@@ -71,7 +72,7 @@ fn test-scenario [name fct]{
 
 try {
 	direnv allow
-} except e {
+} catch e {
 	nop
 }
 

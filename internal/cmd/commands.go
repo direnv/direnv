@@ -8,7 +8,7 @@ import (
 
 type actionSimple func(env Env, args []string) error
 
-func (fn actionSimple) Call(env Env, args []string, config *Config) error {
+func (fn actionSimple) Call(env Env, args []string, _ *Config) error {
 	return fn(env, args)
 }
 
@@ -48,6 +48,7 @@ func init() {
 		CmdAllow,
 		CmdApplyDump,
 		CmdShowDump,
+		CmdCheckRequired,
 		CmdDeny,
 		CmdDotEnv,
 		CmdDump,
@@ -65,19 +66,26 @@ func init() {
 		CmdWatch,
 		CmdWatchDir,
 		CmdWatchList,
+		CmdWatchPrint,
 		CmdCurrent,
+		CmdLog,
 	}
 }
 
 func cmdWithWarnTimeout(fn action) action {
 	return actionWithConfig(func(env Env, args []string, config *Config) (err error) {
+		// Disable warning if WarnTimeout is <= 0
+		if config.WarnTimeout <= 0 {
+			return fn.Call(env, args, config)
+		}
+
 		done := make(chan bool, 1)
 		go func() {
 			select {
 			case <-done:
 				return
 			case <-time.After(config.WarnTimeout):
-				logError("(%v) is taking a while to execute. Use CTRL-C to give up.", args)
+				logError(config, "(%v) is taking a while to execute. Use CTRL-C to give up.", args)
 			}
 		}()
 
@@ -109,11 +117,9 @@ func CommandsDispatch(env Env, args []string) error {
 			command = cmd
 			break
 		}
-		if cmd.Aliases != nil {
-			for _, alias := range cmd.Aliases {
-				if alias == commandName {
-					command = cmd
-				}
+		for _, alias := range cmd.Aliases {
+			if alias == commandName {
+				command = cmd
 			}
 		}
 	}

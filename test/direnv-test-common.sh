@@ -34,7 +34,20 @@ direnv_eval() {
 }
 
 test_start() {
-  cd "$TEST_DIR/scenarios/$1"
+  local isolated=false
+  if [[ "$2" == "isolated" ]]; then
+    isolated=true
+  fi
+
+  if [[ "$isolated" == false ]]; then
+    cd "$TEST_DIR/scenarios/$1"
+  else
+    export DIRENV_TEST_DIR=$(mktemp -d)
+
+    trap '[[ -n "$DIRENV_TEST_DIR" ]] && rm -r "$DIRENV_TEST_DIR"' EXIT
+    cp -r "$TEST_DIR/scenarios/$1" "$DIRENV_TEST_DIR"
+    cd "$DIRENV_TEST_DIR/$1"
+  fi
   direnv allow
   if [[ "$DIRENV_DEBUG" == "1" ]]; then
     echo
@@ -49,6 +62,12 @@ test_stop() {
   rm -f "${XDG_CONFIG_HOME}/direnv/direnv.toml"
   cd /
   direnv_eval
+  if [[ -n "$DIRENV_TEST_DIR" ]]; then
+    trap - EXIT
+
+    rm -r "$DIRENV_TEST_DIR"
+    unset DIRENV_TEST_DIR
+  fi
 }
 
 test_eq() {
@@ -95,6 +114,16 @@ test_start base
   test -z "${HELLO}"
 
   unset WATCHES
+test_stop
+
+test_start rm isolated
+  direnv_eval
+  test_eq "$HELLO" "world"
+
+  echo "Removing .envrc (should unload)"
+  mv .envrc .envrc.old
+  direnv_eval
+  test_eq "$HELLO" ""
 test_stop
 
 test_start inherit
@@ -207,6 +236,11 @@ test_start "failure"
   test_eq "${DIRENV_DIFF:-}" ""
   test_eq "${DIRENV_WATCHES:-}" ""
 
+  if direnv export "$TARGET_SHELL" >/dev/null 2>&1; then
+    echo "a failing .envrc must make direnv export fail"
+    false
+  fi
+
   direnv_eval
 
   test_neq "${DIRENV_DIFF:-}" ""
@@ -218,6 +252,11 @@ test_start "watch-dir"
     test_eq "${DIRENV_WATCHES}" "${WATCHES}"
 
     direnv_eval
+
+    if ! direnv watch-print | grep -q "testdir"; then
+        echo "FAILED: testdir added to watches"
+        exit 1
+    fi
 
     if ! direnv show_dump "${DIRENV_WATCHES}" | grep -q "testfile"; then
         echo "FAILED: testfile not added to DIRENV_WATCHES"
@@ -257,6 +296,11 @@ if has python; then
       echo "FAILED: VIRTUAL_ENV/bin not added to PATH"
       exit 1
     fi
+
+    if [[ ! -f .direnv/CACHEDIR.TAG ]]; then
+      echo "the layout dir should contain that file to filter that folder out of backups"
+      exit 1
+    fi
   test_stop
 
   test_start "python-custom-virtual-env"
@@ -270,19 +314,59 @@ if has python; then
   test_stop
 fi
 
+test_start "deleted-envrc"
+  direnv_eval
+  test_eq "$HELLO" "world"
+
+  echo "Deleting .envrc (env should be unloaded on next eval)"
+  cp .envrc .envrc.bak
+  rm .envrc
+  direnv_eval
+  test -z "${HELLO}"
+
+  mv .envrc.bak .envrc
+test_stop
+
 test_start "aliases"
   direnv deny
   # check that allow/deny aliases work
-  direnv permit && direnv_eval && test -n "${HELLO}"
-  direnv block  && direnv_eval && test -z "${HELLO}"
-  direnv grant  && direnv_eval && test -n "${HELLO}"
-  direnv revoke && direnv_eval && test -z "${HELLO}"
+  direnv permit   && direnv_eval && test -n "${HELLO}"
+  direnv block    && direnv_eval && test -z "${HELLO}"
+  direnv grant    && direnv_eval && test -n "${HELLO}"
+  direnv revoke   && direnv_eval && test -z "${HELLO}"
+  direnv grant    && direnv_eval && test -n "${HELLO}"
+  direnv disallow && direnv_eval && test -z "${HELLO}"
+test_stop
+
+# Make sure that the direnv process is not kept alive by process forks spawned
+# by .envrc
+test_start "process-fork"
+  direnv_eval &
+  DIRENV_PID=$!
+  sleep 1
+  if kill -0 "$DIRENV_PID" 2>/dev/null; then
+    kill -9 "$DIRENV_PID"
+    false
+  fi
+  unset DIRENV_PID
+test_stop
+
+test_start "big-var"
+  direnv_eval
+  test_eq "${#BIG}" 70000
 test_stop
 
 # shellcheck disable=SC2016
 test_start '$test'
   direnv_eval
   [[ $FOO = bar ]]
+test_stop
+
+# Make sure that directories with names that can end up creating paths like
+# \b or \r are not broken (Windows specific issue).
+test_start 'special-characters/backspace/return'
+  direnv_eval
+  test_eq "${HI}" "there"
 test_stop
 
 # Context: foo/bar is a symlink to ../baz. foo/ contains and .envrc file
@@ -304,3 +388,43 @@ test_stop
 #   NEW_LINK_TIME=`direnv file-mtime link-to-somefile`
 #   test "$LINK_TIME" = "$NEW_LINK_TIME"
 # test_stop
+
+test_start "require-allowed"
+  # First, deny to start fresh
+  direnv deny
+  unset REQUIRE_ALLOWED_TEST
+  unset DIRENV_REQUIRED
+
+  echo "Test 1: First allow permits .envrc but not required files"
+  direnv allow
+  direnv_eval
+  # REQUIRE_ALLOWED_TEST should NOT be set because required files aren't approved yet
+  test -z "${REQUIRE_ALLOWED_TEST:-}"
+  # DIRENV_REQUIRED should be set with the files needing approval
+  test -n "${DIRENV_REQUIRED:-}"
+
+  echo "Test 2: Second allow approves required files"
+  direnv allow
+  direnv_eval
+  test_eq "$REQUIRE_ALLOWED_TEST" "success"
+
+  echo "Test 3: Modifying a required file triggers re-approval"
+  sleep 1
+  # Save original content
+  ORIG_CONTENT=$(cat config.toml)
+  # Modify the file
+  echo "modified = true" >> config.toml
+  direnv_eval
+  # After modifying a required file, REQUIRE_ALLOWED_TEST should be unset
+  # because the file needs re-approval
+  test -z "${REQUIRE_ALLOWED_TEST:-}"
+
+  echo "Test 4: Re-allowing after modification works"
+  direnv allow
+  direnv_eval
+  test_eq "$REQUIRE_ALLOWED_TEST" "success"
+
+  # Restore original content for future test runs
+  echo "$ORIG_CONTENT" > config.toml
+  direnv allow
+test_stop

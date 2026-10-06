@@ -3,47 +3,51 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os"
+	"strings"
 )
 
 const (
-	defaultLogFormat        = "direnv: %s"
-	errorLogFormat          = defaultLogFormat
-	errorLogFormatWithColor = "\033[31mdirenv: %s\033[0m"
+	defaultLogFormat = "direnv: %s"
+	errorColor       = "\033[31m"
+	clearColor       = "\033[0m"
 )
 
 var debugging bool
-var noColor = os.Getenv("TERM") == "dumb"
 
 func setupLogging(env Env) {
 	log.SetFlags(0)
 	log.SetPrefix("")
-	if val, ok := env[DIRENV_DEBUG]; ok && val == "1" {
+	if val, ok := env[DIRENV_DEBUG]; ok && (val == "1" || strings.EqualFold(val, "true")) {
 		debugging = true
 		log.SetFlags(log.Ltime)
 		log.SetPrefix("direnv: ")
 	}
 }
 
-func logError(msg string, a ...interface{}) {
-	if noColor {
-		logMsg(errorLogFormat, msg, a...)
+func logError(c *Config, msg string, a ...any) {
+	if c.LogColor {
+		logMsg(errorColor+defaultLogFormat+clearColor, msg, a...)
 	} else {
-		logMsg(errorLogFormatWithColor, msg, a...)
+		logMsg(defaultLogFormat, msg, a...)
 	}
 }
 
-func logStatus(env Env, msg string, a ...interface{}) {
-	format, ok := env["DIRENV_LOG_FORMAT"]
-	if !ok {
-		format = defaultLogFormat
+func logStatus(c *Config, msg string, a ...any) {
+	format := c.LogFormat
+	shouldLog := true
+	if c.LogFilter != nil {
+		shouldLog = c.LogFilter.MatchString(msg)
 	}
-	if format != "" {
-		logMsg(format, msg, a...)
+	if shouldLog && format != "" {
+		if c.LogColor {
+			logMsg(fmt.Sprintf("%s%s", clearColor, format), msg, a...)
+		} else {
+			logMsg(format, msg, a...)
+		}
 	}
 }
 
-func logDebug(msg string, a ...interface{}) {
+func logDebug(msg string, a ...any) {
 	if !debugging {
 		return
 	}
@@ -53,7 +57,7 @@ func logDebug(msg string, a ...interface{}) {
 	_ = log.Output(2, msg)
 }
 
-func logMsg(format, msg string, a ...interface{}) {
+func logMsg(format, msg string, a ...any) {
 	defer log.SetFlags(log.Flags())
 	defer log.SetPrefix(log.Prefix())
 	log.SetFlags(0)

@@ -24,6 +24,16 @@ Add the following line at the end of the `~/.zshrc` file:
 eval "$(direnv hook zsh)"
 ```
 
+## Oh my zsh
+
+Oh my zsh has [a core plugin with direnv](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/direnv) support.
+
+Add direnv to the plugins array in your zshrc file:
+
+```sh
+plugins=(... direnv)
+```
+
 ## FISH
 
 Add the following line at the end of the `~/.config/fish/config.fish` file:
@@ -53,11 +63,55 @@ eval `direnv hook tcsh`
 Run:
 
 ```
-$> direnv hook elvish > ~/.elvish/lib/direnv.elv
+~> mkdir -p ~/.config/elvish/lib
+~> direnv hook elvish > ~/.config/elvish/lib/direnv.elv
 ```
 
-and add the following line to your `~/.elvish/rc.elv` file:
+and add the following line to your `~/.config/elvish/rc.elv` file:
 
 ```
 use direnv
+```
+
+## Nushell
+
+The following `config.nu` snippet, requiring Nushell 0.104 or later, shows how to
+configure a hook that runs when the current working directory is changed:
+
+```nushell
+use std/config *
+
+# Initialize the PWD hook as an empty list if it doesn't exist
+$env.config.hooks.env_change.PWD = $env.config.hooks.env_change.PWD? | default []
+
+$env.config.hooks.env_change.PWD ++= [{||
+  if (which direnv | is-empty) {
+    # If direnv isn't installed, do nothing
+    return
+  }
+
+  direnv export json | from json | default {} | load-env
+  # If direnv changes the PATH, it will become a string and we need to re-convert it to a list
+  $env.PATH = do (env-conversions).path.from_string $env.PATH
+}]
+```
+
+> **Note**
+> you can follow the official [cookbook example](https://www.nushell.sh/cookbook/direnv.html)
+> for the always up-to-date version of the hook above.
+
+## PowerShell
+
+Add the following line to your `$PROFILE`:
+
+```powershell
+Invoke-Expression "$(direnv hook pwsh)"
+```
+
+## Murex
+
+Add the following line to your `~/.murex_profile` file:
+
+```sh
+direnv hook murex -> source
 ```

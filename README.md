@@ -12,7 +12,7 @@ current directory.
 
 ## Use cases
 
-* Load 12factor apps environment variables
+* Load [12factor apps](https://12factor.net/) environment variables
 * Create per-project isolated development environments
 * Load secrets for deployment
 
@@ -37,7 +37,7 @@ used to build solutions similar to rbenv, pyenv and phpenv.
 ### Prerequisites
 
 * Unix-like operating system (macOS, Linux, ...)
-* A supported shell (bash, zsh, tcsh, fish, elvish)
+* A supported shell (bash, zsh, tcsh, fish, elvish, powershell, murex, nushell)
 
 ### Basic Installation
 
@@ -113,6 +113,7 @@ file next.
 * [Hook into your shell](docs/hook.md)
 * [Develop for direnv](docs/development.md)
 * [Manage your rubies with direnv and ruby-install](docs/ruby.md)
+* [Using direnv with GitHub Actions](docs/github-actions.md)
 * [Community Wiki](https://github.com/direnv/direnv/wiki)
 
 Make sure to take a look at the wiki! It contains all sorts of useful
@@ -121,6 +122,7 @@ information such as common recipes, editor integration, tips-and-tricks.
 ### Man pages
 
 * [direnv(1) man page](man/direnv.1.md)
+* [direnv-fetchurl(1) man page](man/direnv-fetchurl.1.md)
 * [direnv-stdlib(1) man page](man/direnv-stdlib.1.md)
 * [direnv.toml(1) man page](man/direnv.toml.1.md)
 
@@ -135,7 +137,7 @@ confusing for users:
 
 2. It's possible to override the stdlib with your own set of function by
    adding a bash file to `~/.config/direnv/direnvrc`. This file is loaded and
-   it's content made available to any `.envrc` file.
+   its content made available to any `.envrc` file.
 
 3. direnv is not loading the `.envrc` into the current shell. It's creating a
    new bash sub-process to load the stdlib, direnvrc and `.envrc`, and only
@@ -143,6 +145,12 @@ confusing for users:
    to record the environment changes accurately and also work with all sorts
    of shells. It also means that aliases and functions are not exportable
    right now.
+
+### Translations
+
+The direnv documentation is also available in other languages:
+
+* [日本語 (Japanese)](https://gemmaro.github.io/direnv/)
 
 ## Contributing
 
@@ -152,6 +160,15 @@ discussion happen on http://github.com/direnv/direnv/issues .
 Or drop by on [Matrix](https://matrix.to/#/#direnv:numtide.com) to
 have a chat. If you ask a question make sure to stay around as not everyone is
 active all day.
+
+### Testing
+
+To run our tests, use these commands: (you may need to install [homebrew](https://brew.sh/))
+
+```
+brew bundle
+make test
+```
 
 ## Complementary projects
 
@@ -166,12 +183,20 @@ Here is a list of other projects found in the same design space. Feel free to
 submit new ones.
 
 * [Environment Modules](http://modules.sourceforge.net/) - one of the oldest (in a good way) environment-loading systems
-* [autoenv](https://github.com/kennethreitz/autoenv) - lightweight; doesn't support unloads
+* [autoenv](https://github.com/hyperupcall/autoenv) - older, popular, and lightweight.
 * [zsh-autoenv](https://github.com/Tarrasch/zsh-autoenv) - a feature-rich mixture of autoenv and [smartcd](https://github.com/cxreg/smartcd): enter/leave events, nesting, stashing (Zsh-only).
 * [asdf](https://github.com/asdf-vm/asdf) - a pure bash solution that has a plugin system. The [asdf-direnv](https://github.com/asdf-community/asdf-direnv) plugin allows using asdf managed tools with direnv.
 * [ondir](https://github.com/alecthomas/ondir) - OnDir is a small program to automate tasks specific to certain directories
 * [shadowenv](https://shopify.github.io/shadowenv/) - uses an s-expression format to define environment changes that should be executed
 * [quickenv](https://github.com/untitaker/quickenv) - an alternative loader for `.envrc` files that does not hook into your shell and favors speed over convenience.
+* [mise](https://github.com/jdx/mise) - direnv, make and asdf all in one tool.
+
+## Commercial support
+
+Looking for help or customization?
+
+Get in touch with Numtide to get a quote. We make it easy for companies to
+work with Open Source projects: <https://numtide.com/contact>
 
 ## COPYRIGHT
 

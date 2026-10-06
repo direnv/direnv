@@ -29,7 +29,7 @@ set -euo pipefail
 
   kernel=$(uname -s | tr "[:upper:]" "[:lower:]")
   case "${kernel}" in
-    mingw*)
+    msys*|mingw*)
       kernel=windows
       ;;
   esac
@@ -39,6 +39,9 @@ set -euo pipefail
       ;;
     i686 | i386)
       machine=386
+      ;;
+    armv7l)
+      machine=arm
       ;;
     aarch64 | arm64)
       machine=arm64
@@ -76,12 +79,23 @@ set -euo pipefail
   fi
   echo "release=$release"
 
+  curl_args=(
+    -fL
+    "https://api.github.com/repos/direnv/direnv/releases/$release"
+  )
+
+  if [[ -n "${DIRENV_GITHUB_API_TOKEN:-}" ]]; then
+    # note: this doesn't actually print the token value.
+    echo "using DIRENV_GITHUB_API_TOKEN for GitHub API authentication"
+    curl_args+=(-H "Authorization: Bearer ${DIRENV_GITHUB_API_TOKEN}")
+  fi
+
   log "looking for a download URL"
   download_url=$(
-    curl -fL "https://api.github.com/repos/direnv/direnv/releases/$release" \
+    curl "${curl_args[@]}" \
     | grep browser_download_url \
     | cut -d '"' -f 4 \
-    | grep "direnv.$kernel.$machine"
+    | grep "direnv.$kernel.$machine\$"
   )
   echo "download_url=$download_url"
 

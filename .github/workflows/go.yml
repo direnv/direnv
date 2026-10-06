@@ -3,12 +3,13 @@ on:
   push:
     branches: [ master ]
   pull_request: {}
+  merge_group:
 permissions:
   contents: read
 
 jobs:
   build:
-    name: Build
+    name: Go Build
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -19,21 +20,22 @@ jobs:
           - windows-latest
 
     steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v6
+
     - name: Set up Go
-      uses: actions/setup-go@v3.4.0
+      uses: actions/setup-go@v6.2.0
       with:
-        go-version: 1.16
+        go-version: '1.26'
+        cache: true
       id: go
 
     - name: Set up Python
       if: runner.os != 'Windows'
-      uses: actions/setup-python@v4.3.0
+      uses: actions/setup-python@v6.2.0
       with:
         python-version: "3.9"
       id: python
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3.3.0
 
     - name: Build
       env:
