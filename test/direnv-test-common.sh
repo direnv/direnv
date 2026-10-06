@@ -213,6 +213,26 @@ test_start "failure"
   test_neq "${DIRENV_WATCHES:-}" ""
 test_stop
 
+echo "## Testing unloading message ##"
+unload_dir=$(mktemp -d)
+cd "$unload_dir"
+echo "export UNLOAD_TEST=1" >.envrc
+direnv deny
+direnv_eval
+cd /
+test_eq "$(direnv export "$TARGET_SHELL" 2>&1 >/dev/null | grep -c unloading)" "0"
+direnv_eval
+cd "$unload_dir"
+direnv allow
+direnv_eval
+test_eq "$UNLOAD_TEST" "1"
+echo "export UNLOAD_TEST=2" >.envrc
+cd /
+test_eq "$(direnv export "$TARGET_SHELL" 2>&1 >/dev/null | grep -c unloading)" "1"
+direnv_eval
+test_eq "${UNLOAD_TEST:-}" ""
+rm -rf "$unload_dir"
+
 test_start "watch-dir"
     echo "No watches by default"
     test_eq "${DIRENV_WATCHES}" "${WATCHES}"
