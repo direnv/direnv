@@ -60,6 +60,24 @@ test_name dotenv_if_exists
   [[ $FOO = bar ]]
 )
 
+test_name dotenv_fifo
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'kill %1 2>/dev/null; rm -rf "$workdir"' EXIT
+  cd "$workdir"
+  mkfifo .env
+
+  for fn in dotenv dotenv_if_exists; do
+    unset FOO DIRENV_WATCHES
+    echo "export FOO=bar" >.env &
+    "$fn" .env
+    assert_eq "${FOO:-}" bar
+    assert_eq "${DIRENV_WATCHES:-}" ""
+  done
+)
+
 test_name find_up
 (
   load_stdlib
