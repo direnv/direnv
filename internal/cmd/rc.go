@@ -279,16 +279,9 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
 	cmd.Stdin = stdin
-
-	var stderr io.ReadCloser
-	stderr, err = cmd.StderrPipe()
-	if err != nil {
-		return
-	}
-
-	go func() {
-		_, _ = io.Copy(os.Stderr, stderr)
-	}()
+	// an *os.File is not copied through a pipe, so forked processes holding
+	// it open do not block Wait
+	cmd.Stderr = os.Stderr
 
 	var stdout io.ReadCloser
 	stdout, err = cmd.StdoutPipe()
@@ -297,33 +290,29 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	}
 
 	var buf bytes.Buffer
-	scanner := bufio.NewScanner(stdout)
+	reader := bufio.NewReader(stdout)
 
 	err = cmd.Start()
 	if err != nil {
 		return
 	}
 
-	for scanner.Scan() {
-		line := scanner.Bytes()
+	// Stop at the end of the JSON output to not wait for forked
+	// subprocesses forever
+	for {
+		line, readErr := reader.ReadBytes('\n')
 		buf.Write(line)
-		buf.WriteByte('\n')
-
-		// Close all pipes after end of JSON output to not wait for forked
-		// subprocesses forever
-		if len(line) == 1 && line[0] == '}' {
-			_ = stdout.Close()
-			_ = stderr.Close()
-			_ = stdin.Close()
+		if readErr != nil || bytes.Equal(line, []byte("}\n")) {
 			break
 		}
 	}
+	_ = stdout.Close()
 
-	if err := cmd.Wait(); err == nil {
-		if output := buf.Bytes(); len(output) > 0 {
-			if newEnv2, err := LoadEnvJSON(output); err == nil {
-				newEnv = newEnv2
-			}
+	if err = cmd.Wait(); err == nil && buf.Len() > 0 {
+		var newEnv2 Env
+		newEnv2, err = LoadEnvJSON(buf.Bytes())
+		if err == nil {
+			newEnv = newEnv2
 		}
 	}
 
