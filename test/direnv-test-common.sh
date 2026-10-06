@@ -236,6 +236,11 @@ test_start "failure"
   test_eq "${DIRENV_DIFF:-}" ""
   test_eq "${DIRENV_WATCHES:-}" ""
 
+  if direnv export "$TARGET_SHELL" >/dev/null 2>&1; then
+    echo "a failing .envrc must make direnv export fail"
+    false
+  fi
+
   direnv_eval
 
   test_neq "${DIRENV_DIFF:-}" ""
@@ -344,6 +349,11 @@ test_start "process-fork"
     false
   fi
   unset DIRENV_PID
+test_stop
+
+test_start "big-var"
+  direnv_eval
+  test_eq "${#BIG}" 70000
 test_stop
 
 # shellcheck disable=SC2016
