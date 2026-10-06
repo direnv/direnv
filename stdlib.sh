@@ -855,17 +855,30 @@ layout_php() {
 
 # Usage: layout pixi [args]
 #
-# Loads a pixi environment.
-# If no additional arguments are given the `default` environment is loaded.
-# You can pass `-e <env_name>` to load a different environment instead.
-# For supported arguments see `pixi shell-hook --help`.
+# Loads a pixi environment. Arguments are passed to `pixi shell-hook`,
+# e.g. `layout pixi -e <env_name>`.
+# Must be used in the workspace root. The manifest and pixi.lock need to be
+# approved with `direnv allow` whenever they change.
 layout_pixi() {
-  if [[ ! -f "pixi.toml" ]] && [[ ! -f "pyproject.toml" ]]; then
-    log_error "No pixi.toml or pyproject.toml found.  Use \`pixi init\` to create a project first."
+  local manifest
+  if [[ -f pixi.toml ]]; then
+    manifest=pixi.toml
+  elif [[ -f pyproject.toml ]]; then
+    manifest=pyproject.toml
+  else
+    log_error "No pixi.toml or pyproject.toml found. Use \`pixi init\` to create a workspace first."
     exit 2
   fi
-  watch_file pixi.lock
-  require_allowed pixi.lock
+
+  if [[ ! -f pixi.lock ]]; then
+    watch_file pixi.lock
+    log_error "No pixi.lock found. Run \`pixi lock\` in the workspace root, review it and run \`direnv allow\`."
+    exit 2
+  fi
+
+  # also watches both files
+  require_allowed "$manifest" pixi.lock
+
   local __direnv_out
   __direnv_out="$(pixi shell-hook "$@")"
   eval "$__direnv_out"
