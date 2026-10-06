@@ -47,6 +47,16 @@ jobs:
         GO111MODULE: on
       run: go test -v ./...
 
+    - name: Set up Nix
+      if: runner.os != 'Windows'
+      uses: cachix/install-nix-action@v31
+      id: nix
+
+    - name: Use nix develop
+      if: runner.os != 'Windows'
+      uses: nicknovitski/nix-develop@v1
+      id: nix-develop
+
     - name: Test Host bash
       # FIXME: make this work on Windows as well
       if: runner.os != 'Windows'
