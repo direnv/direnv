@@ -26,26 +26,20 @@ func TestPwshExportRemovesBeforeAssigning(t *testing.T) {
 	}
 }
 
-func TestPwshHookQuotesSelfPathWithSpaces(t *testing.T) {
-	selfPath := "C:/Users/Jane Doe/direnv/direnv.exe"
-
-	hookStr, err := Pwsh.Hook()
+func TestPwshHookQuotesSelfPath(t *testing.T) {
+	hook, err := Pwsh.Hook()
 	if err != nil {
-		t.Fatalf("Hook() returned error: %v", err)
+		t.Fatal(err)
 	}
-
-	hookTemplate, err := template.New("hook").Parse(hookStr)
+	tmpl, err := template.New("hook").Parse(hook)
 	if err != nil {
-		t.Fatalf("failed to parse hook template: %v", err)
+		t.Fatal(err)
 	}
-
 	var out strings.Builder
-	err = hookTemplate.Execute(&out, HookContext{SelfPath: selfPath})
-	if err != nil {
-		t.Fatalf("failed to execute hook template: %v", err)
+	if err := tmpl.Execute(&out, HookContext{SelfPath: "C:/Users/Jane O'Doe/$x/direnv.exe"}); err != nil {
+		t.Fatal(err)
 	}
-
-	expected := `$export = (& "C:/Users/Jane Doe/direnv/direnv.exe" export pwsh) -join [Environment]::NewLine;`
+	expected := `$export = (& 'C:/Users/Jane O''Doe/$x/direnv.exe' export pwsh) -join [Environment]::NewLine;`
 	if !strings.Contains(out.String(), expected) {
 		t.Errorf("expected hook output to contain %q, got:\n%s", expected, out.String())
 	}
