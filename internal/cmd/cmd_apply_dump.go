@@ -36,7 +36,10 @@ func cmdApplyDumpAction(env Env, args []string) (err error) {
 
 	diff := env.Diff(dumpedEnv)
 
-	exports := diff.ToShell(Bash)
+	exports, err := diff.ToShell(Bash)
+	if err != nil {
+		return err
+	}
 
 	_, err = fmt.Println(exports)
 	if err != nil {

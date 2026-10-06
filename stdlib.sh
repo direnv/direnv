@@ -239,11 +239,13 @@ dotenv() {
     path=$path/.env
   fi
   watch_file "$path"
-  if ! [[ -f $path ]]; then
+  if ! [[ -f $path || -p $path ]]; then
     log_error ".env at $path not found"
     return 1
   fi
-  eval "$("$direnv" dotenv bash "$@")"
+  local __direnv_out
+  __direnv_out="$("$direnv" dotenv bash "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: dotenv_if_exists [<filename>]
@@ -258,10 +260,37 @@ dotenv_if_exists() {
     path=$path/.env
   fi
   watch_file "$path"
-  if ! [[ -f $path ]]; then
+  if ! [[ -f $path || -p $path ]]; then
     return
   fi
-  eval "$("$direnv" dotenv bash "$@")"
+  local __direnv_out
+  __direnv_out="$("$direnv" dotenv bash "$@")"
+  eval "$__direnv_out"
+}
+
+# Usage: require_allowed <filename> [<filename> ...]
+#
+# Requires that the specified files are approved before loading the .envrc.
+# If any files haven't been approved or have changed since approval, direnv
+# will prompt the user to run `direnv allow` again.
+#
+# This helps prevent supply chain attacks by ensuring that changes to
+# critical files (like pixi.toml, package.json, etc.) require explicit
+# user approval.
+#
+# Example:
+#
+#    require_allowed pixi.toml pixi.lock
+#
+require_allowed() {
+  # Also watch these files for changes
+  watch_file "$@"
+
+  # Check if files are in the allowed-required DB
+  # Pass $PWD/.envrc as the envrc path since we're executing in the .envrc's directory
+  local __direnv_out
+  __direnv_out="$("$direnv" check-required bash "$PWD/.envrc" "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: user_rel_path <abs_path>
@@ -414,14 +443,18 @@ env_vars_required() {
 # especially in direnvrc
 #
 watch_file() {
-  eval "$("$direnv" watch bash "$@")"
+  local __direnv_out
+  __direnv_out="$("$direnv" watch bash "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: watch_dir <dir>
 #
 # Adds <dir> to the list of dirs that direnv will recursively watch for changes
 watch_dir() {
-  eval "$("$direnv" watch-dir bash "$1")"
+  local __direnv_out
+  __direnv_out="$("$direnv" watch-dir bash "$1")"
+  eval "$__direnv_out"
 }
 
 # Usage: _source_up [<filename>] [true|false]
@@ -553,7 +586,9 @@ direnv_load() {
 # Loads the output of `direnv dump` that was stored in a file.
 direnv_apply_dump() {
   local path=$1
-  eval "$("$direnv" apply_dump "$path")"
+  local __direnv_out
+  __direnv_out="$("$direnv" apply_dump "$path")"
+  eval "$__direnv_out"
 }
 
 # Usage: PATH_add <path> [<path> ...]
@@ -789,7 +824,9 @@ layout_node() {
 # Sets environment variables from `opam env`.
 layout_opam() {
   export OPAMSWITCH=$PWD
-  eval "$(opam env "$@")"
+  local result
+  result="$(opam env "$@")"
+  eval "$result"
 }
 
 # Usage: layout perl
@@ -813,6 +850,24 @@ layout_perl() {
 # Adds "$PWD/vendor/bin" to the PATH environment variable
 layout_php() {
   PATH_add vendor/bin
+}
+
+# Usage: layout pixi [args]
+#
+# Loads a pixi environment.
+# If no additional arguments are given the `default` environment is loaded.
+# You can pass `-e <env_name>` to load a different environment instead.
+# For supported arguments see `pixi shell-hook --help`.
+layout_pixi() {
+  if [[ ! -f "pixi.toml" ]] && [[ ! -f "pyproject.toml" ]]; then
+    log_error "No pixi.toml or pyproject.toml found.  Use \`pixi init\` to create a project first."
+    exit 2
+  fi
+  watch_file pixi.lock
+  require_allowed pixi.lock
+  local __direnv_out
+  __direnv_out="$(pixi shell-hook "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: layout python <python_exe>
@@ -996,7 +1051,9 @@ layout_anaconda() {
     fi
   fi
 
-  eval "$("$conda" shell.bash activate "$env_loc")"
+  local result
+  result="$("$conda" shell.bash activate "$env_loc")"
+  eval "$result"
 }
 
 # Usage: layout pipenv
@@ -1163,7 +1220,9 @@ use_julia() {
 # Loads rbenv which add the ruby wrappers available on the PATH.
 #
 use_rbenv() {
-  eval "$(rbenv init -)"
+  local result
+  result="$(rbenv init -)"
+  eval "$result"
 }
 
 # Usage: rvm [...]
@@ -1292,6 +1351,8 @@ use_nodenv() {
 use_nix() {
   local -A values_to_restore=(
     ["NIX_BUILD_TOP"]=${NIX_BUILD_TOP:-__UNSET__}
+    ["NIX_ATTRS_JSON_FILE"]=${NIX_ATTRS_JSON_FILE:-__UNSET__}
+    ["NIX_ATTRS_SH_FILE"]=${NIX_ATTRS_SH_FILE:-__UNSET__}
     ["TMP"]=${TMP:-__UNSET__}
     ["TMPDIR"]=${TMPDIR:-__UNSET__}
     ["TEMP"]=${TEMP:-__UNSET__}
@@ -1327,7 +1388,11 @@ use_flake() {
   watch_file flake.nix
   watch_file flake.lock
   mkdir -p "$(direnv_layout_dir)"
-  eval "$(nix --extra-experimental-features "nix-command flakes" print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
+  local result
+  result="$(nix --extra-experimental-features "nix-command flakes" print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
+  eval "$result"
+  # refresh the gcroot mtime so age-based GC (e.g. nh clean) keeps it; -h because the target is in the read-only store
+  touch -h "$(direnv_layout_dir)/flake-profile"
   nix --extra-experimental-features "nix-command flakes" profile wipe-history --profile "$(direnv_layout_dir)/flake-profile"
 }
 
@@ -1336,18 +1401,19 @@ use_flake() {
 # Load environment variables from `flox activate`. By default uses the .flox
 # directory in the current directory.
 #
-# You can specify a remote environment with '--remote=<owner>/<name>' where
-# <owner>/<name> is the FloxHub environment name (e.g. `use_flox --remote=myorg/env`).
+# You can specify a FloxHub environment with '--reference=<owner>/<name>' 
+# or `-r=<owner>/<name>`, where <owner>/<name>
+# is the FloxHub environment name (e.g. `use_flox '--reference=myorg/env`).
 #
-# The '--trust' flag can be added to automatically trust remote environments:
-#    use_flox --trust --remote=myorg/env
+# The '--trust' flag can be added to automatically trust FloxHub environments:
+#    use_flox --trust '--reference=myorg/env
 #
 # An alternate local environment directory can be specified with '--dir=<path>',
 # where <path> contains a .flox directory.
 #
 # Example:
 #
-#    use_flox --remote=acme/production
+#    use_flox --reference=acme/production
 #    use_flox --dir=/path/to/env
 #
 # Note: Custom commands are not supported since flox activate is used for loading.
@@ -1384,7 +1450,7 @@ function use_flox() {
         return 1
     fi
 
-    direnv_load flox activate "${args[@]}" -- "$direnv" dump
+    direnv_load flox activate "${args[@]}" -c "$direnv dump"
 
     if [[ ${#args[@]} -eq 0 ]]; then
         watch_dir "$flox_dir/env/"
@@ -1412,9 +1478,13 @@ use_guix() {
     if [ -f channels.scm ]
     then
 	log_status "Using Guix version from channels.scm"
-	eval "$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
+	local result
+	result="$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
+	eval "$result"
     else
-	eval "$(guix shell "$@" --search-paths)"
+	local result
+	result="$(guix shell "$@" --search-paths)"
+	eval "$result"
     fi
 }
 
@@ -1433,7 +1503,7 @@ use_vim() {
 
 # Usage: direnv_version <version_at_least>
 #
-# Checks that the direnv version is at least old as <version_at_least>.
+# Checks that the direnv version is no older than <version_at_least>.
 direnv_version() {
   "$direnv" version "$@"
 }
@@ -1497,7 +1567,7 @@ __main__() {
   exec 3>&1
   exec 1>&2
 
-  # shellcheck disable=SC2317
+  # shellcheck disable=SC2329
   __dump_at_exit() {
     local ret=$?
     "$direnv" dump json "" >&3
@@ -1508,6 +1578,10 @@ __main__() {
 
   # load direnv libraries
   for lib in "$direnv_config_dir/lib/"*.sh; do
+    # Skip the unexpanded glob. nullglob only drops a non-matching pattern
+    # while pathname expansion is enabled; under `set -f` (noglob) the literal
+    # "*.sh" survives and would otherwise be sourced as a missing file.
+    [[ -f $lib ]] || continue
     # shellcheck disable=SC1090
     source "$lib"
   done

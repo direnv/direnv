@@ -19,11 +19,12 @@ func cmdLog(_ Env, args []string, c *Config) (err error) {
 	}
 	logType := args[1]
 	message := args[2]
-	if logType == "--status" || logType == "-status" {
+	switch logType {
+	case "--status", "-status":
 		logStatus(c, message)
-	} else if logType == "--error" || logType == "-error" {
+	case "--error", "-error":
 		logError(c, message)
-	} else {
+	default:
 		return fmt.Errorf("invalid log-type '%s'", logType)
 	}
 	return nil

@@ -47,7 +47,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	loadedRC := config.LoadedRC()
 	toLoad := findEnvUp(config.WorkDir, config.LoadDotenv)
 
-	if loadedRC == nil && toLoad == "" {
+	if loadedRC == nil && toLoad == "" && currentEnv[DIRENV_DIFF] == "" {
 		return
 	}
 
@@ -67,6 +67,10 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logDebug("new RC, loading")
 	case loadedRC.times.Check() != nil:
 		logDebug("file changed, reloading")
+	case currentEnv[DIRENV_REQUIRED] != "":
+		// Force reload if required files were pending approval.
+		// The approval status might have changed even if file times haven't.
+		logDebug("required files pending, reloading")
 	default:
 		logDebug("no update needed")
 		return
@@ -104,7 +108,10 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logStatus(config, "export %s", out)
 	}
 
-	diffString := currentEnv.Diff(newEnv).ToShell(shell)
+	diffString, diffErr := currentEnv.Diff(newEnv).ToShell(shell)
+	if diffErr != nil {
+		return fmt.Errorf("ToShell() failed: %w", diffErr)
+	}
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
 

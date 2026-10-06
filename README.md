@@ -113,6 +113,7 @@ file next.
 * [Hook into your shell](docs/hook.md)
 * [Develop for direnv](docs/development.md)
 * [Manage your rubies with direnv and ruby-install](docs/ruby.md)
+* [Using direnv with GitHub Actions](docs/github-actions.md)
 * [Community Wiki](https://github.com/direnv/direnv/wiki)
 
 Make sure to take a look at the wiki! It contains all sorts of useful
@@ -144,6 +145,12 @@ confusing for users:
    to record the environment changes accurately and also work with all sorts
    of shells. It also means that aliases and functions are not exportable
    right now.
+
+### Translations
+
+The direnv documentation is also available in other languages:
+
+* [日本語 (Japanese)](https://gemmaro.github.io/direnv/)
 
 ## Contributing
 

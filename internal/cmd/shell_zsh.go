@@ -1,5 +1,7 @@
 package cmd
 
+import "strings"
+
 // ZSH is a singleton instance of ZSH_T
 type zsh struct{}
 
@@ -8,8 +10,10 @@ var Zsh Shell = zsh{}
 
 const zshHook = `
 _direnv_hook() {
+  setopt localoptions localtraps
+  vars="$("{{.SelfPath}}" export zsh)"
   trap -- '' SIGINT
-  eval "$("{{.SelfPath}}" export zsh)"
+  eval "$vars"
   trap - SIGINT
 }
 typeset -ag precmd_functions
@@ -26,22 +30,24 @@ func (sh zsh) Hook() (string, error) {
 	return zshHook, nil
 }
 
-func (sh zsh) Export(e ShellExport) (out string) {
+func (sh zsh) Export(e ShellExport) (string, error) {
+	var out strings.Builder
 	for key, value := range e {
 		if value == nil {
-			out += sh.unset(key)
+			out.WriteString(sh.unset(key))
 		} else {
-			out += sh.export(key, *value)
+			out.WriteString(sh.export(key, *value))
 		}
 	}
-	return out
+	return out.String(), nil
 }
 
-func (sh zsh) Dump(env Env) (out string) {
+func (sh zsh) Dump(env Env) (string, error) {
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out
+	return out.String(), nil
 }
 
 func (sh zsh) export(key, value string) string {

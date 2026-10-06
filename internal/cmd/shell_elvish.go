@@ -32,22 +32,22 @@ set @edit:before-readline = $@edit:before-readline {
 `, nil
 }
 
-func (sh elvish) Export(e ShellExport) string {
+func (sh elvish) Export(e ShellExport) (string, error) {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(e)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return buf.String()
+	return buf.String(), nil
 }
 
-func (sh elvish) Dump(env Env) (out string) {
+func (sh elvish) Dump(env Env) (string, error) {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(env)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return buf.String()
+	return buf.String(), nil
 }
 
 var (

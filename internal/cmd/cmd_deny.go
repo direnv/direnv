@@ -40,5 +40,27 @@ func cmdDenyAction(_ Env, args []string, config *Config) (err error) {
 		}
 		return fmt.Errorf(".envrc file not found")
 	}
+
+	// Remove required files for this .envrc
+	if err = removeAllowedRequiredFiles(rc.Path(), config); err != nil {
+		return err
+	}
+
 	return rc.Deny()
+}
+
+func removeAllowedRequiredFiles(rcPath string, config *Config) error {
+	envrcPathHash, err := pathHash(rcPath)
+	if err != nil {
+		return fmt.Errorf("failed to hash envrc path: %w", err)
+	}
+
+	allowedRequiredDir := filepath.Join(config.AllowedRequiredDir(), envrcPathHash)
+
+	// Remove the entire allowed-required directory for this .envrc
+	if err := os.RemoveAll(allowedRequiredDir); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to remove allowed-required files: %w", err)
+	}
+
+	return nil
 }

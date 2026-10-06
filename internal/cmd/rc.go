@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -138,11 +141,15 @@ func (rc *RC) Deny() (err error) {
 	return os.Remove(rc.allowPath)
 }
 
+// AllowStatus represents the permission status of an RC file.
 type AllowStatus int
 
 const (
+	// Allowed indicates the RC file is permitted to load.
 	Allowed AllowStatus = iota
+	// NotAllowed indicates the RC file has not been granted permission.
 	NotAllowed
+	// Denied indicates the RC file has been explicitly denied.
 	Denied
 )
 
@@ -272,12 +279,38 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
 	cmd.Stdin = stdin
+	// an *os.File is not copied through a pipe, so forked processes holding
+	// it open do not block Wait
 	cmd.Stderr = os.Stderr
 
-	var out []byte
-	if out, err = cmd.Output(); err == nil && len(out) > 0 {
+	var stdout io.ReadCloser
+	stdout, err = cmd.StdoutPipe()
+	if err != nil {
+		return
+	}
+
+	var buf bytes.Buffer
+	reader := bufio.NewReader(stdout)
+
+	err = cmd.Start()
+	if err != nil {
+		return
+	}
+
+	// Stop at the end of the JSON output to not wait for forked
+	// subprocesses forever
+	for {
+		line, readErr := reader.ReadBytes('\n')
+		buf.Write(line)
+		if readErr != nil || bytes.Equal(line, []byte("}\n")) {
+			break
+		}
+	}
+	_ = stdout.Close()
+
+	if err = cmd.Wait(); err == nil && buf.Len() > 0 {
 		var newEnv2 Env
-		newEnv2, err = LoadEnvJSON(out)
+		newEnv2, err = LoadEnvJSON(buf.Bytes())
 		if err == nil {
 			newEnv = newEnv2
 		}
@@ -320,7 +353,11 @@ func fileExists(path string) bool {
 	if err != nil {
 		return false
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Printf("Warning: failed to close file: %v", err)
+		}
+	}()
 
 	// Next, check that the file is a regular file.
 	fi, err := f.Stat()

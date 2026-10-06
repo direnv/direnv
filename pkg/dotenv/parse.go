@@ -32,18 +32,67 @@ const LINE = `
 \z
 `
 
-var linesRe = regexp.MustCompile("[\\r\\n]+")
+var linesRe = regexp.MustCompile(`[\r\n]+`)
 var lineRe = regexp.MustCompile(
-	regexp.MustCompile("\\s+").ReplaceAllLiteralString(
-		regexp.MustCompile("\\s+# .*").ReplaceAllLiteralString(LINE, ""), ""))
+	regexp.MustCompile(`\s+`).ReplaceAllLiteralString(
+		regexp.MustCompile(`\s+# .*`).ReplaceAllLiteralString(LINE, ""), ""))
 
 // Parse reads a string in the .env format and returns a map of the extracted key=values.
 //
 // Ported from https://github.com/bkeepers/dotenv/blob/84f33f48107c492c3a99bd41c1059e7b4c1bb67a/lib/dotenv/parser.rb
 func Parse(data string) (map[string]string, error) {
 	var dotenv = make(map[string]string)
+	var lines = linesRe.Split(data, -1)
+	var inMultiline bool
+	var multilineValue string
+	var quoteChar byte
 
-	for _, line := range linesRe.Split(data, -1) {
+	for i := range lines {
+		line := lines[i]
+
+		// Continue collecting a multi-line value
+		if inMultiline {
+			multilineValue += "\n" + line
+
+			// Check if this line completes the multi-line value
+			if strings.HasSuffix(strings.TrimSpace(line), string(quoteChar)) {
+				// Process the completed multi-line value
+				match := lineRe.FindStringSubmatch(multilineValue)
+				if len(match) > 1 && len(match[1]) > 0 {
+					key := match[1]
+					value := match[2]
+					parseValue(key, value, dotenv)
+				}
+				inMultiline = false
+			}
+			continue
+		}
+
+		// Check for the beginning of a multi-line value, but not in a
+		// comment line that happens to contain a quote
+		if trimmed := strings.TrimLeft(line, " \t"); !strings.HasPrefix(trimmed, "#") &&
+			(strings.Contains(line, "=") || strings.Contains(line, ":")) {
+			sepIdx := strings.IndexAny(line, "=:")
+			if sepIdx > 0 && sepIdx+1 < len(line) {
+				// Extract the part after the separator
+				afterSep := line[sepIdx+1:]
+				trimmedAfterSep := strings.TrimLeft(afterSep, " \t")
+
+				// Check if value starts with a quote
+				if len(trimmedAfterSep) > 0 && (trimmedAfterSep[0] == '"' || trimmedAfterSep[0] == '\'') {
+					// Start multi-line collection only if the opening
+					// quote is not closed on the same line
+					if unclosedQuote(trimmedAfterSep) {
+						quoteChar = trimmedAfterSep[0]
+						inMultiline = true
+						multilineValue = line
+						continue
+					}
+				}
+			}
+		}
+
+		// Normal line processing
 		if !lineRe.MatchString(line) {
 			return nil, fmt.Errorf("invalid line: %s", line)
 		}
@@ -63,6 +112,11 @@ func Parse(data string) (map[string]string, error) {
 		parseValue(key, value, dotenv)
 	}
 
+	// If we end with an unclosed multi-line value, return an error
+	if inMultiline {
+		return nil, fmt.Errorf("unclosed quoted value in .env file")
+	}
+
 	return dotenv, nil
 }
 
@@ -73,6 +127,23 @@ func MustParse(data string) map[string]string {
 		panic(err)
 	}
 	return env
+}
+
+// unclosedQuote reports whether value, which starts with a quote, has no
+// unescaped closing quote.
+func unclosedQuote(value string) bool {
+	quote := value[0]
+	for i := 1; i < len(value); i++ {
+		switch value[i] {
+		case '\\':
+			if i+1 < len(value) && value[i+1] == quote {
+				i++
+			}
+		case quote:
+			return false
+		}
+	}
+	return true
 }
 
 func parseValue(key string, value string, dotenv map[string]string) {
@@ -100,15 +171,15 @@ func parseValue(key string, value string, dotenv map[string]string) {
 	dotenv[key] = value
 }
 
-var escRe = regexp.MustCompile("\\\\([^$])")
+var escRe = regexp.MustCompile(`\\([^$])`)
 
 func unescapeCharacters(value string) string {
 	return escRe.ReplaceAllString(value, "$1")
 }
 
 func expandNewLines(value string) string {
-	value = strings.Replace(value, "\\n", "\n", -1)
-	value = strings.Replace(value, "\\r", "\r", -1)
+	value = strings.ReplaceAll(value, "\\n", "\n")
+	value = strings.ReplaceAll(value, "\\r", "\r")
 	return value
 }
 
@@ -123,16 +194,32 @@ func expandEnv(value string, dotenv map[string]string) string {
 		return getFromEnvOrDefault(envKey, defaultValue, hasDefault)
 	}
 
-	return os.Expand(value, expander)
+	// A backslash before a dollar sign escapes it, as in the canonical
+	// implementation. unescapeCharacters deliberately leaves `\$` alone for this
+	// step, and os.Expand knows nothing about escaping, so the escape has to be
+	// resolved here or the backslash is kept and the variable expands anyway.
+	var expanded strings.Builder
+	for {
+		i := strings.Index(value, `\$`)
+		if i < 0 {
+			break
+		}
+		expanded.WriteString(os.Expand(value[:i], expander))
+		expanded.WriteString("$")
+		value = value[i+2:]
+	}
+	expanded.WriteString(os.Expand(value, expander))
+
+	return expanded.String()
 }
 
 func splitKeyAndDefault(value string, sep string) (string, string, bool) {
-	var i = strings.Index(value, sep)
+	var before, after, ok = strings.Cut(value, sep)
 
-	if i == -1 {
+	if !ok {
 		return value, "", false
 	}
-	return value[0:i], value[i+len(sep):], true
+	return before, after, true
 }
 
 func lookupDotenv(value string, dotenv map[string]string) (string, bool) {

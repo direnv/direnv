@@ -1,5 +1,5 @@
-// the gzenv format: json+gzip+base64
-// a quickly designed format to export the whole environment back into itself
+// Package gzenv implements a compressed environment format using json+gzip+base64.
+// It provides a quickly designed format to export the whole environment back into itself.
 package gzenv
 
 import (
@@ -9,11 +9,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 )
 
 // Marshal encodes the object into the gzenv format
-func Marshal(obj interface{}) string {
+func Marshal(obj any) string {
 	jsonData, err := json.Marshal(obj)
 
 	if err != nil {
@@ -24,7 +25,9 @@ func Marshal(obj interface{}) string {
 	w := zlib.NewWriter(zlibData)
 	// we assume the zlib writer would never fail
 	_, _ = w.Write(jsonData)
-	w.Close()
+	if err := w.Close(); err != nil {
+		log.Printf("Warning: failed to close zlib writer: %v", err)
+	}
 
 	base64Data := base64.URLEncoding.EncodeToString(zlibData.Bytes())
 
@@ -32,7 +35,7 @@ func Marshal(obj interface{}) string {
 }
 
 // Unmarshal restores the gzenv format back into a Go object
-func Unmarshal(gzenv string, obj interface{}) error {
+func Unmarshal(gzenv string, obj any) error {
 	gzenv = strings.TrimSpace(gzenv)
 
 	data, err := base64.URLEncoding.DecodeString(gzenv)
@@ -53,7 +56,9 @@ func Unmarshal(gzenv string, obj interface{}) error {
 	if err != nil {
 		return fmt.Errorf("unmarshal() zlib decoding: %w", err)
 	}
-	w.Close()
+	if err := w.Close(); err != nil {
+		log.Printf("Warning: failed to close zlib reader: %v", err)
+	}
 
 	err = json.Unmarshal(envData.Bytes(), &obj)
 	if err != nil {
