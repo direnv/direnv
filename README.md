@@ -84,6 +84,10 @@ $ echo ${FOO-nope}
 nope
 ```
 
+Some stdlib functions store files in `.direnv/`. Add `.direnv/` to your
+`.gitignore`. For local overrides that you do not commit, put
+`source_env_if_exists .envrc.local` in `.envrc` and also ignore `.envrc.local`.
+
 ### The stdlib
 
 Exporting variables by hand is a bit repetitive so direnv provides a set of
@@ -145,6 +149,12 @@ confusing for users:
    to record the environment changes accurately and also work with all sorts
    of shells. It also means that aliases and functions are not exportable
    right now.
+
+### Translations
+
+The direnv documentation is also available in other languages:
+
+* [日本語 (Japanese)](https://gemmaro.github.io/direnv/)
 
 ## Contributing
 

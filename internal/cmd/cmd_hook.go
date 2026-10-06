@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 	"text/template"
 )
 
@@ -13,29 +12,27 @@ type HookContext struct {
 	SelfPath string
 }
 
+// BashSelfPath is SelfPath escaped for bash and zsh
+func (ctx HookContext) BashSelfPath() string {
+	return BashEscape(ctx.SelfPath)
+}
+
 // CmdHook is `direnv hook $0`
 var CmdHook = &Cmd{
 	Name:   "hook",
 	Desc:   "Used to setup the shell hook",
 	Args:   []string{"SHELL"},
-	Action: actionSimple(cmdHookAction),
+	Action: actionWithConfig(cmdHookAction),
 }
 
-func cmdHookAction(_ Env, args []string) (err error) {
+func cmdHookAction(_ Env, args []string, config *Config) (err error) {
 	var target string
 
 	if len(args) > 1 {
 		target = args[1]
 	}
 
-	selfPath, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
-	// Convert Windows path if needed
-	selfPath = strings.ReplaceAll(selfPath, "\\", "/")
-	ctx := HookContext{selfPath}
+	ctx := HookContext{config.SelfPath}
 
 	shell := DetectShell(target)
 	if shell == nil {

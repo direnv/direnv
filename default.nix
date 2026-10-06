@@ -1,17 +1,35 @@
-{ buildGoApplication, lib, stdenv, bash }:
+{
+  buildGoApplication,
+  lib,
+  stdenv,
+  bash,
+  __includeMan ? true,
+}:
 buildGoApplication {
   pname = "direnv";
   version = lib.fileContents ./version.txt;
   subPackages = [ "." ];
 
-  src = ./.;
-  pwd = ./.;
+  src = lib.fileset.toSource {
+    root = ./.;
+    fileset = lib.fileset.unions (
+      [
+        ./go.mod
+        ./go.sum
+        ./gomod2nix.toml
+        ./GNUmakefile
+        ./stdlib.sh
+        ./version.txt
+        (lib.fileset.fileFilter (file: file.hasExt "go") ./.)
+      ]
+      ++ lib.optional __includeMan (lib.fileset.fileFilter (file: file.hasExt "1") ./man)
+    );
+  };
+
   modules = ./gomod2nix.toml;
 
   # we have no bash at the moment for windows
-  BASH_PATH =
-    lib.optionalString (!stdenv.hostPlatform.isWindows)
-      "${bash}/bin/bash";
+  BASH_PATH = lib.optionalString (!stdenv.hostPlatform.isWindows) "${bash}/bin/bash";
 
   # replace the build phase to use the GNUMakefile instead
   buildPhase = ''
@@ -22,6 +40,10 @@ buildGoApplication {
   installPhase = ''
     echo $GOCACHE
     make install PREFIX=$out
+  '';
+
+  checkPhase = ''
+    make test-go
   '';
 
   meta = {

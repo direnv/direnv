@@ -172,7 +172,7 @@ COMMANDS
 : Displays the stdlib available in the .envrc execution context.
 
 `direnv version`
-: Prints the version or checks that direnv is older than VERSION_AT_LEAST.
+: Prints the version or checks that direnv is no older than VERSION_AT_LEAST.
 
 USAGE
 -----
@@ -205,6 +205,10 @@ Hopefully this is enough to get you started.
 
 ENVIRONMENT
 -----------
+
+`DIRENV_DISABLE`
+: Set to `1` or `true` to stop direnv from changing the environment. direnv
+does not revert the changes it already made. Unset it to let direnv continue.
 
 `XDG_CONFIG_HOME`
 : Defaults to `$HOME/.config`.

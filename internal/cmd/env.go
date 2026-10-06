@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
+	"maps"
 	"os"
 	"strings"
 
@@ -12,7 +14,8 @@ import (
 type Env map[string]string
 
 // GetEnv turns the classic unix environment variables into a map of
-// key->values which is more handy to work with.
+// key->values which is more handy to work with. It skips over variables
+// that don't follow the "key=value" format.
 //
 // NOTE:  We don't support having two variables with the same name.
 // I've never seen it used in the wild but according to POSIX it's allowed.
@@ -21,7 +24,10 @@ func GetEnv() Env {
 
 	for _, kv := range os.Environ() {
 		kv2 := strings.SplitN(kv, "=", 2)
-
+		if len(kv2) < 2 {
+			fmt.Fprintf(os.Stderr, "direnv: Skipping invalid environment variable: %s\n", kv)
+			continue
+		}
 		key := kv2[0]
 		value := kv2[1]
 
@@ -62,9 +68,7 @@ func LoadEnvJSON(jsonBytes []byte) (env Env, err error) {
 func (env Env) Copy() Env {
 	newEnv := make(Env)
 
-	for key, value := range env {
-		newEnv[key] = value
-	}
+	maps.Copy(newEnv, env)
 
 	return newEnv
 }
@@ -101,6 +105,12 @@ func (env Env) Serialize() string {
 // Diff returns the diff between the current env and the passed env
 func (env Env) Diff(other Env) *EnvDiff {
 	return BuildEnvDiff(env, other)
+}
+
+// IsTrue returns true if the given key is set to "1" or "true".
+func (env Env) IsTrue(key string) bool {
+	v := env[key]
+	return v == "1" || strings.EqualFold(v, "true")
 }
 
 // Fetch tries to get the value associated with the given 'key', or returns

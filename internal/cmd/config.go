@@ -101,10 +101,15 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 
 	var exePath string
-	if exePath, err = os.Executable(); err != nil {
-		err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
-		return
-	}
+	// Check env variable first
+	if envPath := os.Getenv("DIRENV_EXE_PATH"); envPath != "" {
+		exePath = envPath
+	} else {
+		if exePath, err = os.Executable(); err != nil {
+			err = fmt.Errorf("LoadConfig() os.Executable() failed: %w", err)
+			return
+		}
+	}	
 	// Fix for mingsys
 	exePath = strings.ReplaceAll(exePath, "\\", "/")
 	config.SelfPath = exePath
@@ -118,8 +123,14 @@ func LoadConfig(env Env) (config *Config, err error) {
 	// Default Warn Timeout
 	config.WarnTimeout = 5 * time.Second
 
-	// Default log format
-	config.LogFormat = defaultLogFormat
+	if logFmt, ok := env[DIRENV_LOG_FORMAT]; ok {
+		config.LogFormat = logFmt
+	} else {
+		config.LogFormat = defaultLogFormat
+	}
+
+	// Color logs unless TERM=dumb (also applies when no direnv.toml exists)
+	config.LogColor = os.Getenv("TERM") != "dumb"
 
 	config.RCFile = env[DIRENV_FILE]
 
@@ -150,16 +161,13 @@ func LoadConfig(env Env) (config *Config, err error) {
 			return
 		}
 
-		config.LogColor = os.Getenv("TERM") != "dumb"
-
-		format, ok := env["DIRENV_LOG_FORMAT"]
-		if ok {
-			config.LogFormat = format
-		} else if logFmt := global.LogFormat; logFmt != "" {
-			if logFmt == "-" {
-				logFmt = ""
+		if _, hasEnvLogFmt := env[DIRENV_LOG_FORMAT]; !hasEnvLogFmt {
+			if logFmt := global.LogFormat; logFmt != "" {
+				if logFmt == "-" {
+					logFmt = ""
+				}
+				config.LogFormat = logFmt
 			}
-			config.LogFormat = logFmt
 		}
 
 		if global.LogFilter != "" {

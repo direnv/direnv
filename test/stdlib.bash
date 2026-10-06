@@ -74,10 +74,45 @@ test_name source_up
   source_up
 )
 
+test_name eval_propagates_failure
+(
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+  cd "$workdir"
+
+  # shellcheck disable=SC2016
+  printf '#!/usr/bin/env bash\n[[ $1 == "$FAIL_CMD" ]] && exit 1\nexec %q "$@"\n' \
+    "$(command -v direnv)" >fake-direnv
+  chmod +x fake-direnv
+  echo "FOO=bar" >.env
+  direnv dump >env.dump
+
+  # a separate process, because errexit is ignored inside `if` and `&&`
+  run_failing() {
+    FAIL_CMD=$1 bash -euo pipefail -c 'source "$1"; direnv=$2; shift 2; "$@"' \
+      _ "$root/stdlib.sh" "$workdir/fake-direnv" "${@:2}"
+  }
+
+  for t in "dotenv dotenv .env" "dotenv dotenv_if_exists .env" \
+    "check-required require_allowed .env" "watch watch_file .env" \
+    "watch-dir watch_dir ." "apply_dump direnv_apply_dump env.dump"; do
+    # shellcheck disable=SC2086
+    if run_failing $t 2>/dev/null; then
+      echo "failure of 'direnv ${t%% *}' was ignored"
+      return 1
+    fi
+  done
+
+  load_stdlib
+  echo "result=kept" >.env
+  dotenv .env
+  assert_eq "$result" kept
+)
+
 test_name direnv_apply_dump
 (
   tmpfile=$(mktemp)
-  # shellcheck disable=SC2317
+  # shellcheck disable=SC2329
   cleanup() { rm "$tmpfile"; }
   trap cleanup EXIT
 
@@ -173,6 +208,34 @@ test_name use_julia
   JULIA_VERSION_PREFIX=
   test_julia ""    "1.4.0"
   test_julia ""    "1.5"
+)
+
+test_name use_guix
+(
+  load_stdlib
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+  cd "$workdir"
+
+  # shellcheck disable=SC2329
+  guix() { echo "mode=search"; }
+  # shellcheck disable=SC2329
+  direnv_load() { mode=load; }
+  # shellcheck disable=SC2329
+  watch_file() { :; }
+
+  for args in --container -C -NC --emulate-fhs -F "-m m.scm -CF"; do
+    mode=
+    # shellcheck disable=SC2086
+    use_guix $args
+    assert_eq "$mode" search
+  done
+  for args in --file=Config.scm "-f Foo.scm" --development hello; do
+    mode=
+    # shellcheck disable=SC2086
+    use_guix $args
+    assert_eq "$mode" load
+  done
 )
 
 test_name source_env_if_exists
@@ -272,6 +335,36 @@ EOF
   [[ -d .venv ]]
   [[ "$VIRTUAL_ENV" == "$workdir/.venv" ]]
   [[ "$UV_PROJECT_ENVIRONMENT" == "$workdir/.venv" ]]
+)
+
+test_name global_lib_noglob
+(
+  # Regression test for https://github.com/direnv/direnv/issues/1610
+  # With pathname expansion disabled (set -f / noglob) and no global library
+  # files present, direnv must not source the literal "*.sh" glob and emit a
+  # spurious missing-file diagnostic for the optional lib directory.
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+
+  mkdir -p "$workdir/home" "$workdir/project" "$workdir/config/direnv"
+  echo "export DIRENV_NOGLOB_TEST=1" > "$workdir/project/.envrc"
+
+  HOME="$workdir/home" XDG_CONFIG_HOME="$workdir/config" \
+    DIRENV_CONFIG="$workdir/config/direnv" \
+    direnv allow "$workdir/project/.envrc" >/dev/null 2>&1
+
+  output="$(
+    cd "$workdir/project"
+    env HOME="$workdir/home" XDG_CONFIG_HOME="$workdir/config" \
+      DIRENV_CONFIG="$workdir/config/direnv" \
+      SHELLOPTS=braceexpand:hashall:interactive-comments:noglob \
+      direnv export bash 2>&1 >/dev/null
+  )"
+
+  if [[ "$output" == *"lib/*.sh"* ]]; then
+    echo "unexpected missing-library diagnostic under noglob: $output"
+    return 1
+  fi
 )
 
 # test strict_env and unstrict_env

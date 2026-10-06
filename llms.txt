@@ -1,0 +1,21 @@
+# direnv
+
+> direnv is an environment switcher for the shell. It loads and unloads environment variables depending on the current directory, using an `.envrc` file to set up project-specific environments and tear them down when you leave.
+
+Full documentation site: https://direnv.net
+
+## Getting Started
+- [Home](https://direnv.net/index.html)
+- [Installation](https://direnv.net/docs/installation.html)
+- [Hooking direnv into your shell](https://direnv.net/docs/hook.html)
+
+## Guides
+- [Using direnv with Ruby](https://direnv.net/docs/ruby.html)
+- [Using direnv with GitHub Actions](https://direnv.net/docs/github-actions.html)
+- [Development](https://direnv.net/docs/development.html)
+
+## Man Pages
+- [direnv(1)](https://direnv.net/man/direnv.1.html)
+- [direnv-stdlib(1)](https://direnv.net/man/direnv-stdlib.1.html)
+- [direnv-fetchurl(1)](https://direnv.net/man/direnv-fetchurl.1.html)
+- [direnv.toml(1)](https://direnv.net/man/direnv.toml.1.html)
