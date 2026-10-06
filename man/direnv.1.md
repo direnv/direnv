@@ -54,7 +54,7 @@ SETUP
 -----
 
 For direnv to work properly it needs to be hooked into the shell. Each shell
-has it's own extension mechanism:
+has its own extension mechanism:
 
 ### BASH
 
@@ -83,7 +83,7 @@ Add the following line at the end of the `$XDG_CONFIG_HOME/fish/config.fish` fil
 direnv hook fish | source
 ```
 
-Fish supports 3 modes you can set with with the global environment variable `direnv_fish_mode`:
+Fish supports 3 modes you can set with the global environment variable `direnv_fish_mode`:
 
 ```fish
 set -g direnv_fish_mode eval_on_arrow    # trigger direnv at prompt, and on every arrow-based directory change (default)
@@ -105,10 +105,11 @@ eval `direnv hook tcsh`
 Run:
 
 ```
-$> direnv hook elvish > ~/.elvish/lib/direnv.elv
+~> mkdir -p ~/.config/elvish/lib
+~> direnv hook elvish > ~/.config/elvish/lib/direnv.elv
 ```
 
-and add the following line to your `~/.elvish/rc.elv` file:
+and add the following line to your `~/.config/elvish/rc.elv` file:
 
 ```
 use direnv
@@ -121,6 +122,57 @@ Add the following line to your `$PROFILE`:
 ```powershell
 Invoke-Expression "$(direnv hook pwsh)"
 ```
+
+### Murex
+
+Add the following line to your `~/.murex_profile`:
+
+```
+direnv hook murex -> source
+```
+
+
+COMMANDS
+--------
+
+`direnv allow [PATH_TO_RC]`
+: Grants direnv permission to load the given .envrc or .env file.
+
+`direnv deny [PATH_TO_RC]`
+: Revokes the authorization of a given .envrc or .env file.
+
+`direnv edit [PATH_TO_RC]`
+: Opens PATH_TO_RC or the current .envrc or .env into an $EDITOR and allow the file to be loaded afterwards.
+
+`direnv exec DIR COMMAND [...ARGS]`
+: Executes a command after loading the first .envrc or .env found in DIR.
+
+`direnv export SHELL`
+: Loads an .envrc or .env and prints the diff in terms of exports. Supported shells: bash, zsh, fish, tcsh, elvish, pwsh, murex, json, vim, gha (GitHub Actions), gzenv, systemd.
+
+`direnv fetchurl <url> [<integrity-hash>]`
+: Fetches a given URL into direnv's CAS.
+
+`direnv help`
+: Shows this help.
+
+`direnv hook SHELL`
+: Used to setup the shell hook.
+
+`direnv prune`
+: Removes old allowed files.
+
+`direnv reload`
+: Triggers an env reload.
+
+`direnv status`
+: Prints some debug status information.
+
+`direnv stdlib`
+: Displays the stdlib available in the .envrc execution context.
+
+`direnv version`
+: Prints the version or checks that direnv is no older than VERSION_AT_LEAST.
 
 USAGE
 -----
@@ -156,6 +208,9 @@ ENVIRONMENT
 
 `XDG_CONFIG_HOME`
 : Defaults to `$HOME/.config`.
+
+`XDG_DATA_HOME`
+: Defaults to `$HOME/.local/share`.
 
 FILES
 -----

@@ -43,7 +43,7 @@ func TestDotEnvExported(t *testing.T) {
 	if env["OPTION_C"] != "" {
 		t.Error("OPTION_C", env["OPTION_C"])
 	}
-	if v, ok := env["OPTION_D"]; !(v == "" && ok) {
+	if v, ok := env["OPTION_D"]; v != "" || !ok {
 		t.Error("OPTION_D")
 	}
 	if env["OPTION_E"] != "foo" {
@@ -80,10 +80,10 @@ func TestDotEnvPlain(t *testing.T) {
 	if env["OPTION_E"] != "5" {
 		t.Error("OPTION_E")
 	}
-	if v, ok := env["OPTION_F"]; !(v == "" && ok) {
+	if v, ok := env["OPTION_F"]; v != "" || !ok {
 		t.Error("OPTION_F")
 	}
-	if v, ok := env["OPTION_G"]; !(v == "" && ok) {
+	if v, ok := env["OPTION_G"]; v != "" || !ok {
 		t.Error("OPTION_G")
 	}
 	if env["SMTP_ADDRESS"] != "smtp" {
@@ -177,7 +177,7 @@ func TestDotEnvYAML(t *testing.T) {
 	if env["OPTION_E"] != "" {
 		t.Error("OPTION_E")
 	}
-	if v, ok := env["OPTION_F"]; !(v == "" && ok) {
+	if v, ok := env["OPTION_F"]; v != "" || !ok {
 		t.Error("OPTION_F")
 	}
 }
@@ -296,6 +296,38 @@ OPTION_R="${:-}"
 OPTION_S="${BAR:-:-}"
 `
 
+const TestEscapedDollarEnv = `
+OPTION_A=\$FOO
+OPTION_B="\$FOO"
+OPTION_C='\$FOO'
+OPTION_D="\${FOO}"
+OPTION_E="cost is \$5"
+OPTION_F="a\$b$FOO"
+OPTION_G="literal \$"
+OPTION_H="$FOO"
+`
+
+// A backslash escapes a dollar sign. Expected values are those of the canonical
+// implementation, https://github.com/bkeepers/dotenv, on the same input.
+func TestEscapedDollar(t *testing.T) {
+	err := os.Setenv("FOO", "foo")
+	if err != nil {
+		t.Fatalf("unable to set environment variable for testing: %s", err)
+	}
+
+	env := dotenv.MustParse(TestEscapedDollarEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "OPTION_A", "$FOO")
+	envShouldContain(t, env, "OPTION_B", "$FOO")
+	envShouldContain(t, env, "OPTION_C", `\$FOO`) // single quotes are literal
+	envShouldContain(t, env, "OPTION_D", "${FOO}")
+	envShouldContain(t, env, "OPTION_E", "cost is $5")
+	envShouldContain(t, env, "OPTION_F", "a$bfoo")
+	envShouldContain(t, env, "OPTION_G", "literal $")
+	envShouldContain(t, env, "OPTION_H", "foo") // control: an unescaped variable still expands
+}
+
 func TestVariableExpansionWithDefaults(t *testing.T) {
 	err := os.Setenv("FOO", "foo")
 	if err != nil {
@@ -324,4 +356,60 @@ func TestVariableExpansionWithDefaults(t *testing.T) {
 	envShouldContain(t, env, "OPTION_Q", "${OPTION_A:-default}/bar")
 	envShouldContain(t, env, "OPTION_R", "") // this is actually invalid in bash, but what to do here?
 	envShouldContain(t, env, "OPTION_S", ":-")
+}
+
+const TestMultilineEnv = `MULTILINE="line1
+line2
+line3"
+SINGLE=one`
+
+func TestDotEnvMultiline(t *testing.T) {
+	env := dotenv.MustParse(TestMultilineEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "MULTILINE", "line1\nline2\nline3")
+	envShouldContain(t, env, "SINGLE", "one")
+}
+
+func TestDotEnvUnclosedQuote(t *testing.T) {
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Error("should panic with unclosed quoted value")
+		}
+	}()
+	dotenv.MustParse(`FOO="line1
+line2`)
+}
+
+const TestMixedMultilineEnv = `A=1
+B="foo
+bar"
+C=3`
+
+func TestDotEnvMixedMultiline(t *testing.T) {
+	env := dotenv.MustParse(TestMixedMultilineEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "A", "1")
+	envShouldContain(t, env, "B", "foo\nbar")
+	envShouldContain(t, env, "C", "3")
+}
+
+const TestNestedJSONEnv = `CONFIG='{
+  "key1": "value1",
+  "key2": "value2",
+  "nested": {
+    "nested_key_1": "nested_value_1"
+  }
+}'
+OTHER=value`
+
+func TestDotEnvNestedJSON(t *testing.T) {
+	env := dotenv.MustParse(TestNestedJSONEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	expectedJSON := "{\n  \"key1\": \"value1\",\n  \"key2\": \"value2\",\n  \"nested\": {\n    \"nested_key_1\": \"nested_value_1\"\n  }\n}"
+	envShouldContain(t, env, "CONFIG", expectedJSON)
+	envShouldContain(t, env, "OTHER", "value")
 }

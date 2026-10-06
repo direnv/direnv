@@ -14,31 +14,34 @@ func (sh tcsh) Hook() (string, error) {
 	return "alias precmd 'eval `{{.SelfPath}} export tcsh`'", nil
 }
 
-func (sh tcsh) Export(e ShellExport) (out string) {
+func (sh tcsh) Export(e ShellExport) (string, error) {
+	var out strings.Builder
 	for key, value := range e {
 		if value == nil {
-			out += sh.unset(key)
+			out.WriteString(sh.unset(key))
 		} else {
-			out += sh.export(key, *value)
+			out.WriteString(sh.export(key, *value))
 		}
 	}
-	return out
+	return out.String(), nil
 }
 
-func (sh tcsh) Dump(env Env) (out string) {
+func (sh tcsh) Dump(env Env) (string, error) {
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out
+	return out.String(), nil
 }
 
 func (sh tcsh) export(key, value string) string {
 	if key == "PATH" {
-		command := "set path = ("
-		for _, path := range strings.Split(value, ":") {
-			command += " " + sh.escape(path)
+		var command strings.Builder
+		command.WriteString("set path = (")
+		for path := range strings.SplitSeq(value, ":") {
+			command.WriteString(" " + sh.escape(path))
 		}
-		return command + " );"
+		return command.String() + " );"
 	}
 	return "setenv " + sh.escape(key) + " " + sh.escape(value) + " ;"
 }
@@ -115,7 +118,7 @@ func (sh tcsh) escape(str string) string {
 			quoted(char)
 		case char <= BACKTICK:
 			quoted(char)
-		case char <= TILDA:
+		case char <= TILDE:
 			quoted(char)
 		case char == DEL:
 			hex(char)

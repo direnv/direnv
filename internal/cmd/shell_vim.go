@@ -7,29 +7,31 @@ import (
 
 type vim struct{}
 
-// Vim adds support for vim. Not really a shell but it's handly.
+// Vim adds support for vim. Not really a shell but it's handy.
 var Vim Shell = vim{}
 
 func (sh vim) Hook() (string, error) {
 	return "", errors.New("this feature is not supported. Install the direnv.vim plugin instead")
 }
 
-func (sh vim) Export(e ShellExport) (out string) {
+func (sh vim) Export(e ShellExport) (string, error) {
+	var out strings.Builder
 	for key, value := range e {
 		if value == nil {
-			out += sh.unset(key)
+			out.WriteString(sh.unset(key))
 		} else {
-			out += sh.export(key, *value)
+			out.WriteString(sh.export(key, *value))
 		}
 	}
-	return out
+	return out.String(), nil
 }
 
-func (sh vim) Dump(env Env) (out string) {
+func (sh vim) Dump(env Env) (string, error) {
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out
+	return out.String(), nil
 }
 
 func (sh vim) export(key, value string) string {
@@ -47,5 +49,9 @@ func (sh vim) escapeKey(str string) string {
 
 // TODO: Make sure this escaping is valid
 func (sh vim) escapeValue(str string) string {
-	return "'" + strings.Replace(str, "'", "''", -1) + "'"
+	replacer := strings.NewReplacer(
+		"\n", "\\n",
+		"'", "''",
+	)
+	return "'" + replacer.Replace(str) + "'"
 }

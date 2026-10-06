@@ -1,7 +1,106 @@
-2.X / XXXX-XX-XX
+
+2.37.1 / 2025-07-20
 ==================
 
-  * bump to go 1.20
+  * fix: regression in displaying export errors (#1469)
+
+2.37.0 / 2025-07-02
+==================
+
+  * docs: add github-actions page
+  * docs: document sub-commands
+  * docs: fix link to guix manual (#1421)
+  * docs: re-generate manpages
+  * feat(direnv export gha): strengthen export format
+  * feat: add windows arm64 target (#1444)
+  * fix(powershell): "export pwsh" to resolve PowerShell special character issues (#1448)
+  * fix(python): do not include patch level in virtual environment names (#1423)
+  * fix(use_nix): always restore special variables (#1424)
+  * fix: accept true as valid DIRENV_DEBUG value (#1365)
+  * fix: add trailing newline to error messages (#1426)
+  * fix: delete duplicate ansi escape code
+
+v2.36.0 / 2025-04-11
+==================
+
+  * direnv now requires go 1.24 (#1384)
+  * doc: Correct duplicate usage of 'with' in the direnv(1) (#1394)
+  * doc: note direnv version for log_{format,filter} (#1369)
+  * feat: Add `use_flox` to stdlib.sh (#1372)
+  * feat: logging filter (#1336)
+  * fix use_nix: unset TMPDIR variables (#1409)
+  * fix: A more universal fix for the python 3.14 `find_spec` deprecation warning (#1382)
+  * fix: Don't give an error when the current directory doesn't exist (#1395)
+  * fix: add support to fully reproducible guix shells (#1392)
+  * fix: assert minimum powershell version (#1385)
+  * fix: escape newlines in generated vimscript (#1347)
+  * fix: fix empty array error in install.sh (#1406)
+  * fix: optionally authenticate against github api during install (#1337)
+  * fix: use_guix: Enable the watching of Guix related files. (#1353)
+
+2.35.0 / 2024-10-07
+==================
+
+  * doc: Add version requirement for load_dotenv option (#1326)
+  * doc: change Guix link to its package search. (#1268)
+  * doc: fix broken link (#1327)
+  * doc: update elvish docs (#1305)
+  * feat: add opam support (#1298)
+  * fix: add NuShell into list of supported shells (#1260)
+  * fix: close tmp file (#1272)
+  * fix: direnv edit: use `editor` when EDITOR not found, closes #1246 (#1247)
+  * fix: release script
+  * fix: stdlib: enable flakes when use flake is used (#1299)
+  * fix: stdlib: export GOBIN for layout_go (#1286)
+  * fix: stdlib: update layout_python to resolve deprecation warning (#1176)
+  * fix: using PWD in .env files (#1052)
+  * test: Fix Murex python-layout test (#1293)
+
+2.34.0 / 2024-03-01
+==================
+
+  * doc: README.md, man pages: it's typos (#1230)
+  * doc: add shell setup instructions for oh-my-zsh (#1070)
+  * doc: added fetchurl manpage link to README.md
+  * doc: document XDG_DATA_HOME (#1185)
+  * doc: update installation.md for Gentoo (#1206)
+  * feat: add Murex support (#1242)
+  * feat: added systemd shell for export (#1126)
+  * feat: allow to disable warn timeouts (#1209)
+  * feat: hide env diff (#1223, #1234)
+  * feat: made 'direnv export' non private (#1229)
+  * fix: `use_julia` should not set LD_LIBRARY_PATH (#900)
+  * fix: add missing deps for release in go.mod
+  * fix: avoid use of regex in bash hook output (#1043)
+  * fix: direnv.toml.1.md: add examples for $HOME expansion
+  * fix: stdlib: use_flake: don't keep old generations around (#1089)
+  * fix: stdlib: use_node: strip leading v from version (#1071)
+  * fix: support Bash 5.1 array PROMPT_COMMAND (#1208)
+  * fix: update stdlib.sh to avoid deprecation warning (#1221)
+  * fix: update zsh syntax in internal/cmd/shell_zsh.go (#1075)
+
+2.33.0 / 2023-11-29
+==================
+
+  * doc: add a Nushell section to `hook.md` by @amtoine in https://github.com/direnv/direnv/pull/1175
+  * doc: fix broken links in installation.md by @just1602 in https://github.com/direnv/direnv/pull/1110
+  * doc: show how to run tests by @bukzor-sentryio in https://github.com/direnv/direnv/pull/1137
+  * doc: update NixOS installation instructions by @Gerg-L in https://github.com/direnv/direnv/pull/1172
+  * doc: update direnv.toml.1.md by @Ativerc in https://github.com/direnv/direnv/pull/1099
+  * feat: `direnv status --json` by @shivaraj-bh in https://github.com/direnv/direnv/pull/1142
+  * feat: add PowerShell Support by @bamsammich in https://github.com/direnv/direnv/pull/1171
+  * feat: add mergify configuration by @Mic92 in https://github.com/direnv/direnv/pull/1147
+  * feat: add support for armv7l platform in install.sh by @ardje in https://github.com/direnv/direnv/pull/1162
+  * feat: add watch print command by @Mic92 in https://github.com/direnv/direnv/pull/1198
+  * feat: alias `direnv disallow` to deny by @will in https://github.com/direnv/direnv/pull/1182
+  * feat: stdlib: create CACHEDIR.TAG inside .direnv by @Mic92 in https://github.com/direnv/direnv/pull/1148
+  * fix: `allowPath` for `LoadedRC` by @shivaraj-bh in https://github.com/direnv/direnv/pull/1157
+  * fix: don't prompt to allow if user explicitly denied by @Gabriella439 in https://github.com/direnv/direnv/pull/1158
+  * fix: man/direnv-stdlib: fix obsolete opam-env example by @mzacho in https://github.com/direnv/direnv/pull/1170
+  * fix: print correct path in source_env log message by @wentasah in https://github.com/direnv/direnv/pull/1144
+  * fix: quote tcsh $PATH, to avoid failure on whitespace by @bukzor-sentryio in https://github.com/direnv/direnv/pull/1139
+  * fix: remove redundant nil check in `CommandsDispatch` by @Juneezee in https://github.com/direnv/direnv/pull/1166
+  * fix: update nixpkgs and shellcheck by @Mic92 in https://github.com/direnv/direnv/pull/1146
 
 2.32.3 / 2023-05-20
 ==================
@@ -137,7 +236,7 @@
   * Updated conditional for zsh hook to be more forgiving (#808)
   * Add -r flag for matching Git branches with a regexp (#800)
   * Add docs about pipenv (#797)
-  * Enable syntax hilights to the quick demo code (#752)
+  * Enable syntax highlights to the quick demo code (#752)
   * Fixed extra quotes for lower alpha characters (#783)
   * Remove noisy warning about PS1 again (#781)
 
@@ -396,7 +495,7 @@ expose issues with existing `.envrc` files.
   * FIX: Perform stricter search for existing Anaconda environments (#462)
   * FIX: arity mismatch for elvish (#482)
   * FIX: avoid reloading on each prompt after error (#468)
-  * FIX: improve bash hook handlign of empty PROMPT_COMMAND (#473)
+  * FIX: improve bash hook handling of empty PROMPT_COMMAND (#473)
   * FIX: improved the tests for bash, zsh, fish and tcsh (#469)
   * MISC: migrated from Travis CI to Azure Pipelines (#484)
 

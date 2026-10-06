@@ -3,7 +3,7 @@
 ############################################################################
 
 # Set this to change the target installation path
-PREFIX   = /usr/local
+PREFIX   ?= /usr/local
 BINDIR   = ${PREFIX}/bin
 SHAREDIR = ${PREFIX}/share
 MANDIR   = ${SHAREDIR}/man
@@ -24,7 +24,12 @@ SHELL = bash
 ############################################################################
 
 .PHONY: all
-all: build man
+all: build man ## Build direnv and generate man pages (default)
+
+.PHONY: help
+help: ## Show this help message
+	@echo "Available targets:"
+	@awk 'BEGIN {FS = ":.*##"; printf "\n"} /^[a-zA-Z_-]+:.*##/ { printf "  %-20s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 export GO111MODULE=on
 
@@ -33,10 +38,10 @@ export GO111MODULE=on
 ############################################################################
 
 .PHONY: build
-build: direnv
+build: direnv ## Build the direnv binary
 
 .PHONY: clean
-clean:
+clean: ## Remove build artifacts
 	rm -rf \
 		.gopath \
 		direnv
@@ -44,9 +49,11 @@ clean:
 GO_LDFLAGS =
 
 ifeq ($(shell uname), Darwin)
+  ifneq ($(CGO_ENABLED), 0)
 	# Fixes DYLD_INSERT_LIBRARIES issues
 	# See https://github.com/direnv/direnv/issues/194
 	GO_LDFLAGS += -linkmode=external
+  endif
 endif
 
 ifdef BASH_PATH
@@ -57,7 +64,9 @@ ifneq ($(strip $(GO_LDFLAGS)),)
 	GO_BUILD_FLAGS = -ldflags '$(GO_LDFLAGS)'
 endif
 
-direnv: *.go
+SOURCES = $(wildcard *.go internal/*/*.go pkg/*/*.go)
+
+direnv: $(SOURCES)
 	$(GO) build $(GO_BUILD_FLAGS) -o $(exe)
 
 ############################################################################
@@ -70,7 +79,7 @@ fmt-go:
 	$(GO) fmt
 
 fmt-sh:
-	@command -v shfmt >/dev/null || (echo "Could not format stdlib.sh because shfmt is missing. Run: go get -u mvdan.cc/sh/cmd/shfmt"; false)
+	@command -v shfmt >/dev/null || (echo "Could not format stdlib.sh because shfmt is missing. Run: go install mvdan.cc/sh/cmd/shfmt@latest"; false)
 	shfmt -i 2 -w stdlib.sh
 
 ############################################################################
@@ -81,10 +90,10 @@ man_md = $(wildcard man/*.md)
 roffs = $(man_md:.md=)
 
 .PHONY: man
-man: $(roffs)
+man: $(roffs) ## Generate man pages
 
 %.1: %.1.md
-	@command -v go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing. Run: go get -u github.com/cpuguy83/go-md2man/v2"; false)
+	@command -v go-md2man >/dev/null || (echo "Could not generate man page because go-md2man is missing. Run: go install github.com/cpuguy83/go-md2man/v2@latest"; false)
 	go-md2man -in $< -out $@
 
 ############################################################################
@@ -102,7 +111,8 @@ tests = \
 				test-fish \
 				test-tcsh \
 				test-zsh \
-				test-pwsh
+				test-pwsh \
+				test-mx
 
 # Skip few checks for IBM Z mainframe's z/OS aka OS/390
 ifeq ($(shell uname), OS/390)
@@ -114,7 +124,7 @@ ifeq ($(shell uname), OS/390)
 endif
 
 .PHONY: $(tests)
-test: build $(tests)
+test: build $(tests) ## Run all tests
 	@echo
 	@echo SUCCESS!
 
@@ -150,12 +160,15 @@ test-zsh:
 test-pwsh:
 	pwsh ./test/direnv-test.ps1
 
+test-mx:
+	murex -trypipe ./test/direnv-test.mx
+
 ############################################################################
 # Installation
 ############################################################################
 
 .PHONY: install
-install: all
+install: all ## Install direnv to PREFIX (default: /usr/local)
 	install -d $(DESTDIR)$(BINDIR)
 	install $(exe) $(DESTDIR)$(BINDIR)
 	install -d $(DESTDIR)$(MANDIR)/man1
@@ -164,31 +177,61 @@ install: all
 	echo "$(BINDIR)/direnv hook fish | source" > $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d/direnv.fish
 
 .PHONY: dist
-dist:
-	@command -v gox >/dev/null || (echo "Could not generate dist because gox is missing. Run: go get -u github.com/mitchellh/gox"; false)
-	CGO_ENABLED=0 GOFLAGS="-trimpath" \
-		gox -rebuild -ldflags="-s -w" -output "$(DISTDIR)/direnv.{{.OS}}-{{.Arch}}" \
-		-osarch darwin/amd64 \
-		-osarch darwin/arm64 \
-		-osarch freebsd/386 \
-		-osarch freebsd/amd64 \
-		-osarch freebsd/arm \
-		-osarch linux/386 \
-		-osarch linux/amd64 \
-		-osarch linux/arm \
-		-osarch linux/arm64 \
-		-osarch linux/mips \
-		-osarch linux/mips64 \
-		-osarch linux/mips64le \
-		-osarch linux/mipsle \
-		-osarch linux/ppc64 \
-		-osarch linux/ppc64le \
-		-osarch linux/s390x \
-		-osarch netbsd/386 \
-		-osarch netbsd/amd64 \
-		-osarch netbsd/arm \
-		-osarch openbsd/386 \
-		-osarch openbsd/amd64 \
-		-osarch windows/386 \
-		-osarch windows/amd64 \
-		&& true
+dist: ## Build cross-platform binaries
+	@mkdir -p $(DISTDIR)
+	@echo "Building cross-platform binaries..."
+	@platforms=" \
+		darwin/amd64 \
+		darwin/arm64 \
+		freebsd/386 \
+		freebsd/amd64 \
+		freebsd/arm \
+		linux/386 \
+		linux/amd64 \
+		linux/arm \
+		linux/arm64 \
+		linux/mips \
+		linux/mips64 \
+		linux/mips64le \
+		linux/mipsle \
+		linux/ppc64 \
+		linux/ppc64le \
+		linux/s390x \
+		netbsd/386 \
+		netbsd/amd64 \
+		netbsd/arm \
+		openbsd/386 \
+		openbsd/amd64 \
+		windows/386 \
+		windows/amd64 \
+		windows/arm64 \
+	"; \
+	for platform in $$platforms; do \
+		os=$${platform%/*}; \
+		arch=$${platform#*/}; \
+		echo "Building for $$os/$$arch..."; \
+		suffix=""; \
+		if [ "$$os" = "windows" ]; then \
+			suffix=".exe"; \
+		fi; \
+		CGO_ENABLED=0 GOFLAGS="-trimpath" GOOS=$$os GOARCH=$$arch \
+			$(GO) build -ldflags="-s -w" -o "$(DISTDIR)/direnv.$$os-$$arch$$suffix"; \
+	done
+
+.PHONY: prepare-release
+prepare-release: ## Interactive release preparation (changelog, PR, tag)
+	./script/prepare-release.sh $(VERSION) $(REPO)
+
+.PHONY: create-release
+create-release: dist ## Create GitHub release with binaries (CI only)
+	@if [ -z "$$GITHUB_REF_NAME" ]; then \
+		echo "GITHUB_REF_NAME is not set. This target is meant to be run in GitHub Actions."; \
+		exit 1; \
+	fi
+	@echo "Extracting release notes from CHANGELOG.md..."
+	@release_notes=$$(awk '/^==================/{if(headers>0) exit} /^==================/{headers++; next} headers>0' CHANGELOG.md | sed '/^v[0-9]/d'); \
+	gh release create "$$GITHUB_REF_NAME" \
+		--title "Release $$GITHUB_REF_NAME" \
+		--notes "$$release_notes" \
+		--verify-tag
+	gh release upload "$$GITHUB_REF_NAME" $(DISTDIR)/direnv.*

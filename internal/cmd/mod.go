@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -23,7 +24,7 @@ func Main(env Env, args []string, modBashPath string, modStdlib string, modVersi
 
 	err := CommandsDispatch(env, args)
 	if err != nil {
-		logError("error %v", err)
+		fmt.Fprintf(os.Stderr, "%sdirenv: error %v%s\n", errorColor, err, clearColor)
 	}
 	return err
 }

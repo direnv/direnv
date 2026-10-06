@@ -27,8 +27,8 @@ func assertNotNil(t *testing.T, a Shell) {
 	}
 }
 
-func assertEqual(t *testing.T, a, b string) {
-	if a != b {
-		t.Errorf("Expected \"%v\" to equal \"%v\"", b, a)
+func assertEqual(t *testing.T, expected, actual string) {
+	if expected != actual {
+		t.Errorf("Expected \"%v\" to equal \"%v\"", expected, actual)
 	}
 }

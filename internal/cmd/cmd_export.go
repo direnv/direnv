@@ -7,12 +7,23 @@ import (
 	"strings"
 )
 
+func supportedShellFormattedString() string {
+	res := "["
+	for k := range supportedShellList {
+		res += k + ", "
+	}
+	res = strings.TrimSuffix(res, ", ")
+	res += "]"
+	return res
+}
+
 // CmdExport is `direnv export $0`
 var CmdExport = &Cmd{
-	Name:    "export",
-	Desc:    "loads an .envrc or .env and prints the diff in terms of exports",
+	Name: "export",
+	Desc: `Loads an .envrc or .env and prints the diff in terms of exports.
+  Supported SHELL values are: ` + supportedShellFormattedString(),
 	Args:    []string{"SHELL"},
-	Private: true,
+	Private: false,
 	Action:  cmdWithWarnTimeout(actionWithConfig(exportCommand)),
 }
 
@@ -36,7 +47,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	loadedRC := config.LoadedRC()
 	toLoad := findEnvUp(config.WorkDir, config.LoadDotenv)
 
-	if loadedRC == nil && toLoad == "" {
+	if loadedRC == nil && toLoad == "" && currentEnv[DIRENV_DIFF] == "" {
 		return
 	}
 
@@ -56,6 +67,10 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logDebug("new RC, loading")
 	case loadedRC.times.Check() != nil:
 		logDebug("file changed, reloading")
+	case currentEnv[DIRENV_REQUIRED] != "":
+		// Force reload if required files were pending approval.
+		// The approval status might have changed even if file times haven't.
+		logDebug("required files pending, reloading")
 	default:
 		logDebug("no update needed")
 		return
@@ -70,7 +85,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	}
 
 	if toLoad == "" {
-		logStatus(currentEnv, "unloading")
+		logStatus(config, "unloading")
 		newEnv = previousEnv.Copy()
 		newEnv.CleanContext()
 	} else {
@@ -89,13 +104,17 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		}
 	}
 
-	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" {
-		logStatus(currentEnv, "export %s", out)
+	if out := diffStatus(previousEnv.Diff(newEnv)); out != "" && !config.HideEnvDiff {
+		logStatus(config, "export %s", out)
 	}
 
-	diffString := currentEnv.Diff(newEnv).ToShell(shell)
+	diffString, diffErr := currentEnv.Diff(newEnv).ToShell(shell)
+	if diffErr != nil {
+		return fmt.Errorf("ToShell() failed: %w", diffErr)
+	}
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
+
 	return
 }
 

@@ -1,0 +1,354 @@
+#!/usr/bin/env -S murex -trypipe
+
+runmode trypipe module
+
+cd ${ dirname $ARGV[2] }
+global TEST_DIR=$PWD
+export XDG_CONFIG_HOME=$TEST_DIR/config
+export XDG_DATA_HOME=$TEST_DIR/data
+$PATH -> :paths: append ${ dirname $TEST_DIR } -> export PATH
+
+# Reset the direnv loading if any
+export DIRENV_CONFIG=$PWD
+
+unsafe {
+	!set <!null> DIRENV_BASH
+	!set <!null> DIRENV_DIR
+	!set <!null> DIRENV_FILE
+	!set <!null> DIRENV_WATCHES
+	!set <!null> DIRENV_DIFF
+}
+
+mkdir -p $XDG_CONFIG_HOME/direnv
+touch $XDG_CONFIG_HOME/direnv/direnvrc
+
+function direnv_eval {
+	direnv export murex -> set exports
+	if { $exports != "" } then {
+		$exports -> :json: formap key value {
+			if { is-null value } {
+				!export "$key"
+			} else {
+				$value -> export "$key"
+			}
+		}
+	}
+}
+
+function test_start {
+	cd $TEST_DIR/scenarios/$1
+	direnv allow
+	if { $DIRENV_DEBUG == "1" } then { out }
+	out "## Testing $1 ##"
+	if { $DIRENV_DEBUG == "1" } then { out }
+}
+
+function test_stop {
+	rm -f "$XDG_CONFIG_HOME/direnv/direnv.toml"
+	cd /
+	direnv_eval
+}
+
+function test_eq {
+	if { $1 != $2 } then {
+		out "FAILED: '$1' == '$2'"
+		exit 1
+	}
+}
+
+function test_neq {
+	if { $1 == $2 } then {
+		out "FAILED: '$1' != '$2'"
+		exit 1
+	}
+}
+
+function test_empty {
+	if { $1 != "" } then {
+		out "FAILED: '$1' != ''"
+		exit 1
+	}
+}
+
+function test_nonempty {
+	if { $1 == "" } then {
+		out "FAILED: '$1' == ''"
+		exit 1
+	}
+}
+
+function which_bash {
+	$PATH -> :paths: foreach p {
+		if { g $p/bash -> f +fx } then {
+			g $p/bash -> f +fx -> foreach found_bash {
+				if { $found_bash != 'null' } then {
+					out $found_bash
+					return
+				}
+			}
+		}
+	}
+}
+
+unsafe { direnv allow }
+direnv_eval
+
+test_start base
+	out "Setting up"
+	direnv_eval
+	test_eq "$HELLO" "world"
+
+	set WATCHES=$DIRENV_WATCHES
+
+	out "Reloading (should be no-op)"
+	direnv_eval
+	test_eq $WATCHES $DIRENV_WATCHES
+
+	sleep 1
+
+	out "Updating envrc and reloading (should reload)"
+	touch .envrc
+	direnv_eval
+	test_neq $WATCHES $DIRENV_WATCHES
+
+	out "Leaving dir (should clear env set by dir's envrc)"
+	cd ..
+	direnv_eval
+	!if { is-null HELLO } then {
+		test_empty $HELLO
+	}
+
+	!set WATCHES
+test_stop
+
+test_start inherit
+	cp ../base/.envrc ../inherited/.envrc
+	direnv_eval
+	out "HELLO should be world:" "$HELLO"
+
+	sleep 1
+	out "export HELLO=goodbye" |> ../inherited/.envrc
+	direnv_eval
+	test_eq "$HELLO" "goodbye"
+test_stop
+
+if { which ruby } then {
+	test_start "ruby-layout"
+		direnv_eval
+		test_neq "$GEM_HOME" ""
+	test_stop
+}
+
+test_start "space dir"
+	direnv_eval
+	test_eq "$SPACE_DIR" "true"
+test_stop
+
+test_start "child-env"
+	direnv_eval
+	test_eq "$PARENT_PRE" "1"
+	test_eq "$CHILD" "1"
+	test_eq "$PARENT_POST" "1"
+	!if { is-null REMOVE_ME } then {
+		test_empty "$REMOVE_ME"
+	}
+test_stop
+
+test_start "special-vars"
+	export DIRENV_BASH=${ which_bash }
+	export DIRENV_CONFIG=foobar
+	unsafe { direnv_eval }
+	test_nonempty "$DIRENV_BASH"
+	test_eq "$DIRENV_CONFIG" "foobar"
+	!export DIRENV_BASH
+	!export DIRENV_CONFIG
+test_stop
+
+test_start "dump"
+	direnv_eval
+	test_eq "$LS_COLORS" "*.ogg=38;5;45:*.wav=38;5;45"
+	test_eq "$THREE_BACKSLASHES" '\\\'
+	test_eq "$LESSOPEN" "||/usr/bin/lesspipe.sh %s"
+test_stop
+
+test_start "empty-var"
+	direnv_eval
+	test_neq ${ $FOO ?? "unset" } "unset"
+	test_eq $FOO ""
+test_stop
+
+test_start "empty-var-unset"
+	export FOO=""
+	direnv_eval
+	test_eq ${ $FOO ?? "unset" } "unset"
+	!export FOO
+test_stop
+
+test_start "in-envrc"
+	direnv_eval
+	unsafe {
+		./test-in-envrc <!null>
+		exitnum -> set es
+	}
+	test_eq $es "1"
+test_stop
+
+test_start "missing-file-source-env"
+	direnv_eval
+test_stop
+
+test_start "symlink-changed"
+	ln -fs ./state-A ./symlink
+	direnv_eval
+	test_eq "$STATE" "A"
+	sleep 1
+
+	ln -fs ./state-B ./symlink
+	direnv_eval
+	test_eq "$STATE" "B"
+test_stop
+
+test_start "symlink-dir"
+	direnv allow foo
+	direnv deny foo
+	direnv allow bar
+	direnv deny bar
+test_stop
+
+test_start "utf-8"
+	direnv_eval
+	test_eq "$UTFSTUFF" '♀♂'
+test_stop
+
+test_start "failure"
+	test_eq ${ $DIRENV_DIFF ?? "" } ""
+	test_eq ${ $DIRENV_WATCHES ?? "" } ""
+
+	unsafe { direnv export murex -> set exports }
+	if { $exports != "" } then {
+		$exports -> :json: formap key value {
+			if { is-null value } {
+				!export "$key"
+			} else {
+				$value -> export "$key"
+			}
+		}
+	}
+
+	test_neq ${ $DIRENV_DIFF ?? "" } ""
+	test_neq ${ $DIRENV_WATCHES ?? "" } ""
+test_stop	
+
+test_start "watch-dir"
+	out "No watches by default"
+
+	!if { is-null DIRENV_WATCHES WATCHES } then {
+		test_eq "$DIRENV_WATCHES" "$WATCHES"
+	}
+
+	direnv_eval
+
+	!if { direnv watch-print -> grep "testdir" } then {
+		out "FAILED: testdir added to watches"
+		exit 1
+	}
+
+	!if { direnv show_dump "$DIRENV_WATCHES" -> grep "testfile" } then {
+		out "FAILED: testfile not added to DIRENV_WATCHES"
+		exit 1
+	}
+
+	out "After eval, watches have changed"
+	test_neq { DIRENV_WATCHES ?? '' } { WATCHES ?? '' }
+test_stop
+
+test_start "load-envrc-before-env"
+	direnv_eval
+	test_eq "$HELLO" "bar"
+test_stop
+
+test_start "load-env"
+	out "[global]
+load_dotenv = true" |> "$XDG_CONFIG_HOME/direnv/direnv.toml"
+	direnv allow
+	direnv_eval
+	test_eq "$HELLO" "world"
+test_stop
+
+test_start "skip-env"
+	direnv_eval
+	!if { is-null SKIPPED } then {
+		test_empty "$SKIPPED"
+	}
+test_stop
+
+if { ${ which python } != 'unknown' } then {
+	test_start "python-layout"
+	rm -rf .direnv
+
+	direnv_eval
+	test_nonempty "$VIRTUAL_ENV"
+
+	set bool python_in_path = false
+	$PATH -> :paths: foreach paths_entry {
+		if { "$paths_entry" == "$VIRTUAL_ENV/bin" } then {
+			set python_in_path = true
+		}
+	}
+
+	!if { $python_in_path } then {
+		out "FAILED: VIRTUAL_ENV/bin not added to PATH"
+		exit 1
+	}
+
+	!if { g .direnv/CACHEDIR.TAG -> f +f } then {
+		out "the layout dir should contain that file to filter that folder out of backups"
+		exit 1
+	}
+
+	test_stop
+}
+
+test_start "aliases"
+	direnv deny
+
+	direnv permit
+	direnv_eval
+	test_nonempty "$HELLO"
+	
+	direnv block
+	direnv_eval
+	!if { is-null HELLO } then {
+		test_empty "$HELLO"
+	}
+	
+	direnv grant
+	direnv_eval
+	test_nonempty "$HELLO"
+	
+	direnv revoke
+	direnv_eval
+	!if { is-null HELLO } then {
+		test_empty "$HELLO"
+	}
+	
+	direnv grant
+	direnv_eval
+	test_nonempty "$HELLO"
+	
+	direnv disallow
+	direnv_eval
+	!if { is-null HELLO } then {
+		test_empty "$HELLO"
+	}
+test_stop
+
+test_start '$test'
+	direnv_eval
+	test_eq "$FOO" "bar"
+test_stop
+
+test_start 'special-characters/backspace/return'
+	direnv_eval
+	test_eq "$HI" "there"
+test_stop

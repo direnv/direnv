@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -124,9 +127,7 @@ func (rc *RC) Deny() (err error) {
 		return
 	}
 
-	// G306: Expect WriteFile permissions to be 0600 or less
-	// #nosec
-	if err = os.WriteFile(rc.denyPath, []byte(rc.path+"\n"), 0644); err != nil {
+	if err = os.WriteFile(rc.denyPath, []byte(rc.path+"\n"), 0644); /* #nosec G306 -- these deny files are not private */ err != nil {
 		return
 	}
 
@@ -140,11 +141,15 @@ func (rc *RC) Deny() (err error) {
 	return os.Remove(rc.allowPath)
 }
 
+// AllowStatus represents the permission status of an RC file.
 type AllowStatus int
 
 const (
+	// Allowed indicates the RC file is permitted to load.
 	Allowed AllowStatus = iota
+	// NotAllowed indicates the RC file has not been granted permission.
 	NotAllowed
+	// Denied indicates the RC file has been explicitly denied.
 	Denied
 )
 
@@ -274,14 +279,51 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
 	cmd.Stdin = stdin
-	cmd.Stderr = os.Stderr
 
-	var out []byte
-	if out, err = cmd.Output(); err == nil && len(out) > 0 {
-		var newEnv2 Env
-		newEnv2, err = LoadEnvJSON(out)
-		if err == nil {
-			newEnv = newEnv2
+	var stderr io.ReadCloser
+	stderr, err = cmd.StderrPipe()
+	if err != nil {
+		return
+	}
+
+	go func() {
+		_, _ = io.Copy(os.Stderr, stderr)
+	}()
+
+	var stdout io.ReadCloser
+	stdout, err = cmd.StdoutPipe()
+	if err != nil {
+		return
+	}
+
+	var buf bytes.Buffer
+	scanner := bufio.NewScanner(stdout)
+
+	err = cmd.Start()
+	if err != nil {
+		return
+	}
+
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		buf.Write(line)
+		buf.WriteByte('\n')
+
+		// Close all pipes after end of JSON output to not wait for forked
+		// subprocesses forever
+		if len(line) == 1 && line[0] == '}' {
+			_ = stdout.Close()
+			_ = stderr.Close()
+			_ = stdin.Close()
+			break
+		}
+	}
+
+	if err := cmd.Wait(); err == nil {
+		if output := buf.Bytes(); len(output) > 0 {
+			if newEnv2, err := LoadEnvJSON(output); err == nil {
+				newEnv = newEnv2
+			}
 		}
 	}
 
@@ -322,7 +364,11 @@ func fileExists(path string) bool {
 	if err != nil {
 		return false
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Printf("Warning: failed to close file: %v", err)
+		}
+	}()
 
 	// Next, check that the file is a regular file.
 	fi, err := f.Stat()
@@ -390,6 +436,9 @@ func findEnvUp(searchDir string, loadDotenv bool) (path string) {
 }
 
 func findUp(searchDir string, fileNames ...string) (path string) {
+	if searchDir == "" {
+		return ""
+	}
 	for _, dir := range eachDir(searchDir) {
 		for _, fileName := range fileNames {
 			path := filepath.Join(dir, fileName)

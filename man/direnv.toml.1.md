@@ -44,6 +44,8 @@ If set to `true`, stdin is disabled (redirected to /dev/null) during the `.envrc
 
 ### `load_dotenv`
 
+> direnv >= 2.31.0 is required
+
 If set to `true`, also look for and load `.env` files on top of the `.envrc` files. If both `.envrc` and `.env` files exist, the `.envrc` will always be chosen first.
 
 ### `strict_env`
@@ -60,6 +62,26 @@ A duration string is a possibly signed sequence of decimal numbers, each with
 optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 
+This feature is disabled if the duration is lower or equal to zero.
+Will be overwritten if the environment variable `DIRENV_WARN_TIMEOUT` is set to any of the above values.
+
+### `hide_env_diff`
+
+Set to `true` to hide the diff of the environment variables when loading the
+`.envrc`. Defaults to `false`.
+
+### `log_format`
+
+Sets the log format for direnv outputs. Set to "-" to disable normal logging.
+
+> direnv >= 2.36.0 is required
+
+### `log_filter`
+
+A Regexp that can be used to filter out some of the logs.
+
+> direnv >= 2.36.0 is required
+
 ## [whitelist]
 
 Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" -- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. **This feature should be used with great care**, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.
@@ -74,18 +96,20 @@ Example:
 
 ```toml
 [whitelist]
-prefix = [ "/home/user/code/project-a" ]
+prefix = [ "/home/user/code/project-a", "~/code/project-b" ]
 ```
 
 In this example, the following .envrc files will be implicitly allowed:
 
 * `/home/user/code/project-a/.envrc`
 * `/home/user/code/project-a/subdir/.envrc`
+* `~/code/project-b/.envrc`
+* `~/code/project-b/subdir/.envrc`
 * and so on
 
 In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running `direnv allow`):
 
-* `/home/user/project-b/.envrc`
+* `/home/user/project-c/.envrc`
 * `/opt/random/.envrc`
 
 ### `exact`
@@ -96,18 +120,18 @@ Example:
 
 ```toml
 [whitelist]
-exact = [ "/home/user/project-b/.envrc", "/home/user/project-b/subdir-a" ]
+exact = [ "/home/user/project-a/.envrc", "~/project-b/subdir-a" ]
 ```
 
 In this example, the following .envrc files will be implicitly allowed, and no others:
 
-* `/home/user/code/project-b/.envrc`
-* `/home/user/code/project-b/subdir-a`
+* `/home/user/code/project-a/.envrc`
+* `~/project-b/subdir-a`
 
 In this example, the following .envrc files will not be implicitly allowed (although they can be explicitly allowed by running `direnv allow`):
 
 * `/home/user/code/project-b/subproject-c/.envrc`
-* `/home/user/code/.envrc`
+* `~/code/.envrc`
 
 COPYRIGHT
 ---------

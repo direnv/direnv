@@ -10,10 +10,10 @@ import (
 // CmdVersion is `direnv version`
 var CmdVersion = &Cmd{
 	Name:    "version",
-	Desc:    "prints the version or checks that direnv is older than VERSION_AT_LEAST.",
+	Desc:    "prints the version or checks that direnv is no older than VERSION_AT_LEAST.",
 	Args:    []string{"[VERSION_AT_LEAST]"},
 	Aliases: []string{"--version"},
-	Action: actionSimple(func(env Env, args []string) error {
+	Action: actionSimple(func(_ Env, args []string) error {
 		semVersion := ensureVPrefixed(version)
 		if len(args) > 1 {
 			atLeast := ensureVPrefixed(args[1])
