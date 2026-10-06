@@ -126,6 +126,25 @@ test_start rm isolated
   test_eq "$HELLO" ""
 test_stop
 
+test_start disable
+  export DIRENV_DISABLE=1
+  direnv_eval
+  test_eq "${HELLO-}" ""
+
+  export DIRENV_DISABLE=0
+  direnv_eval
+  test_eq "$HELLO" "world"
+
+  export DIRENV_DISABLE=1
+  cd ..
+  direnv_eval
+  test_eq "$HELLO" "world"
+
+  unset DIRENV_DISABLE
+  direnv_eval
+  test_eq "${HELLO-}" ""
+test_stop
+
 test_start inherit
   cp ../base/.envrc ../inherited/.envrc
   direnv_eval

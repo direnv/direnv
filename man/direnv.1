@@ -204,6 +204,11 @@ Hopefully this is enough to get you started.
 
 .SH ENVIRONMENT
 .TP
+\fBDIRENV_DISABLE\fR
+Set to \fB1\fR or \fBtrue\fR to stop direnv from changing the environment. direnv
+does not revert the changes it already made. Unset it to let direnv continue.
+
+.TP
 \fBXDG_CONFIG_HOME\fR
 Defaults to \fB$HOME/.config\fR\&.
 

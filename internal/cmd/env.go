@@ -107,6 +107,12 @@ func (env Env) Diff(other Env) *EnvDiff {
 	return BuildEnvDiff(env, other)
 }
 
+// IsTrue returns true if the given key is set to "1" or "true".
+func (env Env) IsTrue(key string) bool {
+	v := env[key]
+	return v == "1" || strings.EqualFold(v, "true")
+}
+
 // Fetch tries to get the value associated with the given 'key', or returns
 // the provided default if none is set.
 //
