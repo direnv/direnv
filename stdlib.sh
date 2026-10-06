@@ -243,7 +243,9 @@ dotenv() {
     log_error ".env at $path not found"
     return 1
   fi
-  eval "$("$direnv" dotenv bash "$@")"
+  local __direnv_out
+  __direnv_out="$("$direnv" dotenv bash "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: dotenv_if_exists [<filename>]
@@ -261,7 +263,9 @@ dotenv_if_exists() {
   if ! [[ -f $path || -p $path ]]; then
     return
   fi
-  eval "$("$direnv" dotenv bash "$@")"
+  local __direnv_out
+  __direnv_out="$("$direnv" dotenv bash "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: require_allowed <filename> [<filename> ...]
@@ -284,7 +288,9 @@ require_allowed() {
 
   # Check if files are in the allowed-required DB
   # Pass $PWD/.envrc as the envrc path since we're executing in the .envrc's directory
-  eval "$("$direnv" check-required bash "$PWD/.envrc" "$@")"
+  local __direnv_out
+  __direnv_out="$("$direnv" check-required bash "$PWD/.envrc" "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: user_rel_path <abs_path>
@@ -437,14 +443,18 @@ env_vars_required() {
 # especially in direnvrc
 #
 watch_file() {
-  eval "$("$direnv" watch bash "$@")"
+  local __direnv_out
+  __direnv_out="$("$direnv" watch bash "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: watch_dir <dir>
 #
 # Adds <dir> to the list of dirs that direnv will recursively watch for changes
 watch_dir() {
-  eval "$("$direnv" watch-dir bash "$1")"
+  local __direnv_out
+  __direnv_out="$("$direnv" watch-dir bash "$1")"
+  eval "$__direnv_out"
 }
 
 # Usage: _source_up [<filename>] [true|false]
@@ -576,7 +586,9 @@ direnv_load() {
 # Loads the output of `direnv dump` that was stored in a file.
 direnv_apply_dump() {
   local path=$1
-  eval "$("$direnv" apply_dump "$path")"
+  local __direnv_out
+  __direnv_out="$("$direnv" apply_dump "$path")"
+  eval "$__direnv_out"
 }
 
 # Usage: PATH_add <path> [<path> ...]
@@ -853,7 +865,9 @@ layout_pixi() {
   fi
   watch_file pixi.lock
   require_allowed pixi.lock
-  eval "$(pixi shell-hook "$@")"
+  local __direnv_out
+  __direnv_out="$(pixi shell-hook "$@")"
+  eval "$__direnv_out"
 }
 
 # Usage: layout python <python_exe>
