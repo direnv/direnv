@@ -1593,9 +1593,9 @@ load_netrc() {
   local login=""
   local password=""
   local account=""
-  local line word keyword=""
+  local line word words keyword=""
 
-  while read -r line; do
+  while read -r line || [[ -n $line ]]; do
     # Skip comments
     [[ $line =~ ^[[:space:]]*# ]] && continue
 
@@ -1608,7 +1608,8 @@ load_netrc() {
     # Skip empty lines
     [[ -z $line ]] && continue
 
-    for word in $line; do
+    read -ra words <<<"$line"
+    for word in "${words[@]}"; do
       if [[ -n $keyword ]]; then
         # This word is the value for the preceding keyword
         case "$keyword" in

@@ -394,6 +394,21 @@ EOF
   load_netrc --file .netrc_split split.example.com MY_USER MY_PASS 2>/dev/null
   assert_eq "$MY_USER" "splituser"
   assert_eq "$MY_PASS" "splitpass"
+
+  # Test: glob characters in values are not expanded
+  touch globfile
+  echo 'machine glob.example.com login globuser password *' >.netrc_glob
+  unset MY_USER MY_PASS
+  load_netrc --file .netrc_glob glob.example.com MY_USER MY_PASS 2>/dev/null
+  assert_eq "$MY_USER" "globuser"
+  assert_eq "$MY_PASS" "*"
+
+  # Test: last line without a trailing newline
+  printf 'machine nonl.example.com login nonluser password nonlpass' >.netrc_nonl
+  unset MY_USER MY_PASS
+  load_netrc --file .netrc_nonl nonl.example.com MY_USER MY_PASS 2>/dev/null
+  assert_eq "$MY_USER" "nonluser"
+  assert_eq "$MY_PASS" "nonlpass"
 )
 
 
