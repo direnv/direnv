@@ -92,7 +92,7 @@ Example:
 
 ### `env_vars_required <varname> [<varname> ...]`
 
-Logs error for every variable not present in the environment or having an empty value.  
+Logs error for every variable not present in the environment or having an empty value.
 Typically this is used in combination with source_env and source_env_if_exists.
 
 Example:
@@ -249,6 +249,12 @@ Sets environment variables from `opam env`.
 
 Adds "$PWD/vendor/bin" to the PATH environment variable.
 
+### `layout pixi`
+
+Loads a pixi environment. If no additional arguments are given the `default` environment is loaded.
+
+You can pass `-e <env_name>` to load a different environment instead. For supported arguments see `pixi shell-hook --help`.
+
 ### `layout perl`
 
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
@@ -404,7 +410,7 @@ Example (.envrc):
 
 ### `direnv_version <version_at_least>`
 
-Checks that the direnv version is at least old as `version_at_least`. This can
+Checks that the direnv version is no older than `version_at_least`. This can
 be useful when sharing an `.envrc` and to make sure that the users are up to
 date.
 
