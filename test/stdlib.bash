@@ -74,6 +74,41 @@ test_name source_up
   source_up
 )
 
+test_name eval_propagates_failure
+(
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+  cd "$workdir"
+
+  # shellcheck disable=SC2016
+  printf '#!/usr/bin/env bash\n[[ $1 == "$FAIL_CMD" ]] && exit 1\nexec %q "$@"\n' \
+    "$(command -v direnv)" >fake-direnv
+  chmod +x fake-direnv
+  echo "FOO=bar" >.env
+  direnv dump >env.dump
+
+  # a separate process, because errexit is ignored inside `if` and `&&`
+  run_failing() {
+    FAIL_CMD=$1 bash -euo pipefail -c 'source "$1"; direnv=$2; shift 2; "$@"' \
+      _ "$root/stdlib.sh" "$workdir/fake-direnv" "${@:2}"
+  }
+
+  for t in "dotenv dotenv .env" "dotenv dotenv_if_exists .env" \
+    "check-required require_allowed .env" "watch watch_file .env" \
+    "watch-dir watch_dir ." "apply_dump direnv_apply_dump env.dump"; do
+    # shellcheck disable=SC2086
+    if run_failing $t 2>/dev/null; then
+      echo "failure of 'direnv ${t%% *}' was ignored"
+      return 1
+    fi
+  done
+
+  load_stdlib
+  echo "result=kept" >.env
+  dotenv .env
+  assert_eq "$result" kept
+)
+
 test_name direnv_apply_dump
 (
   tmpfile=$(mktemp)
