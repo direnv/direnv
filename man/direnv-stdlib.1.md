@@ -41,15 +41,11 @@ Example:
 
 ### `dotenv [<dotenv_path>]`
 
-Loads a ".env" file into the current environment. The file may be a regular
-file or a named pipe (FIFO), e.g. one mounted by a secrets manager such as
-1Password Environments to inject secrets without writing the secret contents to
-disk. Named pipes are not watched for changes.
+Loads a ".env" file into the current environment.
 
 ### `dotenv_if_exists [<dotenv_path>]`
 
-Loads a ".env" file into the current environment, but only if it exists. As with
-`dotenv`, the file may be a regular file or a named pipe (FIFO).
+Loads a ".env" file into the current environment, but only if it exists.
 
 ### `user_rel_path <abs_path>`
 

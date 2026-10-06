@@ -35,14 +35,10 @@ expand_path ../foo
 .EE
 
 .SS \fBdotenv [<dotenv_path>]\fR
-Loads a ".env" file into the current environment. The file may be a regular
-file or a named pipe (FIFO), e.g. one mounted by a secrets manager such as
-1Password Environments to inject secrets without writing the secret contents to
-disk. Named pipes are not watched for changes.
+Loads a ".env" file into the current environment.
 
 .SS \fBdotenv_if_exists [<dotenv_path>]\fR
-Loads a ".env" file into the current environment, but only if it exists. As with
-\fBdotenv\fR, the file may be a regular file or a named pipe (FIFO).
+Loads a ".env" file into the current environment, but only if it exists.
 
 .SS \fBuser_rel_path <abs_path>\fR
 Transforms an absolute path \fIabs_path\fP into a user-relative path if possible.

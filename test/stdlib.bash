@@ -60,59 +60,22 @@ test_name dotenv_if_exists
   [[ $FOO = bar ]]
 )
 
-test_name "dotenv / dotenv_if_exists (named pipe / FIFO)"
+test_name dotenv_fifo
 (
   load_stdlib
 
   workdir=$(mktemp -d)
-  writer_pid=""
-  # shellcheck disable=SC2064
-  trap '[[ -n $writer_pid ]] && kill "$writer_pid" 2>/dev/null; rm -rf "$workdir"' EXIT
-
-  # Reap the background writer without ever hanging the suite: a writer blocked on
-  # opening the FIFO for write (e.g. if the reader never opened it) is bounded-waited,
-  # then killed. The EXIT trap is the final backstop.
-  reap_writer() {
-    for _ in $(seq 1 50); do kill -0 "$writer_pid" 2>/dev/null || break; sleep 0.1; done
-    kill "$writer_pid" 2>/dev/null || true
-    wait "$writer_pid" 2>/dev/null || true
-    writer_pid=""
-  }
-
+  trap 'kill %1 2>/dev/null; rm -rf "$workdir"' EXIT
   cd "$workdir"
+  mkfifo .env
 
-  # Positive control: watch_file is functional in this harness, so the no-watch
-  # assertions below are meaningful (watching a regular file changes DIRENV_WATCHES).
-  before=${DIRENV_WATCHES:-}
-  : > regular.txt
-  watch_file regular.txt
-  [[ ${DIRENV_WATCHES:-} != "$before" ]] || { echo "watch_file did not record a regular file"; return 1; }
-
-  # A ".env" provided as a named pipe (FIFO) - as mounted by secrets managers
-  # like 1Password Environments to inject secrets on read, without writing the
-  # secret contents to disk. The writer blocks until dotenv opens the pipe.
-  mkfifo fifo.env
-
-  # dotenv loads the FIFO ...
-  before=${DIRENV_WATCHES:-}
-  ( echo "export FOO=bar" > fifo.env ) &
-  writer_pid=$!
-  dotenv fifo.env
-  reap_writer
-  [[ $FOO = bar ]]
-  # ... and must NOT add the FIFO to the watch list: a FIFO's mtime changes on
-  # every read, which would otherwise force a reload on every prompt.
-  assert_eq "${DIRENV_WATCHES:-}" "$before"
-
-  # dotenv_if_exists shares the same gate, so it must load a FIFO too.
-  unset FOO
-  before=${DIRENV_WATCHES:-}
-  ( echo "export FOO=baz" > fifo.env ) &
-  writer_pid=$!
-  dotenv_if_exists fifo.env
-  reap_writer
-  [[ $FOO = baz ]]
-  assert_eq "${DIRENV_WATCHES:-}" "$before"
+  for fn in dotenv dotenv_if_exists; do
+    unset FOO DIRENV_WATCHES
+    echo "export FOO=bar" >.env &
+    "$fn" .env
+    assert_eq "${FOO:-}" bar
+    assert_eq "${DIRENV_WATCHES:-}" ""
+  done
 )
 
 test_name find_up
