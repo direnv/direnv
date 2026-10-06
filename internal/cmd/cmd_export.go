@@ -85,7 +85,9 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	}
 
 	if toLoad == "" {
-		logStatus(config, "unloading")
+		if diffStatus(currentEnv.Diff(previousEnv)) != "" {
+			logStatus(config, "unloading")
+		}
 		newEnv = previousEnv.Copy()
 		newEnv.CleanContext()
 	} else {
