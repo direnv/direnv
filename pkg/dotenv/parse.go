@@ -68,18 +68,15 @@ func Parse(data string) (map[string]string, error) {
 			continue
 		}
 
-		// Check for the beginning of a multi-line value.
-		// A comment line (first non-blank character is '#') is ignored by
-		// lineRe, so it must never put the parser into multi-line mode
-		// either — otherwise a '#' line containing a quote swallows the
-		// following lines or fails the whole file (see issue #1519).
-		if trimmed := strings.TrimLeft(line, " 	"); !strings.HasPrefix(trimmed, "#") &&
+		// Check for the beginning of a multi-line value, but not in a
+		// comment line that happens to contain a quote
+		if trimmed := strings.TrimLeft(line, " \t"); !strings.HasPrefix(trimmed, "#") &&
 			(strings.Contains(line, "=") || strings.Contains(line, ":")) {
 			sepIdx := strings.IndexAny(line, "=:")
 			if sepIdx > 0 && sepIdx+1 < len(line) {
 				// Extract the part after the separator
 				afterSep := line[sepIdx+1:]
-				trimmedAfterSep := strings.TrimLeft(afterSep, " 	")
+				trimmedAfterSep := strings.TrimLeft(afterSep, " \t")
 
 				// Check if value starts with a quote
 				if len(trimmedAfterSep) > 0 && (trimmedAfterSep[0] == '"' || trimmedAfterSep[0] == '\'') {
@@ -132,18 +129,13 @@ func MustParse(data string) map[string]string {
 	return env
 }
 
-// unclosedQuote reports whether a value that starts with a quote character
-// is not closed on the same line. Escaped quotes (\" and \') are ignored,
-// matching the quoted-value alternatives of the lineRe grammar. Anything
-// after the closing quote (e.g. a trailing comment) does not affect the
-// result.
+// unclosedQuote reports whether value, which starts with a quote, has no
+// unescaped closing quote.
 func unclosedQuote(value string) bool {
 	quote := value[0]
 	for i := 1; i < len(value); i++ {
 		switch value[i] {
 		case '\\':
-			// Only an escaped quote matters for finding the real
-			// closing quote.
 			if i+1 < len(value) && value[i+1] == quote {
 				i++
 			}
