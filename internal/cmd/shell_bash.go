@@ -52,6 +52,10 @@ func (sh bash) Dump(env Env) (string, error) {
 	return out.String(), nil
 }
 
+func (sh bash) WindowsNative() bool {
+	return false
+}
+
 func (sh bash) export(key, value string) string {
 	return "export " + sh.escape(key) + "=" + sh.escape(value) + ";"
 }

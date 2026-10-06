@@ -15,6 +15,10 @@ type Shell interface {
 
 	// Dump outputs and evaluatable string that sets the env in the host shell
 	Dump(env Env) (string, error)
+
+	// IsWindows returns if the shell is a windows native shell; that is it 
+	// follows windows conventions for paths and env vars.
+	WindowsNative() bool
 }
 
 // ShellExport represents environment variables to add and remove on the host
@@ -33,6 +37,7 @@ func (e ShellExport) Remove(key string) {
 
 var supportedShellList = map[string]Shell{
 	"bash":    Bash,
+	"cmd":     WindowsCmd,
 	"elvish":  Elvish,
 	"fish":    Fish,
 	"gha":     GitHubActions,

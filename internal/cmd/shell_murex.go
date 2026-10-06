@@ -45,6 +45,10 @@ func (sh murex) Export(e ShellExport) (string, error) {
 	return buf.String(), nil
 }
 
+func (sh murex) WindowsNative() bool {
+	return false
+}
+
 var (
 	_ Shell = (*murex)(nil)
 )

@@ -26,6 +26,11 @@ var IgnoredKeys = map[string]bool{
 	"SHELLOPTS": true,
 	"SHLVL":     true,
 	"_":         true,
+
+	// variables used by direnv to control bash on windows
+	"MSYS2_ENV_CONV_EXCL": true,
+	"MSYS_NO_PATHCONV":    true,
+	"TERM":                true, // changed by msys2 bash on windows
 }
 
 // EnvDiff represents the diff between two environments
@@ -96,7 +101,9 @@ func (diff *EnvDiff) ToShell(shell Shell) (string, error) {
 	}
 
 	for key, value := range diff.Next {
-		e.Add(key, value)
+		if !IgnoredEnvForShell(key, shell) {
+			e.Add(key, value)
+		}
 	}
 
 	return shell.Export(e)
@@ -140,4 +147,14 @@ func IgnoredEnv(key string) bool {
 	}
 	_, found := IgnoredKeys[key]
 	return found
+}
+
+// IgnoredEnvForShell returns true if the key should be ignored in environment diffs for the given shell.
+func IgnoredEnvForShell(key string, shell Shell) bool {
+	if shell.WindowsNative() {
+		if key == "TERM" {
+			return true
+		}
+	}
+	return false
 }

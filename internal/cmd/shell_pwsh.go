@@ -62,6 +62,10 @@ func (sh pwsh) Dump(env Env) (string, error) {
 	return out.String(), nil
 }
 
+func (sh pwsh) WindowsNative() bool {
+	return true
+}
+
 func (sh pwsh) export(key, value string) string {
 	return fmt.Sprintf("${env:%s}='%s';", sh.escapeEnvKey(key), sh.escapeVerbatimString(value))
 }

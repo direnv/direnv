@@ -83,6 +83,10 @@ func (sh fish) Dump(env Env) (string, error) {
 	return out.String(), nil
 }
 
+func (sh fish) WindowsNative() bool {
+	return false
+}
+
 func (sh fish) export(key, value string) string {
 	if key == "PATH" {
 		var command strings.Builder

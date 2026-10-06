@@ -50,6 +50,10 @@ func (sh zsh) Dump(env Env) (string, error) {
 	return out.String(), nil
 }
 
+func (sh zsh) WindowsNative() bool {
+	return false
+}
+
 func (sh zsh) export(key, value string) string {
 	return "export " + sh.escape(key) + "=" + sh.escape(value) + ";"
 }
