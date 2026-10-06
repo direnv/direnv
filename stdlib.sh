@@ -1472,19 +1472,36 @@ function use_flox() {
 # If a channels.scm is available, `guix time-machine -C channels.scm`
 # is automatically invoked before creating the shell.
 use_guix() {
+    local arg
     watch_file guix.scm
     watch_file manifest.scm
     watch_file channels.scm
+
+    # Containers cannot run the host direnv binary, so keep using --search-paths.
+    for arg in "$@"; do
+	case "$arg" in
+	--container | --emulate-fhs | -[CF]* | -[!-]*[CF]*)
+	    local result
+	    if [ -f channels.scm ]
+	    then
+		log_status "Using Guix version from channels.scm"
+		result="$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
+	    else
+		result="$(guix shell "$@" --search-paths)"
+	    fi
+	    eval "$result"
+	    return
+	    ;;
+	esac
+    done
+
+    # direnv_load needs this path preserved so direnv dump can write its output.
     if [ -f channels.scm ]
     then
 	log_status "Using Guix version from channels.scm"
-	local result
-	result="$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
-	eval "$result"
+	direnv_load guix time-machine -C channels.scm -- shell "$@" --preserve=^DIRENV_DUMP_FILE_PATH$ -- "$direnv" dump
     else
-	local result
-	result="$(guix shell "$@" --search-paths)"
-	eval "$result"
+	direnv_load guix shell "$@" --preserve=^DIRENV_DUMP_FILE_PATH$ -- "$direnv" dump
     fi
 }
 
