@@ -55,28 +55,32 @@ func (sh tcsh) escape(str string) string {
 		return "''"
 	}
 	in := []byte(str)
-	out := ""
+	var out strings.Builder
+	out.Grow(len(in))
 	i := 0
 	l := len(in)
 
 	hex := func(char byte) {
-		out += fmt.Sprintf("\\x%02x", char)
+		fmt.Fprintf(&out, "\\x%02x", char)
 	}
 
 	backslash := func(char byte) {
-		out += string([]byte{BACKSLASH, char})
+		out.WriteByte(BACKSLASH)
+		out.WriteByte(char)
 	}
 
 	escaped := func(str string) {
-		out += str
+		out.WriteString(str)
 	}
 
 	quoted := func(char byte) {
-		out += `"` + string([]byte{char}) + `"`
+		out.WriteByte('"')
+		out.WriteByte(char)
+		out.WriteByte('"')
 	}
 
 	literal := func(char byte) {
-		out += string([]byte{char})
+		out.WriteByte(char)
 	}
 
 	for i < l {
@@ -128,5 +132,5 @@ func (sh tcsh) escape(str string) string {
 		i++
 	}
 
-	return out
+	return out.String()
 }

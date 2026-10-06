@@ -45,13 +45,13 @@ func (sh pwsh) Export(e ShellExport) (string, error) {
 	for key, value := range e {
 		if key != "" {
 			if value == nil {
-        unsets.WriteString(sh.unset(key))
+				unsets.WriteString(sh.unset(key))
 			} else {
-        exports.WriteString(sh.export(key, *value))
+				exports.WriteString(sh.export(key, *value))
 			}
 		}
 	}
-  return unsets.String() + exports.String(), nil
+	return unsets.String() + exports.String(), nil
 }
 
 func (sh pwsh) Dump(env Env) (string, error) {
@@ -80,20 +80,21 @@ func PowerShellEscapeEnvKey(str string) string {
 		return "__DiReNv_UnReAcHaBlE__"
 	}
 	in := []byte(str)
-	out := ""
+	var out strings.Builder
+	out.Grow(len(in))
 	i := 0
 	l := len(in)
 
 	escaped := func(str string) {
-		out += str
+		out.WriteString(str)
 	}
 
 	hex := func(char byte) {
-		out += fmt.Sprintf("\\x%02x", char)
+		fmt.Fprintf(&out, "\\x%02x", char)
 	}
 
 	literal := func(char byte) {
-		out += string([]byte{char})
+		out.WriteByte(char)
 	}
 
 	for i < l {
@@ -121,7 +122,7 @@ func PowerShellEscapeEnvKey(str string) string {
 		i++
 	}
 
-	return out
+	return out.String()
 }
 
 func (pwsh) escapeVerbatimEnvKey(str string) string {
@@ -134,16 +135,17 @@ func PowerShellEscapeVerbatimEnvKey(str string) string {
 		return "__DiReNv_UnReAcHaBlE__"
 	}
 	in := []byte(str)
-	out := ""
+	var out strings.Builder
+	out.Grow(len(in))
 	i := 0
 	l := len(in)
 
 	escaped := func(str string) {
-		out += str
+		out.WriteString(str)
 	}
 
 	literal := func(char byte) {
-		out += string([]byte{char})
+		out.WriteByte(char)
 	}
 
 	for i < l {
@@ -157,7 +159,7 @@ func PowerShellEscapeVerbatimEnvKey(str string) string {
 		i++
 	}
 
-	return out
+	return out.String()
 }
 func (pwsh) escapeVerbatimString(str string) string {
 	return PowerShellEscapeVerbatimString(str)
@@ -169,16 +171,17 @@ func PowerShellEscapeVerbatimString(str string) string {
 		return ""
 	}
 	in := []byte(str)
-	out := ""
+	var out strings.Builder
+	out.Grow(len(in))
 	i := 0
 	l := len(in)
 
 	escaped := func(str string) {
-		out += str
+		out.WriteString(str)
 	}
 
 	literal := func(char byte) {
-		out += string([]byte{char})
+		out.WriteByte(char)
 	}
 
 	for i < l {
@@ -192,7 +195,7 @@ func PowerShellEscapeVerbatimString(str string) string {
 		i++
 	}
 
-	return out
+	return out.String()
 }
 
 /*
