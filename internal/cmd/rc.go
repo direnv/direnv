@@ -266,9 +266,9 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	// like \b or \r in paths. Force slash usage to avoid issues on Windows.
 	slashSeparatedPath := filepath.ToSlash(rc.Path())
 	arg := fmt.Sprintf(
-		`%seval "$("%s" stdlib)" && __main__ %s %s`,
+		`%seval "$(%s stdlib)" && __main__ %s %s`,
 		prelude,
-		direnv,
+		BashEscape(filepath.ToSlash(direnv)),
 		fn,
 		BashEscape(slashSeparatedPath),
 	)
