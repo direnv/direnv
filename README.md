@@ -84,8 +84,9 @@ $ echo ${FOO-nope}
 nope
 ```
 
-We recommend that you commit `.envrc` to your version control system, but add
-the `.envrc.local` file and the `.direnv/` directory e.g. to `.gitignore`.
+Some stdlib functions store files in `.direnv/`. Add `.direnv/` to your
+`.gitignore`. For local overrides that you do not commit, put
+`source_env_if_exists .envrc.local` in `.envrc` and also ignore `.envrc.local`.
 
 ### The stdlib
 
