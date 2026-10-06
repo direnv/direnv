@@ -15,32 +15,33 @@ func (sh tcsh) Hook() (string, error) {
 }
 
 func (sh tcsh) Export(e ShellExport) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range e {
 		if value == nil {
-			out += sh.unset(key)
+			out.WriteString(sh.unset(key))
 		} else {
-			out += sh.export(key, *value)
+			out.WriteString(sh.export(key, *value))
 		}
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh tcsh) Dump(env Env) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh tcsh) export(key, value string) string {
 	if key == "PATH" {
-		command := "set path = ("
-		for _, path := range strings.Split(value, ":") {
-			command += " " + sh.escape(path)
+		var command strings.Builder
+		command.WriteString("set path = (")
+		for path := range strings.SplitSeq(value, ":") {
+			command.WriteString(" " + sh.escape(path))
 		}
-		return command + " );"
+		return command.String() + " );"
 	}
 	return "setenv " + sh.escape(key) + " " + sh.escape(value) + " ;"
 }
@@ -54,28 +55,32 @@ func (sh tcsh) escape(str string) string {
 		return "''"
 	}
 	in := []byte(str)
-	out := ""
+	var out strings.Builder
+	out.Grow(len(in))
 	i := 0
 	l := len(in)
 
 	hex := func(char byte) {
-		out += fmt.Sprintf("\\x%02x", char)
+		fmt.Fprintf(&out, "\\x%02x", char)
 	}
 
 	backslash := func(char byte) {
-		out += string([]byte{BACKSLASH, char})
+		out.WriteByte(BACKSLASH)
+		out.WriteByte(char)
 	}
 
 	escaped := func(str string) {
-		out += str
+		out.WriteString(str)
 	}
 
 	quoted := func(char byte) {
-		out += `"` + string([]byte{char}) + `"`
+		out.WriteByte('"')
+		out.WriteByte(char)
+		out.WriteByte('"')
 	}
 
 	literal := func(char byte) {
-		out += string([]byte{char})
+		out.WriteByte(char)
 	}
 
 	for i < l {
@@ -127,5 +132,5 @@ func (sh tcsh) escape(str string) string {
 		i++
 	}
 
-	return out
+	return out.String()
 }

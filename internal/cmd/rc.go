@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"errors"
@@ -277,12 +279,38 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
 	cmd.Stdin = stdin
+	// an *os.File is not copied through a pipe, so forked processes holding
+	// it open do not block Wait
 	cmd.Stderr = os.Stderr
 
-	var out []byte
-	if out, err = cmd.Output(); err == nil && len(out) > 0 {
+	var stdout io.ReadCloser
+	stdout, err = cmd.StdoutPipe()
+	if err != nil {
+		return
+	}
+
+	var buf bytes.Buffer
+	reader := bufio.NewReader(stdout)
+
+	err = cmd.Start()
+	if err != nil {
+		return
+	}
+
+	// Stop at the end of the JSON output to not wait for forked
+	// subprocesses forever
+	for {
+		line, readErr := reader.ReadBytes('\n')
+		buf.Write(line)
+		if readErr != nil || bytes.Equal(line, []byte("}\n")) {
+			break
+		}
+	}
+	_ = stdout.Close()
+
+	if err = cmd.Wait(); err == nil && buf.Len() > 0 {
 		var newEnv2 Env
-		newEnv2, err = LoadEnvJSON(out)
+		newEnv2, err = LoadEnvJSON(buf.Bytes())
 		if err == nil {
 			newEnv = newEnv2
 		}
