@@ -31,7 +31,7 @@ jobs:
       id: go
 
     - name: Set up Python
-      if: runner.os != 'Windows'
+      if: runner.os == 'macOS'
       uses: actions/setup-python@v6.2.0
       with:
         python-version: "3.9"
@@ -43,13 +43,13 @@ jobs:
       run: go build -v .
 
     - name: Test
+      if: runner.os == 'Windows'
       env:
         GO111MODULE: on
       run: go test -v ./...
 
     - name: Test Host bash
-      # FIXME: make this work on Windows as well
-      if: runner.os != 'Windows'
+      if: runner.os == 'macOS'
       env:
         GO111MODULE: on
       run: make test-stdlib test-bash

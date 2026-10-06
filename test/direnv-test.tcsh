@@ -34,6 +34,7 @@ direnv allow || true
 direnv_eval
 
 cd $TEST_DIR/scenarios/base
+  direnv allow
   echo "Testing base"
   direnv_eval
   test "$HELLO" = "world"

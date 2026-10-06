@@ -20,14 +20,9 @@ buildGoApplication {
         ./GNUmakefile
         ./stdlib.sh
         ./version.txt
-        ./README.md
         (lib.fileset.fileFilter (file: file.hasExt "go") ./.)
-        ./test
-        ./internal
-        ./pkg
-        (lib.fileset.fileFilter (file: file.name == ".envrc") ./.)
       ]
-      ++ lib.optional __includeMan ./man
+      ++ lib.optional __includeMan (lib.fileset.fileFilter (file: file.hasExt "1") ./man)
     );
   };
 
