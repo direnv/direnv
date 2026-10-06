@@ -48,6 +48,7 @@ func init() {
 		CmdAllow,
 		CmdApplyDump,
 		CmdShowDump,
+		CmdCheckRequired,
 		CmdDeny,
 		CmdDotEnv,
 		CmdDump,

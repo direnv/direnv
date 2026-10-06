@@ -1,5 +1,7 @@
 package cmd
 
+import "strings"
+
 import "fmt"
 
 type bash struct{}
@@ -10,10 +12,11 @@ var Bash Shell = bash{}
 const bashHook = `
 _direnv_hook() {
   local previous_exit_status=$?;
+  local previous_sigint_trap="$(trap -p SIGINT)";
   vars="$("{{.SelfPath}}" export bash)";
   trap -- '' SIGINT;
   eval "$vars";
-  trap - SIGINT;
+  eval "${previous_sigint_trap:-trap - SIGINT}";
   return $previous_exit_status;
 };
 if [[ ";${PROMPT_COMMAND[*]:-};" != *";_direnv_hook;"* ]]; then
@@ -30,23 +33,23 @@ func (sh bash) Hook() (string, error) {
 }
 
 func (sh bash) Export(e ShellExport) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range e {
 		if value == nil {
-			out += sh.unset(key)
+			out.WriteString(sh.unset(key))
 		} else {
-			out += sh.export(key, *value)
+			out.WriteString(sh.export(key, *value))
 		}
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh bash) Dump(env Env) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh bash) export(key, value string) string {
