@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"testing"
 	"text/template"
 )
@@ -52,7 +53,7 @@ func TestHookPreservesSIGINT(t *testing.T) {
 				t.Run(tc.name, func(t *testing.T) {
 					// Bash preserves the previous command's status; Zsh's hook returns zero.
 					expectedStatus := 0
-					args := []string{"-f", "-c"}
+					args := []string{"-f", "-i"}
 					if shellName == "bash" {
 						expectedStatus = 23
 						args = []string{"--noprofile", "--norc", "-c"}
@@ -94,7 +95,13 @@ for mode in success failed_export failed_eval; do
   done
 done
 `, rendered.String(), tc.setup, expectedStatus, tc.signal)
-					command := exec.Command(shellPath, append(args, script)...)
+					var command *exec.Cmd
+					if shellName == "zsh" {
+						command = exec.Command(shellPath, args...)
+						command.Stdin = strings.NewReader(script)
+					} else {
+						command = exec.Command(shellPath, append(args, script)...)
+					}
 					command.Env = append(os.Environ(), "BASH_ENV=", "ENV=", "ZDOTDIR="+t.TempDir())
 					if output, err := command.CombinedOutput(); err != nil {
 						t.Fatalf("hook failed: %v\n%s", err, output)
