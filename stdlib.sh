@@ -1480,14 +1480,16 @@ use_guix() {
     # Containers cannot run the host direnv binary, so keep using --search-paths.
     for arg in "$@"; do
 	case "$arg" in
-	--container | -*C*)
+	--container | --emulate-fhs | -[CF]* | -[!-]*[CF]*)
+	    local result
 	    if [ -f channels.scm ]
 	    then
 		log_status "Using Guix version from channels.scm"
-		eval "$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
+		result="$(guix time-machine -C channels.scm -- shell "$@" --search-paths)"
 	    else
-		eval "$(guix shell "$@" --search-paths)"
+		result="$(guix shell "$@" --search-paths)"
 	    fi
+	    eval "$result"
 	    return
 	    ;;
 	esac
