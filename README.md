@@ -84,6 +84,10 @@ $ echo ${FOO-nope}
 nope
 ```
 
+Some stdlib functions store files in `.direnv/`. Add `.direnv/` to your
+`.gitignore`. For local overrides that you do not commit, put
+`source_env_if_exists .envrc.local` in `.envrc` and also ignore `.envrc.local`.
+
 ### The stdlib
 
 Exporting variables by hand is a bit repetitive so direnv provides a set of
