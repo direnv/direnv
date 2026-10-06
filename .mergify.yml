@@ -8,8 +8,8 @@ queue_rules:
       - check-success=Go Build (macos-latest)
       - check-success=Go Build (ubuntu-latest)
       - check-success=Go Build (windows-latest)
-      - check-success=Nix Build (macos-latest)
-      - check-success=Nix Build (ubuntu-latest)
+      - check-success=nixbot/nix-eval
+      - check-success=nixbot/nix-build
     merge_method: rebase
 
 pull_request_rules:
