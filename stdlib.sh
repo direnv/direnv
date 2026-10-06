@@ -241,7 +241,8 @@ dotenv() {
   elif [[ -d $path ]]; then
     path=$path/.env
   fi
-  watch_file "$path"
+  # A FIFO's mtime changes on every read, so watching it reloads on every prompt.
+  [[ -p $path ]] || watch_file "$path"
   if ! [[ -f $path || -p $path ]]; then
     log_error ".env at $path not found"
     return 1
@@ -263,7 +264,8 @@ dotenv_if_exists() {
   elif [[ -d $path ]]; then
     path=$path/.env
   fi
-  watch_file "$path"
+  # A FIFO's mtime changes on every read, so watching it reloads on every prompt.
+  [[ -p $path ]] || watch_file "$path"
   if ! [[ -f $path || -p $path ]]; then
     return
   fi
