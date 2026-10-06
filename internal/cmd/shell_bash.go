@@ -1,6 +1,9 @@
 package cmd
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type bash struct{}
 
@@ -10,10 +13,11 @@ var Bash Shell = bash{}
 const bashHook = `
 _direnv_hook() {
   local previous_exit_status=$?;
+  local previous_sigint_trap="$(trap -p SIGINT)";
   vars="$("{{.SelfPath}}" export bash)";
   trap -- '' SIGINT;
   eval "$vars";
-  trap - SIGINT;
+  eval "${previous_sigint_trap:-trap - SIGINT}";
   return $previous_exit_status;
 };
 if [[ ";${PROMPT_COMMAND[*]:-};" != *";_direnv_hook;"* ]]; then
@@ -30,23 +34,23 @@ func (sh bash) Hook() (string, error) {
 }
 
 func (sh bash) Export(e ShellExport) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range e {
 		if value == nil {
-			out += sh.unset(key)
+			out.WriteString(sh.unset(key))
 		} else {
-			out += sh.export(key, *value)
+			out.WriteString(sh.export(key, *value))
 		}
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh bash) Dump(env Env) (string, error) {
-	var out string
+	var out strings.Builder
 	for key, value := range env {
-		out += sh.export(key, value)
+		out.WriteString(sh.export(key, value))
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (sh bash) export(key, value string) string {
@@ -108,33 +112,35 @@ func BashEscape(str string) string {
 		return "''"
 	}
 	in := []byte(str)
-	out := ""
+	var out strings.Builder
+	out.Grow(len(in) + 4)
 	i := 0
 	l := len(in)
 	escape := false
 
 	hex := func(char byte) {
 		escape = true
-		out += fmt.Sprintf("\\x%02x", char)
+		fmt.Fprintf(&out, "\\x%02x", char)
 	}
 
 	backslash := func(char byte) {
 		escape = true
-		out += string([]byte{BACKSLASH, char})
+		out.WriteByte(BACKSLASH)
+		out.WriteByte(char)
 	}
 
 	escaped := func(str string) {
 		escape = true
-		out += str
+		out.WriteString(str)
 	}
 
 	quoted := func(char byte) {
 		escape = true
-		out += string([]byte{char})
+		out.WriteByte(char)
 	}
 
 	literal := func(char byte) {
-		out += string([]byte{char})
+		out.WriteByte(char)
 	}
 
 	for i < l {
@@ -183,8 +189,8 @@ func BashEscape(str string) string {
 	}
 
 	if escape {
-		out = "$'" + out + "'"
+		return "$'" + out.String() + "'"
 	}
 
-	return out
+	return out.String()
 }

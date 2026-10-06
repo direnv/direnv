@@ -103,8 +103,8 @@ func allowRequiredFiles(rcPath, requiredPaths string, config *Config) error {
 		return fmt.Errorf("failed to create allowed-required directory: %w", err)
 	}
 
-	paths := strings.Split(requiredPaths, ":")
-	for _, relPath := range paths {
+	paths := strings.SplitSeq(requiredPaths, ":")
+	for relPath := range paths {
 		absPath := filepath.Join(rcDir, relPath)
 
 		hash, err := fileHash(absPath)
