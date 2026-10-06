@@ -330,7 +330,7 @@ version = "0.1.0"
 dependencies = []
 EOF
   uv lock
-  layout_uv
+  layout_uv --no-dev
 
   [[ -d .venv ]]
   [[ "$VIRTUAL_ENV" == "$workdir/.venv" ]]

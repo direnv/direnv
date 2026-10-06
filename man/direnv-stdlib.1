@@ -277,8 +277,8 @@ Similar to \fBlayout python\fR, but uses pyenv to build a virtualenv with the sp
 .PP
 Multiple versions may be specified separated by spaces; please refer to the pyenv documentation for more information.
 
-.SS \fBlayout uv [<python>] [<uv-sync-args>...]\fR
-Similar to \fBlayout python\fR, but uses uv to sync the project's dependencies and activate the virtual environment. Requires a \fBpyproject.toml\fR. An optional Python version or interpreter path may be passed as the first argument (e.g. \fBlayout uv 3.12\fR); otherwise uv reads it from \fB.python-version\fR or \fBpyproject.toml\fR. Any argument beginning with \fB--\fR and all arguments after the Python specifier are passed through to \fBuv sync\fR (e.g. \fBlayout uv 3.12 --no-dev\fR). The virtual environment path can be overridden with \fBUV_PROJECT_ENVIRONMENT\fR.
+.SS \fBlayout uv [<uv-sync-args>...]\fR
+Similar to \fBlayout python\fR, but syncs the uv project with \fBuv sync --frozen\fR and activates its virtual environment. Requires a \fBpyproject.toml\fR\&. \fBuv.lock\fR is never modified, so loading fails when it is out of date with \fBpyproject.toml\fR\&. Arguments are passed to \fBuv sync\fR (e.g. \fBlayout uv --no-dev\fR). The Python version comes from \fB\&.python-version\fR, \fBpyproject.toml\fR or \fBUV_PYTHON\fR (e.g. \fBUV_PYTHON=3.12 layout uv\fR). The virtual environment path can be overridden with \fBUV_PROJECT_ENVIRONMENT\fR\&.
 
 .SS \fBlayout python [<python_exe>]\fR
 Creates and loads a virtualenv environment under \fB$PWD/.direnv/python-$python_version\fR\&. This forces the installation of any egg into the project's sub-folder.

@@ -1118,23 +1118,16 @@ layout_pyenv() {
   [[ -n "$PYENV_VERSION" ]] && export PYENV_VERSION
 }
 
-# Usage: layout uv [<python>] [<uv-sync-args>...]
+# Usage: layout uv [<uv-sync-args>...]
 #
-# Similar to layout_python, but uses uv to sync the project's dependencies
-# and activate the virtual environment. Requires a pyproject.toml.
+# Similar to layout_python, but syncs the uv project with `uv sync --frozen`
+# and activates its virtual environment. Requires a pyproject.toml.
 #
-# An optional Python version or interpreter path can be passed as the first
-# argument (e.g. layout uv 3.12); otherwise uv reads the version from
-# .python-version or pyproject.toml. Any argument starting with "--" and all
-# arguments after the python specifier are passed through to `uv sync`.
-#
-# The virtual environment path can be overridden by setting
-# UV_PROJECT_ENVIRONMENT before calling this layout.
+# Arguments are passed to `uv sync`. The Python version comes from
+# .python-version, pyproject.toml or UV_PYTHON, e.g. `UV_PYTHON=3.12 layout uv`.
+# The virtual environment path can be overridden with UV_PROJECT_ENVIRONMENT.
 #
 layout_uv() {
-  # Reload when project config or lockfile change. With --frozen, a pyproject.toml
-  # change triggers an immediate error (lockfile out of sync); a uv.lock change
-  # triggers a re-sync after the user has updated it manually.
   watch_file .python-version pyproject.toml uv.lock
 
   if ! has uv; then
@@ -1148,24 +1141,13 @@ layout_uv() {
   fi
 
   local venv_path
-  venv_path="$(expand_path "${UV_PROJECT_ENVIRONMENT:-.venv}")"
-  export UV_PROJECT_ENVIRONMENT="$venv_path"
+  venv_path=$(expand_path "${UV_PROJECT_ENVIRONMENT:-.venv}")
+  export UV_PROJECT_ENVIRONMENT=$venv_path
 
-  local python_arg=()
-  local sync_args=()
-  # uv python specifiers (versions, paths, implementations) never start with
-  # "--", so this distinguishes a python specifier from arguments intended for `uv sync`.
-  if [[ -n "${1:-}" && "${1:-}" != --* ]]; then
-    python_arg=(--python "$1")
-    sync_args=("${@:2}")
-  else
-    sync_args=("$@")
-  fi
+  # never modify uv.lock from an .envrc
+  uv sync --frozen "$@" || return
 
-  # must use --frozen: we don't want to modify the lock file
-  uv sync --frozen "${python_arg[@]}" "${sync_args[@]}"
-
-  export VIRTUAL_ENV="$venv_path"
+  export VIRTUAL_ENV=$venv_path
   if [[ -d "$venv_path/bin" ]]; then
     PATH_add "$venv_path/bin"
   fi
