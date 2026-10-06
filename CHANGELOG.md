@@ -1,7 +1,8 @@
 
-2.38.0 / 2026-10-06
+2.38.1 / 2026-10-06
 ==================
 
+  * v2.38.0 was tagged but not published, because its binaries failed to upload (#1630)
   * direnv now requires go 1.26 (#1623)
   * the Windows release binaries are now named direnv.windows-<arch>.exe (#1460, #1627)
   * feat: add `layout uv` (#1594)
@@ -40,6 +41,7 @@
   * fix(use_nix): unset structured attribute variables (#1532)
   * fix(fetchurl): spurious warnings on first download (#1569)
   * perf: fix quadratic string building in the shell escapers (#1612)
+  * fix(release): publish the binaries with the release (#1630)
   * install.sh: support MSYS (#1502)
   * build: make PREFIX customizable (#1537)
   * build: skip -linkmode=external when CGO_ENABLED=0 (#1567)
