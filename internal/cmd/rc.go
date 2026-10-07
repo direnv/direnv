@@ -471,6 +471,74 @@ func findUp(searchDir string, fileNames ...string) (path string) {
 	return ""
 }
 
+// evaluated returns the RC that Load evaluates for rc: rc itself when it is
+// allowed, otherwise the closest allowed RC above it. It also returns the RCs
+// that get skipped.
+func (rc *RC) evaluated() (allowed *RC, skipped []*RC) {
+	if rc.Allowed() == Allowed {
+		return rc, nil
+	}
+	return rc.closestAllowed()
+}
+
+// keepLoadedEnv handles moving from the loaded RC to the RC at path when both
+// evaluate the same allowed RC, for example when entering a directory with a
+// blocked .envrc. The environment is kept as it is, so the RC is not
+// evaluated again; only DIRENV_FILE and the watches are updated and the newly
+// skipped RCs are reported. It returns nil when the RC has to be loaded.
+func keepLoadedEnv(loaded *RC, path string, env Env, config *Config) Env {
+	if loaded.times.Check() != nil {
+		return nil
+	}
+	next, err := RCFromPath(path, config)
+	if err != nil {
+		return nil
+	}
+	prevAllowed, prevSkipped := loaded.evaluated()
+	nextAllowed, nextSkipped := next.evaluated()
+	if prevAllowed == nil || nextAllowed == nil || prevAllowed.path != nextAllowed.path {
+		return nil
+	}
+
+	// Stop watching the RCs that were skipped before, watch the new ones
+	unwatched := make(map[string]bool)
+	for _, s := range prevSkipped {
+		for _, p := range []string{s.path, s.allowPath, s.denyPath} {
+			if p, err = filepath.Abs(p); err == nil {
+				unwatched[filepath.Clean(p)] = true
+			}
+		}
+	}
+	current := NewFileTimes()
+	if err = current.Unmarshal(env[DIRENV_WATCHES]); err != nil {
+		return nil
+	}
+	times := NewFileTimes()
+	for _, t := range *current.list {
+		if !unwatched[t.Path] {
+			if err = times.NewTime(t.Path, t.Modtime, t.Exists); err != nil {
+				return nil
+			}
+		}
+	}
+	for _, s := range nextSkipped {
+		for _, t := range *s.times.list {
+			if err = times.NewTime(t.Path, t.Modtime, t.Exists); err != nil {
+				return nil
+			}
+		}
+		if s.Allowed() == NotAllowed {
+			logError(config, "error "+notAllowed, s.Path())
+		}
+	}
+
+	newEnv := env.Copy()
+	newEnv[DIRENV_WATCHES] = times.Marshal()
+	newEnv[DIRENV_DIR] = "-" + filepath.Dir(next.path)
+	newEnv[DIRENV_FILE] = next.path
+	return newEnv
+}
+
 // closestAllowed looks for the closest RC that is allowed to load, starting
 // next to rc and going up. It also returns the RCs that were skipped on the
 // way, rc included.

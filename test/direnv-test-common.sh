@@ -306,16 +306,31 @@ printf 'source_up\nexport CHILD=1\n' >"$blocked_dir/child/.envrc"
 blocked_count() {
   direnv export "$TARGET_SHELL" 2>&1 >/dev/null | grep -c "child/.envrc is blocked" || true
 }
+loading_count() {
+  direnv export "$TARGET_SHELL" 2>&1 >/dev/null | grep -c "loading" || true
+}
 (
   cd "$blocked_dir"
   direnv allow
+  direnv_eval
+  test_eq "$PARENT" "1"
 
   echo "A blocked child .envrc is reported and the parent stays loaded"
   cd child
   test_eq "$(blocked_count)" "1"
+  echo "The parent is not evaluated again"
+  test_eq "$(loading_count)" "0"
   direnv_eval
   test_eq "$PARENT" "1"
   test -z "${CHILD:-}"
+
+  echo "Going back to the parent doesn't evaluate it again either"
+  cd ..
+  test_eq "$(loading_count)" "0"
+  direnv_eval
+  test_eq "$PARENT" "1"
+  cd child
+  direnv_eval
 
   echo "It is reported only once"
   test_eq "$(blocked_count)" "0"
