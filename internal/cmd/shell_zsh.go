@@ -8,14 +8,14 @@ type zsh struct{}
 // Zsh adds support for the venerable Z shell.
 var Zsh Shell = zsh{}
 
-// The guard skips the hook when chpwd fires outside the top level, e.g. from
-// completion. It follows zsh's Functions/Chpwd/chpwd_recent_dirs.
+// The guard skips the hook when chpwd fires within a non-interactive
+// shell or a subshell, e.g., from completion. It is inspired by zsh's
+// Functions/Chpwd/chpwd_recent_dirs but does not skip a non-toplevel
+// ZSH_EVAL_CONTEXT. See https://github.com/direnv/direnv/issues/1633 as to why.
 const zshHook = `
 _direnv_hook() {
-  setopt localoptions localtraps extendedglob
-  if [[ ! -o interactive  || $ZSH_SUBSHELL -ne 0 || \
-    ( -n $ZSH_EVAL_CONTEXT && \
-    $ZSH_EVAL_CONTEXT != toplevel(:[a-z]#func|)# ) ]]; then
+  setopt localoptions localtraps
+  if [[ ! -o interactive || $ZSH_SUBSHELL -ne 0 ]]; then
     return
   fi
   vars="$({{.BashSelfPath}} export zsh)"
