@@ -219,14 +219,46 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		newEnv[DIRENV_DIFF] = previousEnv.Diff(newEnv).Serialize()
 	}()
 
-	// Abort if the file is not allowed
-	switch rc.Allowed() {
-	case NotAllowed:
-		err = fmt.Errorf(notAllowed, rc.Path())
-		return
-	case Allowed:
-	case Denied:
-		return
+	// A blocked or denied RC is never evaluated. If an allowed RC exists further
+	// up, evaluate that one instead so the trusted environment above is kept.
+	// The blocked RC is still recorded as DIRENV_FILE, and all the skipped RCs
+	// are watched, so allowing or editing any of them triggers a reload.
+	path := rc.path
+	if status := rc.Allowed(); status != Allowed {
+		allowed, skipped := rc.closestAllowed()
+
+		watched := skipped
+		if allowed != nil {
+			watched = append(watched, allowed)
+		}
+		times := NewFileTimes()
+		for _, s := range watched {
+			for _, t := range *s.times.list {
+				if err = times.NewTime(t.Path, t.Modtime, t.Exists); err != nil {
+					return
+				}
+			}
+		}
+		newEnv[DIRENV_WATCHES] = times.Marshal()
+
+		// When there is nothing to load, the returned error reports rc itself
+		reported := skipped
+		if allowed == nil {
+			reported = skipped[1:]
+		}
+		for _, s := range reported {
+			if s.Allowed() == NotAllowed {
+				logError(config, "error "+notAllowed, s.Path())
+			}
+		}
+
+		if allowed == nil {
+			if status == NotAllowed {
+				err = fmt.Errorf(notAllowed, rc.Path())
+			}
+			return
+		}
+		path = allowed.path
 	}
 
 	// Allow RC loads to be canceled with SIGINT
@@ -241,7 +273,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	// check what type of RC we're processing
 	// use different exec method for each
 	fn := "source_env"
-	if filepath.Base(rc.path) == ".env" {
+	if filepath.Base(path) == ".env" {
 		fn = "dotenv"
 	}
 
@@ -264,7 +296,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 	// Non-Windows platforms will already use slashes. However, on Windows
 	// backslashes are used by default which can result in unexpected escapes
 	// like \b or \r in paths. Force slash usage to avoid issues on Windows.
-	slashSeparatedPath := filepath.ToSlash(rc.Path())
+	slashSeparatedPath := filepath.ToSlash(path)
 	arg := fmt.Sprintf(
 		`%seval "$(%s stdlib)" && __main__ %s %s`,
 		prelude,
@@ -437,4 +469,38 @@ func findUp(searchDir string, fileNames ...string) (path string) {
 		}
 	}
 	return ""
+}
+
+// closestAllowed looks for the closest RC that is allowed to load, starting
+// next to rc and going up. It also returns the RCs that were skipped on the
+// way, rc included.
+func (rc *RC) closestAllowed() (allowed *RC, skipped []*RC) {
+	skipped = []*RC{rc}
+	rcPath, err := filepath.Abs(rc.path)
+	if err != nil {
+		return nil, skipped
+	}
+
+	fileNames := []string{".envrc"}
+	if rc.config.LoadDotenv {
+		fileNames = append(fileNames, ".env")
+	}
+
+	for _, dir := range eachDir(filepath.Dir(rcPath)) {
+		for _, fileName := range fileNames {
+			path := filepath.Join(dir, fileName)
+			if path == rcPath || !fileExists(path) {
+				continue
+			}
+			candidate, err := RCFromPath(path, rc.config)
+			if err != nil {
+				continue
+			}
+			if candidate.Allowed() == Allowed {
+				return candidate, skipped
+			}
+			skipped = append(skipped, candidate)
+		}
+	}
+	return nil, skipped
 }

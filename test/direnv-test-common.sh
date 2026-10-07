@@ -298,6 +298,68 @@ direnv_eval
 test_eq "${UNLOAD_TEST:-}" ""
 rm -rf "$unload_dir"
 
+echo "## Testing blocked child ##"
+blocked_dir=$(mktemp -d)
+mkdir -p "$blocked_dir/child"
+echo "export PARENT=1" >"$blocked_dir/.envrc"
+printf 'source_up\nexport CHILD=1\n' >"$blocked_dir/child/.envrc"
+blocked_count() {
+  direnv export "$TARGET_SHELL" 2>&1 >/dev/null | grep -c "child/.envrc is blocked" || true
+}
+(
+  cd "$blocked_dir"
+  direnv allow
+
+  echo "A blocked child .envrc is reported and the parent stays loaded"
+  cd child
+  test_eq "$(blocked_count)" "1"
+  direnv_eval
+  test_eq "$PARENT" "1"
+  test -z "${CHILD:-}"
+
+  echo "It is reported only once"
+  test_eq "$(blocked_count)" "0"
+
+  echo "Directories below the blocked child keep the parent"
+  mkdir -p grandchild
+  cd grandchild
+  test_eq "$(blocked_count)" "0"
+  direnv_eval
+  test_eq "$PARENT" "1"
+  test -z "${CHILD:-}"
+  cd ..
+
+  echo "Allowing the child loads it"
+  direnv allow
+  direnv_eval
+  test_eq "$PARENT" "1"
+  test_eq "$CHILD" "1"
+
+  echo "A denied child is skipped silently and the parent stays loaded"
+  direnv deny
+  test_eq "$(blocked_count)" "0"
+  direnv_eval
+  test_eq "$PARENT" "1"
+  test -z "${CHILD:-}"
+
+  echo "Editing the parent blocks it too, so it is reported and nothing is loaded"
+  sleep 1
+  echo "export PARENT=2" >../.envrc
+  test_eq "$(direnv export "$TARGET_SHELL" 2>&1 >/dev/null | grep -c "$blocked_dir/.envrc is blocked" || true)" "1"
+  direnv_eval || true
+  test -z "${PARENT:-}"
+  test -z "${CHILD:-}"
+
+  echo "Allowing the parent again loads it without changing directory"
+  direnv allow ..
+  direnv_eval
+  test_eq "$PARENT" "2"
+  test -z "${CHILD:-}"
+)
+cd /
+direnv_eval
+rm -rf "$blocked_dir"
+
 test_start "watch-dir"
     echo "No watches by default"
     test_eq "${DIRENV_WATCHES}" "${WATCHES}"
