@@ -409,6 +409,7 @@ func fileHash(path string) (hash string, err error) {
 	if err != nil {
 		return
 	}
+	defer func() { _ = fd.Close() }()
 
 	hasher := sha256.New()
 	_, err = hasher.Write([]byte(path + "\n"))
