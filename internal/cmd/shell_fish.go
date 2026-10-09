@@ -39,22 +39,27 @@ const fishHook = `
     end;
 
     function __direnv_update_fish_complete_path;
-        # Remove previously added completion paths
-        for p in $__direnv_fish_complete_paths;
-            set -l idx (contains -i -- $p $fish_complete_path);
-            and set -e fish_complete_path[$idx];
+        set -l desired;
+        for p in $fish_complete_path;
+            contains -- $p $__direnv_fish_complete_paths;
+            or set -a desired $p;
         end;
-        set -e __direnv_fish_complete_paths;
 
-        # Add completion paths from current XDG_DATA_DIRS
+        set -l added;
         for dir in (string split ':' -- $XDG_DATA_DIRS);
-            set -l completions_dir "$dir/fish/vendor_completions.d";
-            if test -d "$completions_dir";
-                if not contains -- "$completions_dir" $fish_complete_path;
-                    set -ga fish_complete_path $completions_dir;
-                    set -ga __direnv_fish_complete_paths $completions_dir;
-                end;
+            test -n "$dir"; or continue;
+            # same normalisation as fish's share/config.fish, so contains matches its own entries
+            set -l completions_dir (string replace -r '([^/])/$' '$1' -- $dir)/fish/vendor_completions.d;
+            if test -d "$completions_dir"; and not contains -- $completions_dir $desired;
+                set -a desired $completions_dir;
+                set -a added $completions_dir;
             end;
+        end;
+        set -g __direnv_fish_complete_paths $added;
+
+        # every assignment makes fish unload autoloaded completions (complete_invalidate_path)
+        if test (count $desired) -ne (count $fish_complete_path); or test "$desired" != "$fish_complete_path";
+            set -g fish_complete_path $desired;
         end;
     end;
 `

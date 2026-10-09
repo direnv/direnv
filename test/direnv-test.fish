@@ -263,6 +263,15 @@ begin
         echo "FAILED: completions_dir not added to fish_complete_path after direnv_eval"
         exit 1
     end
+
+    echo "Verify a second eval does not touch fish_complete_path"
+    set -g __fcp_writes 0
+    function __count_fcp_writes --on-variable fish_complete_path
+        set -g __fcp_writes (math $__fcp_writes + 1)
+    end
+    direnv_eval
+    functions --erase __count_fcp_writes
+    test_eq 0 $__fcp_writes
 end
 test_stop
 
@@ -273,3 +282,27 @@ if contains -- $completions_dir $fish_complete_path
     exit 1
 end
 echo "## fish-completions cleanup verified ##"
+
+echo "## Testing fish-completions trailing slash ##"
+begin
+    set -l data_dir "$TEST_DIR/scenarios/fish-completions/data"
+    set -l completions_dir "$data_dir/fish/vendor_completions.d"
+    set -l saved_xdg $XDG_DATA_DIRS
+    set -l saved_fcp $fish_complete_path
+
+    set -g fish_complete_path $fish_complete_path $completions_dir
+    set -gx XDG_DATA_DIRS "$data_dir/"
+    set -l before $fish_complete_path
+    __direnv_update_fish_complete_path
+    __direnv_update_fish_complete_path
+
+    if string match -q -- '*//*' $fish_complete_path
+        echo "FAILED: double slash in fish_complete_path: $fish_complete_path"
+        exit 1
+    end
+    test_eq 1 (count (string match -- $completions_dir $fish_complete_path))
+    test_eq "$before" "$fish_complete_path"
+
+    set -gx XDG_DATA_DIRS $saved_xdg
+    set -g fish_complete_path $saved_fcp
+end
