@@ -11,8 +11,8 @@ import (
 func DataDir(env map[string]string, programName string) string {
 	if env["XDG_DATA_HOME"] != "" {
 		return filepath.Join(env["XDG_DATA_HOME"], programName)
-	} else if env["HOME"] != "" {
-		return filepath.Join(env["HOME"], ".local", "share", programName)
+	} else if home := homeDir(env); home != "" {
+		return filepath.Join(home, ".local", "share", programName)
 	}
 	// In theory we could also read /etc/passwd and look for the home based on
 	// the process' UID
@@ -25,8 +25,8 @@ func DataDir(env map[string]string, programName string) string {
 func ConfigDir(env map[string]string, programName string) string {
 	if env["XDG_CONFIG_HOME"] != "" {
 		return filepath.Join(env["XDG_CONFIG_HOME"], programName)
-	} else if env["HOME"] != "" {
-		return filepath.Join(env["HOME"], ".config", programName)
+	} else if home := homeDir(env); home != "" {
+		return filepath.Join(home, ".config", programName)
 	}
 	// In theory we could also read /etc/passwd and look for the home based on
 	// the process' UID
@@ -37,8 +37,8 @@ func ConfigDir(env map[string]string, programName string) string {
 func CacheDir(env map[string]string, programName string) string {
 	if env["XDG_CACHE_HOME"] != "" {
 		return filepath.Join(env["XDG_CACHE_HOME"], programName)
-	} else if env["HOME"] != "" {
-		return filepath.Join(env["HOME"], ".cache", programName)
+	} else if home := homeDir(env); home != "" {
+		return filepath.Join(home, ".cache", programName)
 	}
 	// In theory we could also read /etc/passwd and look for the home based on
 	// the process' UID
