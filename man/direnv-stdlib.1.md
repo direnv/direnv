@@ -255,6 +255,8 @@ Loads a pixi environment. If no additional arguments are given the `default` env
 
 You can pass `-e <env_name>` to load a different environment instead. For supported arguments see `pixi shell-hook --help`.
 
+The manifest (`pixi.toml` if present, `pyproject.toml` otherwise) and `pixi.lock` are added to the allow-list via `require_allowed`, as they can define activation scripts that get executed. Any change to them requires running `direnv allow` again. If no `pixi.lock` exists, loading fails until you run `pixi lock`. Must be used in the workspace root.
+
 ### `layout perl`
 
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.

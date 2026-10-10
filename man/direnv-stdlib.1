@@ -262,6 +262,9 @@ Loads a pixi environment. If no additional arguments are given the \fBdefault\fR
 .PP
 You can pass \fB-e <env_name>\fR to load a different environment instead. For supported arguments see \fBpixi shell-hook --help\fR\&.
 
+.PP
+The manifest (\fBpixi.toml\fR if present, \fBpyproject.toml\fR otherwise) and \fBpixi.lock\fR are added to the allow-list via \fBrequire_allowed\fR, as they can define activation scripts that get executed. Any change to them requires running \fBdirenv allow\fR again. If no \fBpixi.lock\fR exists, loading fails until you run \fBpixi lock\fR\&. Must be used in the workspace root.
+
 .SS \fBlayout perl\fR
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
 
