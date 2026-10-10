@@ -5,7 +5,6 @@
   * fix(fish): stop completions from breaking after the first prompt (#1635, #1636)
   * fix(pixi): require_allowed for the manifest file as well (#1632)
 
-
 2.38.1 / 2026-10-06
 ==================
 
