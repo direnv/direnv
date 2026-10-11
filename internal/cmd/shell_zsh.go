@@ -18,7 +18,7 @@ _direnv_hook() {
   if [[ ! -o interactive || $ZSH_SUBSHELL -ne 0 ]]; then
     return
   fi
-  vars="$({{.BashSelfPath}} export zsh)"
+  local vars="$({{.BashSelfPath}} export zsh)"
   trap -- '' SIGINT
   eval "$vars"
   trap - SIGINT
