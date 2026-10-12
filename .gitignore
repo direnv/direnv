@@ -3,6 +3,7 @@
 .gopath
 /.envrc
 /direnv
+/direnv.exe
 /direnv.test
 /dist
 /test/config

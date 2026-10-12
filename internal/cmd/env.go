@@ -34,6 +34,8 @@ func GetEnv() Env {
 		env[key] = value
 	}
 
+	fixMsys2Paths(env)
+
 	return env
 }
 
