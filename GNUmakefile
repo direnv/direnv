@@ -174,7 +174,14 @@ install: all ## Install direnv to PREFIX (default: /usr/local)
 	install -d $(DESTDIR)$(MANDIR)/man1
 	cp -R man/*.1 $(DESTDIR)$(MANDIR)/man1
 	install -d $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d
-	echo "$(BINDIR)/direnv hook fish | source" > $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d/direnv.fish
+# Prefer direnv from PATH so the hook does not embed a versioned install
+# path (e.g. a Homebrew keg) that goes away on upgrade. See #1639.
+	printf '%s\n' \
+		'if command -q direnv' \
+		'    direnv hook fish | source' \
+		'else' \
+		'    $(BINDIR)/direnv hook fish | source' \
+		'end' > $(DESTDIR)$(SHAREDIR)/fish/vendor_conf.d/direnv.fish
 
 dist_platforms = \
 	darwin/amd64 \
