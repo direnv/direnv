@@ -479,3 +479,26 @@ test_start "require-allowed"
   echo "$ORIG_CONTENT" > config.toml
   direnv allow
 test_stop
+
+test_start "use-nix-require-allowed" isolated
+  direnv deny
+  unset NIX_APPROVAL_TEST DIRENV_REQUIRED
+  direnv allow
+  direnv_eval
+  test -z "${NIX_APPROVAL_TEST:-}"
+  test_eq "$DIRENV_REQUIRED" "default.nix:shell.nix"
+
+  direnv allow
+  direnv_eval
+  test_eq "$NIX_APPROVAL_TEST" "success"
+
+  sleep 1
+  echo '# changed' >> shell.nix
+  direnv_eval
+  test -z "${NIX_APPROVAL_TEST:-}"
+  test -n "${DIRENV_REQUIRED:-}"
+
+  direnv allow
+  direnv_eval
+  test_eq "$NIX_APPROVAL_TEST" "success"
+test_stop

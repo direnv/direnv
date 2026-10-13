@@ -327,7 +327,9 @@ Loads rbenv which add the ruby wrappers available on the PATH.
 
 Load environment variables from `nix-shell`.
 
-If you have a `default.nix` or `shell.nix` these will be used by default, but you can also specify packages directly (e.g `use nix -p ocaml`).
+When called without arguments, `nix-shell` uses `shell.nix` if it exists, or `default.nix` otherwise. You can also specify packages directly (e.g `use nix -p ocaml`).
+
+When called without arguments, existing `default.nix` and `shell.nix` files require approval via `direnv allow` before `nix-shell` runs. Changes to these files require approval again.
 
 See http://nixos.org/nix/manual/#sec-nix-shell
 

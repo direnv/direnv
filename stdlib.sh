@@ -1396,11 +1396,21 @@ use_nodenv() {
 # Usage: use_nix [...]
 #
 # Load environment variables from `nix-shell`.
-# If you have a `default.nix` or `shell.nix` these will be
-# used by default, but you can also specify packages directly
-# (e.g `use nix -p ocaml`).
+# With no arguments, nix-shell uses shell.nix if it exists,
+# or default.nix otherwise. You can also specify packages
+# directly (e.g `use nix -p ocaml`).
 #
 use_nix() {
+  if [[ $# == 0 ]]; then
+    watch_file default.nix shell.nix
+    local nix_files=()
+    [[ -f default.nix ]] && nix_files+=(default.nix)
+    [[ -f shell.nix ]] && nix_files+=(shell.nix)
+    if [[ ${#nix_files[@]} -gt 0 ]]; then
+      require_allowed "${nix_files[@]}"
+    fi
+  fi
+
   local -A values_to_restore=(
     ["NIX_BUILD_TOP"]=${NIX_BUILD_TOP:-__UNSET__}
     ["NIX_ATTRS_JSON_FILE"]=${NIX_ATTRS_JSON_FILE:-__UNSET__}
@@ -1420,10 +1430,6 @@ use_nix() {
       export "$key=$value"
     fi
   done
-
-  if [[ $# == 0 ]]; then
-    watch_file default.nix shell.nix
-  fi
 }
 
 # Usage: use_flake [<installable>]
