@@ -352,6 +352,9 @@ pass an "installable" like "nixpkgs#hello" to load all the build dependencies
 of the hello package from the latest nixpkgs.
 
 .PP
+Existing \fBflake.nix\fR and \fBflake.lock\fR files in the current directory require approval via \fBdirenv allow\fR before Nix runs. Changes to either file require approval again.
+
+.PP
 Note that the flakes feature is hidden behind an experimental flag, which you
 will have to enable on your own. Flakes is not considered stable yet.
 

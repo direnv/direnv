@@ -502,3 +502,26 @@ test_start "use-nix-require-allowed" isolated
   direnv_eval
   test_eq "$NIX_APPROVAL_TEST" "success"
 test_stop
+
+test_start "use-flake-require-allowed" isolated
+  direnv deny
+  unset FLAKE_APPROVAL_TEST DIRENV_REQUIRED
+  direnv allow
+  direnv_eval
+  test -z "${FLAKE_APPROVAL_TEST:-}"
+  test_eq "$DIRENV_REQUIRED" "flake.nix:flake.lock"
+
+  direnv allow
+  direnv_eval
+  test_eq "$FLAKE_APPROVAL_TEST" "success"
+
+  sleep 1
+  echo '{"changed":true}' >> flake.lock
+  direnv_eval
+  test -z "${FLAKE_APPROVAL_TEST:-}"
+  test -n "${DIRENV_REQUIRED:-}"
+
+  direnv allow
+  direnv_eval
+  test_eq "$FLAKE_APPROVAL_TEST" "success"
+test_stop

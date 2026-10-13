@@ -1445,6 +1445,12 @@ use_nix() {
 use_flake() {
   watch_file flake.nix
   watch_file flake.lock
+  local flake_files=()
+  [[ -f flake.nix ]] && flake_files+=(flake.nix)
+  [[ -f flake.lock ]] && flake_files+=(flake.lock)
+  if [[ ${#flake_files[@]} -gt 0 ]]; then
+    require_allowed "${flake_files[@]}"
+  fi
   mkdir -p "$(direnv_layout_dir)"
   local result
   result="$(nix --extra-experimental-features "nix-command flakes" print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
