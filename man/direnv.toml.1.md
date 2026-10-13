@@ -82,6 +82,14 @@ A Regexp that can be used to filter out some of the logs.
 
 > direnv >= 2.36.0 is required
 
+### `flat_search_dirs`
+
+A list of directories that contain external (outside of the corresponding source tree) environment files. This is useful if the environment you use won't be added to the repository, and you don't want it to be a problem when dealing with version-control systems.
+
+Environment files in directories and in parent directories are prioritized over these.
+
+For example, if `/home/alice/envs` is added to the list, and the user enters the `/home/alice/project` directory, `/home/alice/envs` will be searched for `project.envrc`, (`project.env`), `project/.envrc` and (`project/.env`) in that order. The directories in parentheses are searched in respect to `load_dotenv`.
+
 ## [whitelist]
 
 Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" -- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. **This feature should be used with great care**, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.
