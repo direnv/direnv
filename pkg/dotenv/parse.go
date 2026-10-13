@@ -45,7 +45,9 @@ func Parse(data string) (map[string]string, error) {
 	var lines = linesRe.Split(data, -1)
 	var inMultiline bool
 	var multilineValue string
-	var quoteChar byte
+	// multilineQuoteOffset is the index in multilineValue at which the
+	// opening quote of the value being collected starts.
+	var multilineQuoteOffset int
 
 	for i := range lines {
 		line := lines[i]
@@ -54,8 +56,13 @@ func Parse(data string) (map[string]string, error) {
 		if inMultiline {
 			multilineValue += "\n" + line
 
-			// Check if this line completes the multi-line value
-			if strings.HasSuffix(strings.TrimSpace(line), string(quoteChar)) {
+			// Check if this line completes the multi-line value. The value
+			// is done as soon as its opening quote is matched again; anything
+			// after the closing quote (a trailing comment, trailing
+			// whitespace, ...) must not prevent detection. Looking at the
+			// accumulated value with the same escape-aware rule used to open
+			// it keeps the two in sync (see issue #1487).
+			if !unclosedQuote(multilineValue[multilineQuoteOffset:]) {
 				// Process the completed multi-line value
 				match := lineRe.FindStringSubmatch(multilineValue)
 				if len(match) > 1 && len(match[1]) > 0 {
@@ -83,9 +90,9 @@ func Parse(data string) (map[string]string, error) {
 					// Start multi-line collection only if the opening
 					// quote is not closed on the same line
 					if unclosedQuote(trimmedAfterSep) {
-						quoteChar = trimmedAfterSep[0]
 						inMultiline = true
 						multilineValue = line
+						multilineQuoteOffset = sepIdx + 1 + (len(afterSep) - len(trimmedAfterSep))
 						continue
 					}
 				}
