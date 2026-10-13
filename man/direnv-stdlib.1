@@ -335,7 +335,10 @@ Loads rbenv which add the ruby wrappers available on the PATH.
 Load environment variables from \fBnix-shell\fR\&.
 
 .PP
-If you have a \fBdefault.nix\fR or \fBshell.nix\fR these will be used by default, but you can also specify packages directly (e.g \fBuse nix -p ocaml\fR).
+When called without arguments, \fBnix-shell\fR uses \fBshell.nix\fR if it exists, or \fBdefault.nix\fR otherwise. You can also specify packages directly (e.g \fBuse nix -p ocaml\fR).
+
+.PP
+When called without arguments, existing \fBdefault.nix\fR and \fBshell.nix\fR files require approval via \fBdirenv allow\fR before \fBnix-shell\fR runs. Changes to these files require approval again.
 
 .PP
 See http://nixos.org/nix/manual/#sec-nix-shell
@@ -347,6 +350,9 @@ Load the build environment of a derivation similar to \fBnix develop\fR\&.
 By default it will load the current folder flake.nix devShell attribute. Or
 pass an "installable" like "nixpkgs#hello" to load all the build dependencies
 of the hello package from the latest nixpkgs.
+
+.PP
+Existing \fBflake.nix\fR and \fBflake.lock\fR files in the current directory require approval via \fBdirenv allow\fR before Nix runs. Changes to either file require approval again.
 
 .PP
 Note that the flakes feature is hidden behind an experimental flag, which you

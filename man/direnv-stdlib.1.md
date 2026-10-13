@@ -327,7 +327,9 @@ Loads rbenv which add the ruby wrappers available on the PATH.
 
 Load environment variables from `nix-shell`.
 
-If you have a `default.nix` or `shell.nix` these will be used by default, but you can also specify packages directly (e.g `use nix -p ocaml`).
+When called without arguments, `nix-shell` uses `shell.nix` if it exists, or `default.nix` otherwise. You can also specify packages directly (e.g `use nix -p ocaml`).
+
+When called without arguments, existing `default.nix` and `shell.nix` files require approval via `direnv allow` before `nix-shell` runs. Changes to these files require approval again.
 
 See http://nixos.org/nix/manual/#sec-nix-shell
 
@@ -338,6 +340,8 @@ Load the build environment of a derivation similar to `nix develop`.
 By default it will load the current folder flake.nix devShell attribute. Or
 pass an "installable" like "nixpkgs#hello" to load all the build dependencies
 of the hello package from the latest nixpkgs.
+
+Existing `flake.nix` and `flake.lock` files in the current directory require approval via `direnv allow` before Nix runs. Changes to either file require approval again.
 
 Note that the flakes feature is hidden behind an experimental flag, which you
 will have to enable on your own. Flakes is not considered stable yet.
