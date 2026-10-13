@@ -316,6 +316,10 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 		}
 	}
 
+	if ctx.Err() != nil {
+		err = fmt.Errorf("load canceled: %w", ctx.Err())
+	}
+
 	return
 }
 
