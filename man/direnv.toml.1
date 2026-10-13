@@ -96,6 +96,16 @@ direnv >= 2.36.0 is required
 
 .RE
 
+.SS \fBignore_paths\fR
+A list of directories to be ignored from being evaluated by direnv. This can be useful to avoid evaluating .envrc files in directories that are known to be slow or that contain untrusted code.
+
+.PP
+Example:
+
+.EX
+ignore_paths = [ "/run", "/tmp" ]
+.EE
+
 .SH [whitelist]
 Specifying whitelist directives marks specific directory hierarchies or specific directories as "trusted" -- direnv will evaluate any matching .envrc files regardless of whether they have been specifically allowed. \fBThis feature should be used with great care\fP, as anyone with the ability to write files to that directory (including collaborators on VCS repositories) will be able to execute arbitrary code on your computer.
 
