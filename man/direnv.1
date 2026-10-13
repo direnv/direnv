@@ -187,6 +187,12 @@ handy shortcut that opens the file in your $EDITOR and automatically reloads it
 if the file's modification time has changed.
 
 .PP
+A blocked or denied \fB\&.envrc\fR is never loaded, but it doesn't drop the
+environment of the directories above it either: direnv loads the closest
+allowed \fB\&.envrc\fR up the tree instead. Allowing the blocked file loads it on the
+next prompt.
+
+.PP
 Now that the environment is loaded you can notice that once you \fBcd\fR out
 of the directory it automatically gets unloaded. If you \fBcd\fR back into it it's
 loaded again. That's the base of the mechanism that allows you to build cool

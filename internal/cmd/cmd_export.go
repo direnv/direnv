@@ -69,6 +69,12 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 	case loadedRC == nil:
 		logDebug("no RC (implies no DIRENV_DIFF),loading")
 	case loadedRC.path != toLoad:
+		if currentEnv[DIRENV_REQUIRED] == "" {
+			if newEnv := keepLoadedEnv(loadedRC, toLoad, currentEnv, config); newEnv != nil {
+				logDebug("new RC evaluates the loaded one, keeping the environment")
+				return printEnvDiff(currentEnv, newEnv, shell)
+			}
+		}
 		logDebug("new RC, loading")
 	case loadedRC.times.Check() != nil:
 		logDebug("file changed, reloading")
@@ -115,14 +121,22 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logStatus(config, "export %s", out)
 	}
 
-	diffString, diffErr := currentEnv.Diff(newEnv).ToShell(shell)
-	if diffErr != nil {
-		return fmt.Errorf("ToShell() failed: %w", diffErr)
+	if diffErr := printEnvDiff(currentEnv, newEnv, shell); diffErr != nil {
+		return diffErr
+	}
+
+	return
+}
+
+// printEnvDiff prints the shell code that turns currentEnv into newEnv
+func printEnvDiff(currentEnv, newEnv Env, shell Shell) error {
+	diffString, err := currentEnv.Diff(newEnv).ToShell(shell)
+	if err != nil {
+		return fmt.Errorf("ToShell() failed: %w", err)
 	}
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
-
-	return
+	return nil
 }
 
 // Return a string of +/-/~ indicators of an environment diff
