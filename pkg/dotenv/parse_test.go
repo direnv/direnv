@@ -521,3 +521,54 @@ func TestDotEnvEscapedQuoteMultiline(t *testing.T) {
 	envShouldContain(t, env, "MULTI", "a\"b\nc")
 	envShouldContain(t, env, "AFTER", "done")
 }
+
+// A trailing comment on the line that closes a multi-line value must not
+// prevent the parser from seeing the closing quote (issue #1487). Previously
+// the close was detected with a HasSuffix check on the raw line, so any text
+// after the closing quote (here a comment) made the value look unclosed and
+// the whole file failed with "unclosed quoted value in .env file".
+const TestMultilineTrailingCommentEnv = `X='abc
+123' # trailing comment
+AFTER=done
+`
+
+func TestDotEnvMultilineSingleQuotedTrailingComment(t *testing.T) {
+	env := dotenv.MustParse(TestMultilineTrailingCommentEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "X", "abc\n123")
+	envShouldContain(t, env, "AFTER", "done")
+}
+
+// Same as above for a double-quoted multi-line value closed with a comment.
+const TestMultilineDoubleQuotedTrailingCommentEnv = `X="abc
+123" # trailing comment
+AFTER=done
+`
+
+func TestDotEnvMultilineDoubleQuotedTrailingComment(t *testing.T) {
+	env := dotenv.MustParse(TestMultilineDoubleQuotedTrailingCommentEnv)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "X", "abc\n123")
+	envShouldContain(t, env, "AFTER", "done")
+}
+
+// A trailing comment must not swallow subsequent lines, and a genuinely
+// unclosed value must still be reported as an error.
+func TestDotEnvMultilineTrailingCommentDoesNotSwallow(t *testing.T) {
+	env := dotenv.MustParse("A=1\nX='one\ntwo' # c\nB=2\nC=3\n")
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "A", "1")
+	envShouldContain(t, env, "X", "one\ntwo")
+	envShouldContain(t, env, "B", "2")
+	envShouldContain(t, env, "C", "3")
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("should panic with unclosed quoted value")
+		}
+	}()
+	dotenv.MustParse("X='abc\n123")
+}
