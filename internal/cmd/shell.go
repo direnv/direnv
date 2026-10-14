@@ -34,16 +34,17 @@ func (e ShellExport) Remove(key string) {
 var supportedShellList = map[string]Shell{
 	"bash":    Bash,
 	"elvish":  Elvish,
+	"environ": Environ,
 	"fish":    Fish,
 	"gha":     GitHubActions,
 	"gzenv":   GzEnv,
 	"json":    JSON,
 	"murex":   Murex,
+	"pwsh":    Pwsh,
+	"systemd": Systemd,
 	"tcsh":    Tcsh,
 	"vim":     Vim,
 	"zsh":     Zsh,
-	"pwsh":    Pwsh,
-	"systemd": Systemd,
 }
 
 // DetectShell returns a Shell instance from the given target.
