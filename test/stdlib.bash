@@ -385,6 +385,40 @@ test_name global_lib_noglob
   fi
 )
 
+test_name on_git_branch
+(
+  workdir=$(mktemp -d "${TMPDIR:-/tmp}/direnv-on-git-branch.XXXXXX")
+  trap 'rm -rf "$workdir"' EXIT
+  git init -q "$workdir"
+  git -C "$workdir" symbolic-ref HEAD refs/heads/direnv-test
+  cd "$workdir"
+
+  # Separate strict shells expose an unbound positional argument even when
+  # on_git_branch is used as the condition of an if statement.
+  bash -euo pipefail -c 'source "$1"; shift; strict_env; on_git_branch' \
+    _ "$root/stdlib.sh"
+  bash -euo pipefail -c '
+    source "$1"; shift; strict_env
+    if on_git_branch -r 2>error.log; then
+      echo "missing regexp unexpectedly accepted"
+      exit 1
+    fi
+    grep -q "missing regexp pattern" error.log
+    if grep -q "unbound variable" error.log; then
+      exit 1
+    fi
+  ' _ "$root/stdlib.sh"
+
+  load_stdlib
+  on_git_branch direnv-test
+  on_git_branch -r '^direnv-'
+  if on_git_branch other-branch || on_git_branch -r '^other-'; then
+    echo "non-matching branch unexpectedly accepted"
+    return 1
+  fi
+  [[ -n ${DIRENV_WATCHES:-} ]]
+)
+
 # test strict_env and unstrict_env
 ./strict_env_test.bash
 

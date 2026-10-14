@@ -1612,9 +1612,9 @@ on_git_branch() {
   elif ! git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null); then
     log_error "on_git_branch could not locate the .git directory corresponding to the current working directory"
     return 1
-  elif [ -z "$1" ]; then
+  elif [ -z "${1:-}" ]; then
     return 0
-  elif [[ "$1" = "-r" && -z "$2" ]]; then
+  elif [[ "$1" = "-r" && -z "${2:-}" ]]; then
     log_error "missing regexp pattern after \`-r\` flag"
     return 1
   fi
