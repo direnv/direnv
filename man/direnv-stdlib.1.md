@@ -283,7 +283,14 @@ Creates and loads a virtualenv environment under `$PWD/.direnv/python-$python_ve
 
 It's possible to specify the python executable if you want to use different versions of python (eg: `layout python python3`).
 
+It's possible to specify the virtualenv directory using the `VIRTUAL_ENV` variable.
+
 Note that previously virtualenv was located under `$PWD/.direnv/virtualenv` and will be re-used by direnv if it exists.
+
+Example:
+
+    VIRTUAL_ENV=.venv
+    layout python3
 
 ### `layout python3`
 
