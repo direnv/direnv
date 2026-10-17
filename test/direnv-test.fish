@@ -40,6 +40,7 @@ set -e DIRENV_DIR
 set -e DIRENV_FILE
 set -e DIRENV_WATCHES
 set -e DIRENV_DIFF
+set -e DIRENV_STATUS
 
 # Source the hook to get __direnv_update_fish_complete_path and other functions
 direnv hook fish | source
