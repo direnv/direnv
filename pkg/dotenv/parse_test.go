@@ -521,3 +521,26 @@ func TestDotEnvEscapedQuoteMultiline(t *testing.T) {
 	envShouldContain(t, env, "MULTI", "a\"b\nc")
 	envShouldContain(t, env, "AFTER", "done")
 }
+
+// Unquoted values may contain whitespace, as in the reference implementation.
+// Surrounding whitespace and a trailing comment are not part of the value.
+// From https://github.com/direnv/direnv/issues/1441
+const TestUnquotedSpacesEnv = `API_DB_EXTRA_OPTIONS={"sslmode": "disable"}
+GREETING=hello world
+` + "PADDED =  a  b\tc  \n" + `COMMENTED=foo bar # not part of the value
+AFTER=done
+`
+
+func TestDotEnvUnquotedSpaces(t *testing.T) {
+	env, err := dotenv.Parse(TestUnquotedSpacesEnv)
+	if err != nil {
+		t.Fatal(err)
+	}
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "API_DB_EXTRA_OPTIONS", `{"sslmode": "disable"}`)
+	envShouldContain(t, env, "GREETING", "hello world")
+	envShouldContain(t, env, "PADDED", "a  b\tc")
+	envShouldContain(t, env, "COMMENTED", "foo bar")
+	envShouldContain(t, env, "AFTER", "done")
+}
