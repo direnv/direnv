@@ -130,7 +130,7 @@ func LoadConfig(env Env) (config *Config, err error) {
 	}
 
 	// Color logs unless TERM=dumb (also applies when no direnv.toml exists)
-	config.LogColor = os.Getenv("TERM") != "dumb"
+	config.LogColor = logColorEnabled()
 
 	config.RCFile = env[DIRENV_FILE]
 
