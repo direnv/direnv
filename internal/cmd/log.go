@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
 )
 
 const (
@@ -12,6 +13,12 @@ const (
 )
 
 var debugging bool
+
+// logColorEnabled reports whether direnv may print ANSI escape sequences,
+// which is the case unless TERM=dumb.
+func logColorEnabled() bool {
+	return os.Getenv("TERM") != "dumb"
+}
 
 func setupLogging(env Env) {
 	log.SetFlags(0)

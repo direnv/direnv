@@ -123,3 +123,51 @@ func TestLoadConfigLogColorRespectsTERM(t *testing.T) {
 		t.Fatalf("expected LogColor=true with toml when TERM is not dumb")
 	}
 }
+
+func captureStderr(t *testing.T, fn func()) string {
+	t.Helper()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	prev := os.Stderr
+	os.Stderr = w
+	defer func() { os.Stderr = prev }()
+	fn()
+	_ = w.Close()
+	var buf bytes.Buffer
+	if _, err := buf.ReadFrom(r); err != nil {
+		t.Fatal(err)
+	}
+	return buf.String()
+}
+
+// The error returned by a command is printed by Main, not by logError, so it
+// has to follow the same TERM rule (issue #1509).
+func TestMainErrorColorRespectsTERM(t *testing.T) {
+	// Main unsets PWD; restore it when the test is done.
+	t.Setenv("PWD", os.Getenv("PWD"))
+
+	runMain := func() string {
+		return captureStderr(t, func() {
+			if err := Main(Env{}, []string{"direnv", "no-such-command"}, "", "", ""); err == nil {
+				t.Fatal("expected an error for an unknown command")
+			}
+		})
+	}
+
+	t.Setenv("TERM", "dumb")
+	out := runMain()
+	if strings.Contains(out, "\033[") {
+		t.Fatalf("expected no escape codes when TERM=dumb, got %q", out)
+	}
+	if strings.TrimSpace(out) != `direnv: error command "direnv no-such-command" not found` {
+		t.Fatalf("unexpected output %q", out)
+	}
+
+	t.Setenv("TERM", "xterm-256color")
+	out = runMain()
+	if !strings.HasPrefix(out, errorColor) || !strings.Contains(out, clearColor) {
+		t.Fatalf("expected colored error when TERM is not dumb, got %q", out)
+	}
+}
