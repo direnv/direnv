@@ -116,6 +116,23 @@ test_start base
   unset WATCHES
 test_stop
 
+test_start base isolated
+  echo "Reloading a denied envrc (should fail)"
+  direnv deny
+  if direnv reload; then
+    echo "FAILED: direnv reload succeeded on a denied .envrc"
+    exit 1
+  fi
+
+  echo "Reloading an envrc that is not allowed yet (should fail)"
+  direnv allow
+  echo "# changed" >> .envrc
+  if direnv reload; then
+    echo "FAILED: direnv reload succeeded on a .envrc that is not allowed"
+    exit 1
+  fi
+test_stop
+
 test_start rm isolated
   direnv_eval
   test_eq "$HELLO" "world"

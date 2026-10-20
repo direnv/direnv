@@ -17,7 +17,7 @@ var CmdReload = &Cmd{
 			return fmt.Errorf(".envrc not found")
 		}
 
-		if foundRC.Allowed() == Denied {
+		if foundRC.Allowed() != Allowed {
 			return fmt.Errorf(notAllowed, foundRC.Path())
 		}
 
