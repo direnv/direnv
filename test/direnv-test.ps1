@@ -371,6 +371,11 @@ Invoke-Test "special-characters/backspace/return" -Test {
   Assert-Equal $env:HI "there"
 }
 
+# the hook runs direnv, a native command, on every directory change, even in the middle of a line
+Write-Host "## Testing the hook keeps `$LASTEXITCODE ##" -ForegroundColor Green
+$code = pwsh -NoProfile -Command "direnv hook pwsh | Out-String | Invoke-Expression; pwsh -NoProfile -Command 'exit 7'; Set-Location '$TestDir/scenarios/base'; `$LASTEXITCODE"
+Assert-Equal "7" $code
+
 #endregion
 
 Stop-TestSuite

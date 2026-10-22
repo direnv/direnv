@@ -21,10 +21,13 @@ if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -
 $hook = [EventHandler[LocationChangedEventArgs]] {
   param([object] $source, [LocationChangedEventArgs] $eventArgs)
   end {
+    # direnv is a native command, which sets $LASTEXITCODE: keep the one from before the directory change
+    $exitCode = $global:LASTEXITCODE;
     $export = (& '{{.PwshSelfPath}}' export pwsh) -join [Environment]::NewLine;
     if ($export) {
       Invoke-Expression -Command $export;
     }
+    $global:LASTEXITCODE = $exitCode;
   }
 };
 $currentAction = $ExecutionContext.SessionState.InvokeCommand.LocationChangedAction;
