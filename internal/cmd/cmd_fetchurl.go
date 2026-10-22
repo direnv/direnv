@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -48,7 +50,7 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 		}
 
 		// Shortcut if the cache already has the file
-		casFile := casPath(casDir, hash)
+		casFile := casPath(casDir, url, hash)
 		if fileExists(casFile) {
 			fmt.Println(casFile)
 			return nil
@@ -115,8 +117,8 @@ func cmdFetchURL(_ Env, args []string, config *Config) (err error) {
 		return fmt.Errorf("hash mismatch. Expected '%s' but got '%s'", integrityHash, calculatedHash.String())
 	}
 
-	// Derive the CAS file location from the SRI hash
-	casFile := casPath(casDir, calculatedHash)
+	// Derive the CAS file location from the URL and SRI hash
+	casFile := casPath(casDir, url, calculatedHash)
 
 	// Put the file into the CAS store if it's not already there
 	if !fileExists(casFile) {
@@ -156,9 +158,17 @@ func casDir(c *Config) string {
 	return filepath.Join(c.CacheDir, "cas")
 }
 
-// casPath returns filesystem path for SRI hashes
-func casPath(dir string, integrityHash *sri.Hash) string {
+// casPath returns the filesystem path for the content fetched from a URL
+// with the given SRI hash.
+//
+// The URL is mixed into the key so that the cache entry is tied to the URL
+// the content was fetched from. Keying by the SRI hash alone would silently
+// reuse the cached content when a .envrc changes the URL but keeps the old
+// integrity hash; with the URL in the key, the changed URL misses the cache,
+// the content is downloaded again and the integrity check rejects it if it
+// does not match the given hash.
+func casPath(dir string, url string, integrityHash *sri.Hash) string {
+	key := sha256.Sum256([]byte(url + "\n" + integrityHash.Hex()))
 	// Use Hex encoding for the filesystem to avoid issues
-	sriFile := integrityHash.Hex()
-	return filepath.Join(dir, sriFile)
+	return filepath.Join(dir, hex.EncodeToString(key[:]))
 }
