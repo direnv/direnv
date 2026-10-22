@@ -11,6 +11,63 @@ import (
 	"text/template"
 )
 
+func TestHookIgnoresSIGINTDuringExport(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("requires Unix signal handling")
+	}
+	for _, shellName := range []string{"bash", "zsh"} {
+		t.Run(shellName, func(t *testing.T) {
+			shellPath, err := exec.LookPath(shellName)
+			if err != nil {
+				t.Skipf("%s is not installed", shellName)
+			}
+			hook, err := DetectShell(shellName).Hook()
+			if err != nil {
+				t.Fatal(err)
+			}
+			tmpl, err := template.New("hook").Parse(hook)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var rendered bytes.Buffer
+			if err := tmpl.Execute(&rendered, HookContext{SelfPath: "__direnv_export"}); err != nil {
+				t.Fatal(err)
+			}
+			// The export stub interrupts the shell while the hook is still
+			// capturing the export output, like CTRL+C during a long load.
+			// The hook must ignore the signal so that the captured output is
+			// still evaluated; otherwise the shell abandons the hook, the
+			// updated watches in the output are lost, and the next prompt
+			// restarts the load from the beginning.
+			script := fmt.Sprintf(`
+__direnv_export() {
+  kill -INT $$
+  printf 'export hook_ran=yes\n'
+}
+%s
+hook_ran=no
+_direnv_hook
+test "$hook_ran" = yes || { echo "export output was not evaluated after SIGINT during export"; exit 1; }
+`, rendered.String())
+			args := []string{"-f", "-i"}
+			if shellName == "bash" {
+				args = []string{"--noprofile", "--norc", "-c"}
+			}
+			var command *exec.Cmd
+			if shellName == "zsh" {
+				command = exec.Command(shellPath, args...)
+				command.Stdin = strings.NewReader(script)
+			} else {
+				command = exec.Command(shellPath, append(args, script)...)
+			}
+			command.Env = append(os.Environ(), "BASH_ENV=", "ENV=", "ZDOTDIR="+t.TempDir())
+			if output, err := command.CombinedOutput(); err != nil {
+				t.Fatalf("hook failed: %v\n%s", err, output)
+			}
+		})
+	}
+}
+
 func TestHookPreservesSIGINT(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("requires Unix signal handling")
