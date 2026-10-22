@@ -47,9 +47,9 @@ func cmdEditAction(env Env, args []string, config *Config) (err error) {
 		rcPath = foundRC.path
 	}
 
-	editor := env["EDITOR"]
+	editor := editorFromEnv(env)
 	if editor == "" {
-		logError(config, "$EDITOR not found.")
+		logError(config, "$VISUAL or $EDITOR not found.")
 		editor = detectEditor(env["PATH"])
 		if editor == "" {
 			err = fmt.Errorf("could not find a default editor in the PATH")
@@ -83,6 +83,15 @@ func cmdEditAction(env Env, args []string, config *Config) (err error) {
 }
 
 // Utils
+
+// editorFromEnv returns the user's preferred editor: $VISUAL first, then
+// $EDITOR, the same order as git and other tools.
+func editorFromEnv(env Env) string {
+	if editor := env["VISUAL"]; editor != "" {
+		return editor
+	}
+	return env["EDITOR"]
+}
 
 // Editors contains a list of known editors and how to start them.
 var Editors = [][]string{
