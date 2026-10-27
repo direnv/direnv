@@ -20,6 +20,7 @@ var IgnoredKeys = map[string]bool{
 	"PS1":             true, // PS1 should not be exported, fixes problem in bash
 
 	// variables that should change freely
+	"LINENO":    true, // maintained by the shell itself, read-only in zsh
 	"OLDPWD":    true,
 	"PWD":       true,
 	"SHELL":     true,

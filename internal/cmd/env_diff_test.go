@@ -54,3 +54,28 @@ func TestIgnoredEnv(t *testing.T) {
 		t.Fail()
 	}
 }
+
+// Issue #1310
+// LINENO is maintained by the shell itself: when it is present in the
+// environment, the shell evaluating the .envrc increments and re-exports
+// it, so it always looks changed. If it lands in the diff, the hook then
+// tries to export it back into the user's shell, which zsh refuses with
+// "read-only variable: LINENO".
+func TestEnvDiffIgnoresLineno(t *testing.T) {
+	if !IgnoredEnv("LINENO") {
+		t.Fail()
+	}
+
+	before := Env{"LINENO": "5", "FOO": "a"}
+	after := Env{"LINENO": "1642", "FOO": "a"}
+
+	diff := BuildEnvDiff(before, after)
+	if len(diff.Prev) != 0 || len(diff.Next) != 0 {
+		t.Errorf("expected empty diff, got prev=%v next=%v", diff.Prev, diff.Next)
+	}
+
+	removed := BuildEnvDiff(before, Env{"FOO": "a"})
+	if len(removed.Prev) != 0 || len(removed.Next) != 0 {
+		t.Errorf("expected empty diff, got prev=%v next=%v", removed.Prev, removed.Next)
+	}
+}
