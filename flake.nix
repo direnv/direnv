@@ -120,6 +120,7 @@
               ./test
             ];
             inputs = [
+              pkgs.git
               pkgs.python3
               pkgs.uv
             ];

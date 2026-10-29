@@ -387,6 +387,11 @@ test_name global_lib_noglob
 
 test_name on_git_branch
 (
+  if ! command -v git >/dev/null 2>&1; then
+    echo "WARN: git not found, skipping on_git_branch test"
+    exit 0
+  fi
+
   workdir=$(mktemp -d "${TMPDIR:-/tmp}/direnv-on-git-branch.XXXXXX")
   trap 'rm -rf "$workdir"' EXIT
   git init -q "$workdir"
