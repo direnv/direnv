@@ -46,6 +46,9 @@ func watchDirCommand(env Env, args []string) (err error) {
 		if err != nil {
 			return err
 		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			return watches.Update(path)
+		}
 		return watches.NewTime(path, info.ModTime().Unix(), true)
 	})
 	if err != nil {
