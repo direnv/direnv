@@ -90,6 +90,33 @@ direnv allow || true
 direnv_eval
 
 test_start base
+  echo "Executing commands without a shell hook"
+  for exec_command in x exec; do
+    exec_args=("$exec_command")
+    if [[ "$exec_command" == exec ]]; then
+      exec_args+=(.)
+    fi
+
+    test_eq "$(direnv "${exec_args[@]}" sh -c 'printf %s "$HELLO"')" "world"
+    test_eq "$(direnv "${exec_args[@]}" sh -c 'printf "<%s>" "$@"' _ 'two words' '' '*' $'line\nbreak')" $'<two words><><*><line\nbreak>'
+
+    if direnv "${exec_args[@]}" sh -c 'exit 42'; then
+      echo "FAILED: command exit status was not preserved"
+      exit 1
+    else
+      test_eq "$?" "42"
+    fi
+
+    if output=$(direnv "${exec_args[@]}" 2>&1); then
+      echo "FAILED: missing command was accepted"
+      exit 1
+    else
+      test_eq "$?" "1"
+      [[ "$output" == *"missing COMMAND argument"* ]]
+    fi
+  done
+  unset exec_command exec_args output
+
   echo "Setting up"
   direnv_eval
   test_eq "$HELLO" "world"
@@ -327,6 +354,7 @@ test_start "load-env"
   echo "[global]
 load_dotenv = true" > "${XDG_CONFIG_HOME}/direnv/direnv.toml"
   direnv allow
+  test_eq "$(direnv x sh -c 'printf %s "$HELLO"')" "world"
   direnv_eval
   test_eq "${HELLO}" "world"
 test_stop

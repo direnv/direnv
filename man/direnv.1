@@ -135,6 +135,10 @@ Opens PATH_TO_RC or the current .envrc or .env into an $EDITOR and allow the fil
 Executes a command after loading the first .envrc or .env found in DIR.
 
 .TP
+\fBdirenv x COMMAND [...ARGS]\fR
+Shorthand for \fBdirenv exec . COMMAND [...ARGS]\fR, using the current directory's environment.
+
+.TP
 \fBdirenv export SHELL\fR
 Loads an .envrc or .env and prints the diff in terms of exports. Supported shells: bash, zsh, fish, tcsh, elvish, pwsh, murex, json, vim, gha (GitHub Actions), gzenv, systemd.
 
