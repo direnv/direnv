@@ -147,6 +147,9 @@ COMMANDS
 `direnv exec DIR COMMAND [...ARGS]`
 : Executes a command after loading the first .envrc or .env found in DIR.
 
+`direnv x COMMAND [...ARGS]`
+: Shorthand for `direnv exec . COMMAND [...ARGS]`, using the current directory's environment.
+
 `direnv export SHELL`
 : Loads an .envrc or .env and prints the diff in terms of exports. Supported shells: bash, zsh, fish, tcsh, elvish, pwsh, murex, json, vim, gha (GitHub Actions), gzenv, systemd.
 

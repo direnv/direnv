@@ -54,6 +54,7 @@ func init() {
 		CmdDump,
 		CmdEdit,
 		CmdExec,
+		CmdX,
 		CmdExport,
 		CmdFetchURL,
 		CmdHelp,
