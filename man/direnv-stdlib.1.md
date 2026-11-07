@@ -208,6 +208,7 @@ Example:
 ### `semver_search <directory> <folder_prefix> <partial_version>`
 
 Search a directory for the highest version number in SemVer format (X.Y.Z).
+A partial version that ends in a digit does not match a longer number: `1.4` matches `1.4.10`, but not `1.40.0`.
 
 Examples:
 
