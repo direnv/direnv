@@ -218,6 +218,7 @@ load_prefix ~/rubies/ruby-1.9.3
 
 .SS \fBsemver_search <directory> <folder_prefix> <partial_version>\fR
 Search a directory for the highest version number in SemVer format (X.Y.Z).
+A partial version that ends in a digit does not match a longer number: \fB1.4\fR matches \fB1.4.10\fR, but not \fB1.40.0\fR\&.
 
 .PP
 Examples:

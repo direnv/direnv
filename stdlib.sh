@@ -752,6 +752,8 @@ load_prefix() {
 # Usage: semver_search <directory> <folder_prefix> <partial_version>
 #
 # Search a directory for the highest version number in SemVer format (X.Y.Z).
+# A partial version that ends in a digit does not match a longer number:
+# `1.4` matches `1.4.10`, but not `1.40.0`.
 #
 # Examples:
 #
@@ -772,12 +774,15 @@ semver_search() {
   local version_dir=${1:-}
   local prefix=${2:-}
   local partial_version=${3:-}
+  local boundary=''
+  case $partial_version in *[0-9]) boundary='[!0-9]' ;; esac
   # Look for matching versions in $version_dir path
   # Strip possible "/" suffix from $version_dir, then use that to
   # strip $version_dir/$prefix prefix from line.
   # Sort by version: split by "." then reverse numeric sort for each piece of the version string
   # The first one is the highest
-  find "$version_dir" -maxdepth 1 -mindepth 1 -type d -name "${prefix}${partial_version}*" |
+  find "$version_dir" -maxdepth 1 -mindepth 1 -type d \
+    \( -name "${prefix}${partial_version}" -o -name "${prefix}${partial_version}${boundary}*" \) |
     while IFS= read -r line; do echo "${line#"${version_dir%/}"/"${prefix}"}"; done |
     sort -t . -k 1,1rn -k 2,2rn -k 3,3rn |
     head -1

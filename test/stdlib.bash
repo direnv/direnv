@@ -190,6 +190,21 @@ test_name semver_search
   assert_eq "$(semver_search "$versions" "" "1.6")"           "1.6.0"
   assert_eq "$(semver_search "$versions" "program-" "")"      "1.5.0"
   assert_eq "$(semver_search "$versions" "" "")"              "1.6.0"
+
+  mkdir "$versions/program-1.4.10"
+  mkdir "$versions/program-1.40.0"
+  mkdir "$versions/program-10.0.0"
+  mkdir "$versions/program-20.0.0"
+  mkdir "$versions/program-1.7.0-rc1"
+  mkdir "$versions/program-1.9.0rc1"
+
+  assert_eq "$(semver_search "$versions" "program-" "1.4.1")" "1.4.1"
+  assert_eq "$(semver_search "$versions" "program-" "1.4")"   "1.4.10"
+  assert_eq "$(semver_search "$versions" "program-" "1")"     "1.40.0"
+  assert_eq "$(semver_search "$versions" "program-" "2")"     ""
+  assert_eq "$(semver_search "$versions" "program-" "1.7.0")" "1.7.0-rc1"
+  assert_eq "$(semver_search "$versions" "program-" "1.7.0-rc")" "1.7.0-rc1"
+  assert_eq "$(semver_search "$versions" "program-" "1.9.0")" "1.9.0rc1"
 )
 
 test_name use_julia
