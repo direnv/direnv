@@ -111,3 +111,57 @@ done
 		})
 	}
 }
+
+// A CTRL+C while direnv export is running must interrupt direnv (and the
+// processes it started), but the shell must still evaluate the diff that the
+// failed export prints. Otherwise the next prompt starts the load over again.
+func TestHookEvaluatesExportInterruptedBySIGINT(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("requires Unix signal handling")
+	}
+	shellPath, err := exec.LookPath("bash")
+	if err != nil {
+		t.Skip("bash is not installed")
+	}
+	hook, err := Bash.Hook()
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmpl, err := template.New("hook").Parse(hook)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var rendered bytes.Buffer
+	if err := tmpl.Execute(&rendered, HookContext{SelfPath: "__direnv_export"}); err != nil {
+		t.Fatal(err)
+	}
+	script := fmt.Sprintf(`
+__direnv_export() {
+  # Like CTRL+C, the shell gets SIGINT while the export is running.
+  kill -INT "$$"
+  # The processes the export starts must still be interruptible, i.e. they
+  # must not inherit an ignored SIGINT.
+  if test -r /proc/self/status; then
+    ignored=$(sh -c 'sed -n "s/^SigIgn:[[:space:]]*//p" /proc/$$/status')
+    if (( 0x$ignored & 2 )); then child=ignored; fi
+  fi
+  printf 'export hook_ran=yes child=%%s;\n' "$child"
+  return 1
+}
+%s
+for setup in "trap - INT" "trap 'custom=yes' INT"; do
+  eval "$setup"
+  expected_traps=$(trap)
+  hook_ran=no
+  _direnv_hook
+  test "$hook_ran" = yes || { echo "export output was not evaluated ($setup)"; exit 1; }
+  test "$child" = "" || { echo "SIGINT was ignored by the export's children ($setup)"; exit 1; }
+  test "$(trap)" = "$expected_traps" || { echo "changed SIGINT trap ($setup)"; exit 1; }
+done
+`, rendered.String())
+	command := exec.Command(shellPath, "--noprofile", "--norc", "-c", script)
+	command.Env = append(os.Environ(), "BASH_ENV=", "ENV=")
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Fatalf("hook failed: %v\n%s", err, output)
+	}
+}
