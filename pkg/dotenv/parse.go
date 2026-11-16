@@ -32,7 +32,8 @@ const LINE = `
 \z
 `
 
-var linesRe = regexp.MustCompile(`[\r\n]+`)
+// Split one line ending at a time so blank lines in quoted values survive.
+var linesRe = regexp.MustCompile(`\r\n|[\r\n]`)
 var lineRe = regexp.MustCompile(
 	regexp.MustCompile(`\s+`).ReplaceAllLiteralString(
 		regexp.MustCompile(`\s+# .*`).ReplaceAllLiteralString(LINE, ""), ""))

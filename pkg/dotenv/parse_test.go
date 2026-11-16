@@ -2,6 +2,7 @@ package dotenv_test
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	dotenv "github.com/direnv/direnv/v2/pkg/dotenv"
@@ -369,6 +370,43 @@ func TestDotEnvMultiline(t *testing.T) {
 
 	envShouldContain(t, env, "MULTILINE", "line1\nline2\nline3")
 	envShouldContain(t, env, "SINGLE", "one")
+}
+
+func TestDotEnvMultilinePreservesBlankLines(t *testing.T) {
+	for _, tc := range []struct {
+		name, newline string
+	}{
+		{"LF", "\n"},
+		{"CRLF", "\r\n"},
+		{"CR", "\r"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			input := strings.Join([]string{
+				"",
+				"SINGLE='",
+				"first",
+				"",
+				"second",
+				"",
+				"'",
+				"",
+				`DOUBLE="first`,
+				"",
+				`second"`,
+				"",
+				"AFTER=ok",
+				"",
+			}, tc.newline)
+			env, err := dotenv.Parse(input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			envShouldContain(t, env, "SINGLE", "\nfirst\n\nsecond\n\n")
+			envShouldContain(t, env, "DOUBLE", "first\n\nsecond")
+			envShouldContain(t, env, "AFTER", "ok")
+			shouldNotHaveEmptyKey(t, env)
+		})
+	}
 }
 
 func TestDotEnvUnclosedQuote(t *testing.T) {
