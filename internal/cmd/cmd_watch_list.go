@@ -28,10 +28,9 @@ func watchListCommand(env Env, args []string) (err error) {
 		shellName = "bash"
 	}
 
-	shell := DetectShell(shellName)
-
-	if shell == nil {
-		return fmt.Errorf("unknown target shell '%s'", shellName)
+	shell, err := DetectShell(shellName)
+	if err != nil {
+		return err
 	}
 
 	watches := NewFileTimes()

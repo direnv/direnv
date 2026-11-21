@@ -25,7 +25,10 @@ func cmdDotEnvAction(_ Env, args []string) (err error) {
 	var target string
 
 	if len(args) > 1 {
-		shell = DetectShell(args[1])
+		shell, err = DetectShell(args[1])
+		if err != nil {
+			return err
+		}
 	} else {
 		shell = Bash
 	}

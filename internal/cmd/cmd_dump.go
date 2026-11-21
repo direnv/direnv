@@ -41,9 +41,9 @@ func cmdDumpAction(env Env, args []string) (err error) {
 		}
 	}
 
-	shell := DetectShell(target)
-	if shell == nil {
-		return fmt.Errorf("unknown target shell '%s'", target)
+	shell, err := DetectShell(target)
+	if err != nil {
+		return err
 	}
 
 	dumpStr, err := shell.Dump(env)

@@ -43,9 +43,9 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		target = args[1]
 	}
 
-	shell := DetectShell(target)
-	if shell == nil {
-		return fmt.Errorf("unknown target shell '%s'", target)
+	shell, err := DetectShell(target)
+	if err != nil {
+		return err
 	}
 
 	logDebug("loading RCs")
