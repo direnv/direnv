@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"text/template"
 )
@@ -34,9 +33,9 @@ func cmdHookAction(_ Env, args []string, config *Config) (err error) {
 
 	ctx := HookContext{config.SelfPath}
 
-	shell := DetectShell(target)
-	if shell == nil {
-		return fmt.Errorf("unknown target shell '%s'", target)
+	shell, err := DetectShell(target)
+	if err != nil {
+		return err
 	}
 
 	hookStr, err := shell.Hook()

@@ -55,12 +55,34 @@ func BenchmarkBashEscape(b *testing.B) {
 }
 
 func TestShellDetection(t *testing.T) {
-	assertNotNil(t, DetectShell("-bash"))
-	assertNotNil(t, DetectShell("-/bin/bash"))
-	assertNotNil(t, DetectShell("-/usr/local/bin/bash"))
-	assertNotNil(t, DetectShell("-zsh"))
-	assertNotNil(t, DetectShell("-/bin/zsh"))
-	assertNotNil(t, DetectShell("-/usr/local/bin/zsh"))
+	targets := []string{
+		"-bash", "-/bin/bash", "-/usr/local/bin/bash",
+		"-zsh", "-/bin/zsh", "-/usr/local/bin/zsh",
+	}
+	for name := range supportedShellList {
+		targets = append(targets, name)
+	}
+	for _, target := range targets {
+		t.Run(target, func(t *testing.T) {
+			shell, err := DetectShell(target)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assertNotNil(t, shell)
+		})
+	}
+}
+
+func TestShellDetectionRejectsUnknownShell(t *testing.T) {
+	for _, target := range []string{"unknown", "", "-", "/bin/unknown"} {
+		t.Run(target, func(t *testing.T) {
+			shell, err := DetectShell(target)
+			want := "unknown target shell '" + target + "'"
+			if shell != nil || err == nil || err.Error() != want {
+				t.Fatalf("expected nil shell and %q, got %v, %v", want, shell, err)
+			}
+		})
+	}
 }
 
 func assertNotNil(t *testing.T, a Shell) {

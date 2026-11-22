@@ -23,10 +23,9 @@ func watchDirCommand(env Env, args []string) (err error) {
 	shellName := args[1]
 	dir := args[2]
 
-	shell := DetectShell(shellName)
-
-	if shell == nil {
-		return fmt.Errorf("unknown target shell '%s'", shellName)
+	shell, err := DetectShell(shellName)
+	if err != nil {
+		return err
 	}
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {

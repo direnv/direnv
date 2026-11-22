@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"path/filepath"
+	"strings"
 )
 
 // Shell is the interface that represents the interaction with the host shell.
@@ -46,19 +48,14 @@ var supportedShellList = map[string]Shell{
 	"systemd": Systemd,
 }
 
-// DetectShell returns a Shell instance from the given target.
+// DetectShell returns a Shell instance from the given target, or an error if
+// the target is not supported.
 //
 // target is usually $0 and can also be prefixed by `-`
-func DetectShell(target string) Shell {
-	target = filepath.Base(target)
-	// $0 starts with "-"
-	if target[0:1] == "-" {
-		target = target[1:]
+func DetectShell(target string) (Shell, error) {
+	shellName := strings.TrimPrefix(filepath.Base(target), "-")
+	if shell, ok := supportedShellList[shellName]; ok {
+		return shell, nil
 	}
-
-	detectedShell, isValid := supportedShellList[target]
-	if isValid {
-		return detectedShell
-	}
-	return nil
+	return nil, fmt.Errorf("unknown target shell '%s'", target)
 }

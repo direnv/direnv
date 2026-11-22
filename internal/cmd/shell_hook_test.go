@@ -21,7 +21,11 @@ func TestHookPreservesSIGINT(t *testing.T) {
 			if err != nil {
 				t.Skipf("%s is not installed", shellName)
 			}
-			hook, err := DetectShell(shellName).Hook()
+			shell, err := DetectShell(shellName)
+			if err != nil {
+				t.Fatal(err)
+			}
+			hook, err := shell.Hook()
 			if err != nil {
 				t.Fatal(err)
 			}

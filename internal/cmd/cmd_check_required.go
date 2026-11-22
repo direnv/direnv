@@ -30,9 +30,9 @@ func cmdCheckRequiredAction(_ Env, args []string, config *Config) error {
 	}
 
 	shellName := args[1]
-	shell := DetectShell(shellName)
-	if shell == nil {
-		return fmt.Errorf("unknown target shell '%s'", shellName)
+	shell, err := DetectShell(shellName)
+	if err != nil {
+		return err
 	}
 
 	envrcPath, err := filepath.Abs(args[2])
