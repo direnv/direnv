@@ -261,9 +261,11 @@ The manifest (`pixi.toml` if present, `pyproject.toml` otherwise) and `pixi.lock
 
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
 
-### `layout pipenv`
+### `layout pipenv [<pipenv-install-args>...]`
 
 Similar to `layout python`, but uses Pipenv to build a virtualenv from the `Pipfile` located in the same directory. The path can be overridden by the `PIPENV_PIPFILE` environment variable.
+
+When creating a virtualenv, arguments are passed to `pipenv install --dev` (e.g. `layout pipenv --site-packages`).
 
 Note that unlike invoking Pipenv manually, this does not load environment variables from a `.env` file automatically. You may want to add `dotenv .env` to copy that behavior.
 

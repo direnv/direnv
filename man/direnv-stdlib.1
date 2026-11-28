@@ -268,8 +268,11 @@ The manifest (\fBpixi.toml\fR if present, \fBpyproject.toml\fR otherwise) and \f
 .SS \fBlayout perl\fR
 Setup environment variables required by perl's local::lib See http://search.cpan.org/dist/local-lib/lib/local/lib.pm for more details.
 
-.SS \fBlayout pipenv\fR
+.SS \fBlayout pipenv [<pipenv-install-args>...]\fR
 Similar to \fBlayout python\fR, but uses Pipenv to build a virtualenv from the \fBPipfile\fR located in the same directory. The path can be overridden by the \fBPIPENV_PIPFILE\fR environment variable.
+
+.PP
+When creating a virtualenv, arguments are passed to \fBpipenv install --dev\fR (e.g. \fBlayout pipenv --site-packages\fR).
 
 .PP
 Note that unlike invoking Pipenv manually, this does not load environment variables from a \fB\&.env\fR file automatically. You may want to add \fBdotenv .env\fR to copy that behavior.
