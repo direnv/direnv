@@ -24,9 +24,16 @@ func TestFishEscape(t *testing.T) {
 func TestTcshEscape(t *testing.T) {
 	assertEqual(t, `''`, (tcsh{}).escape(""))
 	assertEqual(t, `escape\'quote`, (tcsh{}).escape("escape'quote"))
-	assertEqual(t, `foo\r\n\tbar`, (tcsh{}).escape("foo\r\n\tbar"))
+	// \t, \n and \r are emitted inside double quotes, which tcsh interprets.
+	assertEqual(t, `foo"\r""\n""\t"bar`, (tcsh{}).escape("foo\r\n\tbar"))
 	assertEqual(t, `foo\ bar`, (tcsh{}).escape("foo bar"))
-	assertEqual(t, `\xc3\xa9`, (tcsh{}).escape("é"))
+	// Control and non-ASCII bytes are emitted raw inside double quotes, which
+	// tcsh passes through untouched. Each byte gets its own quoting, and tcsh
+	// concatenates the adjacent quoted parts back into the original value.
+	assertEqual(t, "\"\x06\"", (tcsh{}).escape("\x06"))
+	assertEqual(t, "\"\xc3\"\"\xa9\"", (tcsh{}).escape("é"))
+	// A double quote must not unbalance the quoting of the whole word.
+	assertEqual(t, `a\"b`, (tcsh{}).escape(`a"b`))
 }
 
 func TestPowerShellEscape(t *testing.T) {

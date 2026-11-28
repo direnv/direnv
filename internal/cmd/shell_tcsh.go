@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -60,23 +59,24 @@ func (sh tcsh) escape(str string) string {
 	i := 0
 	l := len(in)
 
-	hex := func(char byte) {
-		fmt.Fprintf(&out, "\\x%02x", char)
-	}
-
 	backslash := func(char byte) {
 		out.WriteByte(BACKSLASH)
 		out.WriteByte(char)
 	}
 
+	// tcsh interprets \t, \n and \r inside double quotes.
 	escaped := func(str string) {
+		out.WriteByte(DOUBLE_QUOTE)
 		out.WriteString(str)
+		out.WriteByte(DOUBLE_QUOTE)
 	}
 
 	quoted := func(char byte) {
-		out.WriteByte('"')
+		// Raw bytes inside double quotes pass through tcsh untouched; it is
+		// the only reliable way to emit control and non-ASCII characters.
+		out.WriteByte(DOUBLE_QUOTE)
 		out.WriteByte(char)
-		out.WriteByte('"')
+		out.WriteByte(DOUBLE_QUOTE)
 	}
 
 	literal := func(char byte) {
@@ -87,7 +87,7 @@ func (sh tcsh) escape(str string) string {
 		char := in[i]
 		switch {
 		case char == ACK:
-			hex(char)
+			quoted(char)
 		case char == TAB:
 			escaped(`\t`)
 		case char == LF:
@@ -96,8 +96,10 @@ func (sh tcsh) escape(str string) string {
 			escaped(`\r`)
 		case char == SPACE:
 			backslash(char)
+		case char == DOUBLE_QUOTE:
+			backslash(char)
 		case char <= US:
-			hex(char)
+			quoted(char)
 		case char <= AMPERSTAND:
 			quoted(char)
 		case char == SINGLE_QUOTE:
@@ -125,9 +127,9 @@ func (sh tcsh) escape(str string) string {
 		case char <= TILDE:
 			quoted(char)
 		case char == DEL:
-			hex(char)
+			quoted(char)
 		default:
-			hex(char)
+			quoted(char)
 		}
 		i++
 	}
