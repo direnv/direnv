@@ -1088,7 +1088,7 @@ layout_pipenv() {
   )
 
   if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
-    pipenv install --dev
+    pipenv install --dev "$@"
     VIRTUAL_ENV=$(pipenv --venv)
   fi
 

@@ -355,6 +355,35 @@ EOF
   [[ "$UV_PROJECT_ENVIRONMENT" == "$workdir/.venv" ]]
 )
 
+test_name layout_pipenv
+(
+  load_stdlib
+
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
+  cd "$workdir"
+  PIPENV_PIPFILE=Pipfile
+  touch "$PIPENV_PIPFILE"
+
+  pipenv() {
+    case "$1" in
+      --venv)
+        [[ -d .venv ]] || return 1
+        printf '%s\n' "$workdir/.venv"
+        ;;
+      install)
+        assert_eq "$#" 3 && assert_eq "$2" --dev && assert_eq "$3" --site-packages || return 1
+        mkdir .venv
+        ;;
+      *) return 1 ;;
+    esac
+  }
+
+  layout pipenv --site-packages
+  assert_eq "$VIRTUAL_ENV" "$workdir/.venv"
+  assert_eq "$PIPENV_ACTIVE" 1
+)
+
 test_name global_lib_noglob
 (
   # Regression test for https://github.com/direnv/direnv/issues/1610
